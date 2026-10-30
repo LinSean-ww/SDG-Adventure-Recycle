@@ -1,9 +1,14 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using Object = UnityEngine.Object;
 
 namespace M6IntegrationTests
 {
@@ -15,33 +20,198 @@ namespace M6IntegrationTests
     public sealed class C3V9VisibleIndustrialRouteTests
     {
         const string Scene="Assets/_Modules_/02_Levels/Level03/Scenes/C_Main.unity";
-        private IEnumerator Open()
+        private const float BoundsTolerance=.01f;
+        private IEnumerator Open(Action<Transform> beforePhysicsSync=null)
         {
             yield return SceneManager.LoadSceneAsync(Scene,LoadSceneMode.Single);
             yield return null;
-            Assert.IsNotNull(GameObject.Find("C3_V3_VerifiedCirculation"));
+            Transform root=CirculationRoot();
+            // Capture real pre-sync data before this one-time load boundary.
+            // autoSyncTransforms is deliberately left at the project's setting.
+            beforePhysicsSync?.Invoke(root);
+            Physics.SyncTransforms();
         }
         [UnityTest]
         public IEnumerator ReplacementStairsHaveMatchingPhysicalTreadsOnBothSides()
         {
-            yield return Open();
-            foreach (string side in new[] { "A_WEST", "B_EAST" })
+            Type layout=Type.GetType("C3TreasurePuzzle.C3V3Circulation, Assembly-CSharp");
+            Assert.IsNotNull(layout,"Missing production C3V3Circulation type");
+            int steps=LayoutConstant<int>(layout,"StairSteps");
+            Assert.AreEqual(22,steps,"V11 requires 22 treads on each of its two stairs");
+            float ground=LayoutConstant<float>(layout,"GroundSurface");
+            float rise=(LayoutConstant<float>(layout,"WalkSurface")-ground)/steps;
+            List<TreadProbe> probes=new List<TreadProbe>();
+            yield return Open(root=>
             {
-                Transform stair = GameObject.Find("STAIR_" + side).transform;
-                Assert.IsNotNull(stair);
-                for (int i = 1; i <= 22; i++)
+                Assert.IsNotNull(root.parent,"Circulation root must belong to its scene generator");
+                Assert.IsNotNull(root.parent.GetComponent(layout),"Root owner has no C3V3Circulation");
+                foreach (string side in new[] { "A_WEST", "B_EAST" })
                 {
-                    Transform tread = stair.Find("TREAD_" + i.ToString("D2"));
-                    Assert.IsNotNull(tread);
-                    Renderer renderer = tread.GetComponent<Renderer>();
-                    Collider collider = tread.GetComponent<Collider>();
-                    Assert.IsTrue(renderer.enabled && collider.enabled);
-                    Assert.Less(Vector3.Distance(renderer.bounds.center, collider.bounds.center), .01f);
-                    Assert.That(collider.bounds.max.y, Is.EqualTo(.56f + i * (3.94f / 22f)).Within(.01f));
+                    Transform stair=UniqueChild(root,"STAIR_"+side);
+                    Assert.AreEqual(steps,stair.Cast<Transform>().Count(t=>t.name.StartsWith("TREAD_")),
+                        "Expected "+steps+" treads; actual children of "+Hierarchy(stair)+"\n"+TransformChain(stair));
+                    for (int i=1;i<=steps;i++)
+                    {
+                        Transform tread=UniqueChild(stair,"TREAD_"+i.ToString("D2"));
+                        probes.Add(new TreadProbe(tread,ground+i*rise));
+                    }
                 }
+            });
+            foreach (TreadProbe probe in probes) probe.AfterSync=new TreadSnapshot(probe.Tread);
+
+            string fixedStep="not needed";
+            if (probes.Any(p=>!p.AfterSync.Matches(p.ExpectedTop)))
+            {
+                // A normal physics step can distinguish registration delay from
+                // a persistent mismatch. Never reactivate objects or change time,
+                // simulation mode, collider data or the global auto-sync flag.
+                if (probes.All(p=>p.AfterSync.StructureReady) && Time.timeScale>0f &&
+                    Time.fixedDeltaTime>0f && Physics.simulationMode==SimulationMode.FixedUpdate)
+                {
+                    fixedStep="waited one normal FixedUpdate; no second SyncTransforms";
+                    yield return new WaitForFixedUpdate();
+                    foreach (TreadProbe probe in probes) probe.AfterFixed=new TreadSnapshot(probe.Tread);
+                }
+                else fixedStep="not waited: invalid activation/components or no running automatic fixed simulation";
             }
+            foreach (TreadProbe probe in probes)
+            {
+                TreadSnapshot actual=probe.Current;
+                string evidence=probe.Evidence(fixedStep);
+                Assert.IsNotNull(actual.Renderer,evidence);
+                Assert.IsNotNull(actual.Collider,evidence);
+                Assert.IsTrue(actual.Active,evidence);
+                Assert.IsTrue(actual.RendererEnabled,evidence);
+                Assert.IsTrue(actual.ColliderEnabled,evidence);
+                Assert.IsFalse(actual.Trigger,evidence);
+                Assert.IsInstanceOf<BoxCollider>(actual.Collider,evidence);
+                Assert.IsTrue(HasVolume(actual.Visual),"Empty/non-finite Renderer bounds\n"+evidence);
+                Assert.IsTrue(HasVolume(actual.Physical),"Empty/non-finite Collider bounds\n"+evidence);
+                Assert.Less(Vector3.Distance(actual.Visual.center,actual.Physical.center),BoundsTolerance,evidence);
+                Assert.That(actual.Physical.max.y,Is.EqualTo(probe.ExpectedTop).Within(BoundsTolerance),evidence);
+            }
+            // One evidence block only when a pre-sync/post-sync anomaly occurred.
+            // Persistent problems fail above with the affected tread's snapshots.
+            TreadProbe first=probes.FirstOrDefault(p=>!p.Before.Matches(p.ExpectedTop) || !p.AfterSync.Matches(p.ExpectedTop));
+            if (first!=null) Debug.Log("V9 stair bounds diagnostic\n"+first.Evidence(fixedStep));
             Assert.IsNull(GameObject.Find("V9_RIGHT_STAIR_WALKABLE_RAMP"));
             Assert.IsNotNull(GameObject.Find("UpperChipMaintenanceBench"));
+        }
+        private static T LayoutConstant<T>(Type layout,string name)
+        {
+            FieldInfo field=layout.GetField(name,BindingFlags.Public|BindingFlags.Static);
+            Assert.IsNotNull(field,"Missing production layout constant: "+name);
+            Assert.IsTrue(field.IsLiteral,"Expected a production const: "+name);
+            return (T)field.GetRawConstantValue();
+        }
+        private static Transform CirculationRoot()
+        {
+            UnityEngine.SceneManagement.Scene loaded=SceneManager.GetSceneByPath(Scene);
+            Assert.IsTrue(loaded.IsValid() && loaded.isLoaded,"Expected loaded scene: "+Scene);
+            Transform[] roots=Object.FindObjectsByType<Transform>(FindObjectsInactive.Include,FindObjectsSortMode.None)
+                .Where(t=>t.name=="C3_V3_VerifiedCirculation").ToArray();
+            Assert.AreEqual(1,roots.Length,"Expected one circulation root across loaded scenes; actual="+
+                string.Join("; ",roots.Select(t=>t.gameObject.scene.path+":"+Hierarchy(t)+"#"+t.GetInstanceID())));
+            Transform root=roots[0];
+            Assert.AreEqual(loaded,root.gameObject.scene,"Wrong-scene circulation root\n"+TransformChain(root));
+            Assert.IsTrue(root.gameObject.activeInHierarchy,"Inactive circulation root\n"+TransformChain(root));
+            return root;
+        }
+        private static Transform UniqueChild(Transform parent,string name)
+        {
+            // Direct scoped lookup includes inactive children and rejects duplicate
+            // names, rather than borrowing an arbitrary GameObject.Find match.
+            Transform[] matches=parent.Cast<Transform>().Where(t=>t.name==name).ToArray();
+            Assert.AreEqual(1,matches.Length,"Expected one "+Hierarchy(parent)+"/"+name+
+                "; actual count="+matches.Length+"; ids="+string.Join(",",matches.Select(t=>t.GetInstanceID()))+
+                "\n"+TransformChain(parent));
+            return matches[0];
+        }
+        private static string Hierarchy(Transform item)
+        {
+            string path=item.name;
+            for (Transform parent=item.parent;parent;parent=parent.parent) path=parent.name+"/"+path;
+            return path;
+        }
+        private static string TransformChain(Transform item)
+        {
+            StringBuilder text=new StringBuilder();
+            text.AppendLine("scene="+item.gameObject.scene.name+" path="+item.gameObject.scene.path);
+            for (Transform current=item;current;current=current.parent)
+                text.AppendLine(current.name+"#"+current.GetInstanceID()+
+                    " position="+current.position.ToString("F6")+" localPosition="+current.localPosition.ToString("F6")+
+                    " lossyScale="+current.lossyScale.ToString("F6")+" rotation="+current.rotation.ToString("F6")+
+                    " localRotation="+current.localRotation.ToString("F6")+
+                    " activeSelf="+current.gameObject.activeSelf+" activeInHierarchy="+current.gameObject.activeInHierarchy);
+            return text.ToString();
+        }
+        private static bool Finite(Vector3 value) => !float.IsNaN(value.x) && !float.IsNaN(value.y) &&
+            !float.IsNaN(value.z) && !float.IsInfinity(value.x) && !float.IsInfinity(value.y) && !float.IsInfinity(value.z);
+        private static bool HasVolume(Bounds bounds) => Finite(bounds.center) && Finite(bounds.size) &&
+            bounds.size.x>0f && bounds.size.y>0f && bounds.size.z>0f;
+        private static string BoundsText(Bounds bounds) => "center="+bounds.center.ToString("F6")+
+            " size="+bounds.size.ToString("F6")+" min="+bounds.min.ToString("F6")+" max="+bounds.max.ToString("F6")+
+            " nonemptyFinite="+HasVolume(bounds);
+
+        private sealed class TreadSnapshot
+        {
+            public readonly Renderer Renderer;
+            public readonly Collider Collider;
+            public readonly Bounds Visual,Physical;
+            public readonly bool Active,RendererEnabled,ColliderEnabled,Trigger;
+            public readonly string Details;
+            public bool StructureReady => Renderer && Collider is BoxCollider && Active &&
+                RendererEnabled && ColliderEnabled && !Trigger;
+            public bool Matches(float top) => StructureReady && HasVolume(Visual) && HasVolume(Physical) &&
+                Vector3.Distance(Visual.center,Physical.center)<BoundsTolerance && Mathf.Abs(Physical.max.y-top)<=BoundsTolerance;
+            public TreadSnapshot(Transform tread)
+            {
+                Renderer=tread.GetComponent<Renderer>();
+                Collider=tread.GetComponent<Collider>();
+                Active=tread.gameObject.activeInHierarchy;
+                RendererEnabled=Renderer && Renderer.enabled;
+                ColliderEnabled=Collider && Collider.enabled;
+                Trigger=Collider && Collider.isTrigger;
+                Visual=Renderer?Renderer.bounds:default(Bounds);
+                Physical=Collider?Collider.bounds:default(Bounds);
+                BoxCollider box=Collider as BoxCollider;
+                Details="scene="+tread.gameObject.scene.name+" path="+tread.gameObject.scene.path+
+                    " hierarchy="+Hierarchy(tread)+" frame="+Time.frameCount+" fixedTime="+Time.fixedTime+
+                    " autoSyncTransforms="+Physics.autoSyncTransforms+" simulationMode="+Physics.simulationMode+
+                    " timeScale="+Time.timeScale+" fixedDeltaTime="+Time.fixedDeltaTime+"\n"+TransformChain(tread)+
+                    "Renderer exists="+(Renderer!=null)+" enabled="+RendererEnabled+" "+BoundsText(Visual)+"\n"+
+                    "Collider exists="+(Collider!=null)+" type="+(Collider?Collider.GetType().FullName:"missing")+
+                    " enabled="+ColliderEnabled+" isTrigger="+Trigger+" "+BoundsText(Physical)+"\n"+
+                    (box?"BoxCollider local center="+box.center.ToString("F6")+" size="+box.size.ToString("F6")+"\n":"")+
+                    "centerDistance="+Vector3.Distance(Visual.center,Physical.center).ToString("F9");
+            }
+        }
+        private sealed class TreadProbe
+        {
+            public readonly Transform Tread;
+            public readonly float ExpectedTop;
+            public readonly TreadSnapshot Before;
+            public TreadSnapshot AfterSync,AfterFixed;
+            public TreadSnapshot Current => AfterFixed??AfterSync;
+            public TreadProbe(Transform tread,float expectedTop)
+            {
+                Tread=tread;
+                ExpectedTop=expectedTop;
+                Before=new TreadSnapshot(tread);
+            }
+            public string Evidence(string fixedStep)
+            {
+                string result=!Before.StructureReady || !Current.StructureReady?"activation/component state invalid":
+                    !Before.Matches(ExpectedTop) && AfterSync.Matches(ExpectedTop)?"matched after SyncTransforms; supports sync-timing hypothesis for this run":
+                    AfterFixed!=null && !AfterSync.Matches(ExpectedTop) && AfterFixed.Matches(ExpectedTop)?"matched after normal FixedUpdate":
+                    !HasVolume(Current.Physical)?"empty/non-finite Collider bounds persist":
+                    !Current.Matches(ExpectedTop)?"bounds/height mismatch persists":"bounds match";
+                return Hierarchy(Tread)+" expected: active/enabled solid BoxCollider, nonempty finite bounds, centerDistance<"+
+                    BoundsTolerance+", topY="+ExpectedTop.ToString("F6")+" +/-"+BoundsTolerance+
+                    "\nclassification="+result+"; fixedStep="+fixedStep+
+                    "\nBEFORE SYNC\n"+Before.Details+"\nAFTER SYNC\n"+AfterSync.Details+
+                    "\nAFTER FIXED UPDATE\n"+(AfterFixed!=null?AfterFixed.Details:"NOT ATTEMPTED");
+            }
         }
         [UnityTest]
         public IEnumerator BReceivingBeltActuallyExistsOnCFrontFaceAndMeetsMainHighBelt()

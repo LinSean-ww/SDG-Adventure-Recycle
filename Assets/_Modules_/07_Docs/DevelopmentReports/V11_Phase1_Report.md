@@ -1,7 +1,85 @@
 # V11 Phase 1 — Safe Factory Circulation
 
-最新狀態：使用者回報基準 `bacfd3f8e99d56f242aa8fc4caf250672e1dcaf2` 在 Windows Unity 2023.1.22f1 的七項 V11 PlayMode 結果為 **6 PASS、1 FAIL**。本次針對 B／C 門口提交修正；**修正後 Unity Compilation: NOT RUN；Unity PlayMode: NOT RUN**。
-本雲端沒有可用 Unity Editor。下列靜態檢查不等於修正後的編譯、渲染、實際雙向通行或遊戲驗收通過；使用者的既有實測結果與本次未執行項目分開記錄。
+最新狀態：使用者回報 Windows Unity 2023.1.22f1 的 V9 樓梯 Bounds 測試失敗。本次以遠端最新 `5b576d7b09ee11d32f8a78844cb77235d57dbe95` 為基準，加入可驗證的初始化與分階段診斷，保留全部 44 階與 0.01m 精度。**修正後 Unity Compilation: NOT RUN；Unity PlayMode: NOT RUN**。
+本雲端沒有可用 Unity Editor；同步效果及最終根因均尚未實測。以下區分原始實際失敗、靜態來源證據與待驗證假說，不將靜態檢查當作 Unity 通過。
+
+## V9 Stair Renderer/Collider Bounds Mismatch
+
+### A. 使用者原始錯誤：CONFIRMED PLAYMODE TEST FAILURE
+
+使用者實際 Test Runner：`ReplacementStairsHaveMatchingPhysicalTreadsOnBothSides`，執行 0.163s，`C3V9VisibleIndustrialRouteTests.cs:39`：
+
+```text
+Expected: less than 0.00999999978f
+But was: 23.555521f
+M6IntegrationTests.C3V9VisibleIndustrialRouteTests+
+<ReplacementStairsHaveMatchingPhysicalTreadsOnBothSides>d__2.MoveNext()
+```
+
+此處比較的是 `Vector3.Distance(renderer.bounds.center, collider.bounds.center) < .01f`。這是已確認的原版本實測失敗，不是 PASS，也不能在缺少原始雙方 Bounds 的情況下直接認定樓梯錯位。
+
+### B. 數值與初始化來源分析
+
+依未修改的 `C3V3Circulation` 常數及 `BuildStair()` 計算，西側第一階中心理論上為 **(-23.200000, .649545, 4.025000)**；其到原點距離為 **23.555520251m**，float32 計算近似為 **23.555521011m**，吻合回報值。以上是離線推導，不是 Unity 的 Renderer／Collider 實測快照；尤其不能藉此填入「實際 Collider 中心為原點」或「實際 Bounds 尺寸為零」。
+
+靜態來源可確認：
+
+- `C3FactoryPresentation.Awake()` 先安裝 Workshop／ReferenceFactory，再以既有 `GetComponent` 防重複判斷 AddComponent<C3V3Circulation>；該元件在 Awake 同步建立 root、兩側樓梯及 44 階，沒有把建模工作延遲到 Start／Update。
+- `Box()` 透過同一個 Primitive Cube 的 Transform 執行 SetParent、SetPositionAndRotation 與 localScale，再設定材質；踏板的 Renderer 和 BoxCollider 共用該 Transform。沒有找到將新踏板 Renderer 與 Collider 各自移位的來源路徑。
+- `RetireLeaf()` 只處理舊 `C_TwoFloor_Blockout` 的精確葉路徑；新的 TREAD 不在其中。`Visual()` 只處理八個既有裝飾設備，沒有用它建立新踏板。新 root 在 OnDestroy 才被停用並清理。
+- 專案 `DynamicsManager.asset` 的序列化 `m_AutoSyncTransforms: 0`、`m_AutoSimulation: 1`；舊 V9 Open 只等待 LoadSceneAsync 與一個 render frame，沒有明確的物理同步／固定物理步驟邊界。等待一個 render frame 不保證已完成一次物理更新。原 V11 初始化／行走測試已有針對原角色重新定位的明確 SyncTransforms。
+- 原 V9 的 `GameObject.Find(...).transform` 在 Assert 前就可能 NullReference；全域同名搜尋也沒有檢查場景、重複 root、祖先啟用狀態或空 Bounds。這些診斷缺口是可由程式碼確認的問題。
+
+### C. 同步前後比較：全部 NOT RUN
+
+| 項目 | 同步前 | Physics.SyncTransforms 後 | 必要時一次 FixedUpdate 後 |
+| --- | --- | --- | --- |
+| Renderer Bounds 中心 | NOT RUN | NOT RUN | NOT RUN |
+| Collider Bounds 中心 | NOT RUN | NOT RUN | NOT RUN |
+| Collider Bounds 尺寸 | NOT RUN | NOT RUN | NOT RUN |
+| 中心距離 | NOT RUN | NOT RUN | NOT RUN |
+
+沒有本環境的 Unity 測量值；同步是否有效、是否實際需要 FixedUpdate 都是 **NOT VERIFIED**。
+
+### D. 根因判定
+
+- **CONFIRMED**：使用者原測試回報 23.555521m 差異；舊初始化缺少明確物理同步，且啟用／空 Bounds／同名物件檢查不足。來源顯示踏板共用 Transform，尚無來源證據需要改動生成器。
+- **LIKELY**：初始物理註冊／Transform 同步時機是合理的優先假說，根據為 auto-sync 設定、render-frame 等待及上述到原點距離的吻合；這不是已證實的根因。
+- **NOT VERIFIED**：原 Collider 是否真的在原點、是否為空 Bounds、是否有祖先未啟用、runtime 同名重複生成器、其他物件後續改動、真正的世界 Transform 異常，以及同步／固定步驟能否解決。必須由下述實測快照確認；不能把全部可能性直接歸為 SyncTransforms。
+
+### E. 最小修正及診斷行為
+
+只修改 `C3V9VisibleIndustrialRouteTests.cs` 與本報告：
+
+1. 共用 `Open(Action<Transform> beforePhysicsSync=null)` 在原場景載入及 render-frame 等待後，核對當前 C_Main 已載入、跨已載入場景只有一個 circulation root、root 屬於正確場景且啟用。樓梯測試額外確認 root 的父物件有原生成器；用 scoped／包含 inactive 的子物件查找，拒絕重名，避免取得錯誤物件或在 Assert 前 NullReference。
+2. 樓梯測試在 Open 的 callback 先保存全部 44 階的真實 Renderer.bounds／Collider.bounds 與狀態，然後 Open **每次載入只呼叫一次 Physics.SyncTransforms**；返回後重新讀取相同踏板。其餘四項 V9 測試方法內容逐位元不變，但共用 Open 也得到這個明確物理查詢邊界。原角色測試在定位後的既有同步保留，沒有在每一階重複同步。
+3. 若同步後仍不符，只有在元件／啟用／實體 BoxCollider 狀態有效、timeScale>0、fixedDeltaTime>0 且 simulationMode=FixedUpdate 時，才等待**一次正常 WaitForFixedUpdate**再取快照；不額外同步、不自行 Simulate、不改時間或 Physics 全域旗標。不具備正常物理步驟條件就直接保留失敗診斷，避免已暫停時盲等。
+4. 每個快照包含 Scene 名稱／路徑、STAIR／TREAD 完整階層與 instance ID、物件及所有祖先的世界／局部位置、旋轉、lossyScale、activeSelf／activeInHierarchy；Renderer／Collider 是否存在、啟用、Collider 類型／Trigger；雙方 Bounds 中心／尺寸／min／max、距離與空／非有限值分類；BoxCollider 局部 center／size；autoSyncTransforms、simulationMode、frame／fixedTime／timeScale／fixedDeltaTime。
+5. 保留西側 22 階、東側 22 階、每階存在性、啟用、真實中心距離 **<.01m**、真實 Collider 頂面 **±.01m**、舊 ramp 不存在及原維修桌存在的斷言，另要求 activeInHierarchy、非 Trigger、BoxCollider 及有效非零 Bounds。階數／高度從原生成器的 public const 反射讀取（原 asmdef 不引用 Assembly-CSharp），另保留每側必須 22 階的設計約束；不重複硬編碼階高。
+6. 正常且未觀察到異常時不輸出 Log；若初始化曾異常但最終對齊，只對第一個異常踏板輸出一份三階段快照。持續不符就由第一個失敗斷言攜帶該階的完整證據，分類為啟用／元件無效、空 Bounds 持續或真正仍不符。`matched after SyncTransforms` 只在同一踏板前不符、後符合的當次觀察下輸出；它支持同步假說，不宣稱已證明所有歷史問題。
+
+沒有改動 `C3V3Circulation.cs`、`C_Main.unity`、完整七項 V11、原玩家／工作台／晶片／背包／武器／護欄／輸送設備／PVC 條簾，也沒有移動物件、改 Collider 中心或尺寸、強制啟用物件、放寬容差、修改 global auto-sync／套件／asmdef／meta。
+
+### 本次檢查與分階段驗收
+
+| 檢查 | 結果 |
+| --- | --- |
+| C# AST 語法、基本 return／yield 掃描 | PASS：106 檔、843 方法、97 個具體 IEnumerator；非完整編譯／型別分析 |
+| Git diff --check | PASS |
+| 44 階、.01 容差、真實 Bounds／頂面斷言與前後快照順序 | PASS（靜態） |
+| scoped lookup、null 防護、反射 const 名稱／型別、無全域物理寫入 | PASS（來源核對，尚未在 Unity 呼叫） |
+| 五項 V9／七項 V11、其餘四項 V9 內容與受保護檔案保留 | PASS（相對 5b576d7 逐位元／AST 比較）；沒有新增 Ignore／Explicit |
+| Unity Compilation | **NOT RUN** |
+| 單項 V9 樓梯測試 | **NOT RUN** |
+| 全部五項 V9 | **NOT RUN** |
+| 全部七項 V11 | **NOT RUN** |
+| 玩家實際樓梯通行、護欄／工作桌／晶片、PVC 及 B／C 雙向通行 | **NOT RUN** |
+
+驗收依序：關閉 Unity → GitHub Desktop 確認 `feature/v11-factory-rebuild` → Fetch origin → Pull origin → History 核對本次新提交 → 重開 Unity 2023.1.22f1，先排除紅色編譯錯誤 → 單跑 V9 樓梯測試，保留任何三階段診斷 → 單項通過後跑全部五項 V9，再跑全部七項 V11 → 玩家走西梯、後方平台、維修桌拿晶片、東梯下樓，反向再走並驗證護欄防墜、PVC／進料及 B／C 雙向通行 → 將 Test Runner／Console／人工結果交 ChatGPT 審查。
+
+仍待確認根因與實際修正效果。保持原 PR #2 為 Draft；不新建分支／PR、不修改或合併 main、不 force push。這次可驗證程式交付不等於 Unity 驗收通過；先前版本的 PASS 不沿用到本次提交。
+
+以下 B／C 修正與更早內容為歷史記錄：原 bacfd3f 的 V11 結果為使用者回報 6 PASS、1 FAIL，5b576d7 的 PVC／通行修正驗收仍待回報。
 
 ## B／C 通道修正：CONFIRMED PLAYMODE FAILURE
 
