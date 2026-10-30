@@ -30,6 +30,8 @@ namespace C3TreasurePuzzle
             public bool ProductCreated { get; internal set; }
             public string BatchId { get; internal set; }
             public EcoRecycleCargo Cargo { get; internal set; }
+            internal Transform Visual;
+            internal Vector3 VisualScale;
             public int Units => 1;
             public readonly List<C3MaterialState> History=new List<C3MaterialState>();
             internal TransportPath Path;
@@ -44,8 +46,10 @@ namespace C3TreasurePuzzle
             public Transform Product { get; internal set; }
             public bool OutputReached { get; internal set; }
             public bool Collected { get; internal set; }
+            public int CurrentRouteSegment { get; internal set; }
             internal TransportPath Path;
             internal float Distance;
+            internal float OutputDistance;
         }
         internal sealed class Leg
         {
@@ -58,6 +62,7 @@ namespace C3TreasurePuzzle
         {
             public readonly List<Leg> Legs=new List<Leg>();
             public Vector3 EntranceNormal=Vector3.up,ExitNormal=Vector3.up;
+            public Vector3 ExitForward;
             public float Length => Legs.Sum(s=>s.Length);
             public void Add(C3ConveyorSection section) => Legs.Add(new Leg {
                 A=section.Start.position,B=section.End.position,Support=section.Surface });
@@ -72,7 +77,13 @@ namespace C3TreasurePuzzle
                 Vector3 next=segment<Legs.Count-1?Legs[segment+1].Normal:ExitNormal;
                 Vector3 n0=(previous+leg.Normal).normalized,n1=(next+leg.Normal).normalized;
                 Vector3 up=Vector3.Slerp(n0,n1,t).normalized;
-                Vector3 forward=Vector3.ProjectOnPlane(leg.B-leg.A,up).normalized;
+                Vector3 direction=(leg.B-leg.A).normalized;
+                Vector3 previousDirection=segment>0?(Legs[segment-1].B-Legs[segment-1].A).normalized:direction;
+                Vector3 nextDirection=segment<Legs.Count-1?(Legs[segment+1].B-Legs[segment+1].A).normalized:
+                    (ExitForward.sqrMagnitude>.1f?ExitForward:direction);
+                Vector3 forward0=(previousDirection+direction).normalized;
+                Vector3 forward1=segment==Legs.Count-1 && ExitForward.sqrMagnitude>.1f?ExitForward:(direction+nextDirection).normalized;
+                Vector3 forward=Vector3.ProjectOnPlane(Vector3.Slerp(forward0,forward1,t),up).normalized;
                 if (forward.sqrMagnitude<.1f) forward=Vector3.forward;
                 Quaternion rotation=Quaternion.LookRotation(forward,up);
                 float extent=radius;
@@ -92,6 +103,7 @@ namespace C3TreasurePuzzle
             public bool Processing;
             public float Elapsed;
             public int Completed;
+            public FinishedBatch Prepared;
         }
         private C3DeviceState device;
         private C3RecyclingLineGeometry geometry;
@@ -104,6 +116,9 @@ namespace C3TreasurePuzzle
         private float releaseClock;
         private string runId;
         private EcoRecycleCargo.Kind lastCompleted=EcoRecycleCargo.Kind.Plastic;
+        public static readonly Vector3 ProductSize=new Vector3(.52f,.42f,.50f);
+        public event Action<string> BatchCompleted;
+        public string LastBlockedReason { get; private set; }="";
         public IReadOnlyList<MaterialRecord> Materials => records;
         public IReadOnlyList<FinishedBatch> Products => batches;
         public int AcceptedUnits => records.Count;
@@ -182,6 +197,8 @@ namespace C3TreasurePuzzle
             cargo.transform.SetParent(cargoRoot,true);
             MaterialRecord record=new MaterialRecord {MaterialId=cargo.materialId,MaterialType=cargo.materialType,
                 TargetMachine=MachineIndex(cargo.materialType),Cargo=cargo,State=C3MaterialState.Spawned};
+            record.Visual=cargo.GetComponentInChildren<Renderer>(true).transform;
+            record.VisualScale=record.Visual.localScale;
             record.History.Add(record.State);
             record.Path=new TransportPath {ExitNormal=geometry.Machines[record.TargetMachine].Chute.Normal};
             foreach (C3ConveyorSection section in geometry.CommonSections) record.Path.Add(section);
@@ -241,8 +258,8 @@ namespace C3TreasurePuzzle
                     r.State==C3MaterialState.Diverting && r.Distance<geometry.Machines[lane].Chute.Length);
                 geometry.SetDiverter(lane,atGate!=null?atGate.Distance/geometry.Machines[lane].Chute.Length:0f);
             }
-            TickMachines(dt);
             TickProducts(dt);
+            TickMachines(dt);
             geometry.AnimateRollers(dt);
         }
         private static bool OnPrimary(MaterialRecord record) => record.State==C3MaterialState.Feeding ||
@@ -263,11 +280,111 @@ namespace C3TreasurePuzzle
             record.Path=new TransportPath {EntranceNormal=geometry.MainBelt.Normal};
             foreach (C3ConveyorSection section in model.InputSections) record.Path.Add(section);
             record.Path.Legs.Add(new Leg {A=model.Tray.position,
-                B=model.Tray.position+new Vector3((slot-1)*.32f,0f,-.25f),Support=model.ProcessBed});
+                B=model.Tray.position+new Vector3((slot-1)*.32f,0f,.25f),Support=model.ProcessBed});
             record.Distance=0f; Transition(record,C3MaterialState.Diverting); PlaceRaw(record);
         }
-        private void TickMachines(float dt) { /* Processing milestone supplies the batch transaction. */ }
-        private void TickProducts(float dt) { /* Processing milestone supplies the output transport. */ }
+        private void TickMachines(float dt)
+        {
+            for (int lane=0;lane<work.Length;lane++)
+            {
+                MachineWork machine=work[lane];
+                if (!machine.Processing && machine.Slots.All(r=>r!=null && r.State==C3MaterialState.MachineInput))
+                {
+                    if (machine.Slots.Any(r=>r.TargetMachine!=lane || MachineIndex(r.MaterialType)!=lane))
+                        throw new InvalidOperationException("Wrong material in processing machine "+lane);
+                    machine.Processing=true; machine.Elapsed=0f;
+                    foreach (MaterialRecord record in machine.Slots) Transition(record,C3MaterialState.Processing);
+                }
+                if (!machine.Processing) continue;
+                machine.Elapsed=Mathf.Min(ProcessingSeconds,machine.Elapsed+dt);
+                float t=machine.Elapsed/ProcessingSeconds;
+                geometry.SetPress(lane,Mathf.Sin(Mathf.PI*t));
+                foreach (MaterialRecord record in machine.Slots)
+                {
+                    float squash=Mathf.Lerp(1f,.4f,Mathf.Clamp01(t*2f));
+                    record.Visual.localScale=Vector3.Scale(record.VisualScale,new Vector3(1f,squash,1f));
+                    record.Cargo.transform.rotation=Quaternion.identity;
+                    record.Cargo.transform.position=geometry.Machines[lane].Tray.position+
+                        new Vector3((record.Slot-1)*.32f,C3RecyclingLineGeometry.RawRadius*squash,.25f);
+                }
+                if (machine.Elapsed<ProcessingSeconds) continue;
+                if (machine.Prepared==null) machine.Prepared=PrepareProduct(lane,machine);
+                EcoAdventureRuntime runtime=EcoAdventureRuntime.Instance;
+                FinishedBatch batch=machine.Prepared;
+                if (!runtime || !runtime.TryCommitRecyclingBatch(batch.BatchId,batch.MaterialType,batch.SourceMaterialIds))
+                {
+                    LastBlockedReason="Processing receipt rejected; no output or duplicate credit emitted: "+batch.BatchId;
+                    continue;
+                }
+                foreach (MaterialRecord record in machine.Slots)
+                {
+                    record.Counted=record.ProcessingComplete=record.ProductCreated=true;
+                    record.BatchId=batch.BatchId; record.Cargo.processed=true;
+                    Transition(record,C3MaterialState.OutputReady);
+                    record.Cargo.gameObject.SetActive(false);
+                }
+                batch.Product.gameObject.SetActive(true); batches.Add(batch);
+                lastCompleted=batch.MaterialType; machine.Completed++;
+                machine.Processing=false; machine.Elapsed=0f; machine.Prepared=null;
+                Array.Clear(machine.Slots,0,machine.Slots.Length);
+                geometry.SetPress(lane,0f); LastBlockedReason="";
+                BatchCompleted?.Invoke(batch.BatchId);
+            }
+        }
+        private FinishedBatch PrepareProduct(int lane,MachineWork machine)
+        {
+            string id=runId+"/"+lane+"/"+machine.Completed;
+            GameObject item=new GameObject("P2_FINISHED_"+machine.Slots[0].MaterialType+"_"+id);
+            item.transform.SetParent(cargoRoot,false); item.SetActive(false);
+            GameObject body=GameObject.CreatePrimitive(PrimitiveType.Cube);
+            body.name=lane==0?"PAPER_COMPRESSED_BALE":lane==1?"METAL_COMPRESSED_BLOCK":"PLASTIC_COMPRESSED_BALE";
+            body.transform.SetParent(item.transform,false); body.transform.localScale=ProductSize;
+            body.GetComponent<Renderer>().sharedMaterial=geometry.MaterialFor(lane);
+            Collider c=body.GetComponent<Collider>(); c.enabled=false; Destroy(c);
+            int straps=lane==1?1:2;
+            for (int i=0;i<straps;i++)
+            {
+                GameObject band=GameObject.CreatePrimitive(PrimitiveType.Cube);
+                band.name=lane==1?"METAL_PRESS_SEAM":"BALE_BINDING";
+                band.transform.SetParent(item.transform,false);
+                band.transform.localPosition=new Vector3(straps==1?0f:(i==0?-.16f:.16f),0f,0f);
+                band.transform.localScale=new Vector3(.025f,.43f,.51f);
+                band.GetComponent<Renderer>().sharedMaterial=geometry.BindingMaterial;
+                Collider collider=band.GetComponent<Collider>(); collider.enabled=false; Destroy(collider);
+            }
+            FinishedBatch batch=new FinishedBatch {BatchId=id,MaterialType=machine.Slots[0].MaterialType,
+                SourceMaterialIds=machine.Slots.Select(r=>r.MaterialId).ToArray(),Product=item.transform,
+                Path=new TransportPath {ExitForward=Vector3.back}};
+            foreach (C3ConveyorSection section in geometry.Machines[lane].OutputSections) batch.Path.Add(section);
+            batch.OutputDistance=batch.Path.Legs.Take(2).Sum(s=>s.Length);
+            Leg last=batch.Path.Legs[batch.Path.Legs.Count-1];
+            last.B+=new Vector3((machine.Completed-1)*.65f,0f,0f);
+            int segment;
+            batch.Path.Place(item.transform,0f,0f,ProductSize,out segment);
+            return batch;
+        }
+        private void TickProducts(float dt)
+        {
+            foreach (FinishedBatch batch in batches)
+            {
+                if (batch.Collected) continue;
+                batch.Distance=Mathf.Min(batch.Path.Length,batch.Distance+2f*dt);
+                int segment;
+                batch.Path.Place(batch.Product,batch.Distance,0f,ProductSize,out segment);
+                batch.CurrentRouteSegment=segment;
+                MaterialRecord[] source=records.Where(r=>r.BatchId==batch.BatchId).ToArray();
+                foreach (MaterialRecord record in source) record.CurrentRouteSegment=segment;
+                if (!batch.OutputReached && batch.Distance>=batch.OutputDistance)
+                {
+                    batch.OutputReached=true;
+                    foreach (MaterialRecord record in source) Transition(record,C3MaterialState.Outfeeding);
+                }
+                if (batch.Distance<batch.Path.Length-.0001f) continue;
+                batch.Collected=true;
+                foreach (MaterialRecord record in source) Transition(record,C3MaterialState.Collected);
+                BoxCollider collider=batch.Product.gameObject.AddComponent<BoxCollider>(); collider.size=ProductSize;
+            }
+        }
         private void OnDestroy()
         {
             if (cargoRoot) { cargoRoot.gameObject.SetActive(false); Destroy(cargoRoot.gameObject); }

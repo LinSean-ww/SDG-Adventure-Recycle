@@ -14,7 +14,7 @@ namespace C3TreasurePuzzle
             public Transform Root,Intake,Tray,Output,Collection,Press,Pusher;
             public Renderer Indicator;
             public BoxCollider ProcessBed;
-            public C3ConveyorSection Chute,IntakeRamp,InternalOutput,Outfeed,CollectionBed;
+            public C3ConveyorSection Chute,IntakeRamp,DischargeBed,InternalOutput,Outfeed,CollectionBed;
             public readonly List<C3ConveyorSection> InputSections=new List<C3ConveyorSection>();
             public readonly List<C3ConveyorSection> OutputSections=new List<C3ConveyorSection>();
         }
@@ -163,10 +163,13 @@ namespace C3TreasurePuzzle
                 machine.Chute=Section("V3_CONNECTED_DIVERT_TO_HOPPER_"+lane,main,intake,1.25f);
                 machine.IntakeRamp=Section("P2_INTAKE_RAMP_"+lane,intake,tray,1.25f);
                 machine.InputSections.Add(machine.Chute); machine.InputSections.Add(machine.IntakeRamp);
-                machine.InternalOutput=Section("P2_INTERNAL_OUTPUT_"+lane,tray,output,1.55f);
+                Vector3 bedEdge=tray+Vector3.back*.5f;
+                machine.DischargeBed=Section("P2_DISCHARGE_BED_"+lane,tray,bedEdge,1.55f);
+                machine.InternalOutput=Section("P2_INTERNAL_OUTPUT_"+lane,bedEdge,output,1.55f);
                 machine.Outfeed=Section("CONNECTED_LOWER_OUTFEED_"+lane,output,new Vector3(x,1.25f,9.8f),1.55f);
                 machine.CollectionBed=Section("P2_COLLECTION_BED_"+lane,machine.Outfeed.End.position,collection,2.4f);
-                machine.OutputSections.Add(machine.InternalOutput); machine.OutputSections.Add(machine.Outfeed); machine.OutputSections.Add(machine.CollectionBed);
+                machine.OutputSections.Add(machine.DischargeBed); machine.OutputSections.Add(machine.InternalOutput);
+                machine.OutputSections.Add(machine.Outfeed); machine.OutputSections.Add(machine.CollectionBed);
                 machine.ProcessBed=Box("PROCESS_BED",tray-Vector3.up*.09f,new Vector3(1.5f,.18f,1.0f),steel,machine.Root).GetComponent<BoxCollider>();
                 machine.Press=Box("COMPRESSION_PRESS",tray+Vector3.up*1.25f,new Vector3(1.25f,.22f,.85f),yellow,machine.Root,false).transform;
                 for (int leg=0;leg<2;leg++)
@@ -181,6 +184,7 @@ namespace C3TreasurePuzzle
                 foreach (Material m in r.sharedMaterials) if (m && !materials.Contains(m)) materials.Add(m);
         }
         public Material MaterialFor(int machine) => types[machine];
+        public Material BindingMaterial => steel;
         public void AnimateRollers(float dt)
         {
             foreach (Transform roller in rollers) roller.Rotate(Vector3.up,180f*dt,Space.Self);
@@ -206,6 +210,7 @@ namespace C3TreasurePuzzle
             {
                 if (Vector3.Distance(m.Chute.End.position,m.IntakeRamp.Start.position)>tolerance) return false;
                 if (Vector3.Distance(m.InternalOutput.End.position,m.Outfeed.Start.position)>tolerance) return false;
+                if (Vector3.Distance(m.DischargeBed.End.position,m.InternalOutput.Start.position)>tolerance) return false;
                 if (Vector3.Distance(m.Outfeed.End.position,m.CollectionBed.Start.position)>tolerance) return false;
             }
             foreach (C3ConveyorSection s in Sections)

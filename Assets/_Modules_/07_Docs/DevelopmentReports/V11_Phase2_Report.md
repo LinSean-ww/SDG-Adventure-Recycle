@@ -12,7 +12,7 @@
 | --- | --- | --- |
 | 2.1 高位入口／局部牆洞／完整機械路線 | 已實作 | NOT RUN |
 | 2.2 統一物料狀態與資料相容 | 已實作運輸／識別／輸入佇列；加工交易在 2.3 | NOT RUN |
-| 2.3 三類加工／守恆／出口 | 待實作 | NOT RUN |
+| 2.3 三類加工／守恆／出口 | 已實作 | NOT RUN |
 | 2.4 支柱／管線／回歸 | 待實作 | NOT RUN |
 
 ## 2.1 設備
@@ -38,6 +38,18 @@
 內建測試供料只有 9 件（每類 3 件）、每次新場景不同 ID，且明示是 C 側有限演示，不是 B 通關。每機最多接收 9 件／3 捆，滿載時拒絕並保留上游物料，不持續無限生成。外部 TryAcceptCargo 只接受位於高位接口、1 單位、小型標準姿態、沒有啟用實體碰撞或動態 Rigidbody 的物料；拒絕時不修改上游物件。Dormant／Starting 不運輸、不加工；Completed 僅排空既有物料，不接新料。停用／重啟不重新播種，暫停時不前進。
 
 ## 驗證狀態
+
+## 2.3 加工、成品與守恆
+
+每個可視原料球代表 1 個投入單位，必須 3 個同類單位實際抵達該機的三個加工床位，才啟動 2.5 秒壓縮週期。壓頭依加工進度下壓／回升，原料同步變形；加工完成後才準備對應紙捆／金屬壓塊／塑膠捆。成品保留唯一 BatchId 與三個 SourceMaterialIds；這是 3→1 製造轉換，不是用不同物件假裝同一件原料。
+
+Runtime 以原料 ID 與批次 ID 原子提交、拒絕重複及錯誤類型，然後才顯示成品並發布一次 BatchCompleted。分類只解鎖原取料點，沒有 AddItem 自動放入背包。原料記錄完整經過 Spawned→Feeding→MainBelt→Identified→Diverting→MachineInput→Processing→OutputReady→Outfeeding→Collected。成品在原加工床形成，經水平出料床、機內斜帶、真實前方出口、各自下帶與收集床，沒有跳至出口。滿載每機最多 3 捆，有明確背壓，沒有循環無限生成。
+
+統計定義：AcceptedUnits = WaitingUnits + ProcessingUnits + ProcessedUnits；ProcessedUnits = 3 × ProcessedBatches；CollectedProducts ≤ OutputProducts ≤ ProcessedBatches。WaitingUnits 包含尚未釋放的 Spawned 以及運輸／機台等待；FedUnits 為已正式釋放上帶的單位。OutputProducts 僅在越過真正 MACHINE_OUTPUT 節點後增加；CollectedProducts 僅在到達對應收集格後增加。
+
+Receipt ledger 在同一個持久 Runtime 的場景重載間保留，拒絕已完成上游 ID 重播；未完成物料由上游重試，沒有偽造已完成收據。C_Main 重載仍沿用原規則重置本關材料解鎖計數，不清背包／彈藥／快捷欄。ledger 上限 4095 單位，容量不足拒收而不淘汰去重紀錄。此為本次執行期間的防重播，不宣稱已有跨程式重啟的存檔系統。
+
+## 驗證狀態（本提交）
 
 AST 語法與 Scene YAML 結構檢查已執行，非 Unity 編譯。Unity Compilation: NOT RUN；Unity PlayMode: NOT RUN；Manual Gameplay: NOT RUN。本環境沒有可用 Unity Editor。
 
