@@ -12,6 +12,7 @@ namespace M6IntegrationTests
 {
     // This asmdef deliberately does not reference Assembly-CSharp; use the same
     // reflection boundary as the existing C3 integration tests. No new packages.
+    [NonParallelizable]
     public sealed class C3V11SafeCirculationTests
     {
         private const string ScenePath = "Assets/_Modules_/02_Levels/Level03/Scenes/C_Main.unity";
@@ -21,16 +22,113 @@ namespace M6IntegrationTests
         private Camera camera;
         private MethodInfo tick;
         private const BindingFlags AnyInstance = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+        private Component previousRuntime, inputService;
+        private bool previousRuntimeEnabled, previousHandlerDetached, inventoryScopeActive, globalsCaptured, factoryOwned;
+        private GameObject inventoryHost;
+        private PropertyInfo singleton;
+        private UnityEngine.Events.UnityAction<Scene, LoadSceneMode> previousSceneListener;
+        private object previousInputContext;
+        private bool previousSprintToggled, previousCrouchToggled;
+        private float previousTimeScale;
+        private CursorLockMode previousCursorLock;
+        private bool previousCursorVisible, hadViewPreference;
+        private int previousViewPreference;
+        private string previousInventory, previousSlots;
+        private bool previousPowered;
+        private C3V11CollisionRecorder contacts;
+        private const string ViewPreferenceKey = "SDGAdventure.Player.ViewMode.v1";
+
         private static Type RuntimeType(string name) => Type.GetType(name + ", Assembly-CSharp", true);
         private static Component Find(string name) => Object.FindObjectOfType(RuntimeType(name)) as Component;
+        private static MethodInfo Method(Type type, string name, params Type[] parameterTypes)
+        {
+            MethodInfo method = type.GetMethod(name, AnyInstance, null, parameterTypes, null);
+            Assert.IsNotNull(method, type.FullName + "." + name + " signature changed");
+            return method;
+        }
         private static object Call(Component item, string name, params object[] args)
-            => item.GetType().GetMethod(name, AnyInstance).Invoke(item, args);
-        private static object Property(Component item, string name) => item.GetType().GetProperty(name).GetValue(item);
-        private static object Field(Component item, string name) => item.GetType().GetField(name, AnyInstance).GetValue(item);
+        {
+            Assert.IsNotNull(item, "Missing receiver for " + name);
+            return Method(item.GetType(), name, args.Select(a => a.GetType()).ToArray()).Invoke(item, args);
+        }
+        private static object Property(Component item, string name)
+        {
+            Assert.IsNotNull(item, "Missing receiver for " + name);
+            PropertyInfo property = item.GetType().GetProperty(name, AnyInstance);
+            Assert.IsNotNull(property, item.GetType().FullName + "." + name + " property changed");
+            return property.GetValue(item);
+        }
+        private static object Field(Component item, string name)
+        {
+            Assert.IsNotNull(item, "Missing receiver for " + name);
+            FieldInfo field = item.GetType().GetField(name, AnyInstance);
+            Assert.IsNotNull(field, item.GetType().FullName + "." + name + " field changed");
+            return field.GetValue(item);
+        }
+        private static string InventoryFingerprint(Component owner) => string.Join("|",
+            ((IEnumerable)Field(owner, "inventory")).Cast<object>().Select(entry => JsonUtility.ToJson(entry)));
+        private static string SlotsFingerprint(Component owner) => string.Join("|", (string[])Field(owner, "quickSlots"));
 
         [UnitySetUp]
         public IEnumerator OpenFactory()
         {
+            // NUnit can reuse the fixture instance, including after a failed setup.
+            runtime = null;
+            inventoryHost = null;
+            previousRuntime = null;
+            previousSceneListener = null;
+            inputService = null;
+            previousInputContext = null;
+            previousHandlerDetached = inventoryScopeActive = factoryOwned = false;
+            previousTimeScale = Time.timeScale;
+            previousCursorLock = Cursor.lockState;
+            previousCursorVisible = Cursor.visible;
+            hadViewPreference = PlayerPrefs.HasKey(ViewPreferenceKey);
+            previousViewPreference = PlayerPrefs.GetInt(ViewPreferenceKey);
+            globalsCaptured = true;
+            Time.timeScale = 1f;
+
+            Type inputType = Type.GetType("SDGAdventure.SharedPlayer.PlayerInputService, SDGAdventure.SharedPlayer", true);
+            inputService = inputType.GetProperty("Instance").GetValue(null) as Component;
+            if (inputService)
+            {
+                previousInputContext = Property(inputService, "Context");
+                previousSprintToggled = (bool)Field(inputService, "sprintToggled");
+                previousCrouchToggled = (bool)Field(inputService, "crouchToggled");
+            }
+
+            // Suspend, never destroy, the pre-existing persistent inventory BEFORE
+            // loading C_Main: its sceneLoaded handler also resets sorting state.
+            Type runtimeType = RuntimeType("EcoAdventureRuntime");
+            singleton = runtimeType.GetProperty("Instance", BindingFlags.Static | BindingFlags.Public);
+            Assert.IsNotNull(singleton);
+            Assert.IsNotNull(singleton.GetSetMethod(true), "Inventory singleton setter changed");
+            previousRuntime = singleton.GetValue(null) as Component;
+            if (previousRuntime)
+            {
+                previousRuntimeEnabled = ((Behaviour)previousRuntime).enabled;
+                previousInventory = InventoryFingerprint(previousRuntime);
+                previousSlots = SlotsFingerprint(previousRuntime);
+                previousPowered = (bool)Field(previousRuntime, "factoryPowered");
+                previousSceneListener = (UnityEngine.Events.UnityAction<Scene, LoadSceneMode>)Delegate.CreateDelegate(
+                    typeof(UnityEngine.Events.UnityAction<Scene, LoadSceneMode>), previousRuntime,
+                    Method(runtimeType, "SceneLoaded", typeof(Scene), typeof(LoadSceneMode)));
+            }
+            inventoryScopeActive = true;
+            if (previousRuntime)
+            {
+                ((Behaviour)previousRuntime).enabled = false;
+                SceneManager.sceneLoaded -= previousSceneListener;
+                previousHandlerDetached = true;
+            }
+            singleton.GetSetMethod(true).Invoke(null, new object[] { null });
+            inventoryHost = new GameObject("V11_TEST_INVENTORY");
+            runtime = inventoryHost.AddComponent(runtimeType);
+            ((Behaviour)runtime).enabled = false; // API calls only; no physical input polling
+            Assert.AreSame(runtime, singleton.GetValue(null));
+            if (inputService) Call(inputService, "SetContext", Enum.Parse(previousInputContext.GetType(), "Inactive"));
+
+            factoryOwned = true;
             yield return SceneManager.LoadSceneAsync(ScenePath, LoadSceneMode.Single);
             yield return null;
             player = GameObject.Find("M2_Player");
@@ -45,19 +143,13 @@ namespace M6IntegrationTests
             ((Behaviour)interactor).enabled = false;
             camera = player.GetComponentInChildren<Camera>();
             Assert.IsNotNull(camera);
-            tick = controller.GetType().GetMethod("TickMovement", AnyInstance);
-            Assert.IsNotNull(tick);
+            tick = Method(controller.GetType(), "TickMovement", typeof(Vector2), typeof(bool), typeof(bool), typeof(bool), typeof(float));
             progress = Find("C3TreasurePuzzle.C3TreasureProgress");
-            runtime = Find("EcoAdventureRuntime");
             Assert.IsNotNull(progress);
-            Assert.IsNotNull(runtime);
-            // Test-owned persistent inventory; restore it by scene/bootstrap, not by
-            // mutating a user's save. Each test gets a new runtime to avoid ordering bugs.
-            Object.Destroy(runtime.gameObject);
-            yield return null;
-            runtime = new GameObject("V11_TEST_INVENTORY").AddComponent(RuntimeType("EcoAdventureRuntime"));
-            ((Behaviour)runtime).enabled = false; // explicit API calls; no physical input polling
+            contacts = player.AddComponent<C3V11CollisionRecorder>();
             Call(runtime, "BindCamera");
+            Assert.AreSame(runtime, singleton.GetValue(null));
+            Assert.AreSame(camera, Field(runtime, "activeCamera"));
             Assert.That(body.radius, Is.EqualTo(.3f).Within(.001f));
             Assert.That(body.height, Is.EqualTo(1.8f).Within(.001f));
             Assert.That(body.center, Is.EqualTo(Vector3.up * .9f));
@@ -69,13 +161,81 @@ namespace M6IntegrationTests
         [UnityTearDown]
         public IEnumerator Cleanup()
         {
-            if (runtime) Object.Destroy(runtime.gameObject);
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-            yield return null;
-            // Leave the bootstrap service available to the pre-existing test suites.
-            if (!Find("EcoAdventureRuntime"))
-                new GameObject("EcoAdventureRuntime_PersistentInventory").AddComponent(RuntimeType("EcoAdventureRuntime"));
+            // Stop test factories before restoring the original singleton; otherwise
+            // their Update could grant sorted materials into the original state.
+            try
+            {
+                if (factoryOwned)
+                {
+                    Scene factory = SceneManager.GetSceneByPath(ScenePath);
+                    if (factory.IsValid() && factory.isLoaded)
+                    {
+                        Scene empty = SceneManager.CreateScene("V11_CLEANUP_" + Guid.NewGuid().ToString("N"));
+                        SceneManager.SetActiveScene(empty);
+                        foreach (GameObject root in factory.GetRootGameObjects()) root.SetActive(false);
+                        yield return SceneManager.UnloadSceneAsync(factory);
+                    }
+                }
+            }
+            finally
+            {
+                try
+                {
+                    // Destroy ONLY the fixture-owned inventory, including after a setup
+                    // failure. DestroyImmediate runs OnDestroy before restoration.
+                    if (inventoryHost) Object.DestroyImmediate(inventoryHost);
+                    if (inventoryScopeActive)
+                    {
+                        singleton.GetSetMethod(true).Invoke(null, new object[] { previousRuntime ? previousRuntime : null });
+                        if (previousRuntime)
+                        {
+                            if (previousHandlerDetached) SceneManager.sceneLoaded += previousSceneListener;
+                            ((Behaviour)previousRuntime).enabled = previousRuntimeEnabled;
+                            Call(previousRuntime, "BindCamera"); // discard the unloaded camera binding
+                        }
+                    }
+                }
+                finally { RestoreGlobals(); }
+            }
+            if (inventoryScopeActive)
+            {
+                Assert.AreSame(previousRuntime, singleton.GetValue(null), "Fixture did not restore original singleton");
+                if (previousRuntime)
+                {
+                    Assert.AreEqual(previousInventory, InventoryFingerprint(previousRuntime), "Original inventory changed");
+                    Assert.AreEqual(previousSlots, SlotsFingerprint(previousRuntime), "Original quick slots changed");
+                    Assert.AreEqual(previousPowered, Field(previousRuntime, "factoryPowered"), "Original factory state changed");
+                }
+            }
+        }
+
+        private void RestoreGlobals()
+        {
+            if (!globalsCaptured) return;
+            try
+            {
+                if (inputService && previousInputContext != null)
+                {
+                    Call(inputService, "SetContext", previousInputContext);
+                    inputService.GetType().GetField("sprintToggled", AnyInstance).SetValue(inputService, previousSprintToggled);
+                    inputService.GetType().GetField("crouchToggled", AnyInstance).SetValue(inputService, previousCrouchToggled);
+                }
+            }
+            finally
+            {
+                try
+                {
+                    if (hadViewPreference) PlayerPrefs.SetInt(ViewPreferenceKey, previousViewPreference);
+                    else PlayerPrefs.DeleteKey(ViewPreferenceKey);
+                    PlayerPrefs.Save();
+                }
+                finally
+                {
+                    Time.timeScale = previousTimeScale;
+                    Cursor.lockState = previousCursorLock;
+                    Cursor.visible = previousCursorVisible;
+                }
+            }
         }
 
         private void StartAt(Vector3 position)
@@ -138,6 +298,12 @@ namespace M6IntegrationTests
             Assert.IsTrue(chip.GetComponentsInChildren<Renderer>().Any(r => r.enabled));
             Assert.IsTrue(chip.GetComponent<Collider>().enabled);
             Assert.AreSame(progress, Field(chip, "progress"));
+            Collider bench = GameObject.Find("UpperChipMaintenanceBench").GetComponent<Collider>();
+            Bounds chipBounds = chip.GetComponent<Collider>().bounds;
+            Assert.IsTrue(bench.enabled && bench.gameObject.activeInHierarchy);
+            Assert.That(chipBounds.min.y, Is.EqualTo(bench.bounds.max.y).Within(.08f), "Chip no longer rests on the real desk");
+            Assert.That(chipBounds.center.x, Is.InRange(bench.bounds.min.x, bench.bounds.max.x));
+            Assert.That(chipBounds.center.z, Is.InRange(bench.bounds.min.z, bench.bounds.max.z));
             // Aim from the physically reached position. An intervening rail, bench
             // collider or invisible wall must fail the original interactor's real ray.
             camera.transform.LookAt(chip.GetComponent<Collider>().bounds.center);
@@ -146,6 +312,8 @@ namespace M6IntegrationTests
             int events = 0;
             Action changed = () => events++;
             EventInfo changedEvent = progress.GetType().GetEvent("Changed");
+            Assert.IsNotNull(changedEvent, "Treasure Changed event contract changed");
+            Assert.AreEqual(typeof(Action), changedEvent.EventHandlerType);
             changedEvent.AddEventHandler(progress, changed);
             try
             {
@@ -205,13 +373,29 @@ namespace M6IntegrationTests
                 Vector3.right, Vector3.left, new Vector3(-1,0,1).normalized, new Vector3(1,0,1).normalized,
                 Vector3.left, Vector3.right, Vector3.left, Vector3.right,
                 Vector3.left, Vector3.right, Vector3.left, Vector3.right };
+            string[] guardPaths = {
+                "V11_UPPER_GUARDS/GUARD_WEST_OUTER", "V11_UPPER_GUARDS/GUARD_WEST_INNER",
+                "V11_UPPER_GUARDS/GUARD_REAR_NORTH", "V11_UPPER_GUARDS/GUARD_REAR_SOUTH",
+                "V11_UPPER_GUARDS/GUARD_EAST_WALL_OUTER", "V11_UPPER_GUARDS/GUARD_EAST_WALL_INNER_AFTER_STAIR",
+                "V11_UPPER_GUARDS/GUARD_REAR_NORTH", "V11_UPPER_GUARDS/GUARD_REAR_NORTH",
+                "STAIR_A_WEST/GUARD_FLIGHT_-1", "STAIR_A_WEST/GUARD_FLIGHT_1",
+                "STAIR_B_EAST/GUARD_FLIGHT_-1", "STAIR_B_EAST/GUARD_FLIGHT_1",
+                "STAIR_A_WEST/GUARD_BOTTOM_-1", "STAIR_A_WEST/GUARD_BOTTOM_1",
+                "STAIR_B_EAST/GUARD_BOTTOM_-1", "STAIR_B_EAST/GUARD_BOTTOM_1" };
+            Transform circulationRoot = GameObject.Find("C3_V3_VerifiedCirculation").transform;
             for (int stance = 0; stance < 2; stance++)
             for (int sample = 0; sample < starts.Length; sample++)
             {
                 StartAt(starts[sample]);
-                body.height = stance == 0 ? 1.8f : .75f;
+                body.height = stance == 0 ? (float)Field(controller, "standingHeight") :
+                    Mathf.Clamp((float)Field(controller, "proneHeight"), body.radius * 2f, (float)Field(controller, "crouchHeight"));
                 body.center = Vector3.up * (body.height * .5f);
                 Physics.SyncTransforms();
+                Transform guard = circulationRoot.Find(guardPaths[sample]);
+                Assert.IsNotNull(guard, guardPaths[sample]);
+                Collider expected = guard.GetComponent<Collider>();
+                Assert.IsTrue(expected && expected.enabled && !expected.isTrigger);
+                contacts.SideContacts.Clear();
                 Vector3 from = player.transform.position;
                 for (int i = 0; i < 100; i++)
                 {
@@ -221,6 +405,8 @@ namespace M6IntegrationTests
                 Assert.Less(Vector3.Distance(player.transform.position, from), 1.25f,
                     "Passed guard at sample " + sample + ", stance " + stance);
                 Assert.Greater(player.transform.position.y, starts[sample].y - .20f, "Fell at guard sample " + sample);
+                Assert.IsTrue(contacts.SideContacts.Contains(expected),
+                    "No real controller contact with " + guardPaths[sample] + "; an unrelated obstacle may have stopped the player");
             }
             body.height = 1.8f;
             body.center = Vector3.up * .9f;
@@ -254,9 +440,11 @@ namespace M6IntegrationTests
                 Assert.Less(Vector3.Distance(visible.min, guard.bounds.min), .12f, guard.name);
                 Assert.Less(Vector3.Distance(visible.max, guard.bounds.max), .12f, guard.name);
             }
+            Renderer[] sceneRenderers = Object.FindObjectsOfType<Renderer>();
             foreach (float x in new[] { -23.2f, -1.55f })
-            for (float z = 13.8f; z <= 20.8f; z += .2f) AssertClearHead(x, z);
-            for (float x = -23.2f; x <= -1.55f; x += .2f) AssertClearHead(x, 19.2f);
+            foreach (float offset in new[] { -.35f, 0f, .35f })
+            for (float z = 13.8f; z <= 20.8f; z += .2f) AssertClearHead(x + offset, z, sceneRenderers);
+            for (float x = -23.2f; x <= -1.55f; x += .2f) AssertClearHead(x, 19.2f, sceneRenderers);
             foreach (string name in new[] { "UpperChipMaintenanceBench", "UpperDistributionBox" })
             {
                 GameObject station = GameObject.Find(name);
@@ -270,7 +458,7 @@ namespace M6IntegrationTests
             Assert.That(feed.bounds.max.x, Is.EqualTo(-.64f).Within(.24f));
         }
 
-        private void AssertClearHead(float x, float z)
+        private void AssertClearHead(float x, float z, Renderer[] sceneRenderers)
         {
             // The production collider supplies physics; render bounds also catch
             // collider-free decoration intersecting the upper body/head corridor.
@@ -279,7 +467,7 @@ namespace M6IntegrationTests
                 out RaycastHit floor, .5f, ~0, QueryTriggerInteraction.Ignore), "Gap under upper route");
             Assert.That(floor.point.y, Is.EqualTo(4.5f).Within(.01f));
             StringAssert.StartsWith("2F_", floor.collider.name);
-            foreach (Renderer renderer in Object.FindObjectsOfType<Renderer>())
+            foreach (Renderer renderer in sceneRenderers)
             {
                 if (!renderer.enabled || renderer.transform.IsChildOf(player.transform)) continue;
                 if (!head.Intersects(renderer.bounds)) continue;
@@ -316,6 +504,7 @@ namespace M6IntegrationTests
         [UnityTest]
         public IEnumerator LegacyCleanupPreservesFloorTriggersAndSurvivesSceneReload()
         {
+            AssertNoHiddenArtObstacles();
             GameObject blockout = GameObject.Find("C_TwoFloor_Blockout");
             Assert.IsTrue(blockout.activeSelf);
             Assert.IsTrue(blockout.transform.Find("Floor1_Additions").gameObject.activeSelf);
@@ -331,6 +520,9 @@ namespace M6IntegrationTests
             GameObject proxies = GameObject.Find("C_CollisionProxies");
             foreach (Collider collider in proxies.GetComponentsInChildren<Collider>())
                 Assert.IsTrue(collider.enabled, "Required collision proxy disabled: " + collider.name);
+            Component exit = Find("C3TreasurePuzzle.C3ExitTrigger");
+            Assert.IsNotNull(exit);
+            Assert.IsTrue(exit.GetComponent<Collider>().enabled && exit.GetComponent<Collider>().isTrigger);
             Component circulation = Find("C3TreasurePuzzle.C3V3Circulation");
             int before = GameObject.Find("C3_V3_VerifiedCirculation").GetComponentsInChildren<Collider>().Length;
             ((Behaviour)circulation).enabled = false;
@@ -341,6 +533,33 @@ namespace M6IntegrationTests
             yield return null;
             Assert.AreEqual(1, Object.FindObjectsOfType<Transform>().Count(t => t.name == "C3_V3_VerifiedCirculation"));
             Assert.AreEqual(before, GameObject.Find("C3_V3_VerifiedCirculation").GetComponentsInChildren<Collider>().Length);
+            AssertNoHiddenArtObstacles();
+        }
+
+        private static void AssertNoHiddenArtObstacles()
+        {
+            Transform art = GameObject.Find("C_Factory_Art").transform;
+            Transform bench = art.Find("Floor2_Industrial/UpperChipMaintenanceBench");
+            Transform distribution = art.Find("Floor2_Industrial/UpperDistributionBox");
+            // Enumerate every descendant, NOT the production retirement allowlist.
+            // An unknown active collider requires classification; do not auto-disable it.
+            foreach (Collider collider in art.GetComponentsInChildren<Collider>(true))
+                if (collider.enabled && collider.gameObject.activeInHierarchy && !collider.isTrigger)
+                    Assert.IsTrue(collider.transform.IsChildOf(bench) || collider.transform.IsChildOf(distribution),
+                        "Unclassified active collider in replaced factory art: " + collider.name);
+            foreach (Collider collider in Object.FindObjectsOfType<Collider>())
+            {
+                if (!collider.enabled || collider.isTrigger || collider.transform.IsChildOf(art)) continue;
+                Renderer[] visuals = collider.GetComponentsInChildren<Renderer>(true);
+                if (visuals.Length == 0) continue; // dedicated floor/wall proxies and visible bar assemblies are checked separately
+                Assert.IsTrue(visuals.Any(r => r.enabled && r.gameObject.activeInHierarchy),
+                    "Solid collider with only hidden visuals: " + collider.name);
+            }
+            GameObject originalTest = GameObject.Find("M2_TestInteractable");
+            Assert.IsNotNull(originalTest);
+            Assert.IsTrue(originalTest.GetComponent<Renderer>().enabled);
+            Component interactable = originalTest.GetComponent(RuntimeType("C3TreasurePuzzle.C3TestInteractable"));
+            Assert.IsNotNull(interactable, "Do not remove the original test interaction to remove its obstacle");
         }
 
         [UnityTest]

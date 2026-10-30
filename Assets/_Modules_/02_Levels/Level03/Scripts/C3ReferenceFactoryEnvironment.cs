@@ -337,7 +337,9 @@ namespace C3TreasurePuzzle
                     // Do not block the actual B doorway with an ornamental pillar.
                     if (side==1 && Mathf.Abs(z-12.5f)<1f) continue;
                     // West posts sit inside the wall, outside the stair rail envelope.
-                    float x=side==0?-24.53f:-.75f;
+                    // Keep the east column's inner face (-0.60) outside the V11
+                    // deck edge (-0.65), rather than protruding into the side route.
+                    float x=side==0?-24.53f:-.45f;
                     Box("WAREHOUSE structural column",x,6.05f,z,.30f,10.95f,.32f,graphite);
                     Box("Yellow column kickplate",x,.87f,z,.36f,.48f,.39f,yellow);
                 }

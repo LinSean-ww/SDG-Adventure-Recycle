@@ -233,3 +233,10 @@ runtime V10,GUARD_REAR_WEST_END,停止建立舊版碰撞物件,由兩側完整�
 runtime V10,GUARD_REAR_EAST_END,停止建立舊版碰撞物件,由兩側完整樓梯與無中斷後方平台取代；沒有以隱藏 Renderer 保留舊碰撞。
 runtime V10,GUARD_EAST_CONNECTOR_NORTH_INNER,停止建立舊版碰撞物件,由兩側完整樓梯與無中斷後方平台取代；沒有以隱藏 Renderer 保留舊碰撞。
 runtime V10,GUARD_EAST_CONNECTOR_SOUTH_OUTER,停止建立舊版碰撞物件,由兩側完整樓梯與無中斷後方平台取代；沒有以隱藏 Renderer 保留舊碰撞。
+scene,M2_TestInteractable,恢復既有 MeshRenderer；保留非 Trigger Collider 與 C3TestInteractable,PR #2 回查發現 Renderer 已隱藏但實體碰撞及互動仍啟用；以原模型恢復可見性，未刪除互動。
+runtime V11,"C3_ReferenceRecyclingFactory_Visuals/WAREHOUSE structural column [east,z=1]",X 由 -0.75 移至 -0.45；原裝飾支柱模型不變,原支柱內緣 -0.90 侵入二樓走道；移動後內緣 -0.60 位於護欄外緣 -0.61 之外。此為裝飾網格位置修正，非已執行的物理通行證據。
+runtime V11,"C3_ReferenceRecyclingFactory_Visuals/WAREHOUSE structural column [east,z=4.75]",X 由 -0.75 移至 -0.45；原裝飾支柱模型不變,原支柱內緣 -0.90 侵入二樓走道；移動後內緣 -0.60 位於護欄外緣 -0.61 之外。此為裝飾網格位置修正，非已執行的物理通行證據。
+runtime V11,"C3_ReferenceRecyclingFactory_Visuals/WAREHOUSE structural column [east,z=8.5]",X 由 -0.75 移至 -0.45；原裝飾支柱模型不變,原支柱內緣 -0.90 侵入二樓走道；移動後內緣 -0.60 位於護欄外緣 -0.61 之外。此為裝飾網格位置修正，非已執行的物理通行證據。
+runtime V11,"C3_ReferenceRecyclingFactory_Visuals/WAREHOUSE structural column [east,z=16]",X 由 -0.75 移至 -0.45；原裝飾支柱模型不變,原支柱內緣 -0.90 侵入二樓走道；移動後內緣 -0.60 位於護欄外緣 -0.61 之外。此為裝飾網格位置修正，非已執行的物理通行證據。
+runtime V11,"C3_ReferenceRecyclingFactory_Visuals/WAREHOUSE structural column [east,z=19.75]",X 由 -0.75 移至 -0.45；原裝飾支柱模型不變,原支柱內緣 -0.90 侵入二樓走道；移動後內緣 -0.60 位於護欄外緣 -0.61 之外。此為裝飾網格位置修正，非已執行的物理通行證據。
+runtime V11,"C3_ReferenceRecyclingFactory_Visuals/WAREHOUSE structural column [east,z=23.5]",X 由 -0.75 移至 -0.45；原裝飾支柱模型不變,原支柱內緣 -0.90 侵入二樓走道；移動後內緣 -0.60 位於護欄外緣 -0.61 之外。此為裝飾網格位置修正，非已執行的物理通行證據。

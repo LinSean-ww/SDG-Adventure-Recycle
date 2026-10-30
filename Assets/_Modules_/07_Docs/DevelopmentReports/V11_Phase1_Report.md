@@ -54,8 +54,8 @@ Presentation 的 Activated 訂閱、EcoAdventureRuntime 的持久背包與 scene
 | 檢查 | 結果 | 限制 |
 | --- | --- | --- |
 | Git diff --check | PASS | 僅差異空白檢查 |
-| C# Tree-sitter 語法解析（第三關 32 檔及新增測試；另檢查整個 PlayMode 目錄） | PASS | 不代表 Unity C# 型別解析或編譯成功 |
-| 場景 YAML 前後比對 | PASS | 物件 ID、元件、引用不變；僅桌／箱／晶片三項 Z 改動 |
+| C# Tree-sitter 語法解析（第三關與 PlayMode 共 52 檔，含碰撞記錄輔助元件） | PASS | 不代表 Unity C# 型別解析或編譯成功 |
+| 場景 YAML 前後比對 | PASS | 物件 ID、元件、引用不變；桌／箱／晶片三項 Z 改動，另恢復 M2_TestInteractable 的 Renderer；其 Collider 與腳本不變 |
 | 既有 meta、Prefab、Packages、ProjectSettings 與受保護玩法檔逐位元比對 | PASS | 僅檔案未變，不代表玩法已執行通過 |
 | 套件／asmdef JSON、157 結構葉與 53 舊碰撞路徑核對 | PASS | 靜態內容檢查 |
 | 踏階高度、坡度、通道淨寬、護欄三角面外向性 | PASS | 設計尺寸檢查，非 CharacterController 行走 |
@@ -92,3 +92,39 @@ mkdir -p "$SDG_ADVENTURE_TEST_OUTPUT_ROOT"
 ```
 
 檢查當次 XML 的實際執行數、失敗與跳過，不將零測試當成功；若 -nographics 造成渲染限制，使用本機 Editor 執行模型／淨空測試並記錄原因。必要驗證完成前，本 Phase 1 僅能作為待審查實作，不能宣稱最終驗收合格。
+
+
+## PR #2 回查修正（相對 9800e95）
+
+本輪繼續同一分支與 Draft PR #2，未建立新 PR／分支、未合併 main、未發布環境。**Unity 2023.1.22f1 編譯、EditMode 與七項 PlayMode 均為 NOT RUN**。
+
+### 可由程式碼確認的問題
+
+1. **原互動測試物件是隱形障礙。** M2_TestInteractable 的 MeshRenderer（fileID 737892122）為 0，但 BoxCollider 與 C3TestInteractable 啟用。恢復原 Renderer=1，保留模型、Collider、位置、腳本與 GUID。相對 9800e95，C_Main 唯一修改即此旗標。
+2. **東側裝飾支柱侵入通道。** 原中心 X=-.75、寬 .30，內緣 -.90，侵入平台外緣 -.65 內側；中心線測試不會碰到它。移至 X=-.45，內緣 -.60 位於護欄外緣 -.61 之外。支柱為無 Collider 裝飾網格，此為可確認的視覺穿模風險；實際行走仍待測。淨空測試增加左右 .35m 掃描。
+3. **fixture 會刪除原持久狀態。** 舊 setup 銷毀 EcoAdventureRuntime，teardown 建立空實例，不能保留先前背包／快捷欄。現在先保存原實例、暫停其 Update 並移除其 sceneLoaded 訂閱，再建立專用測試實例。結束時先停用並卸載測試場景、銷毀僅由 fixture 建立的實例，再還原原 singleton 與訂閱。額外驗證原背包、快捷欄及 factoryPowered 未變；保留原 enabled 狀態。場景本身仍採 Single 載入，沒有聲稱還原原場景物件。
+4. **全域輸入／偏好可能污染後續測試。** 保存並還原 Input Context、衝刺／蹲下切換狀態、PlayerPrefs 視角偏好（含原本未設定的情況）、Time.timeScale 與游標。採 finally 清理，反射檢查或 setup 失敗時仍還原全域狀態；fixture 標示 NonParallelizable。
+5. **護欄測試可能被無關障礙擋住而誤判。** 新增 fixture 專用 C3V11CollisionRecorder，從原 CharacterController 的 OnControllerColliderHit 記錄側向接觸。所有 14 段護欄的站姿／趴下案例，除位置與防墜外，必須實際接觸指定 Collider；單純「沒有移動」不算護欄證據。
+
+### 碰撞與互動回查範圍
+
+- 依既有 157 個 blockout 葉節點及 53 個舊美術退役路徑分類後，直接序列化於 C_Main 的其餘 22 個非 Trigger Collider 已逐一回查；舊美術下僅有原維修桌與配電箱兩個必要實體碰撞。地面、牆、屋頂、入口安全邊界、控制台與原互動測試物件皆保留。此數量不包含 Prefab 匯入及執行時新增物件，不能等同完整 PlayMode 碰撞掃描。
+- 加入獨立 runtime 檢查：枚舉整個 C_Factory_Art 的 Collider，不使用生成器的退役清單來斷言自己正確；遇到未分類的活躍非 Trigger Collider 會失敗，沒有自動關閉未知 Collider。另掃描場景其他有可見模型子樹的 Collider，要求至少一個 Renderer 啟用，保留必要無 Renderer 的地面／牆等代理碰撞。
+- 雙樓梯與護欄生成器本輪未再改動：22 階、階高 .17909m、坡度 21.70°，對照真實 prefab 的 StepOffset=.30、SlopeLimit=45、Radius=.30、SkinWidth=.08。頂階接側廊 Z=13.70、側廊接後平台 Z=18.10，護欄接點共用座標。這是尺寸與程式碼檢查，**不是通行 PASS**。
+- 晶片保留 control_chip、原 C3CollectiblePart 與 progress 引用；原 TryCollect 唯一授予邏輯不變。測試增加晶片 Collider 在原維修桌面上方、X/Z 位於桌面內的斷言，仍經原 FindTarget 射線及 Interact 檢查取得結果。
+- 沒有確認目前反射成員名稱失配。強化為依參數型別解析方法、明確檢查欄位／屬性／事件存在性、核對 Changed 的 Action 型別，及測試庫存實例確實等於 singleton。
+
+### 本輪證據
+
+| 檢查 | 實際結果 |
+| --- | --- |
+| C# AST 語法解析（52 檔） | PASS，非 Unity 編譯 |
+| 49 處反射呼叫／成員與原宣告，以及 TickMovement、SceneLoaded、Instance、InventoryItem 契約靜態核對 | PASS，尚未執行 Invoke |
+| 相對 9800e95 的場景 YAML 比對 | PASS，僅 Renderer 啟用旗標；所有 fileID／引用／物理／座標不變 |
+| 既有 meta、Prefab、Packages、ProjectSettings 及十個玩法／動線來源逐位元比對 | PASS |
+| 457 個 Assets GUID 唯一性 | PASS |
+| 已序列化 Collider 分類、踏階參數及支柱邊界計算 | PASS，靜態檢查 |
+| git diff --check | PASS |
+| Unity 編譯／EditMode／七項 PlayMode | NOT RUN |
+
+七項 UnityTest 名稱保留，C3V11CollisionRecorder 僅為測試輔助 MonoBehaviour，不是第八項測試。更新後的七項測試、反射呼叫、fixture 隔離與 MeshCollider 淨空探針，仍須在 Unity Test Runner 真正執行。請先重複執行 fixture 兩次，再與其他回歸測試交錯執行，檢查 singleton、背包、輸入與游標是否復原。使用者需完成原報告人工路線、護欄角落、F 晶片互動、B/C 入口及一樓玩法試玩；ChatGPT 審查與人工驗收前不合併。
