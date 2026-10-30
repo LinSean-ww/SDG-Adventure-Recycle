@@ -63,15 +63,7 @@ namespace C3TreasurePuzzle
                 new Vector3(-12.5f, 6.05f, 24.53f), Quaternion.Euler(0f, 180f, 0f), 3f, .6f, false);
             OwnSign(floorSign, buildRoot);
 
-            // Phase 1 does not redesign the working sorter, B-feed or output equipment.
-            Visual("V3_HopperShields", frameMat);
-            Visual("V3_InfeedCarrierFrame", mechanismMat);
-            Visual("V3_InfeedDrums", frameMat);
-            Visual("V3_OutfeedCarriers", mechanismMat);
-            Visual("V9_BDoorToSorterVisibleBelt", mechanismMat);
-            Visual("V9_BDoorToSorterSteelFrame", frameMat);
-            Visual("V9_BDoorToSorterYellowGuards", railMat);
-            Visual("V9_BDoorToSorterRollers", frameMat);
+            // Phase 2 owns the complete replacement equipment; retain the old OBJ assets only.
         }
 
         private static void RetireLegacyStructure()
@@ -264,19 +256,6 @@ namespace C3TreasurePuzzle
                     Box(supports, "COLUMN_" + x + "_" + z,
                         new Vector3(x, (GroundSurface + WalkSurface - DeckThickness) * .5f, z),
                         new Vector3(.14f, WalkSurface - DeckThickness - GroundSurface, .14f), frameMat);
-        }
-
-        private void Visual(string filename, Material mat)
-        {
-            GameObject asset = Resources.Load<GameObject>("C3V3Models/" + filename);
-            if (!asset) { Debug.LogError("Retained factory mesh missing: " + filename); return; }
-            GameObject piece = Instantiate(asset, Vector3.zero, Quaternion.identity, buildRoot);
-            piece.name = filename;
-            foreach (Renderer renderer in piece.GetComponentsInChildren<Renderer>(true)) renderer.sharedMaterial = mat;
-            // Only these eight known decorative equipment meshes use this path.
-            // Never pass stairs, decks, railings, gameplay objects or triggers here.
-            foreach (Collider collider in piece.GetComponentsInChildren<Collider>(true))
-                if (!collider.isTrigger) collider.enabled = false;
         }
 
         private void OnDestroy()
