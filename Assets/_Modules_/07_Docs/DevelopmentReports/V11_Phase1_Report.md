@@ -103,7 +103,7 @@ mkdir -p "$SDG_ADVENTURE_TEST_OUTPUT_ROOT"
 1. **原互動測試物件是隱形障礙。** M2_TestInteractable 的 MeshRenderer（fileID 737892122）為 0，但 BoxCollider 與 C3TestInteractable 啟用。恢復原 Renderer=1，保留模型、Collider、位置、腳本與 GUID。相對 9800e95，C_Main 唯一修改即此旗標。
 2. **東側裝飾支柱侵入通道。** 原中心 X=-.75、寬 .30，內緣 -.90，侵入平台外緣 -.65 內側；中心線測試不會碰到它。移至 X=-.45，內緣 -.60 位於護欄外緣 -.61 之外。支柱為無 Collider 裝飾網格，此為可確認的視覺穿模風險；實際行走仍待測。淨空測試增加左右 .35m 掃描。
 3. **fixture 會刪除原持久狀態。** 舊 setup 銷毀 EcoAdventureRuntime，teardown 建立空實例，不能保留先前背包／快捷欄。現在先保存原實例、暫停其 Update 並移除其 sceneLoaded 訂閱，再建立專用測試實例。結束時先停用並卸載測試場景、銷毀僅由 fixture 建立的實例，再還原原 singleton 與訂閱。額外驗證原背包、快捷欄及 factoryPowered 未變；保留原 enabled 狀態。場景本身仍採 Single 載入，沒有聲稱還原原場景物件。
-4. **全域輸入／偏好可能污染後續測試。** 保存並還原 Input Context、衝刺／蹲下切換狀態、PlayerPrefs 視角偏好（含原本未設定的情況）、Time.timeScale 與游標。採 finally 清理，反射檢查或 setup 失敗時仍還原全域狀態；fixture 標示 NonParallelizable。
+4. **全域輸入／偏好可能污染後續測試。** 保存並還原 Input Context、衝刺／蹲下切換狀態、PlayerPrefs 視角偏好（含原本未設定的情況）、Time.timeScale 與游標。採 finally 清理，反射檢查或 setup 失敗時仍還原全域狀態。原先新增的 NonParallelizable 標記已在下述 Safe Mode 相容性修正中移除，隔離邏輯保留。
 5. **護欄測試可能被無關障礙擋住而誤判。** 新增 fixture 專用 C3V11CollisionRecorder，從原 CharacterController 的 OnControllerColliderHit 記錄側向接觸。所有 14 段護欄的站姿／趴下案例，除位置與防墜外，必須實際接觸指定 Collider；單純「沒有移動」不算護欄證據。
 
 ### 碰撞與互動回查範圍
@@ -128,3 +128,69 @@ mkdir -p "$SDG_ADVENTURE_TEST_OUTPUT_ROOT"
 | Unity 編譯／EditMode／七項 PlayMode | NOT RUN |
 
 七項 UnityTest 名稱保留，C3V11CollisionRecorder 僅為測試輔助 MonoBehaviour，不是第八項測試。更新後的七項測試、反射呼叫、fixture 隔離與 MeshCollider 淨空探針，仍須在 Unity Test Runner 真正執行。請先重複執行 fixture 兩次，再與其他回歸測試交錯執行，檢查 singleton、背包、輸入與游標是否復原。使用者需完成原報告人工路線、護欄角落、F 晶片互動、B/C 入口及一樓玩法試玩；ChatGPT 審查與人工驗收前不合併。
+
+
+## Safe Mode 編譯修正（基準 306996f，Windows Unity 2023.1.22f1）
+
+**正式驗收阻擋：** 使用者在 Windows Unity 2023.1.22f1 開啟 306996f 後進入 Safe Mode，尚未成功進入正常 PlayMode。Console 的實際編譯結果為 **FAIL（使用者本機）**：
+
+```text
+Assets/_Modules_/05_Testing/PlayMode/C3V11SafeCirculationTests.cs(15,6):
+CS0246: The type or namespace name 'NonParallelizableAttribute' could not be found
+CS0246: The type or namespace name 'NonParallelizable' could not be found
+```
+
+### 原因與最小修正
+
+上一輪新增的 `[NonParallelizable]` 引用了目前 Unity 編譯組件無法辨識的屬性。檔案已經有 `using NUnit.Framework;`，重加 using 無法處理此問題。
+
+鎖定依賴為 `com.unity.test-framework` **1.3.9** → `com.unity.ext.nunit` **2.0.3**。Unity 官方 registry 的 2.0.3 `description` 明確描述這是以 **NUnit 3.5 為基礎的客製版本**，不是 NUnit Framework 2.0.3，也不能把新版 NUnit 文件的所有 API 視為可用。可確認的相容性問題以使用者 CS0246 為準，沒有推測本機 DLL 更細部的建置原因。
+
+本次僅移除該屬性並補註原因，不建立自訂空屬性、不增加套件、不更改版本或測試組件。修改檔案只有：
+
+- `Assets/_Modules_/05_Testing/PlayMode/C3V11SafeCirculationTests.cs`
+- 本工程報告 `V11_Phase1_Report.md`
+
+全部七個 `[UnityTest] public IEnumerator` 方法、UnitySetUp／UnityTearDown、所有其他方法與斷言逐位元保持不變，`C3V11CollisionRecorder.cs` 及其 meta 不變。C_Main、樓梯／平台／護欄／Collider、晶片、背包、武器、分類設備、工作台、場景轉換與 FPS 原始碼均不變。
+
+### 引用、排程及隔離檢查
+
+`M6Integration.PlayModeTests.asmdef` 的 `references` 仍是 `SDGAdventure.TestOutput`、`Unity.ugui`；`optionalUnityReferences=[TestAssemblies]`，`overrideReferences=true`，`precompiledReferences=[nunit.framework.dll]`，`defineConstraints=[UNITY_INCLUDE_TESTS]`。沒有停用 assembly 或用條件編譯隱藏七項測試。
+
+以 C# AST 掃描整個 Assets，未找到任何 `[Parallelizable]`、`[NonParallelizable]`、`[LevelOfParallelism]` 的 class／fixture／assembly 層級宣告；另未找到自訂 TestRunnerApi／ExecutionSettings／NumberOfTestWorkers／執行緒並行設定。移除不支援的標記本身不會加入平行設定。保留 Unity Test Runner 的既有執行路徑；實際執行順序與跨 fixture 隔離仍須 Test Runner 驗證。
+
+原有 EcoAdventureRuntime.Instance、inventory、quickSlots、factoryPowered 保存／還原檢查、SceneManager 事件訂閱隔離、輸入 Context、衝刺／蹲下切換、視角 PlayerPrefs、Time.timeScale、游標及 finally 清理均未改動。請實測單獨執行、連續執行兩次、與其他 fixture 前後交錯執行，並在測試失敗後檢查上述狀態、場景卸載與訂閱是否復原。這些情境目前全部 **NOT RUN**。
+
+### 本次實際檢查結果
+
+| 檢查 | 結果 | 範圍及限制 |
+| --- | --- | --- |
+| git diff --check | PASS | 僅測試檔與本報告變更 |
+| C# AST 語法解析（52 檔） | PASS | 非 Unity 編譯；不做組件型別解析 |
+| 反射契約 49 處及 TickMovement／SceneLoaded／Instance／InventoryItem | PASS | 原宣告與方法簽章靜態核對；未執行 Invoke |
+| asmdef、manifest、packages-lock JSON／引用／版本 | PASS | 全部保持原版本與內容 |
+| 七方法及 setup／teardown／隔離方法存在性與內容比對 | PASS | 七項測試可發現的來源結構不變，實際 Test Runner 發現為 NOT RUN |
+| 平行設定與修改範圍掃描 | PASS | 未新增平行設定；除測試檔／報告之外所有已追蹤檔案與 306996f 相同 |
+| NUnit 版本及已知不相容 API 使用檢查 | PASS | 官方 metadata 與使用者錯誤證據；移除已知不支援的標記 |
+| 官方 NUnit DLL／Test Runner 原始碼直接檢查 | BLOCKED | tarball 302 至 cdn.packages.unity.com 後被網路政策以 403 拒絕；官方 metadata 對應 Test Framework 原始碼 commit 的公開 GitHub 讀取為 404，未取得 DLL 或該版本排程原始碼 |
+| Unity Compilation | NOT RUN | 本環境找不到可用、已授權的 Editor，不能判定 Windows 修復已驗收 |
+| Unity EditMode／七項 PlayMode | NOT RUN | NUnit、UnitySetUp／TearDown／Test、Assert、IEnumerator、Reflection、SceneManager、CharacterController、ComputePenetration、UnityAction 與記錄元件的實際編譯／執行仍待本機 |
+
+官方版本中繼資料來源：`https://packages.unity.com/com.unity.ext.nunit` 與 `https://packages.unity.com/com.unity.test-framework`。調查用資料與工具只放於專案外；未把未驗證套件裝進專案，也未更改網路設定或發布環境。
+
+### Rider 訊息獨立待查
+
+使用者另回報 `Unloading broken assembly Library/ScriptAssemblies/Unity.Rider.Editor.dll, this assembly can cause crashes in the runtime`。尚無證據證明它與 CS0246 為同一根因。未刪除 DLL、Library 或 Rider 套件。先重新編譯；若 CS0246 消失後仍出現此訊息，保留完整 Console 與 Editor.log 作為下一輪獨立問題。
+
+### 使用者重新驗證
+
+1. 關閉 Unity Editor。
+2. GitHub Desktop 切至 `feature/v11-factory-rebuild`。
+3. 執行 Fetch origin。
+4. 執行 Pull origin，確認取得本次修正。
+5. 重新以 Unity 2023.1.22f1 開啟專案。
+6. 檢查 Console，確認兩項 CS0246 消失且沒有新的紅色 C# 錯誤。
+7. **只有確認沒有編譯錯誤後才退出 Safe Mode**，再開 Test Runner 確認七個原測試都能被辨識。正常開啟 Editor 不代表測試已通過。
+8. 若仍有紅色錯誤，保留完整訊息（含檔案、行列與錯誤碼）回報；Rider 訊息若持續也一併保留，不先刪快取／套件。
+
+本次交付是最小修正提交；最終編譯修復驗收需使用者本機確認無新增 C# 錯誤且可退出 Safe Mode。編譯修復驗收不等於 V11 Phase 1 遊戲驗收。PR #2 保持 Draft、不合併 main，等待 Console 回報；本次不繼續功能開發。

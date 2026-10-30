@@ -12,7 +12,8 @@ namespace M6IntegrationTests
 {
     // This asmdef deliberately does not reference Assembly-CSharp; use the same
     // reflection boundary as the existing C3 integration tests. No new packages.
-    [NonParallelizable]
+    // Unity's pinned NUnit build does not expose NonParallelizableAttribute.
+    // Keep UnityTest discovery and the fixture's explicit state restoration intact.
     public sealed class C3V11SafeCirculationTests
     {
         private const string ScenePath = "Assets/_Modules_/02_Levels/Level03/Scenes/C_Main.unity";
