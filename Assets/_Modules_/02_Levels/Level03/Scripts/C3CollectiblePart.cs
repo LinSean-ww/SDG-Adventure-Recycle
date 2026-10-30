@@ -120,8 +120,7 @@ namespace C3TreasurePuzzle
         {
             if (!CanInteract(actor) || !progress.TryCollect(partId, displayName)) return;
             collected = true;
-            if (EcoAdventureRuntime.Instance != null)
-                EcoAdventureRuntime.Instance.AddItem(partId, displayName, 1);
+            // TryCollect owns both the once-only quest transition and inventory grant.
             gameObject.SetActive(false);
         }
     }

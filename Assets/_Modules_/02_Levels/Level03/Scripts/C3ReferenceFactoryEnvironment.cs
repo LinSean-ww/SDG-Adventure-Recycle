@@ -226,18 +226,27 @@ namespace C3TreasurePuzzle
             GameObject art = GameObject.Find("C_Factory_Art");
             if (art)
             {
-                foreach (Renderer r in art.GetComponentsInChildren<Renderer>(true)) r.enabled=false;
+                // These are the original live upper stations, not obsolete factory art.
+                // Exclude their complete subtrees BEFORE hiding the old presentation,
+                // so collider state does not depend on another component's Start().
+                Transform bench = art.transform.Find("Floor2_Industrial/UpperChipMaintenanceBench");
+                Transform box = art.transform.Find("Floor2_Industrial/UpperDistributionBox");
+                foreach (Renderer r in art.GetComponentsInChildren<Renderer>(true))
+                    if (!IsUpperStation(r.transform, bench, box)) r.enabled=false;
                 // Invisible decorative stair/pipe meshes must not remain solid
                 // barriers that trap the player's CharacterController.
-                foreach (Collider c in art.GetComponentsInChildren<Collider>(true))
-                    if (c && !c.isTrigger) c.enabled=false;
+                foreach (string path in RetiredArtCollisionPaths)
+                {
+                    Transform item = art.transform.Find(path);
+                    if (!item) continue;
+                    foreach (Collider c in item.GetComponents<Collider>())
+                        if (!c.isTrigger) c.enabled = false;
+                }
             }
             GameObject oldSimulation = GameObject.Find("C3_SortingSimulation");
             if (oldSimulation)
             {
                 foreach (Renderer r in oldSimulation.GetComponentsInChildren<Renderer>(true)) r.enabled=false;
-                foreach (Collider c in oldSimulation.GetComponentsInChildren<Collider>(true))
-                    if (c && !c.isTrigger) c.enabled=false;
             }
             foreach (string label in new[] { "Plastic", "Metal", "Paper" })
             {
@@ -247,12 +256,70 @@ namespace C3TreasurePuzzle
             // Move the one REAL sorting trigger/machine logic under the bank.
             GameObject line=GameObject.Find("WasteSortingLine");
             if (line) line.transform.position = new Vector3(-13f,.55f,14.55f);
-            // The source art machine volumes otherwise become invisible obstacles.
-            GameObject originalMachines = GameObject.Find("IndustrialMachines");
-            if(originalMachines)
-                foreach(Collider c in originalMachines.GetComponentsInChildren<Collider>(true))
-                    if (c && !c.isTrigger) c.enabled=false;
         }
+
+        // C_Main V10 inventory: only the collision volumes of replaced art.
+        // Never extend this to arbitrary descendants: live stations, new triggers
+        // and future equipment must retain their own physics and interaction.
+        private static readonly string[] RetiredArtCollisionPaths =
+        {
+            "Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceA_-10.0",
+            "Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceA_-17.5",
+            "Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceA_-21.5",
+            "Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceA_-5.5",
+            "Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceB_-10.0",
+            "Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceB_-17.5",
+            "Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceB_-21.5",
+            "Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceB_-5.5",
+            "Floor1_Industrial/EastToolCabinet",
+            "Floor1_Industrial/WestPowerCabinet_A",
+            "Floor1_Industrial/WestPowerCabinet_B",
+            "IndustrialMachines/FeedPump",
+            "IndustrialMachines/NortheastFilterArray",
+            "IndustrialMachines/PurificationReactor",
+            "IndustrialMachines/WasteSortingLine",
+            "Lighting/Cyan_Console/IndicatorLens",
+            "Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-10.0_14.8",
+            "Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-10.0_16.0",
+            "Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-15.0_14.8",
+            "Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-15.0_16.0",
+            "Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-20.0_14.8",
+            "Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-20.0_16.0",
+            "Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-6.0_14.8",
+            "Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-6.0_16.0",
+            "Pipes/Pipe_MountsAndConnections/NorthWallHanger_-10.5",
+            "Pipes/Pipe_MountsAndConnections/NorthWallHanger_-16.0",
+            "Pipes/Pipe_MountsAndConnections/NorthWallHanger_-21.0",
+            "Pipes/Pipe_MountsAndConnections/NorthWallHanger_-5.0",
+            "Pipes/Pipe_MountsAndConnections/NorthWestJoin",
+            "Pipes/Pipe_MountsAndConnections/ReactorDeckHanger_14.4",
+            "Pipes/Pipe_MountsAndConnections/ReactorDeckHanger_17.0",
+            "Pipes/Pipe_MountsAndConnections/ReactorDeckHanger_19.5",
+            "Pipes/Pipe_MountsAndConnections/WestNorthElbow",
+            "Pipes/Pipe_MountsAndConnections/WestWallHanger_14.0",
+            "Pipes/Pipe_MountsAndConnections/WestWallHanger_18.6",
+            "Pipes/Pipe_MountsAndConnections/WestWallHanger_22.0",
+            "Pipes/Pipe_MountsAndConnections/WestWallHanger_4.0",
+            "Pipes/Pipe_MountsAndConnections/WestWallHanger_9.0",
+            "Pipes/Pipe_NorthFilterFeed/Collision_NorthFilterBranch",
+            "Pipes/Pipe_NorthFilterFeed/Collision_NorthFilterMain",
+            "Pipes/Pipe_ReactorReturn/Collision_ReactorOut",
+            "Pipes/Pipe_ReactorReturn/Collision_ReactorReturnJoin",
+            "Pipes/Pipe_ReactorReturn/Collision_ReactorReturnMain",
+            "Pipes/Pipe_UpperCableConduit/Collision_UpperConduitA",
+            "Pipes/Pipe_UpperCableConduit/Collision_UpperConduitB",
+            "Pipes/Pipe_WestServiceTrunk/Collision_MainWestTrunk",
+            "Pipes/Pipe_WestServiceTrunk/Collision_WestCabinetA",
+            "Pipes/Pipe_WestServiceTrunk/Collision_WestCabinetB",
+            "Props/Barrel_East",
+            "Props/Barrel_North",
+            "Props/Barrel_West",
+            "Props/WasteContainer_A",
+            "Props/WasteContainer_B",
+        };
+
+        private static bool IsUpperStation(Transform item, Transform bench, Transform box)
+            => (bench && item.IsChildOf(bench)) || (box && item.IsChildOf(box));
 
         private void BuildWarehouse()
         {
@@ -647,7 +714,9 @@ namespace C3TreasurePuzzle
             for(int p=0;p<5;p++)
             {
                 float x=-23.7f+p*5.58f;
-                float y=6.63f+(p%2)*.36f;
+                // Standing head is at 6.30m on 2F. Keep the hanging clamps (0.71m)
+                // above it across both side routes and the widened maintenance bay.
+                float y=7.60f+(p%2)*.36f;
                 Beam("Industrial wall-longitudinal supply",new Vector3(x,y,1.1f),
                     new Vector3(x,y,24.0f),.13f,p%2==0?pipe:stainless);
                 for(int i=0;i<5;i++)

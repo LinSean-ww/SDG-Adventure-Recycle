@@ -7,7 +7,7 @@ using UnityEngine.TestTools;
 namespace M6IntegrationTests
 {
     /// <summary>
-    /// V9 *Unity PlayMode* checks. None of these results can be claimed to pass
+    /// Current-layout *Unity PlayMode* checks (original file/GUID retained). None of these results can be claimed to pass
     /// until actually run in Unity 2023.1.22f1. Renderer bounds test the imported
     /// OBJ mesh, not the coordinates from the offline mesh generator.
     /// </summary>
@@ -21,21 +21,25 @@ namespace M6IntegrationTests
             Assert.IsNotNull(GameObject.Find("C3_V3_VerifiedCirculation"));
         }
         [UnityTest]
-        public IEnumerator VisibleRightStairExistsAndItsWorldBoundsMatchCWorkAisle()
+        public IEnumerator ReplacementStairsHaveMatchingPhysicalTreadsOnBothSides()
         {
             yield return Open();
-            GameObject go=GameObject.Find("V9_RightVisibleStairTreads");
-            Assert.IsNotNull(go,"RIGHT-HAND staircase not instantiated; check Console errors / Resources importer");
-            var rend=go.GetComponentInChildren<MeshRenderer>(true);
-            Assert.IsNotNull(rend,"Stair imported but has no visible mesh");
-            Assert.IsTrue(rend.enabled);
-            Bounds b=rend.bounds;
-            Assert.That(b.min.x, Is.InRange(-4.4f,-3.7f), "Unity OBJ X-axis mirrored: stair outside C hall");
-            Assert.That(b.max.x, Is.InRange(-1.6f,-.8f));
-            Assert.That(b.min.z, Is.InRange(2.0f,2.8f));
-            Assert.That(b.max.y, Is.InRange(4.4f,4.7f));
-            Assert.IsNotNull(GameObject.Find("V9_RIGHT_STAIR_WALKABLE_RAMP"));
-            Assert.IsNotNull(GameObject.Find("V9_RIGHT_STAIR_EAST_GALLERY_JOIN"));
+            foreach (string side in new[] { "A_WEST", "B_EAST" })
+            {
+                Transform stair = GameObject.Find("STAIR_" + side).transform;
+                Assert.IsNotNull(stair);
+                for (int i = 1; i <= 22; i++)
+                {
+                    Transform tread = stair.Find("TREAD_" + i.ToString("D2"));
+                    Assert.IsNotNull(tread);
+                    Renderer renderer = tread.GetComponent<Renderer>();
+                    Collider collider = tread.GetComponent<Collider>();
+                    Assert.IsTrue(renderer.enabled && collider.enabled);
+                    Assert.Less(Vector3.Distance(renderer.bounds.center, collider.bounds.center), .01f);
+                    Assert.That(collider.bounds.max.y, Is.EqualTo(.56f + i * (3.94f / 22f)).Within(.01f));
+                }
+            }
+            Assert.IsNull(GameObject.Find("V9_RIGHT_STAIR_WALKABLE_RAMP"));
             Assert.IsNotNull(GameObject.Find("UpperChipMaintenanceBench"));
         }
         [UnityTest]
@@ -57,48 +61,54 @@ namespace M6IntegrationTests
             Assert.IsNotNull(GameObject.Find("V7_OPAQUE_C_TO_B_RECEIVING_SHUTTER"));
         }
         [UnityTest]
-        public IEnumerator ObjWorldHandednessMatchesCFactoryWalkwayAndColliderLayout()
+        public IEnumerator ReplacementDeckWorldBoundsMatchBothStairExitsAndRearBay()
         {
             yield return Open();
-            var deck = GameObject.Find("V3_WalkwayDeck");
-            Assert.IsNotNull(deck);
-            Renderer d = deck.GetComponentInChildren<Renderer>();
-            Assert.IsNotNull(d);
-            Assert.That(d.bounds.min.x, Is.InRange(-24.4f, -23.8f),
-                "Walkway x should be negative in C hall, not positive across boundary wall");
-            var east = GameObject.Find("V7_EastWallSkywalkDeck");
-            Assert.IsNotNull(east);
-            Renderer er = east.GetComponentInChildren<Renderer>();
-            Assert.That(er.bounds.min.x, Is.InRange(-4.9f,-4.4f));
-            Assert.That(er.bounds.max.x, Is.InRange(-.9f,-.4f));
+            var west = GameObject.Find("2F_WEST_SERVICE_ROUTE").GetComponent<Collider>();
+            var east = GameObject.Find("2F_EAST_SERVICE_ROUTE").GetComponent<Collider>();
+            var rear = GameObject.Find("2F_CONNECTING_REAR_ROUTE").GetComponent<Collider>();
+            Assert.That(west.bounds.min.x, Is.EqualTo(-24.1f).Within(.01f));
+            Assert.That(west.bounds.max.x, Is.EqualTo(-22.3f).Within(.01f));
+            Assert.That(east.bounds.min.x, Is.EqualTo(-2.45f).Within(.01f));
+            Assert.That(east.bounds.max.x, Is.EqualTo(-.65f).Within(.01f));
+            foreach (Collider side in new[] { west, east })
+            {
+                Assert.That(side.bounds.min.z, Is.EqualTo(13.7f).Within(.01f));
+                Assert.That(side.bounds.max.z, Is.EqualTo(rear.bounds.min.z).Within(.01f));
+                Assert.That(side.bounds.max.y, Is.EqualTo(4.5f).Within(.01f));
+            }
+            Assert.That(rear.bounds.min.z, Is.EqualTo(18.1f).Within(.01f));
+            Assert.That(rear.bounds.max.z, Is.EqualTo(21.3f).Within(.01f));
         }
         [UnityTest]
         public IEnumerator PlayerCanClimbRightStairAndReachRearMaintenanceBridge()
         {
             yield return Open();
-            GameObject player=new GameObject("V9_TEST_WALKER");
-            CharacterController cc=player.AddComponent<CharacterController>();
-            cc.radius=.25f; cc.height=1.80f; cc.center=Vector3.up*.9f;
-            cc.stepOffset=.30f;cc.slopeLimit=54f;
-            player.transform.position=new Vector3(-2.95f,.69f,2.65f);
-            for(int i=0;i<240;i++)
+            GameObject player = GameObject.Find("M2_Player");
+            CharacterController cc = player.GetComponent<CharacterController>();
+            foreach (MonoBehaviour behaviour in player.GetComponents<MonoBehaviour>())
+                if (behaviour && behaviour.GetType().Name == "C3FirstPersonController") behaviour.enabled = false;
+            cc.enabled = false;
+            player.transform.position = new Vector3(-1.55f, .60f, 3.1f);
+            cc.enabled = true;
+            Physics.SyncTransforms();
+            // Production capsule dimensions, not a smaller/slope-relaxed test walker.
+            Vector3[] route = { new Vector3(-1.55f,4.5f,14.2f),
+                new Vector3(-1.55f,4.5f,19.2f), new Vector3(-13.2f,4.5f,19.2f) };
+            foreach (Vector3 goal in route)
             {
-                cc.Move(new Vector3(0f,-.08f,.036f));
-                yield return null;
+                for (int i = 0; i < 600; i++)
+                {
+                    Vector3 delta = goal - player.transform.position;
+                    delta.y = 0f;
+                    if (delta.magnitude < .08f) break;
+                    cc.Move(delta.normalized * .04f + Vector3.down * .025f);
+                    yield return null;
+                }
+                Assert.Less(Vector2.Distance(new Vector2(player.transform.position.x, player.transform.position.z),
+                    new Vector2(goal.x, goal.z)), .15f, "Blocked before " + goal);
+                Assert.Greater(player.transform.position.y, 4.2f, "Fell on upper route");
             }
-            Assert.Greater(player.transform.position.z,10.25f,"Cannot climb visible staircase");
-            Assert.Greater(player.transform.position.y,4.10f,"Not elevated to 2F");
-            for(int i=0;i<36;i++){cc.Move(new Vector3(.040f,-.05f,0f));yield return null;}
-            Assert.Greater(player.transform.position.x,-1.80f,"Stair landing did not join east gallery");
-            for(int i=0;i<145;i++){cc.Move(new Vector3(0f,-.05f,.040f));yield return null;}
-            Assert.Greater(player.transform.position.z,16.95f,"East gallery is blocked");
-            for(int i=0;i<64;i++){cc.Move(new Vector3(-.040f,-.05f,0f));yield return null;}
-            for(int i=0;i<53;i++){cc.Move(new Vector3(0f,-.05f,.040f));yield return null;}
-            Assert.Greater(player.transform.position.z,18.70f,"Rear maintenance bridge cannot be reached");
-            for(int i=0;i<210;i++){cc.Move(new Vector3(-.043f,-.05f,0f));yield return null;}
-            Assert.Less(player.transform.position.x,-10f,"Bench on upper platform still unreachable");
-            Assert.Greater(player.transform.position.y,4.12f,"Player fell through upper walkway");
-            Object.Destroy(player);
         }
         [UnityTest]
         public IEnumerator PriorFloorStripeIsPassable()
