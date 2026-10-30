@@ -354,6 +354,13 @@ namespace M6IntegrationTests
         {
             StartAt(new Vector3(-3.5f, .60f, 10.7f));
             yield return WalkTo(.6f, .55f, 10.7f);
+            Assert.IsTrue(body.isGrounded, "B-side doorway floor must support the original player");
+            Assert.That(body.height, Is.EqualTo(1.8f).Within(.001f), "Do not crouch to bypass the doorway");
+            // Return through the same curtain using TickMovement -> Move; no
+            // teleport, alternate capsule or temporary collision changes.
+            yield return WalkTo(-3.5f, .56f, 10.7f);
+            Assert.IsTrue(body.isGrounded, "Player must return to the C-side floor");
+            Assert.That(body.height, Is.EqualTo(1.8f).Within(.001f));
         }
 
         [UnityTest]

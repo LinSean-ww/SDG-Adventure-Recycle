@@ -1,7 +1,78 @@
 # V11 Phase 1 — Safe Factory Circulation
 
-工程狀態：已實作，等待 Unity 2023.1.22f1 驗收。**Unity PlayMode: NOT RUN**。
-Unity 編譯、EditMode、Game／Scene 截圖與人工操作驗收均為 **NOT RUN**；本機沒有 Unity Editor，不能將下列靜態證據當成實際通行成功。
+最新狀態：使用者回報基準 `bacfd3f8e99d56f242aa8fc4caf250672e1dcaf2` 在 Windows Unity 2023.1.22f1 的七項 V11 PlayMode 結果為 **6 PASS、1 FAIL**。本次針對 B／C 門口提交修正；**修正後 Unity Compilation: NOT RUN；Unity PlayMode: NOT RUN**。
+本雲端沒有可用 Unity Editor。下列靜態檢查不等於修正後的編譯、渲染、實際雙向通行或遊戲驗收通過；使用者的既有實測結果與本次未執行項目分開記錄。
+
+## B／C 通道修正：CONFIRMED PLAYMODE FAILURE
+
+### 原始實測證據與根因
+
+使用者實際 Test Runner：`GroundBCDoorApproachRemainsOpenUnderTheEastFlight`，1.606s，**FAIL**：
+
+```text
+Route blocked before (0.60, 0.55, 10.70); player=(-0.82, 0.63, 10.70)
+Expected: less than 0.150000006f
+But was: 1.42000008f
+C3 movement blocked by:
+M3_Treasure/C3_ReferenceRecyclingFactory_Visuals/V7_OPAQUE_C_TO_B_RECEIVING_SHUTTER
+world=(-0.44, 1.23, 10.70), player=(-0.83, 0.63, 10.70)
+```
+
+舊 `BuildWarehouse()` 以 `Box(..., graphite, true)` 建立實體鐵捲門：中心 (-.36,3.43,12.50)、尺寸 (.16,5.77,4.62)，世界範圍 **X=-.44..-.28、Y=.545..6.315、Z=10.19..14.81**。非 Trigger Collider 橫跨門洞，實際接觸 X=-.44 與此範圍吻合。這是已確認的物理阻擋，不能歸為測試誤判。
+
+另一個程式碼確認的**視覺遮擋**：東牆裝飾板原中心 (-.37,4.2,10.3)、尺寸 (.10,6.2,2.46)，範圍 X=-.42..-.32、Y=1.1..7.3、Z=9.07..11.53，雖無 Collider，仍會遮住 Z=10.7 的人員入口。本次只將該板 Z 裁到 9.07..10.20；其他下層牆板與上層牆板尺寸不變，原牆 Collider 不變。
+
+### 實際修正與通道配置
+
+- 停止生成整個 `V7_OPAQUE_C_TO_B_RECEIVING_SHUTTER`、21 條 `V7_B_SHUTTER_PRESSED_STEEL_SLAT` 與 `V7_C_SIDE_B_FEED_RECEIVING_HATCH`。不是只隱藏 Renderer，也不是保留整片不透明門板而關閉碰撞。更新過時的封閉 B 區註解。
+- 在原門洞 X=-.30、Z=10.20..14.80 建立 `V11_BC_PVC_CURTAIN`。20 片淡藍半透明垂直薄 Cube；各寬 .25m、厚 .012m、高 2.88m，間距 .23m、重疊 .02m，交錯深度 ±.008m 避免共面。整體 Z=10.19..14.81，左右各 .01m 收進門框；Y=.62..3.50，底部離原地面 .07m。
+- 採現有 Built-in render pipeline 的 `Standard`，alpha=.26、Transparent mode=3、One/OneMinusSrcAlpha、ZWrite=0、`_ALPHAPREMULTIPLY_ON`、queue=3000。薄 Cube 有朝向 B／C 兩側的外表面，可雙面看見；不依賴新 Shader、貼圖、套件或自建 Mesh。簾片不投射實心陰影。實際透明外觀／Shader 支援仍待 Unity 驗證。
+- 上軌位於原過樑 Y=3.50..3.58。簾片及上軌都使用既有 `Shape(solid=false)`：建立時立刻停用 Primitive Collider 並排程 Destroy，**沒有非 Trigger 碰撞、Trigger 或推擠物理**。人員通道仍由原地板、牆、門框及外側安全邊界提供碰撞。
+- 同一個既有生成器 Awake 建立一次，停用／啟用不重建；簾根為工廠場景子物件，隨場景銷毀。20 片共用一個 Material，由現有 owned 清單於 OnDestroy 釋放；未新建持久資源，沒有新增 .meta 需求。V9 測試加入連續兩次載入的根數／片數檢查，實際結果 NOT RUN。
+
+`C_Main.unity` 相對本次基準**逐位元不變**，以下十個原物件全部保留；Collider 的 enabled／Trigger、元件與引用未改：
+
+| 原結構 | 保留範圍／用途 |
+| --- | --- |
+| C_Wall_4_Near、C_Wall_4_Far、C_Wall_4_Lintel | 門洞 Z=10.20..14.80，過樑下緣 Y=3.50；地面上方淨高 2.95m |
+| B_NearJamb、B_FarJamb、B_LintelCap | 原可見門框／過樑，未拆除或隱藏 |
+| B_Door_Floor | X=-.40..2.00、Z=9.40..15.60、頂面 Y=.55；與 C_Floor 的 X=-25..0、Y=.55 重疊銜接 |
+| B_Safety_End、B_Safety_Near、B_Safety_Far | 端界內緣 X=1.80；兩側內緣 Z=9.60／15.40，保留全部實體碰撞，阻止走出地板 |
+
+人員沿 **(-3.5,.60,10.7) → (.6,.55,10.7) → (-3.5,.56,10.7)** 通行。仍使用原半徑 .30、站高 1.80、skin .08 的 CharacterController 與 `TickMovement → Move`，不是另造縮小角色。X=.6 僅代表抵達 **C_Main 內的 B 側門外測試區域**；本次沒有新增完整 B 關卡或 B 場景轉場，不能宣稱 B 區關卡／跨場景已驗收。
+
+### 輸送設備與六項既有 PASS 的保護
+
+`C3V3Circulation.cs`、四個 `V9_BDoorToSorter*` OBJ 與 meta 完全不變；`BuildInfeedConveyorAndPhysicalDrops()`、`Update()`、StartMachinery、三分類機與工作台生成等既有方法逐位元不變，保留七個 `B_PORTAL_GENUINE_FEED_CARGO_*` 的建立與既有進料動畫。物料入口在 Z=12.50，地面人員路線在 Z=10.70。
+
+四個原 OBJ 的 Z 最小值為：帶面 11.25872、鋼架 11.15497、黃護欄 11.19668、滾輪 11.28992。對照人員 Z=10.7 加 radius+skin=.38，北側包絡為 11.08，最近模型包絡仍有約 .075m 間距。這是離線模型界限比較，不是匯入後的實際碰撞／通行結果；沒有移動輸送帶或樓梯 B，也未更動輸送與樓梯交會的既有幾何。
+
+V11 **僅修改原失敗測試的方法內容**：保留原起點、X=.6 跨門目標、WalkTo 的位置／高度斷言、全程重力與碰撞，再加入原路返程及兩端站姿／接地檢查。沒有中途傳送、關閉 Collider、Ignore／Explicit、縮短目標或替換控制器。其餘六項測試、setup／teardown、反射輔助、狀態隔離、CollisionRecorder 與晶片一次授予邏輯保持不變。
+
+V9 保留原五項測試與 GUID；`BReceivingBeltActuallyExistsOnCFrontFaceAndMeetsMainHighBelt` 保留所有原輸送帶 bounds 斷言，將要求鐵捲門存在的斷言改為：原門洞／地板／安全邊界及門框存在，透明條簾及雙向表面正確、無 Collider、無不透明牆板遮擋，原四種輸送資產與七個進料物件存在，並在連續兩次場景載入後確認單一簾根與 20 片簾片。另以實際 Physics.Raycast 要求 B 側目的地踩在原 B_Door_Floor；真正角色雙向行走仍由 V11 負責，沒有用座標計算冒充通行成功。
+
+### 本次檢查與尚未驗收項目
+
+| 項目 | 結果 | 根據／限制 |
+| --- | --- | --- |
+| 使用者原始 V11 PlayMode | **6 PASS、1 FAIL** | 使用者 Windows Test Runner 回報；通道測試為 CONFIRMED PLAYMODE FAILURE，屬修正前結果 |
+| git diff --check | PASS | 差異空白檢查 |
+| C# AST 語法與回傳／yield 基本掃描 | PASS | 106 檔、833 方法、97 個具體 IEnumerator；無已知不支援的平行屬性。不是完整型別／控制流程分析或 Unity 編譯 |
+| 七項 V11／五項 V9 保留與斷言前後比對 | PASS | 六項 V11 及隔離／移動方法逐位元不變；V9 原帶面斷言保留，移除過時鐵捲門要求 |
+| 場景／引用、Collider 生成邏輯、門洞尺寸、PVC 材質設定 | PASS | YAML 的門口旋轉均為 identity，納入祖先縮放核對 bounds；457 個 Assets GUID 唯一。僅靜態來源與資源檢查 |
+| 保護範圍 | PASS | 僅下列五檔可變，其餘所有追蹤檔與基準逐位元相同；無新增資源、套件、場景引用或 .meta |
+| **Unity Compilation** | **NOT RUN** | 雲端沒有可用 Editor |
+| **Unity PlayMode：七項 V11** | **NOT RUN** | 修正後全部待重跑，不能沿用修正前六項 PASS 當新結果 |
+| **Unity PlayMode：受影響 V9（整個五項 fixture）** | **NOT RUN** | 新增斷言、Shader／Mesh／Raycast 與兩次重載尚未實際執行 |
+| 實際雙向通行、透明外觀、原有玩法回歸 | **NOT RUN** | 使用者需確認站姿穿簾、地面／安全邊界、樓梯 B、進料與原六項功能均正常 |
+
+修改檔案：`C3ReferenceFactoryEnvironment.cs`、`C3V11SafeCirculationTests.cs`、`C3V9VisibleIndustrialRouteTests.cs`、本報告及 `V11_Phase1_LegacyCleanup.csv`。使用既有 `feature/v11-factory-rebuild` 與 PR #2，不建立分支／PR、不改 main、不 force push；PR 保持 Draft，等待 ChatGPT 審查與使用者 Unity 實測。
+
+尚未驗收：透明渲染、雙向實際物理與全部相關回歸；條簾目前不含動態擺動／音效，屬可選後續項目。更早 V3～V8 的歷史佈局斷言不在本次重整範圍，其中 `C3V7CZoneBoundaryAndAisleTests.CToBIsClosedAndTheReceivingBeltStopsAtThreshold` 仍要求封閉鐵捲門及早已退役的 V8 輸送帶，與現規格衝突，須另行遷移；未執行，不能宣稱全歷史套件通過。既存 V8 fixture 的 Ignore 本次未變更，也未新增任何 Ignore。程式交付不等於 Unity 驗收合格。
+
+使用者操作：關閉 Unity → GitHub Desktop 確認原分支 → Fetch origin → Pull origin → 確認本次新提交 → 以 Unity 2023.1.22f1 開啟 → 檢查 Console → 執行全部七項 V11 與五項 V9 → 人工從 Z=10.7 門口走到 X=.6 再返回 → 將 Console／Test Runner 結果交 ChatGPT 審查。若出現編譯錯誤，先保留錯誤並停止遊戲驗收。
+
+以下為先前 Phase 1 實作與各次修正的歷史記錄；其中 NOT RUN 為當時雲端執行狀態。
 
 ## 基準及實際生成關係
 
@@ -47,7 +118,7 @@ Presentation 的 Activated 訂閱、EcoAdventureRuntime 的持久背包與 scene
 
 控制晶片仍是原 M3_ControlChip prefab 的 C3CollectiblePart，`partId=control_chip`、`progress` 原場景引用不變；不是 Future_M3_ControlChip_2F_Only 空標記，也不是工作桌本體發物品。原桌 Collider 與可見模型保持一致，實際零件位於桌面。
 
-保留原三零件條件、控制台、紙／金屬／塑膠分類邏輯、兩個互動工作台、分散材料與能源回收、持久背包／快捷欄、武器組裝與跨場景繼承。保留原三分類機、輸送帶與 V9 B 進料的八項 OBJ 顯示，未重建 B／C 塑膠簾或 Phase 2/3 設備。原 FPS 與背包／武器程式未更改；保留原互動按鍵 F，避免占用原 E 探頭。
+保留原三零件條件、控制台、紙／金屬／塑膠分類邏輯、兩個互動工作台、分散材料與能源回收、持久背包／快捷欄、武器組裝與跨場景繼承。保留原三分類機、輸送帶與 V9 B 進料的八項 OBJ 顯示；本次依最新規格替換 B／C 門口 PVC 條簾，未重建 Phase 2/3 設備。原 FPS 與背包／武器程式未更改；保留原互動按鍵 F，避免占用原 E 探頭。
 
 ## 執行證據與待驗收測試
 

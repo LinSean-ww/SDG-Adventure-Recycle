@@ -360,7 +360,14 @@ namespace C3TreasurePuzzle
                 // its visual opening must remain open for the player and feed ramp.
                 if (Mathf.Abs(z - 12.5f) > 2.0f)
                 {
-                    Box("Sidewall weathered concrete inset",-.37f,4.2f,z,.10f,6.2f,2.46f,wall);
+                    // Clip the panel's full extent to the real doorway, not just
+                    // its center. The z=10.3 panel otherwise hides the pedestrian
+                    // opening at z=10.7 even after the shutter is removed.
+                    float nearZ=z-1.23f, farZ=z+1.23f;
+                    if (z<12.5f) farZ=Mathf.Min(farZ,10.2f);
+                    else nearZ=Mathf.Max(nearZ,14.8f);
+                    Box("Sidewall weathered concrete inset",-.37f,4.2f,(nearZ+farZ)*.5f,
+                        .10f,6.2f,farZ-nearZ,wall);
                     Box("RAISED_EAST_UPPER_WALL",-.37f,9.80f,z,.10f,5.00f,2.46f,wall);
                 }
             }
@@ -379,20 +386,53 @@ namespace C3TreasurePuzzle
                 float z=2.2f+i*4.05f;
                 Box("Industrial overhead cable rack",-12.5f,10.60f,z,21f,.12f,.28f,steel);
             }
-            // The B area is a different zone. C manufacturing must NOT expose
-            // its interior. A closed industrial material-receiving shutter sits
-            // immediately behind the C-side conveyor terminus, at the existing
-            // x=-0.3 zone boundary. D doorway remains open for level completion.
-            Box("V7_OPAQUE_C_TO_B_RECEIVING_SHUTTER",-.36f,3.43f,12.50f,
-                .16f,5.77f,4.62f,graphite,true);
-            for (int k=0;k<21;k++)
-                Box("V7_B_SHUTTER_PRESSED_STEEL_SLAT",-.461f,.76f+k*.265f,12.50f,
-                    .027f,.038f,4.48f,steel);
-            Box("V7_C_SIDE_B_FEED_RECEIVING_HATCH",-.48f,1.40f,12.50f,
-                .025f,.83f,1.25f,graphite);
+            // V11: the shared B/C doorway admits pedestrians in both directions.
+            // Retain the scene's jambs, lintel, floor and outer safety colliders;
+            // the separate B feed remains at z=12.5, north of the z=10.7 aisle.
+            BuildBCPvcCurtain();
             // Both transitions retain named, legible signs on their real doors.
             Sign("BZone",-.51f,4.36f,12.50f,2.55f,.54f,90f);
             Sign("DZone",-12.50f,4.38f,.44f,2.55f,.54f);
+        }
+        private void BuildBCPvcCurtain()
+        {
+            // Built-in render pipeline, as configured by this project. Standard's
+            // transparent mode needs blending and ZWrite settings as well as alpha.
+            Material pvc = Mat("V11 translucent blue PVC", new Color(.58f,.84f,.91f,.26f), 0f, .68f);
+            pvc.SetFloat("_Mode", 3f);
+            pvc.SetOverrideTag("RenderType", "Transparent");
+            pvc.SetInt("_SrcBlend", (int)BlendMode.One);
+            pvc.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
+            pvc.SetInt("_ZWrite", 0);
+            pvc.DisableKeyword("_ALPHATEST_ON");
+            pvc.DisableKeyword("_ALPHABLEND_ON");
+            pvc.EnableKeyword("_ALPHAPREMULTIPLY_ON");
+            pvc.renderQueue = (int)RenderQueue.Transparent;
+
+            Transform curtain = new GameObject("V11_BC_PVC_CURTAIN").transform;
+            curtain.SetParent(root, false);
+            // Existing wall opening: z=10.2..14.8, floor y=.55, lintel y=3.5.
+            // The header occupies the lintel; strips stop .07m above the floor.
+            GameObject header = Box("HEADER_RAIL",-.30f,3.54f,12.50f,.10f,.08f,4.60f,steel);
+            header.transform.SetParent(curtain, true);
+            const int stripCount = 20;
+            const float pitch = .23f;
+            for (int i=0;i<stripCount;i++)
+            {
+                // .25m strips at .23m pitch overlap .02m. Alternate their depth
+                // to avoid coplanar overlap. Thin cubes have faces towards BOTH
+                // zones, so no custom mesh, two-sided shader or material clone.
+                GameObject strip = Box("PVC_STRIP_"+i.ToString("D2"),
+                    -.30f+(i%2==0?-.008f:.008f),2.06f,10.315f+i*pitch,
+                    .012f,2.88f,.25f,pvc);
+                strip.transform.SetParent(curtain, true);
+                Renderer renderer = strip.GetComponent<Renderer>();
+                renderer.shadowCastingMode = ShadowCastingMode.Off;
+                renderer.receiveShadows = false;
+            }
+            // Box defaults to solid=false: primitive colliders are disabled
+            // immediately and destroyed by Shape, including on the header.
+            // Awake builds once; scene ownership and owned materials handle reload.
         }
         private void BuildFloorAndCirculation()
         {
