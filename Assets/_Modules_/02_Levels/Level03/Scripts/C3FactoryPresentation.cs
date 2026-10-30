@@ -17,9 +17,10 @@ namespace C3TreasurePuzzle
         private Coroutine startup;
         private AudioSource motorAudio;
         private bool motorActive;
+        private C3RecyclingLine line;
         public bool MotorActive => motorActive;
-        public int CompletedCycles { get; private set; }
-        public int CurrentWasteKind { get; private set; }
+        public int CompletedCycles => line?line.ProcessedBatches:0;
+        public int CurrentWasteKind => line?line.LastCompletedLegacyKind:0;
 
         private void Awake()
         {
@@ -48,6 +49,8 @@ namespace C3TreasurePuzzle
             if (!GetComponent<EcoFactoryWorkshop>()) gameObject.AddComponent<EcoFactoryWorkshop>();
             if (!GetComponent<C3ReferenceFactoryEnvironment>()) gameObject.AddComponent<C3ReferenceFactoryEnvironment>();
             if (!GetComponent<C3RecyclingLineGeometry>()) gameObject.AddComponent<C3RecyclingLineGeometry>();
+            line=GetComponent<C3RecyclingLine>();
+            if (!line) line=gameObject.AddComponent<C3RecyclingLine>();
             if (!GetComponent<C3V3Circulation>()) gameObject.AddComponent<C3V3Circulation>();
         }
 

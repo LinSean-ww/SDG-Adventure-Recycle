@@ -38,6 +38,12 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
     public const int MaxStoredEnergy = 120;
     private int completedPlasticSorts;
     private int completedMetalSorts;
+    private int completedPaperSorts;
+    public const int RecyclingReceiptCapacity=4095;
+    private readonly HashSet<string> recyclingReceipts=new HashSet<string>(StringComparer.Ordinal);
+    private readonly HashSet<string> recyclingBatches=new HashSet<string>(StringComparer.Ordinal);
+    public int RecyclingReceiptCount => recyclingReceipts.Count;
+    public bool HasRecyclingReceipt(string materialId) => recyclingReceipts.Contains(materialId);
 
     // A weapon carried in inventory does not recharge unless it is held.
     public bool IsQuantumWeaponEquipped => WeaponEquipped();
@@ -101,6 +107,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             factoryPowered = false;
             completedPlasticSorts = 0;
             completedMetalSorts = 0;
+            completedPaperSorts = 0;
         }
         // Inventory and ammo survive scene changes, camera models do not.
         activeCamera = null;
@@ -192,12 +199,13 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         if (!factoryPowered) return;
         if (kind == 0) completedPlasticSorts++;
         else if (kind == 1) completedMetalSorts++;
+        else if (kind == 2) completedPaperSorts++;
     }
 
     public bool HasSortedMaterial(int kind)
     {
         return kind == 0 ? completedPlasticSorts > 0 :
-            kind == 1 && completedMetalSorts > 0;
+            kind == 1 ? completedMetalSorts > 0 : kind == 2 && completedPaperSorts > 0;
     }
 
     public bool RecoverSortedMaterial(int kind)

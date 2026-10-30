@@ -11,7 +11,7 @@ namespace C3TreasurePuzzle
         public sealed class Machine
         {
             public int Index;
-            public Transform Root,Intake,Tray,Output,Collection,Press;
+            public Transform Root,Intake,Tray,Output,Collection,Press,Pusher;
             public Renderer Indicator;
             public BoxCollider ProcessBed;
             public C3ConveyorSection Chute,IntakeRamp,InternalOutput,Outfeed,CollectionBed;
@@ -108,14 +108,14 @@ namespace C3TreasurePuzzle
         private void BuildElevatedInfeed()
         {
             Vector3[] nodes={new Vector3(1.2f,7f,12.5f),new Vector3(-.9f,7f,12.5f),
-                new Vector3(-5f,7f,12.5f),new Vector3(-5f,7f,16.85f),new Vector3(-8.1f,5.8f,16.85f)};
+                new Vector3(-3.8f,7f,12.5f),new Vector3(-3.8f,7f,16.85f),new Vector3(-6.2f,5.8f,16.85f)};
             BMaterialInterface=Marker("P2_B_HIGH_INFEED_INTERFACE",nodes[0]);
             MainEntry=Marker("P2_MAIN_ENTRY",nodes[nodes.Length-1]);
             for (int i=0;i<nodes.Length-1;i++) CommonSections.Add(Section("P2_INFEED_"+i,nodes[i],nodes[i+1],1.1f));
             MainBelt=Section("P2_MAIN_BELT",nodes[nodes.Length-1],new Vector3(-19.5f,5.8f,16.85f),1.52f);
             // Roof hangers keep the staircase and ground aisle clear; no floor
             // columns below the crossing of the east stair or the PVC doorway.
-            foreach (Vector3 anchor in new[] {new Vector3(.8f,7f,12.5f),new Vector3(-4.5f,7f,12.5f),new Vector3(-5f,7f,16.85f)})
+            foreach (Vector3 anchor in new[] {new Vector3(.8f,7f,12.5f),new Vector3(-3.8f,7f,12.5f),new Vector3(-3.8f,7f,16.85f)})
                 foreach (float side in new[] {-.66f,.66f})
                     Box("P2_ROOF_HANGER",new Vector3(anchor.x,8.9f,anchor.z+side),new Vector3(.10f,3.8f,.10f),steel);
             // New serialized proxy pieces preserve the rest of the original wall.
@@ -155,6 +155,11 @@ namespace C3TreasurePuzzle
                 machine.Tray=Marker("PROCESS_TRAY",tray,machine.Root);
                 machine.Output=Marker("MACHINE_OUTPUT",output,machine.Root);
                 machine.Collection=Marker("FINISHED_COLLECTION",collection,machine.Root);
+                foreach (int side in new[] {-1,1})
+                    Box("IDENTIFIER_UPRIGHT",main+new Vector3(.0f,.35f,side*.92f),new Vector3(.10f,.7f,.10f),steel,machine.Root);
+                Box("IDENTIFIER_GANTRY",main+Vector3.up*.75f,new Vector3(.16f,.12f,1.95f),yellow,machine.Root);
+                Box("IDENTIFIER_SENSOR",main+Vector3.up*.63f,new Vector3(.16f,.08f,.24f),glass,machine.Root,false);
+                machine.Pusher=Box("DIVERT_PUSHER",main+new Vector3(0f,.20f,.8f),new Vector3(.7f,.20f,.08f),yellow,machine.Root,false).transform;
                 machine.Chute=Section("V3_CONNECTED_DIVERT_TO_HOPPER_"+lane,main,intake,1.25f);
                 machine.IntakeRamp=Section("P2_INTAKE_RAMP_"+lane,intake,tray,1.25f);
                 machine.InputSections.Add(machine.Chute); machine.InputSections.Add(machine.IntakeRamp);
@@ -183,9 +188,14 @@ namespace C3TreasurePuzzle
         public void SetPress(int machine,float compression)
         {
             Machine m=Machines[machine];
-            m.Press.position=m.Tray.position+Vector3.up*Mathf.Lerp(1.25f,.42f,compression);
+            m.Press.position=m.Tray.position+Vector3.up*Mathf.Lerp(1.25f,.21f,compression);
             indicatorBlock.SetColor("_Color",compression>0f?new Color(.1f,.95f,.6f):new Color(.12f,.3f,.32f));
             m.Indicator.SetPropertyBlock(indicatorBlock);
+        }
+        public void SetDiverter(int machine,float travel)
+        {
+            Machine m=Machines[machine];
+            m.Pusher.position=m.Chute.Start.position+new Vector3(0f,.2f,Mathf.Lerp(.8f,.15f,Mathf.Sin(Mathf.PI*travel)));
         }
         public bool ConnectionsMatch(float tolerance)
         {

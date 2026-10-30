@@ -1,0 +1,276 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+
+namespace C3TreasurePuzzle
+{
+    public enum C3MaterialState
+    { Spawned,Feeding,MainBelt,Identified,Diverting,MachineInput,Processing,OutputReady,Outfeeding,Collected }
+
+    [DisallowMultipleComponent]
+    public sealed class C3RecyclingLine : MonoBehaviour
+    {
+        public const int UnitsPerBale=3;
+        public const int BalesPerMachineCapacity=3;
+        public const float TransportSpeed=4.5f;
+        public const float ProcessingSeconds=2.5f;
+        [Tooltip("Finite C-side demonstration supply, NOT completion of the unavailable B level.")]
+        public bool useFiniteTestSupply=true;
+
+        public sealed class MaterialRecord
+        {
+            public string MaterialId { get; internal set; }
+            public EcoRecycleCargo.Kind MaterialType { get; internal set; }
+            public C3MaterialState State { get; internal set; }
+            public int CurrentRouteSegment { get; internal set; }
+            public int TargetMachine { get; internal set; }
+            public bool Counted { get; internal set; }
+            public bool ProcessingComplete { get; internal set; }
+            public bool ProductCreated { get; internal set; }
+            public string BatchId { get; internal set; }
+            public EcoRecycleCargo Cargo { get; internal set; }
+            public int Units => 1;
+            public readonly List<C3MaterialState> History=new List<C3MaterialState>();
+            internal TransportPath Path;
+            internal float Distance;
+            internal int Slot=-1;
+        }
+        public sealed class FinishedBatch
+        {
+            public string BatchId { get; internal set; }
+            public EcoRecycleCargo.Kind MaterialType { get; internal set; }
+            public string[] SourceMaterialIds { get; internal set; }
+            public Transform Product { get; internal set; }
+            public bool OutputReached { get; internal set; }
+            public bool Collected { get; internal set; }
+            internal TransportPath Path;
+            internal float Distance;
+        }
+        internal sealed class Leg
+        {
+            public Vector3 A,B;
+            public Collider Support;
+            public Vector3 Normal => Support.transform.up;
+            public float Length => Vector3.Distance(A,B);
+        }
+        internal sealed class TransportPath
+        {
+            public readonly List<Leg> Legs=new List<Leg>();
+            public Vector3 EntranceNormal=Vector3.up,ExitNormal=Vector3.up;
+            public float Length => Legs.Sum(s=>s.Length);
+            public void Add(C3ConveyorSection section) => Legs.Add(new Leg {
+                A=section.Start.position,B=section.End.position,Support=section.Surface });
+            public void Place(Transform item,float distance,float radius,Vector3 boxSize,out int segment)
+            {
+                segment=0;
+                while (segment<Legs.Count-1 && distance>Legs[segment].Length)
+                { distance-=Legs[segment].Length; segment++; }
+                Leg leg=Legs[segment];
+                float t=leg.Length>.0001f?Mathf.Clamp01(distance/leg.Length):1f;
+                Vector3 previous=segment>0?Legs[segment-1].Normal:EntranceNormal;
+                Vector3 next=segment<Legs.Count-1?Legs[segment+1].Normal:ExitNormal;
+                Vector3 n0=(previous+leg.Normal).normalized,n1=(next+leg.Normal).normalized;
+                Vector3 up=Vector3.Slerp(n0,n1,t).normalized;
+                Vector3 forward=Vector3.ProjectOnPlane(leg.B-leg.A,up).normalized;
+                if (forward.sqrMagnitude<.1f) forward=Vector3.forward;
+                Quaternion rotation=Quaternion.LookRotation(forward,up);
+                float extent=radius;
+                if (boxSize!=Vector3.zero)
+                    extent=(Mathf.Abs(Vector3.Dot(rotation*Vector3.right,leg.Normal))*boxSize.x+
+                        Mathf.Abs(Vector3.Dot(up,leg.Normal))*boxSize.y+
+                        Mathf.Abs(Vector3.Dot(rotation*Vector3.forward,leg.Normal))*boxSize.z)*.5f;
+                // Support distance is measured along the actual belt normal. At
+                // slope joints the shared bisector gives the same end/start pose.
+                Vector3 offset=up*(extent/Mathf.Max(.15f,Vector3.Dot(up,leg.Normal)));
+                item.SetPositionAndRotation(Vector3.Lerp(leg.A,leg.B,t)+offset,rotation);
+            }
+        }
+        private sealed class MachineWork
+        {
+            public readonly MaterialRecord[] Slots=new MaterialRecord[UnitsPerBale];
+            public bool Processing;
+            public float Elapsed;
+            public int Completed;
+        }
+        private C3DeviceState device;
+        private C3RecyclingLineGeometry geometry;
+        private Transform cargoRoot;
+        private readonly List<MaterialRecord> records=new List<MaterialRecord>();
+        private readonly List<FinishedBatch> batches=new List<FinishedBatch>();
+        private readonly HashSet<string> accepted=new HashSet<string>(StringComparer.Ordinal);
+        private readonly MachineWork[] work={new MachineWork(),new MachineWork(),new MachineWork()};
+        private bool supplied;
+        private float releaseClock;
+        private string runId;
+        private EcoRecycleCargo.Kind lastCompleted=EcoRecycleCargo.Kind.Plastic;
+        public IReadOnlyList<MaterialRecord> Materials => records;
+        public IReadOnlyList<FinishedBatch> Products => batches;
+        public int AcceptedUnits => records.Count;
+        public int FedUnits => records.Count(r=>r.State!=C3MaterialState.Spawned);
+        public int WaitingUnits => records.Count(r=>r.State<C3MaterialState.Processing);
+        public int ProcessingUnits => records.Count(r=>r.State==C3MaterialState.Processing);
+        public int ProcessedUnits => records.Count(r=>r.ProcessingComplete);
+        public int ProcessedBatches => batches.Count;
+        public int OutputProducts => batches.Count(b=>b.OutputReached);
+        public int CollectedProducts => batches.Count(b=>b.Collected);
+        public int LastCompletedLegacyKind => LegacyKind(lastCompleted);
+        public bool IsOperational => device && device.FactoryState>=C3FactoryState.Running;
+        public string SupplyProvenance => "Finite C-side test supply; B level is not connected";
+
+        public static int MachineIndex(EcoRecycleCargo.Kind kind)
+        {
+            switch (kind) { case EcoRecycleCargo.Kind.Paper:return 0;
+                case EcoRecycleCargo.Kind.Metal:return 1; case EcoRecycleCargo.Kind.Plastic:return 2; default:return -1; }
+        }
+        public static int LegacyKind(EcoRecycleCargo.Kind kind)
+        {
+            switch (kind) { case EcoRecycleCargo.Kind.Paper:return 2;
+                case EcoRecycleCargo.Kind.Metal:return 1; case EcoRecycleCargo.Kind.Plastic:return 0; default:return -1; }
+        }
+        private void Awake()
+        {
+            device=GetComponent<C3DeviceState>(); geometry=GetComponent<C3RecyclingLineGeometry>();
+            if (!device || !geometry || !geometry.BuildRoot) throw new InvalidOperationException("Recycling line requires device and built geometry");
+            runId=Guid.NewGuid().ToString("N");
+            cargoRoot=new GameObject("P2_TRACKED_MATERIALS").transform;
+            cargoRoot.SetParent(geometry.BuildRoot,false);
+        }
+        private bool CanAccept(string id,EcoRecycleCargo.Kind kind)
+        {
+            EcoAdventureRuntime runtime=EcoAdventureRuntime.Instance;
+            int machine=MachineIndex(kind);
+            return gameObject.activeInHierarchy && device.FactoryState!=C3FactoryState.Completed &&
+                runtime && machine>=0 && !string.IsNullOrWhiteSpace(id) && id.Length<=128 &&
+                !accepted.Contains(id) && !runtime.HasRecyclingReceipt(id) &&
+                records.Count(r=>r.TargetMachine==machine)<UnitsPerBale*BalesPerMachineCapacity &&
+                runtime.RecyclingReceiptCount+records.Count(r=>!r.Counted)<EcoAdventureRuntime.RecyclingReceiptCapacity;
+        }
+        public bool TrySupply(string id,EcoRecycleCargo.Kind kind)
+        {
+            if (!CanAccept(id,kind)) return false;
+            GameObject item=new GameObject("P2_RAW_"+id);
+            item.transform.SetParent(cargoRoot,false);
+            item.transform.position=geometry.BMaterialInterface.position+Vector3.up*C3RecyclingLineGeometry.RawRadius;
+            GameObject model=GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            model.name="RAW_MATERIAL"; model.transform.SetParent(item.transform,false);
+            model.transform.localScale=Vector3.one*(C3RecyclingLineGeometry.RawRadius*2f);
+            model.GetComponent<Renderer>().sharedMaterial=geometry.MaterialFor(MachineIndex(kind));
+            Collider collider=model.GetComponent<Collider>(); collider.enabled=false; Destroy(collider);
+            EcoRecycleCargo cargo=item.AddComponent<EcoRecycleCargo>();
+            cargo.materialId=id; cargo.materialType=kind;
+            Admit(cargo); return true;
+        }
+        public bool TryAcceptCargo(EcoRecycleCargo cargo)
+        {
+            if (!cargo || cargo.processed || cargo.lineOwned || cargo.materialUnits!=1 ||
+                cargo.gameObject.scene!=gameObject.scene || !CanAccept(cargo.materialId,cargo.materialType)) return false;
+            if (Vector3.Distance(cargo.transform.position,geometry.BMaterialInterface.position+
+                Vector3.up*C3RecyclingLineGeometry.RawRadius)>.15f) return false;
+            // Transform transport contract: upstream retains rejected objects.
+            // Never silently disable an unknown solid collider or rigidbody.
+            if (cargo.GetComponentsInChildren<Collider>(true).Any(c=>c.enabled && !c.isTrigger) ||
+                cargo.GetComponentsInChildren<Rigidbody>(true).Any(b=>!b.isKinematic) ||
+                Vector3.Distance(cargo.transform.lossyScale,Vector3.one)>.001f) return false;
+            Renderer[] renderers=cargo.GetComponentsInChildren<Renderer>(true);
+            if (renderers.Length==0 || renderers.Any(r=>r.bounds.size.magnitude>.43f)) return false;
+            Admit(cargo); return true;
+        }
+        private void Admit(EcoRecycleCargo cargo)
+        {
+            accepted.Add(cargo.materialId); cargo.lineOwned=true;
+            cargo.transform.SetParent(cargoRoot,true);
+            MaterialRecord record=new MaterialRecord {MaterialId=cargo.materialId,MaterialType=cargo.materialType,
+                TargetMachine=MachineIndex(cargo.materialType),Cargo=cargo,State=C3MaterialState.Spawned};
+            record.History.Add(record.State);
+            record.Path=new TransportPath {ExitNormal=geometry.Machines[record.TargetMachine].Chute.Normal};
+            foreach (C3ConveyorSection section in geometry.CommonSections) record.Path.Add(section);
+            record.Path.Legs.Add(new Leg {A=geometry.MainBelt.Start.position,
+                B=geometry.Machines[record.TargetMachine].Chute.Start.position,Support=geometry.MainBelt.Surface});
+            record.Cargo.gameObject.SetActive(false);
+            records.Add(record);
+        }
+        private static void Transition(MaterialRecord record,C3MaterialState next)
+        {
+            if ((int)next!=(int)record.State+1) throw new InvalidOperationException("Invalid material transition "+record.State+" -> "+next);
+            record.State=next; record.History.Add(next);
+        }
+        private void Update() => AdvanceSimulation(Time.deltaTime);
+        public void AdvanceSimulation(float dt)
+        {
+            if (!gameObject.activeInHierarchy || !IsOperational || Time.timeScale<=0f || dt<=0f || float.IsNaN(dt) || float.IsInfinity(dt)) return;
+            // Bound integration even after a long frame; never jump through stages.
+            dt=Mathf.Min(dt,.25f);
+            if (!supplied && useFiniteTestSupply && device.FactoryState==C3FactoryState.Running)
+            {
+                supplied=true;
+                for (int i=0;i<9;i++) TrySupply("DEMO-"+runId+"-"+i,
+                    i%3==0?EcoRecycleCargo.Kind.Plastic:i%3==1?EcoRecycleCargo.Kind.Metal:EcoRecycleCargo.Kind.Paper);
+            }
+            releaseClock+=dt;
+            MaterialRecord waiting=records.FirstOrDefault(r=>r.State==C3MaterialState.Spawned);
+            if (waiting!=null && releaseClock>=.45f && records.Where(OnPrimary).All(r=>r.Distance>.6f))
+            {
+                releaseClock=0f; Transition(waiting,C3MaterialState.Feeding);
+                waiting.Cargo.gameObject.SetActive(true); PlaceRaw(waiting);
+            }
+            MaterialRecord[] alreadyDiverting=records.Where(r=>r.State==C3MaterialState.Diverting).ToArray();
+            foreach (MaterialRecord record in records.Where(OnPrimary).OrderByDescending(r=>r.Distance).ToArray())
+            {
+                if (record.State==C3MaterialState.Identified) { TryDivert(record); continue; }
+                float next=Mathf.Min(record.Path.Length,record.Distance+TransportSpeed*dt);
+                foreach (MaterialRecord ahead in records.Where(OnPrimary))
+                    if (ahead!=record && ahead.Distance>record.Distance+.001f) next=Mathf.Min(next,ahead.Distance-.5f);
+                record.Distance=Mathf.Max(record.Distance,next); PlaceRaw(record);
+                float commonLength=record.Path.Legs.Take(geometry.CommonSections.Count).Sum(s=>s.Length);
+                if (record.State==C3MaterialState.Feeding && record.Distance>=commonLength) Transition(record,C3MaterialState.MainBelt);
+                if (record.Distance>=record.Path.Length-.0001f)
+                {
+                    if (record.State==C3MaterialState.Feeding) Transition(record,C3MaterialState.MainBelt);
+                    Transition(record,C3MaterialState.Identified); TryDivert(record);
+                }
+            }
+            foreach (MaterialRecord record in alreadyDiverting)
+            {
+                record.Distance=Mathf.Min(record.Path.Length,record.Distance+TransportSpeed*dt); PlaceRaw(record);
+                if (record.Distance>=record.Path.Length-.0001f) Transition(record,C3MaterialState.MachineInput);
+            }
+            for (int lane=0;lane<work.Length;lane++)
+            {
+                MaterialRecord atGate=records.FirstOrDefault(r=>r.TargetMachine==lane &&
+                    r.State==C3MaterialState.Diverting && r.Distance<geometry.Machines[lane].Chute.Length);
+                geometry.SetDiverter(lane,atGate!=null?atGate.Distance/geometry.Machines[lane].Chute.Length:0f);
+            }
+            TickMachines(dt);
+            TickProducts(dt);
+            geometry.AnimateRollers(dt);
+        }
+        private static bool OnPrimary(MaterialRecord record) => record.State==C3MaterialState.Feeding ||
+            record.State==C3MaterialState.MainBelt || record.State==C3MaterialState.Identified;
+        private void PlaceRaw(MaterialRecord record)
+        {
+            int segment;
+            record.Path.Place(record.Cargo.transform,record.Distance,C3RecyclingLineGeometry.RawRadius,Vector3.zero,out segment);
+            record.CurrentRouteSegment=segment;
+        }
+        private void TryDivert(MaterialRecord record)
+        {
+            MachineWork machine=work[record.TargetMachine];
+            int slot=Array.FindIndex(machine.Slots,r=>r==null);
+            if (slot<0) return;
+            machine.Slots[slot]=record; record.Slot=slot;
+            C3RecyclingLineGeometry.Machine model=geometry.Machines[record.TargetMachine];
+            record.Path=new TransportPath {EntranceNormal=geometry.MainBelt.Normal};
+            foreach (C3ConveyorSection section in model.InputSections) record.Path.Add(section);
+            record.Path.Legs.Add(new Leg {A=model.Tray.position,
+                B=model.Tray.position+new Vector3((slot-1)*.32f,0f,-.25f),Support=model.ProcessBed});
+            record.Distance=0f; Transition(record,C3MaterialState.Diverting); PlaceRaw(record);
+        }
+        private void TickMachines(float dt) { /* Processing milestone supplies the batch transaction. */ }
+        private void TickProducts(float dt) { /* Processing milestone supplies the output transport. */ }
+        private void OnDestroy()
+        {
+            if (cargoRoot) { cargoRoot.gameObject.SetActive(false); Destroy(cargoRoot.gameObject); }
+        }
+    }
+}

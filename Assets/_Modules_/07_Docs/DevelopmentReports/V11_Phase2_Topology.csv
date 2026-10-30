@@ -1,9 +1,9 @@
 stage,type,start_x,start_y,start_z,end_x,end_y,end_z,width,meaning
 2.1,infeed_0,1.2,7,12.5,-0.9,7,12.5,1.1,B high interface through dedicated wall aperture
-2.1,infeed_1,-0.9,7,12.5,-5,7,12.5,1.1,roof suspended crossing above east stair
-2.1,infeed_2,-5,7,12.5,-5,7,16.85,1.1,north transfer
-2.1,infeed_3,-5,7,16.85,-8.1,5.8,16.85,1.1,cleated descending transfer
-2.1,main,-8.1,5.8,16.85,-19.5,5.8,16.85,1.52,plastic then metal then paper diversion
+2.1,infeed_1,-0.9,7,12.5,-3.8,7,12.5,1.1,roof suspended crossing above east stair
+2.1,infeed_2,-3.8,7,12.5,-3.8,7,16.85,1.1,north transfer
+2.1,infeed_3,-3.8,7,16.85,-6.2,5.8,16.85,1.1,cleated descending transfer
+2.1,main,-6.2,5.8,16.85,-19.5,5.8,16.85,1.52,plastic then metal then paper diversion
 2.1,paper_chute,-17.9,5.8,16.85,-17.9,4.45,15.8,1.25,paper hopper
 2.1,metal_chute,-13,5.8,16.85,-13,4.45,15.8,1.25,metal hopper
 2.1,plastic_chute,-8.1,5.8,16.85,-8.1,4.45,15.8,1.25,plastic hopper
