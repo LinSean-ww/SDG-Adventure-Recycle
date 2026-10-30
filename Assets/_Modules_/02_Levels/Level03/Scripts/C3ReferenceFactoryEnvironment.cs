@@ -273,7 +273,7 @@ namespace C3TreasurePuzzle
                     Box("WAREHOUSE structural column",x,6.05f,z,.18f,10.95f,.22f,graphite);
                     Box("Yellow column kickplate",x,.87f,z,.22f,.48f,.26f,yellow);
                 }
-                Box("WAREHOUSE top roof truss",-12.5f,11.45f,z,24.0f,.28f,.29f,steel);
+                Box("WAREHOUSE top roof truss",-12.41f,11.45f,z,24.58f,.28f,.29f,steel);
                 for(int t=0;t<6;t++)
                     Beam("Roof web bracing",new Vector3(-23f+t*4f,11.38f,z),
                         new Vector3(-21f+t*4f,10.75f,z),.045f,pipe);
@@ -529,9 +529,9 @@ namespace C3TreasurePuzzle
                 }
             }
             // The reference's large duct elbow above the right side of the sorting line.
-            Beam("Central machine extraction duct",new Vector3(-6.00f,4.28f,15.94f),
-                new Vector3(-6.00f,8.65f,15.94f),.41f,stainless);
-            Beam("Machine extraction roof return",new Vector3(-6.00f,8.65f,15.94f),
+            Beam("Central machine extraction duct",new Vector3(-5.80f,4.28f,15.94f),
+                new Vector3(-5.80f,8.65f,15.94f),.41f,stainless);
+            Beam("Machine extraction roof return",new Vector3(-5.80f,8.65f,15.94f),
                 new Vector3(-3.9f,9.20f,17.10f),.38f,pipe);
             for(int i=0;i<5;i++)
             {

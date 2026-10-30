@@ -14,7 +14,7 @@ namespace C3TreasurePuzzle
             public Transform Root,Intake,Tray,Output,Collection,Press,Pusher;
             public Renderer Indicator;
             public BoxCollider ProcessBed;
-            public C3ConveyorSection Chute,IntakeRamp,DischargeBed,InternalOutput,Outfeed,CollectionBed;
+            public C3ConveyorSection Chute,HopperDrop,IntakeRamp,ReceivingBed,DischargeBed,InternalOutput,Outfeed,CollectionBed;
             public readonly List<C3ConveyorSection> InputSections=new List<C3ConveyorSection>();
             public readonly List<C3ConveyorSection> OutputSections=new List<C3ConveyorSection>();
         }
@@ -29,7 +29,8 @@ namespace C3TreasurePuzzle
         private readonly List<Transform> rollers=new List<Transform>();
         private Material steel,rubber,yellow,glass;
         private Material[] types;
-        private readonly MaterialPropertyBlock indicatorBlock=new MaterialPropertyBlock();
+        private MaterialPropertyBlock indicatorBlock;
+        private static readonly float[] MachineCenters={-17.9f,-13f,-8.1f};
 
         private void Awake()
         {
@@ -37,18 +38,20 @@ namespace C3TreasurePuzzle
             BuildRoot=new GameObject(RootName).transform;
             BuildRoot.SetParent(transform,true);
             BuildRoot.SetPositionAndRotation(Vector3.zero,Quaternion.identity);
-            steel=Material("P2 galvanized steel",new Color(.45f,.54f,.58f),.65f);
-            rubber=Material("P2 conveyor rubber",new Color(.13f,.17f,.18f),.05f);
-            yellow=Material("P2 machine safety",new Color(.98f,.65f,.08f),.25f);
-            glass=Material("P2 scanner lens",new Color(.12f,.72f,.83f),.1f);
-            types=new[] { Material("Paper",new Color(.72f,.51f,.29f),0f),
-                Material("Metal",new Color(.59f,.68f,.74f),.7f),
-                Material("Plastic",new Color(.12f,.65f,.75f),.05f) };
+            indicatorBlock=new MaterialPropertyBlock();
+            steel=CreateMaterial("P2 galvanized steel",new Color(.45f,.54f,.58f),.65f);
+            rubber=CreateMaterial("P2 conveyor rubber",new Color(.13f,.17f,.18f),.05f);
+            yellow=CreateMaterial("P2 machine safety",new Color(.98f,.65f,.08f),.25f);
+            glass=CreateMaterial("P2 scanner lens",new Color(.12f,.72f,.83f),.1f);
+            types=new[] { CreateMaterial("Paper",new Color(.72f,.51f,.29f),0f),
+                CreateMaterial("Metal",new Color(.59f,.68f,.74f),.7f),
+                CreateMaterial("Plastic",new Color(.12f,.65f,.75f),.05f) };
             BuildElevatedInfeed();
             BuildMachines();
+            Physics.SyncTransforms();
         }
 
-        private Material Material(string name,Color color,float metallic)
+        private Material CreateMaterial(string name,Color color,float metallic)
         {
             Material mat=new Material(Shader.Find("Standard")) { name=name,color=color };
             mat.SetFloat("_Metallic",metallic); mat.SetFloat("_Glossiness",.38f);
@@ -70,7 +73,7 @@ namespace C3TreasurePuzzle
             if (!solid) { Collider c=g.GetComponent<Collider>(); c.enabled=false; Destroy(c); }
             return g;
         }
-        private C3ConveyorSection Section(string name,Vector3 a,Vector3 b,float width,Transform parent=null)
+        private C3ConveyorSection Section(string name,Vector3 a,Vector3 b,float width,Transform parent=null,bool withGuards=true)
         {
             Transform sectionRoot=Marker(name,Vector3.zero,parent);
             C3ConveyorSection section=sectionRoot.gameObject.AddComponent<C3ConveyorSection>();
@@ -78,15 +81,18 @@ namespace C3TreasurePuzzle
             Quaternion rotation=Quaternion.LookRotation(direction.normalized,Vector3.up);
             Vector3 normal=rotation*Vector3.up,side=rotation*Vector3.right;
             GameObject surface=Box("BELT_SURFACE",(a+b)*.5f-normal*.09f,
-                new Vector3(width,.18f,direction.magnitude+.12f),rubber,sectionRoot,true,rotation);
+                new Vector3(width,.18f,direction.magnitude),rubber,sectionRoot,true,rotation);
             section.Configure(Marker("START",a,sectionRoot),Marker("END",b,sectionRoot),
                 surface.GetComponent<BoxCollider>(),width);
             foreach (int sign in new[] {-1,1})
             {
-                Box("SIDE_GUARD",(a+b)*.5f+side*(sign*(width*.5f+.035f))+normal*.14f,
-                    new Vector3(.07f,.40f,Mathf.Max(.08f,direction.magnitude-width-.2f)),steel,sectionRoot,true,rotation);
-                Box("YELLOW_EDGE",(a+b)*.5f+side*(sign*(width*.5f+.035f))+normal*.35f,
-                    new Vector3(.075f,.035f,Mathf.Max(.08f,direction.magnitude-width-.2f)),yellow,sectionRoot,false,rotation);
+                if (withGuards && !(name=="P2_MAIN_BELT" && sign<0))
+                {
+                    Box("SIDE_GUARD",(a+b)*.5f+side*(sign*(width*.5f+.035f))+normal*.14f,
+                        new Vector3(.07f,.40f,Mathf.Max(.08f,direction.magnitude-width-.2f)),steel,sectionRoot,true,rotation);
+                    Box("YELLOW_EDGE",(a+b)*.5f+side*(sign*(width*.5f+.035f))+normal*.35f,
+                        new Vector3(.075f,.035f,Mathf.Max(.08f,direction.magnitude-width-.2f)),yellow,sectionRoot,false,rotation);
+                }
                 Box("STEEL_UNDERFRAME",(a+b)*.5f+side*(sign*width*.40f)-normal*.26f,
                     new Vector3(.09f,.14f,direction.magnitude),steel,sectionRoot,true,rotation);
             }
@@ -108,16 +114,38 @@ namespace C3TreasurePuzzle
         private void BuildElevatedInfeed()
         {
             Vector3[] nodes={new Vector3(1.2f,7f,12.5f),new Vector3(-.9f,7f,12.5f),
-                new Vector3(-3.8f,7f,12.5f),new Vector3(-3.8f,7f,16.85f),new Vector3(-6.2f,5.8f,16.85f)};
+                new Vector3(-3.8f,7f,12.5f),new Vector3(-3.8f,7f,16.85f),
+                new Vector3(-4.8f,7f,16.85f),new Vector3(-6.2f,5.8f,16.85f)};
             BMaterialInterface=Marker("P2_B_HIGH_INFEED_INTERFACE",nodes[0]);
             MainEntry=Marker("P2_MAIN_ENTRY",nodes[nodes.Length-1]);
             for (int i=0;i<nodes.Length-1;i++) CommonSections.Add(Section("P2_INFEED_"+i,nodes[i],nodes[i+1],1.1f));
             MainBelt=Section("P2_MAIN_BELT",nodes[nodes.Length-1],new Vector3(-19.5f,5.8f,16.85f),1.52f);
+            float edge=MainBelt.End.position.x;
+            foreach (float center in MachineCenters)
+            {
+                float gap=center+1.2f;
+                MainFrontGuard(edge,gap-.7f);
+                edge=gap+.7f;
+            }
+            MainFrontGuard(edge,MainBelt.Start.position.x);
             // Roof hangers keep the staircase and ground aisle clear; no floor
             // columns below the crossing of the east stair or the PVC doorway.
-            foreach (Vector3 anchor in new[] {new Vector3(.8f,7f,12.5f),new Vector3(-3.8f,7f,12.5f),new Vector3(-3.8f,7f,16.85f)})
+            Vector3[] anchors={new Vector3(.8f,7f,12.5f),new Vector3(-2.8f,7f,12.5f),new Vector3(-3.8f,7f,16f)};
+            for (int i=0;i<anchors.Length;i++)
+            {
+                Vector3 sideAxis=i<2?Vector3.forward:Vector3.right;
                 foreach (float side in new[] {-.66f,.66f})
-                    Box("P2_ROOF_HANGER",new Vector3(anchor.x,8.9f,anchor.z+side),new Vector3(.10f,3.8f,.10f),steel);
+                    Box("P2_ROOF_HANGER",anchors[i]+sideAxis*side+Vector3.up*2.225f,new Vector3(.10f,4.45f,.10f),steel);
+                Box("P2_ROOF_TIE",new Vector3(anchors[i].x,11.45f,anchors[i].z),
+                    i<2?new Vector3(.16f,.20f,1.8f):new Vector3(1.8f,.20f,.16f),steel);
+            }
+            Box("P2_B_SIDE_CANTILEVER",new Vector3(.34f,11.45f,12.25f),new Vector3(1.08f,.20f,.20f),steel);
+            foreach (float x in new[] {-8.5f,-10.5f,-15.4f,-19.3f})
+            {
+                foreach (float side in new[] {-.88f,.88f})
+                    Box("P2_MAIN_ROOF_HANGER",new Vector3(x,8.625f,16.85f+side),new Vector3(.10f,5.65f,.10f),steel);
+                Box("P2_MAIN_ROOF_TIE",new Vector3(x,11.45f,16.85f),new Vector3(.16f,.20f,2.14f),steel);
+            }
             // New serialized proxy pieces preserve the rest of the original wall.
             Box("P2_LINTEL_LOWER_CLADDING",new Vector3(-.3f,5f,12.5f),new Vector3(.16f,3f,5f),steel,solid:false);
             foreach (float z in new[] {11.60f,13.40f})
@@ -127,9 +155,17 @@ namespace C3TreasurePuzzle
             Marker("P2_APERTURE_CENTER",new Vector3(-.3f,7.30f,12.5f));
         }
 
+        private void MainFrontGuard(float from,float to)
+        {
+            if (to-from<.01f) return;
+            Vector3 center=new Vector3((from+to)*.5f,5.94f,16.055f);
+            Box("MAIN_FRONT_GUARD_BETWEEN_GATES",center,new Vector3(to-from,.40f,.07f),steel,MainBelt.transform);
+            Box("MAIN_FRONT_YELLOW_EDGE",center+Vector3.up*.21f,new Vector3(to-from,.035f,.075f),yellow,MainBelt.transform,false);
+        }
+
         private void BuildMachines()
         {
-            float[] centers={-17.9f,-13f,-8.1f};
+            float[] centers=MachineCenters;
             string[] signs={"PaperHall","MetalHall","PlasticHall"};
             for (int lane=0;lane<centers.Length;lane++)
             {
@@ -149,7 +185,7 @@ namespace C3TreasurePuzzle
                 GameObject label=C3BakedSignFactory.AtWorld(signs[lane],new Vector3(x,3.70f,12.82f),Quaternion.identity,2.05f,.55f,false);
                 if (label) { label.transform.SetParent(machine.Root,true); OwnSignMaterials(label); }
                 machine.Indicator=Box("PROCESS_INDICATOR",new Vector3(x+1.64f,3.7f,12.80f),new Vector3(.17f,.17f,.06f),glass,machine.Root,false).GetComponent<Renderer>();
-                Vector3 main=new Vector3(x,5.8f,16.85f),intake=new Vector3(x,4.45f,15.8f);
+                Vector3 main=new Vector3(x+1.2f,5.8f,16.85f),intake=new Vector3(x+1.2f,4.45f,15.6f);
                 Vector3 tray=new Vector3(x,2.4f,15.2f),output=new Vector3(x,1.25f,12.75f),collection=new Vector3(x,1.25f,9.1f);
                 machine.Intake=Marker("MACHINE_INPUT",intake,machine.Root);
                 machine.Tray=Marker("PROCESS_TRAY",tray,machine.Root);
@@ -160,17 +196,27 @@ namespace C3TreasurePuzzle
                 Box("IDENTIFIER_GANTRY",main+Vector3.up*.75f,new Vector3(.16f,.12f,1.95f),yellow,machine.Root);
                 Box("IDENTIFIER_SENSOR",main+Vector3.up*.63f,new Vector3(.16f,.08f,.24f),glass,machine.Root,false);
                 machine.Pusher=Box("DIVERT_PUSHER",main+new Vector3(0f,.20f,.8f),new Vector3(.7f,.20f,.08f),yellow,machine.Root,false).transform;
-                machine.Chute=Section("V3_CONNECTED_DIVERT_TO_HOPPER_"+lane,main,intake,1.25f);
-                machine.IntakeRamp=Section("P2_INTAKE_RAMP_"+lane,intake,tray,1.25f);
-                machine.InputSections.Add(machine.Chute); machine.InputSections.Add(machine.IntakeRamp);
+                // Leave the full-width main belt horizontally before descending;
+                // a ramp starting at its centre would cut through the main surface.
+                Vector3 transfer=new Vector3(x+1.2f,5.8f,15.8f);
+                machine.Chute=Section("V3_CONNECTED_DIVERT_TO_HOPPER_"+lane,main,transfer,1.25f);
+                machine.HopperDrop=Section("P2_HOPPER_DROP_"+lane,transfer,intake,1.25f);
+                // Drop beside the raised press, then feed sideways underneath it.
+                // A centered steep ramp would pass through the retracted head.
+                Vector3 bedEntry=new Vector3(x+1.2f,2.4f,15.3f);
+                machine.IntakeRamp=Section("P2_INTAKE_RAMP_"+lane,intake,bedEntry,.9f);
+                machine.ReceivingBed=Section("P2_RECEIVING_BED_"+lane,bedEntry,
+                    new Vector3(x+1.2f,2.4f,15f),.9f,withGuards:false);
+                machine.InputSections.Add(machine.Chute); machine.InputSections.Add(machine.HopperDrop);
+                machine.InputSections.Add(machine.IntakeRamp); machine.InputSections.Add(machine.ReceivingBed);
                 Vector3 bedEdge=tray+Vector3.back*.5f;
-                machine.DischargeBed=Section("P2_DISCHARGE_BED_"+lane,tray,bedEdge,1.55f);
+                machine.DischargeBed=Section("P2_DISCHARGE_BED_"+lane,tray,bedEdge,1.55f,withGuards:false);
                 machine.InternalOutput=Section("P2_INTERNAL_OUTPUT_"+lane,bedEdge,output,1.55f);
                 machine.Outfeed=Section("CONNECTED_LOWER_OUTFEED_"+lane,output,new Vector3(x,1.25f,9.8f),1.55f);
                 machine.CollectionBed=Section("P2_COLLECTION_BED_"+lane,machine.Outfeed.End.position,collection,2.4f);
                 machine.OutputSections.Add(machine.DischargeBed); machine.OutputSections.Add(machine.InternalOutput);
                 machine.OutputSections.Add(machine.Outfeed); machine.OutputSections.Add(machine.CollectionBed);
-                machine.ProcessBed=Box("PROCESS_BED",tray-Vector3.up*.09f,new Vector3(1.5f,.18f,1.0f),steel,machine.Root).GetComponent<BoxCollider>();
+                machine.ProcessBed=Box("PROCESS_BED",tray-Vector3.up*.09f,new Vector3(3.2f,.18f,1.0f),steel,machine.Root).GetComponent<BoxCollider>();
                 machine.Press=Box("COMPRESSION_PRESS",tray+Vector3.up*1.25f,new Vector3(1.25f,.22f,.85f),yellow,machine.Root,false).transform;
                 for (int leg=0;leg<2;leg++)
                     Box("OUTPUT_LEG",new Vector3(x+(leg==0?-.65f:.65f),.8f,10.1f),new Vector3(.12f,.5f,.12f),steel,machine.Root);
@@ -196,10 +242,12 @@ namespace C3TreasurePuzzle
             indicatorBlock.SetColor("_Color",compression>0f?new Color(.1f,.95f,.6f):new Color(.12f,.3f,.32f));
             m.Indicator.SetPropertyBlock(indicatorBlock);
         }
-        public void SetDiverter(int machine,float travel)
+        public void SetDiverter(int machine,float travel,bool occupied,float dt)
         {
             Machine m=Machines[machine];
-            m.Pusher.position=m.Chute.Start.position+new Vector3(0f,.2f,Mathf.Lerp(.8f,.15f,Mathf.Sin(Mathf.PI*travel)));
+            float offset=occupied?RawRadius+.04f-Mathf.Clamp01(travel)*m.Chute.Length:.8f;
+            Vector3 target=m.Chute.Start.position+new Vector3(0f,.2f,offset);
+            m.Pusher.position=Vector3.MoveTowards(m.Pusher.position,target,C3RecyclingLine.TransportSpeed*2f*dt);
         }
         public bool ConnectionsMatch(float tolerance)
         {
@@ -208,7 +256,9 @@ namespace C3TreasurePuzzle
             if (Vector3.Distance(CommonSections[CommonSections.Count-1].End.position,MainBelt.Start.position)>tolerance) return false;
             foreach (Machine m in Machines)
             {
-                if (Vector3.Distance(m.Chute.End.position,m.IntakeRamp.Start.position)>tolerance) return false;
+                if (Vector3.Distance(m.Chute.End.position,m.HopperDrop.Start.position)>tolerance) return false;
+                if (Vector3.Distance(m.HopperDrop.End.position,m.IntakeRamp.Start.position)>tolerance) return false;
+                if (Vector3.Distance(m.IntakeRamp.End.position,m.ReceivingBed.Start.position)>tolerance) return false;
                 if (Vector3.Distance(m.InternalOutput.End.position,m.Outfeed.Start.position)>tolerance) return false;
                 if (Vector3.Distance(m.DischargeBed.End.position,m.InternalOutput.Start.position)>tolerance) return false;
                 if (Vector3.Distance(m.Outfeed.End.position,m.CollectionBed.Start.position)>tolerance) return false;

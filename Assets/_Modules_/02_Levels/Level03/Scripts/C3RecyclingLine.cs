@@ -15,6 +15,7 @@ namespace C3TreasurePuzzle
         public const int BalesPerMachineCapacity=3;
         public const float TransportSpeed=4.5f;
         public const float ProcessingSeconds=2.5f;
+        public const float MinimumSpacing=1f;
         [Tooltip("Finite C-side demonstration supply, NOT completion of the unavailable B level.")]
         public bool useFiniteTestSupply=true;
 
@@ -68,6 +69,32 @@ namespace C3TreasurePuzzle
                 A=section.Start.position,B=section.End.position,Support=section.Surface });
             public void Place(Transform item,float distance,float radius,Vector3 boxSize,out int segment)
             {
+                Evaluate(distance,radius,boxSize,out Vector3 position,out Quaternion rotation,out segment);
+                item.SetPositionAndRotation(position,rotation);
+            }
+            public float Move(Transform item,float from,float to,float maxMovement,float radius,Vector3 boxSize,out int segment)
+            {
+                Evaluate(to,radius,boxSize,out Vector3 position,out Quaternion rotation,out segment);
+                if (to>from && Vector3.Distance(item.position,position)>maxMovement+.00001f)
+                {
+                    // A sphere rolling around a steep hopper lip follows a longer
+                    // physical arc than the centreline parameter. Bound world travel
+                    // by speed*dt instead of snapping across that extra distance.
+                    float low=from,high=to;
+                    for (int i=0;i<10;i++)
+                    {
+                        float mid=(low+high)*.5f;
+                        Evaluate(mid,radius,boxSize,out position,out rotation,out segment);
+                        if (Vector3.Distance(item.position,position)<=maxMovement) low=mid; else high=mid;
+                    }
+                    to=low;
+                    Evaluate(to,radius,boxSize,out position,out rotation,out segment);
+                }
+                item.SetPositionAndRotation(position,rotation);
+                return to;
+            }
+            private void Evaluate(float distance,float radius,Vector3 boxSize,out Vector3 position,out Quaternion rotation,out int segment)
+            {
                 segment=0;
                 while (segment<Legs.Count-1 && distance>Legs[segment].Length)
                 { distance-=Legs[segment].Length; segment++; }
@@ -76,16 +103,19 @@ namespace C3TreasurePuzzle
                 Vector3 previous=segment>0?Legs[segment-1].Normal:EntranceNormal;
                 Vector3 next=segment<Legs.Count-1?Legs[segment+1].Normal:ExitNormal;
                 Vector3 n0=(previous+leg.Normal).normalized,n1=(next+leg.Normal).normalized;
-                Vector3 up=Vector3.Slerp(n0,n1,t).normalized;
+                float blend=Mathf.Max(.001f,Mathf.Min(.35f,leg.Length*.5f));
+                float enter=Mathf.Clamp01(t*leg.Length/blend),leave=Mathf.Clamp01(1f-(1f-t)*leg.Length/blend);
+                Vector3 up=Vector3.Slerp(Vector3.Slerp(n0,leg.Normal,enter),n1,leave).normalized;
                 Vector3 direction=(leg.B-leg.A).normalized;
                 Vector3 previousDirection=segment>0?(Legs[segment-1].B-Legs[segment-1].A).normalized:direction;
                 Vector3 nextDirection=segment<Legs.Count-1?(Legs[segment+1].B-Legs[segment+1].A).normalized:
                     (ExitForward.sqrMagnitude>.1f?ExitForward:direction);
                 Vector3 forward0=(previousDirection+direction).normalized;
                 Vector3 forward1=segment==Legs.Count-1 && ExitForward.sqrMagnitude>.1f?ExitForward:(direction+nextDirection).normalized;
-                Vector3 forward=Vector3.ProjectOnPlane(Vector3.Slerp(forward0,forward1,t),up).normalized;
+                Vector3 heading=Vector3.Slerp(Vector3.Slerp(forward0,direction,enter),forward1,leave);
+                Vector3 forward=Vector3.ProjectOnPlane(heading,up).normalized;
                 if (forward.sqrMagnitude<.1f) forward=Vector3.forward;
-                Quaternion rotation=Quaternion.LookRotation(forward,up);
+                rotation=Quaternion.LookRotation(forward,up);
                 float extent=radius;
                 if (boxSize!=Vector3.zero)
                     extent=(Mathf.Abs(Vector3.Dot(rotation*Vector3.right,leg.Normal))*boxSize.x+
@@ -94,7 +124,29 @@ namespace C3TreasurePuzzle
                 // Support distance is measured along the actual belt normal. At
                 // slope joints the shared bisector gives the same end/start pose.
                 Vector3 offset=up*(extent/Mathf.Max(.15f,Vector3.Dot(up,leg.Normal)));
-                item.SetPositionAndRotation(Vector3.Lerp(leg.A,leg.B,t)+offset,rotation);
+                position=Vector3.Lerp(leg.A,leg.B,t)+offset;
+                // Cast from above the actual neighbouring finite surfaces. This
+                // handles both spheres bridging a steep hopper lip and bales
+                // whose infinite-plane contact corner lies beyond a belt end.
+                int first=Mathf.Max(0,segment-1),last=Mathf.Min(Legs.Count-1,segment+1);
+                float margin=radius+boxSize.magnitude*.5f+.2f;
+                float startY=position.y+margin,lowest=position.y;
+                for (int i=first;i<=last;i++)
+                {
+                    startY=Mathf.Max(startY,Legs[i].Support.bounds.max.y+margin);
+                    lowest=Mathf.Min(lowest,Legs[i].Support.bounds.min.y);
+                }
+                Vector3 origin=new Vector3(position.x,startY,position.z);
+                RaycastHit[] hits=boxSize!=Vector3.zero
+                    ?Physics.BoxCastAll(origin,boxSize*.5f,Vector3.down,rotation,startY-lowest+margin,~0,QueryTriggerInteraction.Ignore)
+                    :Physics.SphereCastAll(origin,radius,Vector3.down,startY-lowest+margin,~0,QueryTriggerInteraction.Ignore);
+                float drop=float.PositiveInfinity;
+                foreach (RaycastHit hit in hits)
+                    for (int i=first;i<=last;i++)
+                        if (Legs[i].Support==hit.collider) drop=Mathf.Min(drop,hit.distance);
+                if (float.IsPositiveInfinity(drop))
+                    throw new InvalidOperationException("Material lost its physical conveyor: "+leg.Support.name);
+                position.y=startY-drop+.001f;
             }
         }
         private sealed class MachineWork
@@ -116,7 +168,8 @@ namespace C3TreasurePuzzle
         private float releaseClock;
         private string runId;
         private EcoRecycleCargo.Kind lastCompleted=EcoRecycleCargo.Kind.Plastic;
-        public static readonly Vector3 ProductSize=new Vector3(.52f,.42f,.50f);
+        // Envelope includes the visible bale straps; body is slightly inset.
+        public static readonly Vector3 ProductSize=new Vector3(.52f,.43f,.51f);
         public event Action<string> BatchCompleted;
         public string LastBlockedReason { get; private set; }="";
         public IReadOnlyList<MaterialRecord> Materials => records;
@@ -226,7 +279,7 @@ namespace C3TreasurePuzzle
             }
             releaseClock+=dt;
             MaterialRecord waiting=records.FirstOrDefault(r=>r.State==C3MaterialState.Spawned);
-            if (waiting!=null && releaseClock>=.45f && records.Where(OnPrimary).All(r=>r.Distance>.6f))
+            if (waiting!=null && releaseClock>=.45f && records.Where(OnPrimary).All(r=>r.Distance>MinimumSpacing))
             {
                 releaseClock=0f; Transition(waiting,C3MaterialState.Feeding);
                 waiting.Cargo.gameObject.SetActive(true); PlaceRaw(waiting);
@@ -237,8 +290,8 @@ namespace C3TreasurePuzzle
                 if (record.State==C3MaterialState.Identified) { TryDivert(record); continue; }
                 float next=Mathf.Min(record.Path.Length,record.Distance+TransportSpeed*dt);
                 foreach (MaterialRecord ahead in records.Where(OnPrimary))
-                    if (ahead!=record && ahead.Distance>record.Distance+.001f) next=Mathf.Min(next,ahead.Distance-.5f);
-                record.Distance=Mathf.Max(record.Distance,next); PlaceRaw(record);
+                    if (ahead!=record && ahead.Distance>record.Distance+.001f) next=Mathf.Min(next,ahead.Distance-MinimumSpacing);
+                MoveRaw(record,Mathf.Max(record.Distance,next),TransportSpeed*dt);
                 float commonLength=record.Path.Legs.Take(geometry.CommonSections.Count).Sum(s=>s.Length);
                 if (record.State==C3MaterialState.Feeding && record.Distance>=commonLength) Transition(record,C3MaterialState.MainBelt);
                 if (record.Distance>=record.Path.Length-.0001f)
@@ -249,14 +302,14 @@ namespace C3TreasurePuzzle
             }
             foreach (MaterialRecord record in alreadyDiverting)
             {
-                record.Distance=Mathf.Min(record.Path.Length,record.Distance+TransportSpeed*dt); PlaceRaw(record);
+                MoveRaw(record,Mathf.Min(record.Path.Length,record.Distance+TransportSpeed*dt),TransportSpeed*dt);
                 if (record.Distance>=record.Path.Length-.0001f) Transition(record,C3MaterialState.MachineInput);
             }
             for (int lane=0;lane<work.Length;lane++)
             {
                 MaterialRecord atGate=records.FirstOrDefault(r=>r.TargetMachine==lane &&
                     r.State==C3MaterialState.Diverting && r.Distance<geometry.Machines[lane].Chute.Length);
-                geometry.SetDiverter(lane,atGate!=null?atGate.Distance/geometry.Machines[lane].Chute.Length:0f);
+                geometry.SetDiverter(lane,atGate!=null?atGate.Distance/geometry.Machines[lane].Chute.Length:0f,atGate!=null,dt);
             }
             TickProducts(dt);
             TickMachines(dt);
@@ -270,6 +323,13 @@ namespace C3TreasurePuzzle
             record.Path.Place(record.Cargo.transform,record.Distance,C3RecyclingLineGeometry.RawRadius,Vector3.zero,out segment);
             record.CurrentRouteSegment=segment;
         }
+        private void MoveRaw(MaterialRecord record,float next,float maxMovement)
+        {
+            int segment;
+            record.Distance=record.Path.Move(record.Cargo.transform,record.Distance,next,maxMovement,
+                C3RecyclingLineGeometry.RawRadius,Vector3.zero,out segment);
+            record.CurrentRouteSegment=segment;
+        }
         private void TryDivert(MaterialRecord record)
         {
             MachineWork machine=work[record.TargetMachine];
@@ -279,8 +339,8 @@ namespace C3TreasurePuzzle
             C3RecyclingLineGeometry.Machine model=geometry.Machines[record.TargetMachine];
             record.Path=new TransportPath {EntranceNormal=geometry.MainBelt.Normal};
             foreach (C3ConveyorSection section in model.InputSections) record.Path.Add(section);
-            record.Path.Legs.Add(new Leg {A=model.Tray.position,
-                B=model.Tray.position+new Vector3((slot-1)*.32f,0f,.25f),Support=model.ProcessBed});
+            record.Path.Legs.Add(new Leg {A=model.ReceivingBed.End.position,
+                B=model.Tray.position+new Vector3((slot-1)*.32f,0f,-.2f),Support=model.ProcessBed});
             record.Distance=0f; Transition(record,C3MaterialState.Diverting); PlaceRaw(record);
         }
         private void TickMachines(float dt)
@@ -305,7 +365,7 @@ namespace C3TreasurePuzzle
                     record.Visual.localScale=Vector3.Scale(record.VisualScale,new Vector3(1f,squash,1f));
                     record.Cargo.transform.rotation=Quaternion.identity;
                     record.Cargo.transform.position=geometry.Machines[lane].Tray.position+
-                        new Vector3((record.Slot-1)*.32f,C3RecyclingLineGeometry.RawRadius*squash,.25f);
+                        new Vector3((record.Slot-1)*.32f,C3RecyclingLineGeometry.RawRadius*squash,-.2f);
                 }
                 if (machine.Elapsed<ProcessingSeconds) continue;
                 if (machine.Prepared==null) machine.Prepared=PrepareProduct(lane,machine);
@@ -320,6 +380,7 @@ namespace C3TreasurePuzzle
                 {
                     record.Counted=record.ProcessingComplete=record.ProductCreated=true;
                     record.BatchId=batch.BatchId; record.Cargo.processed=true;
+                    record.CurrentRouteSegment=0;
                     Transition(record,C3MaterialState.OutputReady);
                     record.Cargo.gameObject.SetActive(false);
                 }
@@ -338,7 +399,7 @@ namespace C3TreasurePuzzle
             item.transform.SetParent(cargoRoot,false); item.SetActive(false);
             GameObject body=GameObject.CreatePrimitive(PrimitiveType.Cube);
             body.name=lane==0?"PAPER_COMPRESSED_BALE":lane==1?"METAL_COMPRESSED_BLOCK":"PLASTIC_COMPRESSED_BALE";
-            body.transform.SetParent(item.transform,false); body.transform.localScale=ProductSize;
+            body.transform.SetParent(item.transform,false); body.transform.localScale=new Vector3(.52f,.42f,.50f);
             body.GetComponent<Renderer>().sharedMaterial=geometry.MaterialFor(lane);
             Collider c=body.GetComponent<Collider>(); c.enabled=false; Destroy(c);
             int straps=lane==1?1:2;
@@ -368,9 +429,9 @@ namespace C3TreasurePuzzle
             foreach (FinishedBatch batch in batches)
             {
                 if (batch.Collected) continue;
-                batch.Distance=Mathf.Min(batch.Path.Length,batch.Distance+2f*dt);
                 int segment;
-                batch.Path.Place(batch.Product,batch.Distance,0f,ProductSize,out segment);
+                batch.Distance=batch.Path.Move(batch.Product,batch.Distance,
+                    Mathf.Min(batch.Path.Length,batch.Distance+2f*dt),2f*dt,0f,ProductSize,out segment);
                 batch.CurrentRouteSegment=segment;
                 MaterialRecord[] source=records.Where(r=>r.BatchId==batch.BatchId).ToArray();
                 foreach (MaterialRecord record in source) record.CurrentRouteSegment=segment;
