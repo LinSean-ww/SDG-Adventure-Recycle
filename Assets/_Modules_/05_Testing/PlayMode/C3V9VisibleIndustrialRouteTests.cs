@@ -216,36 +216,20 @@ namespace M6IntegrationTests
         [UnityTest]
         public IEnumerator BReceivingBeltActuallyExistsOnCFrontFaceAndMeetsMainHighBelt()
         {
-            // Validate the actual imported belt and rebuilt doorway on both loads;
-            // duplicate curtain roots/strips must not survive a scene reload.
+            // Phase 2 replaces the low OBJ feed; prove the actual elevated surfaces,
+            // junctions, aperture and preserved PVC/floor/safety on both scene loads.
             for (int load=0;load<2;load++)
             {
                 yield return Open();
-                GameObject g=GameObject.Find("V9_BDoorToSorterVisibleBelt");
-                Assert.IsNotNull(g,"V9 B-port feed mesh is missing");
-                MeshRenderer r=g.GetComponentInChildren<MeshRenderer>(true);
-                Assert.IsNotNull(r);
-                Assert.IsTrue(r.enabled && r.gameObject.activeInHierarchy);
-                Bounds b=r.bounds;
-                Assert.Greater(b.min.z,11.1f,"B belt extends into front walkway");
-                Assert.Less(b.min.z,12.0f,"Raised B feed still hidden entirely behind sorter");
-                Assert.Greater(b.max.z,16.85f,"B conveyor does not reach C sorting line");
-                Assert.Less(b.min.x,-6.15f, "Unity OBJ X-axis mirrored: B belt outside C hall");
-                Assert.Greater(b.max.x,-.90f);
-                Assert.Less(b.max.x,-.44f,"V9 feed intrudes through B-room wall");
-                Assert.Greater(b.max.y,6.48f,"B feeder upper section should be visible over sorter");
-                Assert.Greater(b.min.z,10.7f+.30f+.08f,"B feed overlaps the standing pedestrian corridor");
-                foreach (string name in new[] { "V9_BDoorToSorterSteelFrame",
-                    "V9_BDoorToSorterYellowGuards", "V9_BDoorToSorterRollers" })
-                {
-                    GameObject part=GameObject.Find(name);
-                    Assert.IsNotNull(part,name);
-                    Assert.IsTrue(part.GetComponentsInChildren<Renderer>().Any(v=>v.enabled),name);
-                }
-                Transform[] sceneTransforms=Object.FindObjectsByType<Transform>(
-                    FindObjectsInactive.Include,FindObjectsSortMode.None);
-                Assert.AreEqual(7,sceneTransforms.Count(t=>t.name.StartsWith("B_PORTAL_GENUINE_FEED_CARGO_")));
-                Assert.AreEqual(1,sceneTransforms.Count(t=>t.name=="V11_BC_PVC_CURTAIN"));
+                Component geometry=C3V11Phase2RecyclingLineTests.Find("C3TreasurePuzzle.C3RecyclingLineGeometry");
+                Assert.IsNotNull(geometry);
+                C3V11Phase2RecyclingLineTests.AssertEquipmentConnections(geometry);
+                Transform entry=(Transform)C3V11Phase2RecyclingLineTests.Member(geometry,"BMaterialInterface");
+                Assert.Greater(entry.position.y,6.8f);
+                Assert.AreEqual(1,Object.FindObjectsByType<Transform>(FindObjectsInactive.Include,FindObjectsSortMode.None)
+                    .Count(t=>t.name=="C3_P2_RecyclingLine"));
+                foreach (string retired in new[] {"V9_BDoorToSorterVisibleBelt","V9_BDoorToSorterSteelFrame",
+                    "V9_BDoorToSorterYellowGuards","V9_BDoorToSorterRollers"}) Assert.IsNull(GameObject.Find(retired));
                 AssertBCDoorwayAndCurtain();
             }
         }

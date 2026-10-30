@@ -93,7 +93,7 @@ namespace C3TreasurePuzzle
                 item.SetPositionAndRotation(position,rotation);
                 return to;
             }
-            private void Evaluate(float distance,float radius,Vector3 boxSize,out Vector3 position,out Quaternion rotation,out int segment)
+            internal void Evaluate(float distance,float radius,Vector3 boxSize,out Vector3 position,out Quaternion rotation,out int segment)
             {
                 segment=0;
                 while (segment<Legs.Count-1 && distance>Legs[segment].Length)
@@ -395,6 +395,16 @@ namespace C3TreasurePuzzle
         private FinishedBatch PrepareProduct(int lane,MachineWork machine)
         {
             string id=runId+"/"+lane+"/"+machine.Completed;
+            FinishedBatch batch=new FinishedBatch {BatchId=id,MaterialType=machine.Slots[0].MaterialType,
+                SourceMaterialIds=machine.Slots.Select(r=>r.MaterialId).ToArray(),
+                Path=new TransportPath {ExitForward=Vector3.back}};
+            foreach (C3ConveyorSection section in geometry.Machines[lane].OutputSections) batch.Path.Add(section);
+            batch.OutputDistance=batch.Path.Legs.Take(2).Sum(s=>s.Length);
+            Leg last=batch.Path.Legs[batch.Path.Legs.Count-1];
+            last.B+=new Vector3((machine.Completed-1)*.65f,0f,0f);
+            // Validate the physical output before allocating scene objects. A
+            // broken/missing surface must not leak a new hidden bale each retry.
+            batch.Path.Evaluate(0f,0f,ProductSize,out Vector3 position,out Quaternion rotation,out _);
             GameObject item=new GameObject("P2_FINISHED_"+machine.Slots[0].MaterialType+"_"+id);
             item.transform.SetParent(cargoRoot,false); item.SetActive(false);
             GameObject body=GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -413,15 +423,8 @@ namespace C3TreasurePuzzle
                 band.GetComponent<Renderer>().sharedMaterial=geometry.BindingMaterial;
                 Collider collider=band.GetComponent<Collider>(); collider.enabled=false; Destroy(collider);
             }
-            FinishedBatch batch=new FinishedBatch {BatchId=id,MaterialType=machine.Slots[0].MaterialType,
-                SourceMaterialIds=machine.Slots.Select(r=>r.MaterialId).ToArray(),Product=item.transform,
-                Path=new TransportPath {ExitForward=Vector3.back}};
-            foreach (C3ConveyorSection section in geometry.Machines[lane].OutputSections) batch.Path.Add(section);
-            batch.OutputDistance=batch.Path.Legs.Take(2).Sum(s=>s.Length);
-            Leg last=batch.Path.Legs[batch.Path.Legs.Count-1];
-            last.B+=new Vector3((machine.Completed-1)*.65f,0f,0f);
-            int segment;
-            batch.Path.Place(item.transform,0f,0f,ProductSize,out segment);
+            batch.Product=item.transform;
+            item.transform.SetPositionAndRotation(position,rotation);
             return batch;
         }
         private void TickProducts(float dt)

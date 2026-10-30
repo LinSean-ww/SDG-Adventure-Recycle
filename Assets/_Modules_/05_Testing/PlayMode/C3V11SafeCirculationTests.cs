@@ -132,6 +132,7 @@ namespace M6IntegrationTests
             factoryOwned = true;
             yield return SceneManager.LoadSceneAsync(ScenePath, LoadSceneMode.Single);
             yield return null;
+            Physics.SyncTransforms(); // initialize all scene-owned Phase 2 collision before bounds queries
             player = GameObject.Find("M2_Player");
             Assert.IsNotNull(player);
             body = player.GetComponent<CharacterController>();
@@ -460,10 +461,12 @@ namespace M6IntegrationTests
                 Assert.IsTrue(station.GetComponent<Collider>().enabled);
                 Assert.IsTrue(station.GetComponentsInChildren<Renderer>().All(r => r.enabled));
             }
-            // Retained OBJ equipment still needs an actual imported WORLD-bounds check.
-            Renderer feed = GameObject.Find("V9_BDoorToSorterVisibleBelt").GetComponentInChildren<Renderer>();
-            Assert.That(feed.bounds.min.x, Is.EqualTo(-7.49f).Within(.24f));
-            Assert.That(feed.bounds.max.x, Is.EqualTo(-.64f).Within(.24f));
+            // The former low OBJ feed is retired. Query actual Phase 2 surface
+            // meshes/colliders and all real junctions instead of its old bounds.
+            Component equipment=Find("C3TreasurePuzzle.C3RecyclingLineGeometry");
+            Assert.IsNotNull(equipment);
+            Physics.SyncTransforms();
+            C3V11Phase2RecyclingLineTests.AssertEquipmentConnections(equipment);
             yield break;
         }
 

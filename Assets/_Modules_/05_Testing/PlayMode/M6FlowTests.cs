@@ -366,63 +366,50 @@ namespace M6IntegrationTests
         [UnityTest]
         public IEnumerator FactoryStartupAndThreeWasteTypesUseBoundedVisualPool()
         {
-            yield return SceneManager.LoadSceneAsync(C3, LoadSceneMode.Single);
+            yield return SceneManager.LoadSceneAsync(C3,LoadSceneMode.Single);
             yield return null;
-            Component device = Find("C3TreasurePuzzle.C3DeviceState");
-            Component progress = Find("C3TreasurePuzzle.C3TreasureProgress");
-            Component puzzle = Find("C3TreasurePuzzle.C3PuzzleState");
-            Component presentation = Find("C3TreasurePuzzle.C3FactoryPresentation");
-            Assert.IsNotNull(presentation);
-            Renderer steelSource = GameObject.Find("DarkServicePillar")?.GetComponent<Renderer>();
-            Renderer feedRail = GameObject.Find("B區輸送帶支架")?.GetComponent<Renderer>();
-            Assert.IsNotNull(steelSource, "The C-area dark steel source must exist.");
-            Assert.IsNotNull(feedRail, "The feed rail must use a visible renderer.");
-            Assert.AreSame(steelSource.sharedMaterial, feedRail.sharedMaterial,
-                "The feed rail should reuse existing industrial steel without editing a shared material.");
-            Type type = presentation.GetType();
-            type.GetField("lightRestoreSeconds", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(presentation, 0.1f);
-            type.GetField("motorStartSeconds", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(presentation, 0.1f);
-            type.GetField("cycleSeconds", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(presentation, 0.15f);
-            GameObject[] waste = (GameObject[])type.GetField("waste", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(presentation);
-            Transform[] marks = (Transform[])type.GetField("feedMarks", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(presentation);
-            Vector3 markBefore = marks[0].localPosition;
-            Light[] lights = (Light[])type.GetField("factoryLights", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(presentation);
-            float initialLight = lights[0].intensity;
-            Assert.AreEqual(3, waste.Length);
-            Assert.IsFalse((bool)Get(presentation, "MotorActive"));
-            foreach (GameObject item in waste) Assert.IsFalse(item.activeSelf);
-            foreach (string id in new[] { "fuse", "control_chip", "filter_module" })
-                Assert.IsTrue((bool)Call(progress, "TryCollect", id, id));
-            Type step = RuntimeType("C3TreasurePuzzle.C3ProcessingStep");
-            Array answer = Array.CreateInstance(step, 3);
-            answer.SetValue(Enum.Parse(step, "Sorting"), 0);
-            answer.SetValue(Enum.Parse(step, "Recycling"), 1);
-            answer.SetValue(Enum.Parse(step, "PollutionTreatment"), 2);
-            Assert.IsTrue((bool)Call(puzzle, "SubmitAnswer", answer));
-            Assert.IsTrue((bool)Call(device, "TryActivate"));
-            Assert.AreEqual("Starting", Get(device, "FactoryState").ToString());
-            yield return new WaitForSeconds(0.3f);
-            Assert.AreEqual("Running", Get(device, "FactoryState").ToString());
-            Assert.IsTrue((bool)Get(presentation, "MotorActive"));
-            Assert.Greater(lights[0].intensity, initialLight);
-            yield return new WaitForSeconds(0.1f);
-            Assert.Greater(Vector3.Distance(markBefore, marks[0].localPosition), 0.01f);
-            yield return new WaitForSeconds(0.65f);
-            Assert.GreaterOrEqual((int)Get(presentation, "CompletedCycles"), 3);
-            GameObject[,] markers = (GameObject[,])type.GetField("sortedMarkers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(presentation);
-            for (int i = 0; i < 3; i++) Assert.IsTrue(markers[i, 0].activeSelf, "Each sorted category must retain a visible result.");
-            GameObject[] same = (GameObject[])type.GetField("waste", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(presentation);
-            for (int i = 0; i < 3; i++) Assert.AreSame(waste[i], same[i]);
-            type.GetField("cycleSeconds", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(presentation, 10f);
-            for (int i = 0; i < 3; i++)
+            Component device=Find("C3TreasurePuzzle.C3DeviceState");
+            Component progress=Find("C3TreasurePuzzle.C3TreasureProgress");
+            Component puzzle=Find("C3TreasurePuzzle.C3PuzzleState");
+            Component presentation=Find("C3TreasurePuzzle.C3FactoryPresentation");
+            Component line=Find("C3TreasurePuzzle.C3RecyclingLine");
+            Assert.IsNotNull(line);
+            Physics.SyncTransforms();
+            C3V11Phase2RecyclingLineTests.AssertEquipmentConnections(Find("C3TreasurePuzzle.C3RecyclingLineGeometry"));
+            Assert.AreEqual(0,(int)Get(line,"AcceptedUnits"));
+            Type type=presentation.GetType();
+            type.GetField("lightRestoreSeconds",BindingFlags.NonPublic|BindingFlags.Instance).SetValue(presentation,.1f);
+            type.GetField("motorStartSeconds",BindingFlags.NonPublic|BindingFlags.Instance).SetValue(presentation,.1f);
+            Light[] lights=(Light[])type.GetField("factoryLights",BindingFlags.NonPublic|BindingFlags.Instance).GetValue(presentation);
+            float initial=lights[0].intensity;
+            Assert.IsFalse((bool)Get(presentation,"MotorActive"));
+            foreach (string id in new[] {"fuse","control_chip","filter_module"}) Assert.IsTrue((bool)Call(progress,"TryCollect",id,id));
+            Type step=RuntimeType("C3TreasurePuzzle.C3ProcessingStep");
+            Array answer=Array.CreateInstance(step,3);
+            string[] names={"Sorting","Recycling","PollutionTreatment"};
+            for (int i=0;i<3;i++) answer.SetValue(Enum.Parse(step,names[i]),i);
+            Assert.IsTrue((bool)Call(puzzle,"SubmitAnswer",answer)); Assert.IsTrue((bool)Call(device,"TryActivate"));
+            Assert.AreEqual("Starting",Get(device,"FactoryState").ToString());
+            float deadline=Time.realtimeSinceStartup+35f;
+            while ((int)Get(presentation,"CompletedCycles")<3 && Time.realtimeSinceStartup<deadline) yield return null;
+            Assert.IsTrue((bool)Get(presentation,"MotorActive")); Assert.Greater(lights[0].intensity,initial);
+            Assert.AreEqual(9,(int)Get(line,"AcceptedUnits")); Assert.AreEqual(3,(int)Get(line,"ProcessedBatches"));
+            object[] materials=C3V11Phase2RecyclingLineTests.Items(line,"Materials");
+            object[] products=C3V11Phase2RecyclingLineTests.Items(line,"Products");
+            Assert.AreEqual(3,products.Length);
+            int paper=0,metal=0,plastic=0;
+            foreach (object product in products)
             {
-                type.GetField("cycleIndex", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(presentation, i);
-                type.GetField("cycleTime", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(presentation, 9.8f);
-                yield return null;
-                Assert.IsTrue(waste[i].activeSelf);
-                Assert.That(waste[i].transform.localPosition.x, Is.EqualTo(-0.85f + i * 0.85f).Within(0.2f));
-                Assert.Greater(waste[i].transform.localPosition.z, 0.8f);
+                string kind=C3V11Phase2RecyclingLineTests.Member(product,"MaterialType").ToString();
+                if (kind=="Paper") paper++; else if (kind=="Metal") metal++; else if (kind=="Plastic") plastic++; else Assert.Fail(kind);
+                Assert.IsTrue(((Transform)C3V11Phase2RecyclingLineTests.Member(product,"Product")).gameObject.activeInHierarchy);
             }
+            Assert.AreEqual(1,paper); Assert.AreEqual(1,metal); Assert.AreEqual(1,plastic);
+            yield return new WaitForSeconds(.3f);
+            object[] same=C3V11Phase2RecyclingLineTests.Items(line,"Materials");
+            Assert.AreEqual(materials.Length,same.Length);
+            for (int i=0;i<materials.Length;i++) Assert.AreSame(materials[i],same[i]);
+            Assert.AreEqual(3,(int)Get(line,"ProcessedBatches"),"Finite input must not produce endless timer credits");
         }
 
         [UnityTest]
