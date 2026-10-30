@@ -1,0 +1,38 @@
+object,old_x,old_y,old_z,old_size_x,old_size_y,old_size_z,new_x,new_y,new_z,new_size_x,new_size_y,new_size_z,reason
+V11_EDGE_SUPPORTS/WEST,-24.1,2.44,14.5,0.14,3.76,0.14,-24.32,2.44,13.75,0.18,3.76,0.18,outboard deck-joint column; bracket and knee brace below deck
+V11_EDGE_SUPPORTS/WEST,-24.1,2.44,17.5,0.14,3.76,0.14,-24.32,2.44,17.95,0.18,3.76,0.18,outboard deck-joint column; bracket and knee brace below deck
+V11_EDGE_SUPPORTS/WEST,-24.1,2.44,20.9,0.14,3.76,0.14,-24.32,2.44,21.2,0.18,3.76,0.18,outboard deck-joint column; bracket and knee brace below deck
+V11_EDGE_SUPPORTS/EAST,-0.65,2.44,14.5,0.14,3.76,0.14,-0.43,2.44,13.75,0.18,3.76,0.18,outboard deck-joint column; bracket and knee brace below deck
+V11_EDGE_SUPPORTS/EAST,-0.65,2.44,17.5,0.14,3.76,0.14,-0.43,2.44,17.95,0.18,3.76,0.18,outboard deck-joint column; bracket and knee brace below deck
+V11_EDGE_SUPPORTS/EAST,-0.65,2.44,20.9,0.14,3.76,0.14,-0.43,2.44,21.2,0.18,3.76,0.18,outboard deck-joint column; bracket and knee brace below deck
+WAREHOUSE structural column/WEST,-24.53,6.05,1.0,0.3,10.95,0.32,-24.7,6.05,1.0,0.18,10.95,0.22,thin wall-plane architectural post; no solid collider
+Yellow column kickplate/WEST,-24.53,0.87,1.0,0.36,0.48,0.39,-24.7,0.87,1.0,0.22,0.48,0.26,paired wall-plane kickplate
+WAREHOUSE structural column/EAST,-0.45,6.05,1.0,0.3,10.95,0.32,-0.12,6.05,1.0,0.18,10.95,0.22,thin wall-plane architectural post; no solid collider
+Yellow column kickplate/EAST,-0.45,0.87,1.0,0.36,0.48,0.39,-0.12,0.87,1.0,0.22,0.48,0.26,paired wall-plane kickplate
+WAREHOUSE structural column/WEST,-24.53,6.05,4.75,0.3,10.95,0.32,-24.7,6.05,4.75,0.18,10.95,0.22,thin wall-plane architectural post; no solid collider
+Yellow column kickplate/WEST,-24.53,0.87,4.75,0.36,0.48,0.39,-24.7,0.87,4.75,0.22,0.48,0.26,paired wall-plane kickplate
+WAREHOUSE structural column/EAST,-0.45,6.05,4.75,0.3,10.95,0.32,-0.12,6.05,4.75,0.18,10.95,0.22,thin wall-plane architectural post; no solid collider
+Yellow column kickplate/EAST,-0.45,0.87,4.75,0.36,0.48,0.39,-0.12,0.87,4.75,0.22,0.48,0.26,paired wall-plane kickplate
+WAREHOUSE structural column/WEST,-24.53,6.05,8.5,0.3,10.95,0.32,-24.7,6.05,8.5,0.18,10.95,0.22,thin wall-plane architectural post; no solid collider
+Yellow column kickplate/WEST,-24.53,0.87,8.5,0.36,0.48,0.39,-24.7,0.87,8.5,0.22,0.48,0.26,paired wall-plane kickplate
+WAREHOUSE structural column/EAST,-0.45,6.05,8.5,0.3,10.95,0.32,-0.12,6.05,8.5,0.18,10.95,0.22,thin wall-plane architectural post; no solid collider
+Yellow column kickplate/EAST,-0.45,0.87,8.5,0.36,0.48,0.39,-0.12,0.87,8.5,0.22,0.48,0.26,paired wall-plane kickplate
+WAREHOUSE structural column/WEST,-24.53,6.05,12.25,0.3,10.95,0.32,-24.7,6.05,12.25,0.18,10.95,0.22,thin wall-plane architectural post; no solid collider
+Yellow column kickplate/WEST,-24.53,0.87,12.25,0.36,0.48,0.39,-24.7,0.87,12.25,0.22,0.48,0.26,paired wall-plane kickplate
+WAREHOUSE structural column/WEST,-24.53,6.05,16.0,0.3,10.95,0.32,-24.7,6.05,16.0,0.18,10.95,0.22,thin wall-plane architectural post; no solid collider
+Yellow column kickplate/WEST,-24.53,0.87,16.0,0.36,0.48,0.39,-24.7,0.87,16.0,0.22,0.48,0.26,paired wall-plane kickplate
+WAREHOUSE structural column/EAST,-0.45,6.05,16.0,0.3,10.95,0.32,-0.12,6.05,16.0,0.18,10.95,0.22,thin wall-plane architectural post; no solid collider
+Yellow column kickplate/EAST,-0.45,0.87,16.0,0.36,0.48,0.39,-0.12,0.87,16.0,0.22,0.48,0.26,paired wall-plane kickplate
+WAREHOUSE structural column/WEST,-24.53,6.05,19.75,0.3,10.95,0.32,-24.7,6.05,19.75,0.18,10.95,0.22,thin wall-plane architectural post; no solid collider
+Yellow column kickplate/WEST,-24.53,0.87,19.75,0.36,0.48,0.39,-24.7,0.87,19.75,0.22,0.48,0.26,paired wall-plane kickplate
+WAREHOUSE structural column/EAST,-0.45,6.05,19.75,0.3,10.95,0.32,-0.12,6.05,19.75,0.18,10.95,0.22,thin wall-plane architectural post; no solid collider
+Yellow column kickplate/EAST,-0.45,0.87,19.75,0.36,0.48,0.39,-0.12,0.87,19.75,0.22,0.48,0.26,paired wall-plane kickplate
+WAREHOUSE structural column/WEST,-24.53,6.05,23.5,0.3,10.95,0.32,-24.7,6.05,23.5,0.18,10.95,0.22,thin wall-plane architectural post; no solid collider
+Yellow column kickplate/WEST,-24.53,0.87,23.5,0.36,0.48,0.39,-24.7,0.87,23.5,0.22,0.48,0.26,paired wall-plane kickplate
+WAREHOUSE structural column/EAST,-0.45,6.05,23.5,0.3,10.95,0.32,-0.12,6.05,23.5,0.18,10.95,0.22,thin wall-plane architectural post; no solid collider
+Yellow column kickplate/EAST,-0.45,0.87,23.5,0.36,0.48,0.39,-0.12,0.87,23.5,0.22,0.48,0.26,paired wall-plane kickplate
+Industrial wall-longitudinal supply/0,-23.7,7.6,12.55,0.13,0.13,22.9,-24.55,8.8,12.55,0.13,0.13,22.9,outer pipes above wall; lowest hanger raised from6.835 to8.035 including thickness
+Industrial wall-longitudinal supply/1,-18.119999999999997,7.96,12.55,0.13,0.13,22.9,-18.119999999999997,9.16,12.55,0.13,0.13,22.9,outer pipes above wall; lowest hanger raised from6.835 to8.035 including thickness
+Industrial wall-longitudinal supply/2,-12.54,7.6,12.55,0.13,0.13,22.9,-12.54,8.8,12.55,0.13,0.13,22.9,outer pipes above wall; lowest hanger raised from6.835 to8.035 including thickness
+Industrial wall-longitudinal supply/3,-6.959999999999997,7.96,12.55,0.13,0.13,22.9,-6.959999999999997,9.16,12.55,0.13,0.13,22.9,outer pipes above wall; lowest hanger raised from6.835 to8.035 including thickness
+Industrial wall-longitudinal supply/4,-1.379999999999999,7.6,12.55,0.13,0.13,22.9,-0.15,8.8,12.55,0.13,0.13,22.9,outer pipes above wall; lowest hanger raised from6.835 to8.035 including thickness

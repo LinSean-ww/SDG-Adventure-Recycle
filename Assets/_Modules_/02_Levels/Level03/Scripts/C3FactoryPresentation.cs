@@ -18,7 +18,7 @@ namespace C3TreasurePuzzle
         private AudioSource motorAudio;
         private bool motorActive;
         private C3RecyclingLine line;
-        public bool MotorActive => motorActive;
+        public bool MotorActive => line && line.IsOperational;
         public int CompletedCycles => line?line.ProcessedBatches:0;
         public int CurrentWasteKind => line?line.LastCompletedLegacyKind:0;
 

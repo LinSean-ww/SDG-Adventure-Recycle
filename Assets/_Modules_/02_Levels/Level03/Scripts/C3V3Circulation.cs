@@ -249,13 +249,28 @@ namespace C3TreasurePuzzle
 
         private void BuildSupports(float west, float east)
         {
-            Transform supports = Group("V11_EDGE_SUPPORTS");
-            // Edge-mounted, entirely below deck; never in the upper walking envelope.
-            foreach (float x in new[] { west, east })
-                foreach (float z in new[] { 14.5f, 17.5f, 20.9f })
-                    Box(supports, "COLUMN_" + x + "_" + z,
-                        new Vector3(x, (GroundSurface + WalkSurface - DeckThickness) * .5f, z),
-                        new Vector3(.14f, WalkSurface - DeckThickness - GroundSurface, .14f), frameMat);
+            Transform supports=Group("V11_EDGE_SUPPORTS");
+            // Consolidated outboard columns at deck joints, with visible
+            // cantilever brackets. Every member stays below the deck underside.
+            for (int side=0;side<2;side++)
+            {
+                float edge=side==0?west:east;
+                float columnX=edge+(side==0?-.22f:.22f);
+                float innerX=edge+(side==0?.50f:-.50f);
+                float underside=WalkSurface-DeckThickness;
+                foreach (float z in new[] {13.75f,17.95f,21.2f})
+                {
+                    Box(supports,"COLUMN_"+(side==0?"WEST_":"EAST_")+z,
+                        new Vector3(columnX,(GroundSurface+underside)*.5f,z),
+                        new Vector3(.18f,underside-GroundSurface,.18f),frameMat);
+                    Box(supports,"DECK_JOINT_BRACKET",new Vector3((columnX+innerX)*.5f,underside-.08f,z),
+                        new Vector3(Mathf.Abs(innerX-columnX)+.14f,.16f,.16f),frameMat);
+                    Vector3 low=new Vector3(columnX,underside-.80f,z);
+                    Vector3 high=new Vector3(innerX,underside-.10f,z);
+                    Box(supports,"KNEE_BRACE",(low+high)*.5f,new Vector3(.10f,.10f,Vector3.Distance(low,high)),
+                        frameMat,true,Quaternion.LookRotation(high-low));
+                }
+            }
         }
 
         private void OnDestroy()

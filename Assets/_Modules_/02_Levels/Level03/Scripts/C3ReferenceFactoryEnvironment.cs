@@ -16,15 +16,14 @@ namespace C3TreasurePuzzle
     [DisallowMultipleComponent]
     public sealed class C3ReferenceFactoryEnvironment : MonoBehaviour
     {
-        public const float InputBeltY = 5.62f;
+        public const float InputBeltY = 5.8f;
         public const float InputBeltZ = 16.85f;
-        public const float SorterRoofY = 4.12f;
-        public const float SorterFrontZ = 12.95f;
-        public const float OutfeedTopY = 1.16f;
-        public const float OutputEndZ = 10.02f;
-        public const float OutputStartZ = 12.96f;
+        public const float SorterRoofY = 4.45f;
+        public const float SorterFrontZ = 12.75f;
+        public const float OutfeedTopY = 1.25f;
+        public const float OutputEndZ = 9.10f;
+        public const float OutputStartZ = 12.75f;
         public const int LaneCount = 3;
-        private static readonly float[] Centers = { -17.9f, -13.0f, -8.1f }; // paper, metal, plastic
 
         private Transform root;
         private C3DeviceState device;
@@ -268,12 +267,11 @@ namespace C3TreasurePuzzle
                 {
                     // Do not block the actual B doorway with an ornamental pillar.
                     if (side==1 && Mathf.Abs(z-12.5f)<1f) continue;
-                    // West posts sit inside the wall, outside the stair rail envelope.
-                    // Keep the east column's inner face (-0.60) outside the V11
-                    // deck edge (-0.65), rather than protruding into the side route.
-                    float x=side==0?-24.53f:-.45f;
-                    Box("WAREHOUSE structural column",x,6.05f,z,.30f,10.95f,.32f,graphite);
-                    Box("Yellow column kickplate",x,.87f,z,.36f,.48f,.39f,yellow);
+                    // Full-height warehouse posts are embedded in the wall plane;
+                    // distinct below-deck columns carry the walkway cantilevers.
+                    float x=side==0?-24.70f:-.12f;
+                    Box("WAREHOUSE structural column",x,6.05f,z,.18f,10.95f,.22f,graphite);
+                    Box("Yellow column kickplate",x,.87f,z,.22f,.48f,.26f,yellow);
                 }
                 Box("WAREHOUSE top roof truss",-12.5f,11.45f,z,24.0f,.28f,.29f,steel);
                 for(int t=0;t<6;t++)
@@ -516,10 +514,10 @@ namespace C3TreasurePuzzle
         {
             for(int p=0;p<5;p++)
             {
-                float x=-23.7f+p*5.58f;
-                // Standing head is at 6.30m on 2F. Keep the hanging clamps (0.71m)
-                // above it across both side routes and the widened maintenance bay.
-                float y=7.60f+(p%2)*.36f;
+                float x=p==0?-24.55f:p==4?-.15f:-23.7f+p*5.58f;
+                // Outer risers move over the wall; lowest hangers are now 8.09m,
+                // above the 6.30m standing head and the elevated material bridge.
+                float y=8.80f+(p%2)*.36f;
                 Beam("Industrial wall-longitudinal supply",new Vector3(x,y,1.1f),
                     new Vector3(x,y,24.0f),.13f,p%2==0?pipe:stainless);
                 for(int i=0;i<5;i++)
@@ -532,9 +530,9 @@ namespace C3TreasurePuzzle
             }
             // The reference's large duct elbow above the right side of the sorting line.
             Beam("Central machine extraction duct",new Vector3(-6.00f,4.28f,15.94f),
-                new Vector3(-5.70f,5.60f,16.52f),.41f,stainless);
-            Beam("Machine extraction roof return",new Vector3(-5.70f,5.60f,16.52f),
-                new Vector3(-3.9f,5.98f,17.10f),.38f,pipe);
+                new Vector3(-6.00f,8.65f,15.94f),.41f,stainless);
+            Beam("Machine extraction roof return",new Vector3(-6.00f,8.65f,15.94f),
+                new Vector3(-3.9f,9.20f,17.10f),.38f,pipe);
             for(int i=0;i<5;i++)
             {
                 float z=3.1f+i*4.30f;
