@@ -1,0 +1,6 @@
+{
+    "name": "SDGAdventure.CompletePlayer",
+    "rootNamespace": "SDGAdventure.CompletePlayer",
+    "references": ["SDGAdventure.SharedPlayer"],
+    "autoReferenced": true
+}

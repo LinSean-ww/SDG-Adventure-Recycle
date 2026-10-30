@@ -1,0 +1,244 @@
+{
+  "name": "SDGPlayerControls",
+  "maps": [
+    {
+      "name": "Gameplay",
+      "id": "60b13d1e-5ec5-4ddc-b51f-81cfe14752e1",
+      "actions": [
+        {
+          "name": "Move",
+          "type": "Value",
+          "id": "0ce940f0-f6d6-4e42-9e1f-20258290b960",
+          "expectedControlType": "Vector2"
+        },
+        {
+          "name": "Look",
+          "type": "Value",
+          "id": "de90bd94-02ce-43a1-b513-3fbe2c215696",
+          "expectedControlType": "Vector2"
+        },
+        {
+          "name": "Jump",
+          "type": "Button",
+          "id": "9bc557e4-43a3-4596-adfe-142c20ac34ed",
+          "expectedControlType": "Button"
+        },
+        {
+          "name": "Sprint",
+          "type": "Button",
+          "id": "a4b41c81-598a-4995-a71b-bc2d45774315",
+          "expectedControlType": "Button"
+        },
+        {
+          "name": "Crouch",
+          "type": "Button",
+          "id": "699b81d4-a35c-4476-a607-ae75f5100679",
+          "expectedControlType": "Button"
+        },
+        {
+          "name": "Interact",
+          "type": "Button",
+          "id": "7612727f-d8e5-4378-aa25-7ca67d3889e9",
+          "expectedControlType": "Button"
+        },
+        {
+          "name": "TaskList",
+          "type": "Button",
+          "id": "d0b90d5a-7371-4f61-9e11-11a8e86e4839",
+          "expectedControlType": "Button"
+        },
+        {
+          "name": "Fire",
+          "type": "Button",
+          "id": "a8a698c1-3833-4f48-a4d7-015a5ea0242f",
+          "expectedControlType": "Button"
+        }
+      ],
+      "bindings": [
+        {
+          "name": "2DVector",
+          "id": "78a213f7-e4f7-43a2-a6ac-f197dbaf884a",
+          "path": "2DVector",
+          "action": "Move",
+          "isComposite": true
+        },
+        {
+          "name": "up",
+          "id": "25d77dce-7342-4b0e-93a2-056a897123ca",
+          "path": "<Keyboard>/w",
+          "action": "Move",
+          "isPartOfComposite": true
+        },
+        {
+          "name": "down",
+          "id": "d66dd2a9-4538-49fc-b41f-aa4cedcae914",
+          "path": "<Keyboard>/s",
+          "action": "Move",
+          "isPartOfComposite": true
+        },
+        {
+          "name": "left",
+          "id": "e22924bb-bc95-4199-ad10-e8c1a76c657b",
+          "path": "<Keyboard>/a",
+          "action": "Move",
+          "isPartOfComposite": true
+        },
+        {
+          "name": "right",
+          "id": "c77f01aa-8a51-4549-965d-0a5350769495",
+          "path": "<Keyboard>/d",
+          "action": "Move",
+          "isPartOfComposite": true
+        },
+        {
+          "name": "",
+          "id": "4a226712-046b-48b4-b461-f245e6c8788b",
+          "path": "<Mouse>/delta",
+          "action": "Look"
+        },
+        {
+          "name": "",
+          "id": "b866a3e6-6b8d-418e-87d7-d9980c045d74",
+          "path": "<Keyboard>/space",
+          "action": "Jump"
+        },
+        {
+          "name": "",
+          "id": "871ca802-c1ca-46f8-8d1c-247a954a44a5",
+          "path": "<Keyboard>/leftShift",
+          "action": "Sprint"
+        },
+        {
+          "name": "",
+          "id": "78e87b76-394d-4b9c-8bf6-38260a411636",
+          "path": "<Keyboard>/leftCtrl",
+          "action": "Crouch"
+        },
+        {
+          "name": "",
+          "id": "1048f100-b3d9-4566-99fb-8ec35b0c6404",
+          "path": "<Keyboard>/e",
+          "action": "Interact"
+        },
+        {
+          "name": "",
+          "id": "91fc3caf-9bce-4a65-b6da-3904d65c271b",
+          "path": "<Keyboard>/p",
+          "action": "TaskList"
+        },
+        {
+          "name": "",
+          "id": "08394316-ce23-499d-8811-3c6057073630",
+          "path": "<Mouse>/leftButton",
+          "action": "Fire"
+        }
+      ]
+    },
+    {
+      "name": "Global",
+      "id": "87c109be-cacf-4313-b899-30ea37b956c1",
+      "actions": [
+        {
+          "name": "Pause",
+          "type": "Button",
+          "id": "50bd85a5-b980-4195-9d6a-6a5f680cb48c",
+          "expectedControlType": "Button"
+        }
+      ],
+      "bindings": [
+        {
+          "name": "",
+          "id": "01bfeabd-2885-46e5-954e-3117f98b707b",
+          "path": "<Keyboard>/escape",
+          "action": "Pause"
+        }
+      ]
+    },
+    {
+      "name": "UI",
+      "id": "2d649971-10be-4f99-bc0e-d6e2cb7163c1",
+      "actions": [
+        {
+          "name": "Navigate",
+          "type": "Value",
+          "id": "3a75f8d1-c26b-4efc-ab5d-f1a824503862",
+          "expectedControlType": "Vector2"
+        },
+        {
+          "name": "Submit",
+          "type": "Button",
+          "id": "3394562a-3657-4213-9022-71d97b2619b7",
+          "expectedControlType": "Button"
+        },
+        {
+          "name": "Cancel",
+          "type": "Button",
+          "id": "33683067-cdde-4b1d-a349-7738b647cc32",
+          "expectedControlType": "Button"
+        },
+        {
+          "name": "TaskList",
+          "type": "Button",
+          "id": "fc294546-1664-473d-8c47-16cb2b0cfdaf",
+          "expectedControlType": "Button"
+        }
+      ],
+      "bindings": [
+        {
+          "name": "2DVector",
+          "id": "187d2910-c3e9-4b3c-84f5-b890d5235985",
+          "path": "2DVector",
+          "action": "Navigate",
+          "isComposite": true
+        },
+        {
+          "name": "up",
+          "id": "a9b310e7-b3c3-43ce-adfe-6b53856293f1",
+          "path": "<Keyboard>/upArrow",
+          "action": "Navigate",
+          "isPartOfComposite": true
+        },
+        {
+          "name": "down",
+          "id": "05893088-45e3-42cf-8116-9d75e2a77f10",
+          "path": "<Keyboard>/downArrow",
+          "action": "Navigate",
+          "isPartOfComposite": true
+        },
+        {
+          "name": "left",
+          "id": "f74f7f77-0d05-4ffc-adeb-24ccf4bdf4e2",
+          "path": "<Keyboard>/leftArrow",
+          "action": "Navigate",
+          "isPartOfComposite": true
+        },
+        {
+          "name": "right",
+          "id": "30fe2b72-f7a5-4b39-9347-ea01fb38db0c",
+          "path": "<Keyboard>/rightArrow",
+          "action": "Navigate",
+          "isPartOfComposite": true
+        },
+        {
+          "name": "",
+          "id": "8399319f-d3e7-489b-a3e6-47ad75ccc1d4",
+          "path": "<Keyboard>/enter",
+          "action": "Submit"
+        },
+        {
+          "name": "",
+          "id": "5c331b49-3c76-4cbd-b239-680f287543e8",
+          "path": "<Keyboard>/escape",
+          "action": "Cancel"
+        },
+        {
+          "name": "",
+          "id": "76b8599a-564e-42fb-9aba-32ac3ca5071b",
+          "path": "<Keyboard>/p",
+          "action": "TaskList"
+        }
+      ]
+    }
+  ],
+  "controlSchemes": []
+}

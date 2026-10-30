@@ -1,0 +1,14 @@
+{
+    "name": "SDGAdventure.TestOutput",
+    "rootNamespace": "SDGAdventure.Testing",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

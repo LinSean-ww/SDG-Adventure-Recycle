@@ -1,0 +1,7 @@
+{
+  "name": "C3TextLifecycle.EditModeTests",
+  "references": ["Unity.ugui"],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "autoReferenced": false
+}

@@ -1,0 +1,15 @@
+{
+    "name": "M7SharedPlayer.PlayModeTests",
+    "rootNamespace": "M7SharedPlayerTests",
+    "references": ["SDGAdventure.SharedPlayer", "Unity.InputSystem"],
+    "optionalUnityReferences": ["TestAssemblies"],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": ["nunit.framework.dll"],
+    "autoReferenced": false,
+    "defineConstraints": ["UNITY_INCLUDE_TESTS"],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
