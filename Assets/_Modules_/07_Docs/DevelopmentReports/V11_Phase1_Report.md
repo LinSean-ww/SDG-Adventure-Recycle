@@ -194,3 +194,28 @@ CS0246: The type or namespace name 'NonParallelizable' could not be found
 8. 若仍有紅色錯誤，保留完整訊息（含檔案、行列與錯誤碼）回報；Rider 訊息若持續也一併保留，不先刪快取／套件。
 
 本次交付是最小修正提交；最終編譯修復驗收需使用者本機確認無新增 C# 錯誤且可退出 Safe Mode。編譯修復驗收不等於 V11 Phase 1 遊戲驗收。PR #2 保持 Draft、不合併 main，等待 Console 回報；本次不繼續功能開發。
+
+
+## Safe Mode 接續修正：CS0161（基準 af29e79）
+
+使用者新的 Windows Unity 2023.1.22f1 Console 截圖顯示：
+
+```text
+C3V11SafeCirculationTests.cs(417,28): error CS0161:
+'C3V11SafeCirculationTests.WorldGeometryMatchesEnabledCollidersAndHasNoHeadObstructions()':
+not all code paths return a value
+```
+
+這是正式編譯阻擋，使用者本機此版本結果為 **FAIL**。前次語法解析無法證明方法的回傳控制流程正確，漏掉了這個問題。該方法宣告 IEnumerator，但只有同步斷言、沒有 yield 或回傳值，因此不是合法的迭代器方法。
+
+最小修正：在所有幾何、護欄、工作桌與輸送帶斷言之後補上 **`yield break;`**，使方法成為合法協程並在執行完斷言後結束。沒有提前略過斷言、改成 void、刪除測試或停用 assembly。相對 af29e79，程式碼僅新增這一行；另一修改檔為本報告。七項 UnityTest 名稱與標記保留，其他方法（包含 setup／teardown／隔離）逐位元不變；場景、玩法、碰撞記錄器、meta、Packages 與 asmdef 均不變。
+
+已執行結果：
+
+- **PASS**：整個 Assets 共 106 個 C# 檔語法解析；針對 830 個方法（含 97 個具體 IEnumerator 方法）的回傳／yield 掃描，修正前精確指出此方法，修正後沒有同類「完全缺少 return／yield／throw」候選。此規則不等同 C# 編譯器的完整控制流程分析。
+- **PASS**：49 處反射契約、鎖定套件與 asmdef 引用、七項測試與方法內容保存、修改範圍及 git diff --check。
+- **Unity Compilation: NOT RUN**；**Unity PlayMode: NOT RUN**（七項全部未執行）。仍需使用者本機實際編譯驗收。
+
+截圖中的 CS0618 是 FindObject(s)OfType 過時 API 警告，本次沒有擴大改寫相關 API。Rider 的 `Unloading broken assembly ...Unity.Rider.Editor.dll` 仍獨立待查；沒有證明其與 CS0161 同根因，沒有刪除 DLL、Library 或套件。
+
+關閉 Unity，於原 feature/v11-factory-rebuild Fetch／Pull 新提交，再開啟 Unity 檢查 CS0161 是否消失及是否還有紅色編譯錯誤；無編譯錯誤後再退出 Safe Mode。若 Rider 訊息仍存在，保留更新後 Console／Editor.log 再處理。原 PR #2 保持 Draft，不合併 main；不將此一行修正或靜態檢查當作編譯／遊戲驗收通過。

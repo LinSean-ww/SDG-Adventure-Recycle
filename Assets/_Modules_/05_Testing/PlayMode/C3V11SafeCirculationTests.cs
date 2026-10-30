@@ -457,6 +457,7 @@ namespace M6IntegrationTests
             Renderer feed = GameObject.Find("V9_BDoorToSorterVisibleBelt").GetComponentInChildren<Renderer>();
             Assert.That(feed.bounds.min.x, Is.EqualTo(-7.49f).Within(.24f));
             Assert.That(feed.bounds.max.x, Is.EqualTo(-.64f).Within(.24f));
+            yield break;
         }
 
         private void AssertClearHead(float x, float z, Renderer[] sceneRenderers)
