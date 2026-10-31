@@ -504,8 +504,7 @@ namespace C3TreasurePuzzle
                     new Vector3(.61f,.09f,.61f),graphite,true);
                 Cyl("Purifier flange upper",new Vector3(-2.70f,2.78f,z),
                     new Vector3(.62f,.08f,.62f),pipe,true);
-                Beam("Purifier connected exhaust riser",new Vector3(-2.70f,2.8f,z),
-                    new Vector3(-2.70f,6.72f,z),.105f,pipe);
+                BuildPurifierExhaust(z);
                 if(i>0)
                     Beam("POLLUTION connected pressurized manifold",
                         new Vector3(-2.70f,3.34f,z-1.56f),
@@ -517,7 +516,44 @@ namespace C3TreasurePuzzle
                 Box("Scrubber status screen",-1.84f,1.66f,z,
                     .04f,.26f,.27f,tealGlow);
             }
+            BuildPurifierExhaustHeader();
             Sign("PollutionControl",-1.92f,3.85f,15.8f,2.65f,.61f,90f);
+        }
+        private const float ExhaustWallX=-.50f,ExhaustOffsetY=3.60f,ExhaustHeaderY=7.80f;
+        private const float ExhaustDiameter=.105f;
+        private void BuildPurifierExhaust(float z)
+        {
+            // User identified the Z=19 riser: the old Y=2.8..6.72 pipe cut
+            // through the rear deck at Y=4.32..4.50. All three vessels now
+            // offset BELOW that deck, then rise OUTSIDE its east guard.
+            Vector3 source=new Vector3(-2.70f,2.80f,z);
+            Vector3 low=new Vector3(source.x,ExhaustOffsetY,z);
+            Vector3 wallLow=new Vector3(ExhaustWallX,ExhaustOffsetY,z);
+            Vector3 wallHigh=new Vector3(ExhaustWallX,ExhaustHeaderY,z);
+            Beam("Purifier connected exhaust riser",source,low,ExhaustDiameter,pipe);
+            Beam("Purifier under-deck exhaust offset",low,wallLow,ExhaustDiameter,pipe);
+            Beam("Purifier outboard exhaust riser",wallLow,wallHigh,ExhaustDiameter,pipe);
+            foreach (Vector3 joint in new[] {low,wallLow,wallHigh})
+                Shape("Purifier exhaust elbow coupling",PrimitiveType.Sphere,joint,Vector3.one*.12f,pipe);
+            // Pipe/fittings stay east of the rail's X=-.61 outer face and
+            // west of the wall's X=-.42 inner face. Only this small support
+            // backplate intentionally seats into the wall, above the rail.
+            Box("Purifier exhaust wall clamp",-.455f,6.60f,z,.11f,.12f,.15f,steel);
+        }
+        private void BuildPurifierExhaustHeader()
+        {
+            Vector3 first=new Vector3(ExhaustWallX,ExhaustHeaderY,15.88f);
+            Vector3 turn=new Vector3(ExhaustWallX,ExhaustHeaderY,20.30f);
+            Vector3 roof=new Vector3(ExhaustWallX,10.45f,20.30f);
+            Vector3 outlet=new Vector3(-.70f,10.45f,20.30f);
+            Beam("Purifier exhaust common header",first,turn,ExhaustDiameter,pipe);
+            Beam("Purifier exhaust roof riser",turn,roof,ExhaustDiameter,pipe);
+            Beam("Purifier exhaust roof connection",roof,outlet,ExhaustDiameter,pipe);
+            foreach (Vector3 joint in new[] {turn,roof})
+                Shape("Purifier exhaust roof elbow",PrimitiveType.Sphere,joint,Vector3.one*.12f,pipe);
+            // Join the existing Cross-hall ceiling ventilation at Z=20.30,
+            // Y=10.45, X=-.70; this is a connected exhaust, not a blind stub.
+            Beam("Purifier exhaust roof sleeve",outlet-Vector3.right*.06f,outlet+Vector3.right*.06f,.14f,pipe);
         }
         private void BuildOverheadPiping()
         {

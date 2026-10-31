@@ -469,15 +469,15 @@ Milestone A Commit：`7e116c06386204d882988ca86f2833d8c934da59`。完整前後�
 
 | 圖 | 處理與來源狀態 | 仍需驗收 |
 | --- | --- | --- |
-| 01 | V11_EDGE_SUPPORTS的西／東柱由X=-24.32/-.43改為-24.22/-.53；柱體Y=.62..4.16，止於接合梁底，增加基板；東柱與牆面不再相交。梁撐留在平台底Y≤4.32。 | 已實作可確認的柱／梁接合；圖中細長杆件沒有唯一Hierarchy證據，已請使用者補名稱，未猜測批次刪除。原生／視覺NOT RUN。 |
+| 01 | V11_EDGE_SUPPORTS的西／東柱由X=-24.32/-.43改為-24.22/-.53；柱體Y=.62..4.16，止於接合梁底，增加基板；東柱與牆面不再相交。梁撐留在平台底Y≤4.32。 | 使用者後續已確認圖1的Z19細桿為淨化排氣立管，不是V11柱；三根排氣路由修正及其餘來源盤點見G節。原生／視覺NOT RUN。 |
 | 01 設備 | UpperDistributionBox原碰撞盒完整保留。截圖警告點(-7.78,5.50,20.22)對應原盒角落，玩家(-8.04,4.58,19.90)是在設備邊緣接觸。主走線Z=19.2距盒南邊1.015m，扣.3半徑+.08skin仍.635m。 | 沒有證據應移除設備；新增站／趴雙向走線實測，NOT RUN。 |
 | 02 | 真正主帶死端X=-19.5新增金屬擋板、黃邊及支座；最後分流X=-16.7仍在上游。三個收集端新增擋板，距原成品前緣70mm，三格目標不改。 | 真實原料／九成品、擋板碰撞NOT RUN。 |
 | 03 | 只停止生成SENSOR_LAB monitor gantry、MATERIAL_SCANNER active monitor與兩根Scanner gantry leg。它們是額外裝飾，原本無實體Collider。 | 真實檢測台、武器台、控制台、D門／標示／Trigger全部保留，新增原角色入口通行NOT RUN。 |
 | 04 | 三回收籠底板／四立柱／八橫條使用原尺寸13個BoxCollider，各實體與Renderer對齊；內容物不加細碎碰撞、不改外觀或位置。 | 站／趴CharacterController原生接觸NOT RUN；沒有整區大隱形盒。 |
-| 05 | 底座、三容器／法蘭、控制箱補局部原生碰撞；控制箱增加可見安裝臂，填補懸空接合；原排氣／歧管保留。 | 三容器原角色接觸、東梯／PVC及視覺接合NOT RUN。 |
+| 05 | 底座、三容器／法蘭、控制箱補局部原生碰撞；控制箱增加可見安裝臂，填補懸空接合；原歧管保留；排氣立管後續依使用者定位繞行平台，見G節。 | 三容器原角色接觸、東梯／PVC及視覺接合NOT RUN。 |
 | 06 | 兩個90°高架轉角的內／外L護邊、黃邊、雙側底架、底橫梁、外側屋頂吊桿與鞍座／頂梁接合。 | 原30帶面、端點與運輸演算法不改；新增原生半徑.12m全高架支撐／碰撞測試NOT RUN。 |
 
-新增 `C3V11Phase21FactoryUpgradeTests` 五項：終端／收集淨空、高架轉角全半徑通行與原生支撐、D入口及真實互動保護、回收籠／淨化容器原CharacterController阻擋、支柱不上穿平台與站／趴上層雙向通行。沿用已驗收fixture隔離背包、輸入、游標、Time與場景，無Ignore或禁用舊測試。
+原Milestone A新增 `C3V11Phase21FactoryUpgradeTests` 五項（G節再補兩項，現為七項）：終端／收集淨空、高架轉角全半徑通行與原生支撐、D入口及真實互動保護、回收籠／淨化容器原CharacterController阻擋、支柱不上穿平台與站／趴上層雙向通行。沿用已驗收fixture隔離背包、輸入、游標、Time與場景，無Ignore或禁用舊測試。
 
 Milestone A來源檢查：`git diff --check` PASS；111個C# AST、949方法、130個IEnumerator檢查PASS（非型別編譯）；原Phase 2／V9／V11／VisualFPS／M6測試整檔及Scene／Packages／ProjectSettings比對保留；GUID唯一且新增meta成對。高架新增26個實體盒的1,505點來源幾何檢查預測無半徑.12m干涉，最小球表面淨空.301m。這是來源模型，不是完整Unity世界或PhysX測試。
 
@@ -487,7 +487,7 @@ Unity PlayMode: NOT RUN
 Manual Gameplay: NOT RUN
 ```
 
-本環境無Unity Editor。Milestone A可確認結構已來源實作；細杆唯一識別、相機／設備視覺及原生通行仍待驗收，不宣稱六張圖均已實際PASS。
+本環境無Unity Editor。Milestone A可確認結構已來源實作；使用者後續已識別排氣細桿，精確修正見G節。相機／設備視覺及原生通行仍待驗收，不宣稱六張圖均已實際PASS。
 
 ### C. Milestone B — 素材與正式視覺
 
@@ -552,7 +552,7 @@ flowchart LR
 
 ### E. 原生驗收與剩餘範圍
 
-最終來源檢查：包含新增檔案的完整Commit範圍 `git diff 201a952 --check` PASS；本次新metadata／CSV統一LF與無尾端空白，GUID值保持不變；114個C# AST／997方法／149個IEnumerator PASS（不等同型別編譯），30個新測試反射型別名稱與真實宣告對照PASS；全GUID唯一、新素材與meta成對，四PNG雜湊保留。保護比對包含原Phase 2／V9／V11／VisualFPS／M6整檔、Scene、Packages、ProjectSettings，運輸Evaluate／Move與原機台／帶面方法亦比對保留。新增測試共19項：結構5、素材6、展示8，均NOT RUN。
+最終來源檢查：包含新增檔案的完整Commit範圍 `git diff 201a952 --check` PASS；本次新metadata／CSV統一LF與無尾端空白，GUID值保持不變；114個C# AST／1006方法／151個IEnumerator PASS（不等同型別編譯），31個新測試反射型別名稱與真實宣告對照PASS；全GUID唯一、新素材與meta成對，四PNG雜湊保留。保護比對包含原Phase 2／V9／V11／VisualFPS／M6整檔、Scene、Packages、ProjectSettings，運輸Evaluate／Move與原機台／帶面方法亦比對保留。含本次排氣修正，新增測試現共21項：結構7、素材6、展示8，均NOT RUN。
 
 | 九項需求 | 來源交付狀態 | 原生／人工 |
 | --- | --- | --- |
@@ -560,7 +560,7 @@ flowchart LR
 | 2 高架轉角／機架／護邊 | 已實作，待Unity驗收 | NOT RUN |
 | 3 D入口無用橫架 | 已安全停止生成指定裝飾，待Unity驗收 | NOT RUN |
 | 4 回收籠／污染設備 | 已實作局部碰撞與可見安裝接合，待Unity驗收 | NOT RUN |
-| 5 二樓柱／支架／UpperDistributionBox | **部分完成**：可確認柱腳／梁接合／東牆淨空已修；設備正常接觸保留；截圖細桿唯一Hierarchy仍待提供／核對，未猜測刪除 | NOT RUN |
+| 5 二樓柱／支架／UpperDistributionBox／排氣細桿 | 已確認圖1 Z19排氣管來源，三根同系列均已重規劃，柱梁／設備正常接觸保留；另掃描其他來源，整張畫面仍待Unity驗收，見G節 | NOT RUN |
 | 6 後方三類包／木棧板裝飾 | 已實作，待Unity驗收 | NOT RUN |
 | 7 多種立體原料 | 已實作15種＋VisualRoot，待Unity匯入／驗收 | NOT RUN |
 | 8 真正立體正式壓縮包 | 已實作三類，原尺寸／身份不變，待Unity驗收 | NOT RUN |
@@ -573,14 +573,51 @@ Unity PlayMode: NOT RUN
 Manual Gameplay: NOT RUN
 ```
 
-沒有Unity Editor，未量得新版角色碰撞、畫面質感、原生包絡或資源數。圖1細杆身份仍需使用者Hierarchy／Scene View；已發出文字詢問，沒有因此覆蓋或任意刪物。B→C Full Level Transition: **BLOCKED — Level02 scene unavailable**，不屬本次九項改善完成判定。
+沒有Unity Editor，未量得新版角色碰撞、畫面質感、原生包絡或資源數。圖1 Z19細桿身份已由使用者確認，三根排氣管均已來源修正；其他可見構件已盤點並加入掃描，仍需Scene View驗收，不宣稱整張圖所有穿模已排除。B→C Full Level Transition: **BLOCKED — Level02 scene unavailable**，不屬本次九項改善完成判定。
 
 ### F. 使用者Unity驗收順序
 
 1. GitHub Desktop切回既有Phase 2分支，保留自己的本地修改，Fetch／Pull本PR最新HEAD；比對Milestone A／B／C SHA。不要切main、重建PR或重套舊修補。
 2. Unity 2023.1.22f1開啟專案，等待四PNG／41 OBJ／14材質匯入與腳本編譯；Console確認無紅字。若Safe Mode，保留第一個完整編譯錯誤，不直接按Exit Safe Mode掩蓋。
-3. Test Runner先單跑原OutputConveyor（原生校準＋27→9），再原Phase 2全18項→V9五項→V11七項。接著跑Phase21FactoryUpgrade五項、RecyclingArt六項、RecyclingPresentation八項（十輪較久），以及受影響VisualFPS／M6。匯出XML與失敗完整診斷／每輪資源Log；無執行不標PASS。
-4. Game／Scene View對六張圖逐項核對ObjectMap：終點與通料轉角分開、D門／真工作台保留、籠／淨化設備碰撞、站／趴雙向上層與雙梯／護欄／PVC；對圖1細桿提供唯一Hierarchy後再決定針對性修正，不刪整組設備。
+3. Test Runner先單跑原OutputConveyor（原生校準＋27→9），再原Phase 2全18項→V9五項→V11七項。接著跑Phase21FactoryUpgrade七項、RecyclingArt六項、RecyclingPresentation八項（十輪較久），以及受影響VisualFPS／M6。匯出XML與失敗完整診斷／每輪資源Log；無執行不標PASS。
+4. Game／Scene View對六張圖逐項核對ObjectMap：終點與通料轉角分開、D門／真工作台保留、籠／淨化設備碰撞、站／趴雙向上層與雙梯／護欄／PVC；核對已識別三根排氣管的低位轉向／外側立管與屋頂連接；若仍有其他來源穿模，保留掃描失敗的完整Hierarchy，不刪整組設備。
 5. 啟動前檢視15種原料／三種壓縮包／木棧板的前、側、俯視UV、法線、厚度、金屬／塑膠／紙材質與包絡；正式進料每類三種，全部子Mesh一起壓縮，正式Batch／Source ID與出口保留。
 6. 遊戲正常取得三零件→解謎→首次啟動→等九原料與三成品收集；靠近原控制台按F或自訂互動鍵→「產線展示」。確認面板自動關閉且9→三分類→2.5秒加工→3成品完整播放；重開可見進度、不能重複啟動。完成後重播第三輪，核對正式統計／背包／武器／彈藥／快捷欄不增；測暫停恢復、ESC、離開控制台與正式完成畫面優先。
-7. 核對正式成品顯示／Collider恢復、無展示堆疊或殘留，TAB／1～5／Q-E／Z／射擊／瞄準／換彈及原任務正常。所有未執行、FAIL及圖1未識別項保留明確狀態；維持Draft等待ChatGPT程式碼審查與使用者原生驗收，停止額外功能開發。
+7. 核對正式成品顯示／Collider恢復、無展示堆疊或殘留，TAB／1～5／Q-E／Z／射擊／瞄準／換彈及原任務正常。所有未執行、FAIL及任何其他圖1構件異常保留明確狀態；維持Draft等待ChatGPT程式碼審查與使用者原生驗收，停止額外功能開發。
+
+
+### G. 使用者確認圖1排氣立管：三支路繞行平台修正
+
+**本次基準：**`da677344fd77e68866116ed8928c5c65999946a5`。使用者在Unity 2023.1.22f1 Play Mode選取並確認：`M3_Treasure/C3_ReferenceRecyclingFactory_Visuals/Purifier connected exhaust riser`（同名三根中的Z=19.00）。原Position=(-2.70,4.76,19.00)、Scale=(.105,1.96,.105)，實際Y=2.80..6.72；來源為BuildPollutionSkid()的i=2，會通過後方平台Y4.32..4.50。**這是排氣管，並非V11樓梯支柱；此根不再是「尚未識別」。**使用者文字路徑省略底線，實際repo檔案是 `Assets/_Modules_/02_Levels/Level03/Scripts/C3ReferenceFactoryEnvironment.cs`。
+
+三根Z=15.88／17.44／19.00全部使用相同新路由：
+
+| 物件 | 修改後中心線／用途 | Collider |
+| --- | --- | --- |
+| Purifier connected exhaust riser | 原設備X=-2.70，Y2.80→3.60；保留與法蘭／Y3.34歧管的合理接合 | 保持原視覺管件無啟用Collider |
+| Purifier under-deck exhaust offset | Y3.60，X=-2.70→-.50；在平台底下轉向，非削短後懸空 | 無啟用Collider |
+| Purifier outboard exhaust riser | X=-.50，Y3.60→7.80；置於外護欄以東、牆內表面以西 | 無啟用Collider |
+| Purifier exhaust common header | X=-.50、Y7.80、Z15.88→20.30，接齊三支路 | 無啟用Collider |
+| Purifier exhaust roof riser／roof connection | Z20.30上升至Y10.45，再連至既有Cross-hall ceiling ventilation端點X=-.70 | 無啟用Collider |
+| elbow／sleeve／wall clamp | .12m肘部接件、屋頂接套及三個小型壁掛支座，共27個排氣視覺件；僅壁掛背板刻意坐入牆面固定 | 無新增隱形碰撞牆 |
+
+管徑仍.105m。三台容器、法蘭、控制箱／底座實體碰撞、原歧管均保留。平台、護欄、樓梯、PVC與三分類／素材／展示程式沒有更動。沒有為了穿模關掉平台或護欄，也沒有把排氣設備整座刪除。
+
+**其他細長構件來源繼續排查：**除了這三根，亦盤點中央大型抽氣管、Industrial pipe clamp drop、主帶／高架／轉角屋頂吊桿、倉庫牆柱、V11下方支架及仍可見的舊上層工作站。中央抽氣管X=-5.8/Z15.94在平台足跡外；夾具落管最低Y8.09、主帶吊桿最低Y5.80、進料吊桿Y7.00／轉角Y6.67均高於平台；牆柱在走道外、V11柱止於平台底梁。具體來源及保留理由已加入ObjectMap。新增原生掃描會跨reference／Phase2設備／V11支架／可見舊場景工作站，檢查所有長度>.75m且水平寬深<.65m的可見構件是否與平台相交，失敗輸出完整Hierarchy及Bounds。自有護欄立柱屬平台上的正常安裝，不當作未知管線，但排氣與整組護欄淨空另行檢查。
+
+**新增兩項回歸（結構suite由5→7項；全部NOT RUN）：**
+
+1. `AllThreeExhaustRoutesAvoidDeckRailsAndJoinTheExistingRoofHeader`：依Z辨識三支路，從真Cylinder Mesh／Transform還原端點，確認設備→低位偏移→外側立管→集管→既有屋頂管線連通；從真網格頂點建立世界幾何包絡，對照Renderer Bounds並檢查平台／護欄；用原生OverlapCapsule查詢顯示管件包絡。以使用者原Position／Scale建立**沒有Collider**的舊管線正向回歸控制，必須抓到穿平台，避免只檢查Collider而漏掉視覺問題；同時掃描其他來源細長構件。
+2. `ReroutedExhaustLeavesRealStandingProneAndEyeLeanEnvelopesClear`：用原CharacterController，取實際站姿／趴姿高度、eye height及Q/E lean偏移，往返後方平台（直接經舊Z19管位）與東側走道Z14.2..20.8。每步檢查可見管件與角色Bounds、眼睛／探頭.10m包絡，管件沒有Collider也不能掩蓋穿模。既有雙梯／護欄／PVC測試整檔保留。
+
+**已執行來源檢查（不是Unity）：**獨立樓板／護欄幾何重播確認舊第三根穿後方平台、另兩根不穿樓板；新27件無平台／護欄交叉。預測最小平台淨距.0975m、護欄.0575m、管件至牆.020m（壁掛固定背板除外），低位偏移與平台底間距.6675m。2,004個站姿／趴姿及眼睛／探頭路線樣本無交叉，含.3m半徑+.08m skin的保守包絡最小距離.6175m。這些只是本次來源模型的數值，不是原生Renderer／CharacterController驗收數據。
+
+C# AST來源檢查：114檔、1006方法、151個IEnumerator；GUID保持537個唯一值，無新資源／meta。完整diff格式與修改範圍檢查PASS；本次僅生成環境、結構測試、ObjectMap及本報告四檔，其餘與da67734逐位元保留，含C3V3Circulation／Scene／原30項／PVC／玩家／三分類／素材／展示。Unity API使用既有Renderer／Mesh／Bounds／OverlapCapsule／CharacterController及標準LINQ，沒有新套件或不相容NUnit屬性；型別／Unity編譯仍未執行。
+
+```text
+Unity Compilation: NOT RUN
+Unity PlayMode: NOT RUN
+Manual Gameplay: NOT RUN
+```
+
+**使用者驗收：**Stop Play後Pull此修正→Unity等待編譯、Console無紅字→Test Runner先單跑上述兩項，再跑結構全部7項與原Phase2 18／V9 5／V11 7、相關VisualFPS／M6及素材／展示回歸。Play Mode依Z逐一核對原三個同名stub已縮至Y2.8..3.6，新立管在X=-.5且通往屋頂，站／趴往返東側與後方走道、Q/E視線不穿管；逐張核對圖1其他構件，不因已修這根就宣稱整張圖全部PASS。若掃描失敗，保留完整Hierarchy、Renderer Bounds、角色位置／姿態與XML。PR #3保持Draft，不改PR #2／Phase1／main，等待ChatGPT審查與原生驗收。

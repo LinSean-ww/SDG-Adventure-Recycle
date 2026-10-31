@@ -32,18 +32,58 @@ namespace M6IntegrationTests
             body.height=height; body.center=Vector3.up*(height*.5f); body.enabled=true;
             Physics.SyncTransforms();
         }
-        private IEnumerator WalkTo(Vector3 destination)
+        private IEnumerator WalkTo(Vector3 destination,Renderer[] exhaust=null,float eyeHeight=0f,float leanOffset=0f)
         {
             for (int i=0;i<1000;i++)
             {
                 Vector3 delta=destination-player.transform.position; delta.y=0f;
                 if (delta.magnitude<.06f) break;
                 body.Move(Vector3.ClampMagnitude(delta,.05f)+Vector3.down*.025f);
+                if (exhaust!=null) AssertExhaustClearOfPlayer(exhaust,eyeHeight,leanOffset);
                 yield return null;
             }
             Vector3 remaining=destination-player.transform.position; remaining.y=0f;
             Assert.Less(remaining.magnitude,.15f,"Real player blocked en route to "+destination+" at "+player.transform.position);
             Assert.That(player.transform.position.y,Is.EqualTo(destination.y).Within(.16f));
+        }
+        private static Renderer[] ExhaustVisuals()
+            => GameObject.Find("C3_ReferenceRecyclingFactory_Visuals").GetComponentsInChildren<Renderer>(true)
+                .Where(r=>r.name.StartsWith("Purifier connected exhaust") || r.name.StartsWith("Purifier under-deck exhaust") ||
+                    r.name.StartsWith("Purifier outboard exhaust") || r.name.StartsWith("Purifier exhaust")).ToArray();
+        private static string HierarchyPath(Transform item)
+        {
+            string path=item.name;
+            for (Transform parent=item.parent;parent;parent=parent.parent) path=parent.name+"/"+path;
+            return path;
+        }
+        private static Vector3[] CylinderEnds(Renderer renderer)
+        {
+            MeshFilter filter=renderer.GetComponent<MeshFilter>(); Assert.IsNotNull(filter,renderer.name);
+            Bounds local=filter.sharedMesh.bounds;
+            return new[] {renderer.transform.TransformPoint(local.center-Vector3.up*local.extents.y),
+                renderer.transform.TransformPoint(local.center+Vector3.up*local.extents.y)};
+        }
+        private static float DistanceToPipe(Vector3 point,Vector3[] ends)
+        {
+            Vector3 delta=ends[1]-ends[0]; Assert.Greater(delta.sqrMagnitude,.000001f);
+            return Vector3.Distance(point,ends[0]+delta*Mathf.Clamp01(Vector3.Dot(point-ends[0],delta)/delta.sqrMagnitude));
+        }
+        private void AssertExhaustClearOfPlayer(Renderer[] exhaust,float eyeHeight,float leanOffset)
+        {
+            foreach (Renderer pipe in exhaust)
+            {
+                // Pipes were/are visual-only; an empty physics query alone
+                // would miss the original fault. Check the real visible bounds
+                // against the original controller and the eye/lean envelope too.
+                if (pipe.bounds.Intersects(body.bounds))
+                    Assert.Fail("Visible exhaust crosses player: "+HierarchyPath(pipe.transform)+" pipe="+pipe.bounds+" player="+body.bounds);
+                for (int side=-1;side<=1;side++)
+                {
+                    Vector3 eye=player.transform.position+Vector3.up*eyeHeight+player.transform.right*(side*leanOffset);
+                    if (pipe.bounds.SqrDistance(eye)<=.01f)
+                        Assert.Fail("Exhaust intersects eye/lean envelope: "+HierarchyPath(pipe.transform)+" eye="+eye);
+                }
+            }
         }
         [UnityTest] public IEnumerator EndStopsProtectDeadEndsWithoutClosingLiveTransfers()
         {
@@ -195,6 +235,112 @@ namespace M6IntegrationTests
                 yield return WalkTo(new Vector3(-1.55f,4.5f,19.2f));
                 yield return WalkTo(new Vector3(-23.2f,4.5f,19.2f));
                 yield return WalkTo(new Vector3(-23.2f,4.5f,14.2f));
+            }
+        }
+        [UnityTest] public IEnumerator AllThreeExhaustRoutesAvoidDeckRailsAndJoinTheExistingRoofHeader()
+        {
+            Transform circulation=GameObject.Find("C3_V3_VerifiedCirculation").transform;
+            Collider[] decks=circulation.GetComponentsInChildren<BoxCollider>().Where(c=>c.name.StartsWith("2F_")).Cast<Collider>().ToArray();
+            Assert.AreEqual(3,decks.Length);
+            Collider[] guards=circulation.Find("V11_UPPER_GUARDS").GetComponentsInChildren<Collider>();
+            Assert.AreEqual(6,guards.Length); Collider[] protectedVolumes=decks.Concat(guards).ToArray();
+            Assert.IsTrue(protectedVolumes.All(c=>c.enabled && !c.isTrigger));
+            Renderer[] exhaust=ExhaustVisuals();
+            Renderer[] stubs=exhaust.Where(r=>r.name=="Purifier connected exhaust riser").ToArray();
+            Renderer[] offsets=exhaust.Where(r=>r.name=="Purifier under-deck exhaust offset").ToArray();
+            Renderer[] outboards=exhaust.Where(r=>r.name=="Purifier outboard exhaust riser").ToArray();
+            Assert.AreEqual(3,stubs.Length); Assert.AreEqual(3,offsets.Length); Assert.AreEqual(3,outboards.Length);
+            Renderer header=exhaust.Single(r=>r.name=="Purifier exhaust common header");
+            Renderer roofRiser=exhaust.Single(r=>r.name=="Purifier exhaust roof riser");
+            Renderer connection=exhaust.Single(r=>r.name=="Purifier exhaust roof connection");
+            foreach (float z in new[] {15.88f,17.44f,19f})
+            {
+                Renderer stub=stubs.Single(r=>Mathf.Abs(r.bounds.center.z-z)<.002f);
+                Renderer offset=offsets.Single(r=>Mathf.Abs(r.bounds.center.z-z)<.002f);
+                Renderer outboard=outboards.Single(r=>Mathf.Abs(r.bounds.center.z-z)<.002f);
+                Vector3[] a=CylinderEnds(stub),b=CylinderEnds(offset),c=CylinderEnds(outboard);
+                Assert.Less(Vector3.Distance(a[0],new Vector3(-2.7f,2.8f,z)),.002f,"Vessel exhaust disconnected");
+                Assert.Less(Vector3.Distance(a[1],b[0]),.002f); Assert.Less(Vector3.Distance(b[1],c[0]),.002f);
+                Assert.Less(DistanceToPipe(c[1],CylinderEnds(header)),.002f,"Riser does not enter the common header");
+                float underside=decks.Min(d=>d.bounds.min.y);
+                Assert.Less(stub.bounds.max.y,underside-.2f); Assert.Less(offset.bounds.max.y,underside-.2f);
+                Collider eastGuard=circulation.Find("V11_UPPER_GUARDS/GUARD_EAST_WALL_OUTER").GetComponent<Collider>();
+                Assert.Greater(outboard.bounds.min.x,eastGuard.bounds.max.x+.02f,"Riser clips east guard");
+            }
+            Assert.Less(Vector3.Distance(CylinderEnds(header)[1],CylinderEnds(roofRiser)[0]),.002f);
+            Assert.Less(Vector3.Distance(CylinderEnds(roofRiser)[1],CylinderEnds(connection)[0]),.002f);
+            Transform reference=GameObject.Find("C3_ReferenceRecyclingFactory_Visuals").transform;
+            Renderer roofDuct=reference.GetComponentsInChildren<Renderer>().Single(r=>r.name=="Cross-hall ceiling ventilation" &&
+                Mathf.Abs(r.bounds.center.z-20.3f)<.002f);
+            Assert.Less(CylinderEnds(roofDuct).Min(p=>Vector3.Distance(p,CylinderEnds(connection)[1])),.002f,"Exhaust terminates short of the real roof duct");
+            foreach (Renderer part in exhaust)
+            {
+                Assert.IsTrue(part.enabled && part.gameObject.activeInHierarchy,part.name);
+                MeshFilter mesh=part.GetComponent<MeshFilter>(); Assert.IsNotNull(mesh);
+                Vector3[] vertices=mesh.sharedMesh.vertices; Assert.Greater(vertices.Length,0);
+                Bounds actual=new Bounds(part.transform.TransformPoint(vertices[0]),Vector3.zero);
+                foreach (Vector3 vertex in vertices) actual.Encapsulate(part.transform.TransformPoint(vertex));
+                Assert.Less(Vector3.Distance(actual.center,part.bounds.center),.002f);
+                Assert.Less(Vector3.Distance(actual.size,part.bounds.size),.002f);
+                Assert.IsTrue(part.GetComponents<Collider>().All(c=>!c.enabled),"Do not add a new invisible pipe barrier");
+                foreach (Collider volume in protectedVolumes)
+                    Assert.IsFalse(actual.Intersects(volume.bounds),"Visible exhaust penetrates "+HierarchyPath(volume.transform)+": "+HierarchyPath(part.transform)+" "+actual);
+                if (part.name.Contains("elbow") || part.name.Contains("clamp")) continue;
+                Vector3[] ends=CylinderEnds(part);
+                Vector3 scale=part.transform.lossyScale; Bounds local=mesh.sharedMesh.bounds;
+                float radius=Mathf.Max(Mathf.Abs(scale.x)*local.extents.x,Mathf.Abs(scale.z)*local.extents.z);
+                Assert.IsFalse(Physics.OverlapCapsule(ends[0],ends[1],radius,~0,QueryTriggerInteraction.Ignore).Any(c=>protectedVolumes.Contains(c)),
+                    "Native query of the rendered pipe envelope hits deck/guard: "+part.name);
+            }
+            // Regression positive control: the user's exact old renderer crosses
+            // the real deck even after removing its collider completely.
+            GameObject old=new GameObject("P21_TEST_OLD_EXHAUST_VISUAL");
+            GameObject cylinder=GameObject.CreatePrimitive(PrimitiveType.Cylinder); cylinder.transform.SetParent(old.transform,false);
+            try
+            {
+                Object.DestroyImmediate(cylinder.GetComponent<Collider>());
+                cylinder.transform.position=new Vector3(-2.7f,4.76f,19f); cylinder.transform.localScale=new Vector3(.105f,1.96f,.105f);
+                Physics.SyncTransforms();
+                Assert.IsTrue(decks.Any(d=>cylinder.GetComponent<Renderer>().bounds.Intersects(d.bounds)),"Renderer control failed to detect the reported fault");
+                Assert.IsTrue(Physics.OverlapCapsule(new Vector3(-2.7f,2.8f,19f),new Vector3(-2.7f,6.72f,19f),.0525f,~0,
+                    QueryTriggerInteraction.Ignore).Any(c=>decks.Contains(c)),"Native visual-envelope control missed the original deck crossing");
+            }
+            finally { Object.DestroyImmediate(old); }
+            // Inspect other sources too: extraction duct, roof hangers, below-
+            // deck supports and any still-visible legacy station geometry.
+            // Exclude only the circulation's own guard posts, which intentionally
+            // start on the deck; the exhaust/guard clearance is checked above.
+            Transform legacy=GameObject.Find("C_Factory_Art").transform;
+            Renderer[] candidates=reference.GetComponentsInChildren<Renderer>()
+                .Concat(((Transform)Member(geometry,"BuildRoot")).GetComponentsInChildren<Renderer>())
+                .Concat(circulation.Find("V11_EDGE_SUPPORTS").GetComponentsInChildren<Renderer>())
+                .Concat(legacy.GetComponentsInChildren<Renderer>(true))
+                .Where(r=>r.enabled && r.gameObject.activeInHierarchy && r.bounds.size.y>.75f && r.bounds.size.x<.65f && r.bounds.size.z<.65f).ToArray();
+            Assert.Greater(candidates.Length,3);
+            foreach (Renderer candidate in candidates)
+                foreach (Collider deck in decks)
+                    Assert.IsFalse(candidate.bounds.Intersects(deck.bounds),"Other visible member still crosses deck: "+HierarchyPath(candidate.transform)+" "+candidate.bounds);
+            Debug.Log("P21 exhaust audit: three connected vessel routes; other visible slender members checked="+candidates.Length+"; native deck crossings=0");
+            yield return null;
+        }
+        [UnityTest] public IEnumerator ReroutedExhaustLeavesRealStandingProneAndEyeLeanEnvelopesClear()
+        {
+            Renderer[] exhaust=ExhaustVisuals(); Assert.Greater(exhaust.Length,9);
+            Component controller=player.GetComponent(GameType("C3TreasurePuzzle.C3FirstPersonController"));
+            float standing=(float)Member(controller,"standingHeight");
+            float prone=Mathf.Clamp((float)Member(controller,"proneHeight"),body.radius*2f,(float)Member(controller,"crouchHeight"));
+            float lean=(float)Member(controller,"leanOffset");
+            for (int stance=0;stance<2;stance++)
+            {
+                float height=stance==0?standing:prone;
+                float eye=(float)Member(controller,stance==0?"standingEyeHeight":"proneEyeHeight");
+                StartAt(new Vector3(-23.2f,4.52f,19f),height); AssertExhaustClearOfPlayer(exhaust,eye,lean);
+                yield return WalkTo(new Vector3(-1.55f,4.5f,19f),exhaust,eye,lean);
+                yield return WalkTo(new Vector3(-1.55f,4.5f,14.2f),exhaust,eye,lean);
+                yield return WalkTo(new Vector3(-1.55f,4.5f,20.8f),exhaust,eye,lean);
+                yield return WalkTo(new Vector3(-1.55f,4.5f,19f),exhaust,eye,lean);
+                yield return WalkTo(new Vector3(-23.2f,4.5f,19f),exhaust,eye,lean);
+                Assert.That(body.height,Is.EqualTo(height).Within(.001f));
             }
         }
     }
