@@ -191,10 +191,15 @@ namespace C3TreasurePuzzle
                 machine.Tray=Marker("PROCESS_TRAY",tray,machine.Root);
                 machine.Output=Marker("MACHINE_OUTPUT",output,machine.Root);
                 machine.Collection=Marker("FINISHED_COLLECTION",collection,machine.Root);
+                // Scan on the shared main belt BEFORE the diversion. At main.x
+                // the front post sat directly across the -Z branch centreline.
+                // This setback clears that route, its guards and the pusher while
+                // keeping both posts outside the shared -X material lane.
+                Vector3 scanner=main+Vector3.right*.45f;
                 foreach (int side in new[] {-1,1})
-                    Box("IDENTIFIER_UPRIGHT",main+new Vector3(.0f,.35f,side*.92f),new Vector3(.10f,.7f,.10f),steel,machine.Root);
-                Box("IDENTIFIER_GANTRY",main+Vector3.up*.75f,new Vector3(.16f,.12f,1.95f),yellow,machine.Root);
-                Box("IDENTIFIER_SENSOR",main+Vector3.up*.63f,new Vector3(.16f,.08f,.24f),glass,machine.Root,false);
+                    Box("IDENTIFIER_UPRIGHT",scanner+new Vector3(.0f,.35f,side*.92f),new Vector3(.10f,.7f,.10f),steel,machine.Root);
+                Box("IDENTIFIER_GANTRY",scanner+Vector3.up*.75f,new Vector3(.16f,.12f,1.95f),yellow,machine.Root);
+                Box("IDENTIFIER_SENSOR",scanner+Vector3.up*.63f,new Vector3(.16f,.08f,.24f),glass,machine.Root,false);
                 machine.Pusher=Box("DIVERT_PUSHER",main+new Vector3(0f,.20f,.8f),new Vector3(.7f,.20f,.08f),yellow,machine.Root,false).transform;
                 // Leave the full-width main belt horizontally before descending;
                 // a ramp starting at its centre would cut through the main surface.

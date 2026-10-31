@@ -401,7 +401,10 @@ namespace C3TreasurePuzzle
             foreach (C3ConveyorSection section in geometry.Machines[lane].OutputSections) batch.Path.Add(section);
             batch.OutputDistance=batch.Path.Legs.Take(2).Sum(s=>s.Length);
             Leg last=batch.Path.Legs[batch.Path.Legs.Count-1];
-            last.B+=new Vector3((machine.Completed-1)*.65f,0f,0f);
+            // Fill the two outer slots before the centre. A final diagonal
+            // delivery to the right would sweep through an occupied centre bale.
+            float collectionOffset=machine.Completed==0 ? -.65f : machine.Completed==1 ? .65f : 0f;
+            last.B+=Vector3.right*collectionOffset;
             // Validate the physical output before allocating scene objects. A
             // broken/missing surface must not leak a new hidden bale each retry.
             batch.Path.Evaluate(0f,0f,ProductSize,out Vector3 position,out Quaternion rotation,out _);

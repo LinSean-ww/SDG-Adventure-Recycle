@@ -2,6 +2,8 @@
 
 本報告區分**已實作**及**已驗收**。沒有 Unity Editor 的來源檢查不能代表編譯、PlayMode 或遊戲通過。
 
+**後續實測更新：**使用者在 `aee6dc70b0a2b2792e8e18edffc9b0d57127ee49` 回報 Phase 2 **16 PASS／2 FAIL**、V9 **5 PASS**、V11 **7 PASS**。兩項失敗已確認，修正分析及新提交的 NOT RUN 狀態見文末 **Phase 2 Unity PlayMode — Cargo Collision and Output Contact Repair**。以下 A–G 保留初次交付紀錄，不能沿用為新提交 PASS。
+
 - Phase 1 基準：`ed26bfc9e281737e96421be149f7b539eb79326c`。
 - Head：`feature/v11-phase2-recycling-line`；Base：`feature/v11-factory-rebuild`，依賴尚未合併的 [Draft PR #2](https://github.com/LinSean-ww/SDG-Adventure-Recycle/pull/2)。不修改 #2、不合併 main、不強制推送。
 - 專案 Unity 版本 `2023.1.22f1`；本環境沒有可用 Unity Editor／授權。
@@ -212,3 +214,113 @@ V9低位OBJ名稱／尺寸與V11最後的舊feed Bounds斷言，替換為30段�
 6. 暫停／恢復；完成任務只排空既有料。重載確認一套設備、背包彈藥快捷欄保留、舊已完成ID不重播；新場景九個新演示ID屬新批投入。
 7. 實走西上東下、東上西下、後平台、維修工作桌及轉角；Z趴走長廊、測護欄防墜、晶片只加一個、PVC可見雙向通行。再驗WASD、視角、左射／右瞄、Q/E、R、TAB、1～5、原取料／工作台／武器。
 8. 提供Console、XML、必要Game／Scene View與異常位置供審查修正。驗收前維持Draft，不合併。
+
+## Phase 2 Unity PlayMode — Cargo Collision and Output Contact Repair
+
+### A. 原始測試結果：CONFIRMED PLAYMODE TEST FAILURES
+
+使用者提供 Windows Unity **2023.1.22f1** 實測，失敗基準 SHA `aee6dc70b0a2b2792e8e18edffc9b0d57127ee49`：Phase 2 **16 PASS、2 FAIL**；V9 **5 PASS**；V11 **7 PASS**。這是該基準的使用者測試結果，不是本雲端執行結果，亦不能沿用為本次修正後 PASS。
+
+```text
+CargoFollowsRoute (1.518s)
+Cargo penetrates IDENTIFIER_UPRIGHT
+Expected: greater than or equal to 0.119000003f
+But was: 0.0f
+C3V11Phase2RecyclingLineTests.cs:224
+
+OutputConveyor (2.577s)
+Finished product floats above its actual finite output surface
+Expected: True
+But was: False
+C3V11Phase2RecyclingLineTests.cs:315
+```
+
+上述檔案行號為原失敗版本。原始紀錄未附物料中心／Batch ID／輸出段，因此不能聲稱已在雲端重現原生碰撞位置或已測得成品懸空距離。
+
+### B. CargoFollowsRoute：幾何修正及穿透量測
+
+來源確認：三台分流沿固定 X 向 -Z 移動，原前立柱卻在同一個 X、Z=15.93，Y Bounds=5.80..6.50、厚 .10m，位於原料半徑 .12m 的掃掠範圍內。ClosestPoint 回傳中心造成距離0，並不是穿透深度0。此幾何問題不能以忽略立柱處理。
+
+將**整組辨識架**沿主帶上游（+X）移 .45m，橫樑／感測器一起移動，尺寸、實體立柱／橫樑 Collider、分流點、推桿及所有正式路線不變。新位置仍在主帶開始端內側，物料先經掃描架才到分流口。
+
+| 機台 | 原前／後立柱 | 新前／後立柱 | 新橫樑 | 新感測器 |
+| --- | --- | --- | --- | --- |
+| Paper | (-16.70,6.15,15.93)／(-16.70,6.15,17.77) | (-16.25,6.15,15.93)／(-16.25,6.15,17.77) | (-16.25,6.55,16.85) | (-16.25,6.43,16.85) |
+| Metal | (-11.80,6.15,15.93)／(-11.80,6.15,17.77) | (-11.35,6.15,15.93)／(-11.35,6.15,17.77) | (-11.35,6.55,16.85) | (-11.35,6.43,16.85) |
+| Plastic | (-6.90,6.15,15.93)／(-6.90,6.15,17.77) | (-6.45,6.15,15.93)／(-6.45,6.15,17.77) | (-6.45,6.55,16.85) | (-6.45,6.43,16.85) |
+
+以上是**來源座標，非新版本原生 Bounds 實測**。來源推算三條路線同樣具有：主帶物料到立柱側面至少 .75m 淨空、分流中心線到立柱表面 .40m（扣 .12m 原料半徑後 .28m）、立柱到推桿整個行程包絡的 X 淨空 .05m；分流上段護邊與立柱 X 分離至少 .125m。平帶原料頂約6.041，感測器底6.39、橫樑底6.49，分別約 .349／.449m 垂直間隙；其他共用主線與轉角亦納入來源取樣。
+
+擴充來源數值模型，補入上一版漏掉的辨識架、感測器與推桿動作。同一489個路線取樣在舊位置預測9處立柱干涉（例如來源中心 `(-16.7,5.921,15.9501)`，估算球／盒最小分離深度約 .14994m），移動後預測超過1.1mm的干涉為0。這只是來源數值重播，不是原始 Unity 的實際中心／深度，也不涵蓋完整 Unity 場景。
+
+測試保留 `CargoFollowsRoute` 名稱，改為紙／金屬／塑膠各一份，同時走正式共用主線及各自分流、轉彎、料斗到加工床。保留 ID／GO／類型不變、狀態歷史、目標機與單步 <.37m。合法支撐僅限真正 current／相鄰路段的帶面／加工床；距離仍 <.01m。OverlapSphere 只找候選，啟用的 .12m SphereCollider 探測器以 ComputePenetration 量實際深度／方向，帶面也不排除過深穿入；另以真實 box mesh 的局部尺寸和世界旋轉檢查無實體 Collider 的感測器、壓頭與推桿，不能藉停用其 Collider 掩蓋可見穿模。
+
+新增已知球／盒重疊及分離正負控制，避免查詢一直回 false 卻假通過。失敗才組合 Material ID／類型／狀態／路段／中心／半徑、支撐端點與差距、物件路徑、實際穿透深度／方向及校準結果；正常影格不輸出 Log。
+
+### C. OutputConveyor：分開支撐、間隙與穿透
+
+原探測器為 `shape.enabled=false`，尺寸膨脹 `envelope.size + .006`（每側3mm），再把 ComputePenetration 為 true 當支撐的唯一證據。這不能可靠區分恰好接觸、合法1mm間隙與懸空。**未取得此環境下 disabled collider 的原生查詢結果，不斷言停用是唯一根因；原始 FAIL 也不足以證明真正懸空。**
+
+正式 Evaluate 的約1mm上方間隙與所有出口設備幾何不改；只調整三個既有收集格的到達順序，處理新增多成品覆蓋查出的干涉（下述）。測試使用以下三層驗證：
+
+1. **先校準 API：**隔離的單位 BoxCollider 在已知100mm重疊、100mm分離、表面接觸、1mm間隙各查詢啟用／停用模式並記錄結果；啟用模式必須通過正負控制，恰好接觸可回 false，不要求重疊。停用結果只供比較，不預設它一定有效或一定無效。後續穿透判斷一律用已校準、啟用的探測器。
+2. **支撐／有限帶面：**由所有實際成品 mesh 頂點建立產品局部包絡，套用真實世界旋轉，不拿 world AABB 當精確距離。從成品上方20mm向下 BoxCast 40mm，僅接受 current／相鄰路段與機內相鄰加工床命中；以 hit.distance 減20mm取得有號垂直間隙，最大正間隙3mm。20／40mm是搜尋窗，不是允許懸空的容差。另以隔離實體帶面驗證0、1、10mm間隙：0／1mm應有支撐，10mm應判為懸空。
+3. **實際穿透：**原尺寸、啟用的 BoxCollider 以 OverlapBox＋ComputePenetration 查所有鄰近實體，包括合法帶面、機殼、護邊、支架、棧板及其他成品；只排除自己的子樹。不將所有接觸體加入忽略名單。另驗證物體 up 與實際帶面／相鄰接點的角度，在段內跟隨帶面、接點允許平滑轉角。
+
+探測器是 Trigger、無 Rigidbody，真實位置在工廠外 `(128,128,128)`，ComputePenetration 的參數姿態只供查詢，不搬動正式物料。所有控制物件／探測器都在 finally 銷毀；不更動全域 Physics 設定。
+
+| 工程限制 | 原值／方法 | 修正後 | 原生實測誤差 |
+| --- | --- | --- | --- |
+| 原料接觸 | 絕對表面差 <10mm | 不變，限制 current／相鄰真實支撐 | NOT RUN |
+| 原料穿透 | .12-.119 ≈1mm中心距規則 | 實際 ComputePenetration 深度 ≤1mm | NOT RUN |
+| 成品支撐 | 每側膨脹3mm後要求重疊，無獨立距離 | 真實有限帶面垂直間隙 ≤3mm，對應1mm設計間隙 | NOT RUN |
+| 成品穿透 | 深度 ≤10mm | 不變 | NOT RUN |
+| 單步原料／成品位移 | <.37m／<.18m | 不變 | NOT RUN |
+| 收集格 X／Z | 10mm | 不變並明確驗三格 | NOT RUN |
+
+3mm距離上限沿用既有每側3mm探測尺度，給1mm設計間隙與數值精度餘裕；並非以未測得的誤差為由放寬到0.1m。API控制的數值比對精度 .2mm，實際校準結果仍需 Unity 執行。
+
+`OutputConveyor` 測試三台各9份手動測試投入（共27份→9成品），逐件檢查 `PROCESS_BED → P2_DISCHARGE_BED → P2_INTERNAL_OUTPUT → CONNECTED_LOWER_OUTFEED → P2_COLLECTION_BED`。凍結 GO／Batch ID／Material Type／三個 Source ID，驗證加工後才形成、四段都實際觀察到、出口及收集狀態、三個橫移收集格 X/Z 與支撐／棧板穿透。取樣上限1000→1600只因覆蓋成品3→9，不改速度、單步距離或空間精度；正式遊戲仍是原九件演示料，不增加生成器或供料量。
+
+**多成品落位的來源干涉修正：**原順序 X偏移 `-.65 → 0 → +.65`，第三件沿最後一段斜向右格時，包絡會掃過已收集的中格成品。以實際 .52×.43×.51 包絡、原姿態轉向及同高位置做1001點／件的旋轉盒分離軸檢查，舊順序預測相交量最大約 .153276m；這不是原生深度，也不是原始「每機一成品」測試失敗的已證實原因。最小修正僅讓 `PrepareProduct` 最後路段選格順序改為 `-.65 → +.65 → 0`（左右先、中央後），同模型預測相交為0。收集格座標、帶面、成品形狀、速度、狀態／ID／收據及加工規則全部保留，不搬動已收集成品、不刪除其 Collider、不做瞬移。拓撲CSV只改九個收集格的到達順序註記，所有座標不變。測試按三個實際格位集合驗收，不把產生次序硬寫成正確性的唯一證據，仍逐幀檢查成品間穿透。
+
+異常才提供 Batch ID、類型、路段、物件名、位置／旋轉、局部包絡、設備名、Start／End、實際路徑端點（含橫移收集格）、Surface Bounds、current／相鄰接觸間隙、實際穿透物件／深度／方向與探測器模式校準結果。**目前沒有新原生量測，是否仍有真懸空／穿透為待驗證事項；本次不任意修改已通過其他測試的出口幾何。**
+
+### D. 本次驗證、提交範圍與驗收順序
+
+| 項目 | 本次結果 |
+| --- | --- |
+| 來源語法／yield檢查 | PASS（來源）；110個C#、923個方法、122個IEnumerator；不是型別／Unity編譯 |
+| 修改範圍／保護比對 | PASS（來源）；僅 Geometry 辨識架、PrepareProduct 收集格順序、上述兩測試／helper、本報告及CSV順序註記；其餘16項Phase 2、V9／V11整檔、Scene、其他運輸／加工／收據／玩家／背包／武器程式與所有meta皆與失敗基準相同 |
+| git diff --check | PASS（來源格式） |
+| 擴充來源數值模型 | PASS（來源）；先重播舊立柱干涉，再查新三路線489取樣與機械包絡；不是原生碰撞驗收 |
+| 收集順序數值檢查 | PASS（來源）；1001點／件旋轉盒檢查，重播舊順序相交並檢查左右先／中央後順序；不是原生接觸／穿透結果 |
+| Probe API啟用／停用、重疊／分離／接觸／1mm間隙 | NOT RUN；已加入校準及診斷 |
+| CargoFollowsRoute | NOT RUN（新提交）；原失敗基準 FAIL，不改標PASS |
+| OutputConveyor | NOT RUN（新提交）；原失敗基準 FAIL，不改標PASS |
+| 全18項Phase 2、V9五項、V11七項 | NOT RUN（新提交），不沿用使用者基準PASS |
+| C3VisualFPSIntegrationTests／M6FlowTests受影響項目 | NOT RUN |
+| Unity Compilation | NOT RUN |
+| Unity PlayMode | NOT RUN |
+| Manual Gameplay | NOT RUN |
+| B→C Full Level Transition | BLOCKED — Level02 scene unavailable |
+
+```text
+Unity Compilation: NOT RUN
+Unity PlayMode: NOT RUN
+Manual Gameplay: NOT RUN
+```
+
+本環境仍無 Unity Editor。以上不宣稱根因已在原生環境重現或修正已通過。工作分支維持 `feature/v11-phase2-recycling-line`，更新原 [Draft PR #3](https://github.com/LinSean-ww/SDG-Adventure-Recycle/pull/3)，Base仍為 `feature/v11-factory-rebuild`；不修改 PR #2、Phase 1分支或main，不建立新PR／分支、不強制推送、不合併。
+
+實際修改檔案僅：
+
+- `Assets/_Modules_/02_Levels/Level03/Scripts/C3RecyclingLineGeometry.cs`
+- `Assets/_Modules_/02_Levels/Level03/Scripts/C3RecyclingLine.cs`（僅收集格順序）
+- `Assets/_Modules_/05_Testing/PlayMode/C3V11Phase2RecyclingLineTests.cs`
+- `Assets/_Modules_/07_Docs/DevelopmentReports/V11_Phase2_Report.md`
+- `Assets/_Modules_/07_Docs/DevelopmentReports/V11_Phase2_Topology.csv`（僅順序註記）
+
+Windows Unity 2023.1.22f1驗收順序：拉取新SHA→等待編譯；**先單跑 CargoFollowsRoute，再單跑 OutputConveyor（含探測器校準），兩項通過才跑全18項Phase 2→V9五項→V11七項→受影響的VisualFPS／M6流程測試**。有失敗時保留本次完整診斷及XML，不先放寬門檻。
+
+人工再檢查九件正式演示料經三座辨識架無穿模、各三份加工為一成品、壓頭動作、各出口／收集無懸空跳位，以及原啟動／背包／武器／雙梯／二樓走道／PVC／地面入口。正式B→C關卡轉場仍BLOCKED；C側演示不代表B關通關。完成此次提交後停止額外功能開發，維持Draft等待ChatGPT審查與使用者原生驗收。

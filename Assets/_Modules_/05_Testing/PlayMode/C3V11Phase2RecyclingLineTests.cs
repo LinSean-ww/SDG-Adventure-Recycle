@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -92,6 +93,185 @@ namespace M6IntegrationTests
             Assert.IsTrue((bool)Call(device,"TryActivate"));
             Assert.AreEqual("Starting",Member(device,"FactoryState").ToString());
             if (run) { Call(device,"NotifyStartupFinished"); Assert.AreEqual("Running",Member(device,"FactoryState").ToString()); }
+        }
+        // Probes are enabled triggers, physically outside the factory. Explicit
+        // ComputePenetration poses never move them into gameplay or apply forces.
+        private static readonly Vector3 ProbeParking=new Vector3(128f,128f,128f);
+        private const float ContactLift=.02f,ContactSweep=.04f,MaxSupportGap=.003f;
+        private const float RawPenetrationLimit=.001f,ProductPenetrationLimit=.01f;
+        private static void Require(bool condition,string reason,Func<string> details)
+        {
+            if (!condition) Assert.Fail(reason+"\n"+details());
+        }
+        private static string ColliderPath(Collider collider)
+        {
+            string path=collider.name;
+            for (Transform p=collider.transform.parent;p;p=p.parent) path=p.name+"/"+path;
+            return path;
+        }
+        private static Collider[] RouteSupports(object owner)
+        {
+            object[] legs=Items(Member(owner,"Path"),"Legs");
+            int segment=(int)Member(owner,"CurrentRouteSegment");
+            return legs.Skip(Mathf.Max(0,segment-1)).Take(segment==0?2:3)
+                .Select(s=>(Collider)Member(s,"Support")).Distinct().ToArray();
+        }
+        private static Bounds ProductEnvelope(Transform product)
+        {
+            MeshFilter[] meshes=product.GetComponentsInChildren<MeshFilter>();
+            Assert.Greater(meshes.Length,0);
+            Bounds envelope=new Bounds(Vector3.zero,Vector3.zero);
+            foreach (MeshFilter mesh in meshes)
+                foreach (Vector3 vertex in mesh.sharedMesh.vertices)
+                    envelope.Encapsulate(product.InverseTransformPoint(mesh.transform.TransformPoint(vertex)));
+            Assert.Less(Vector3.Distance(product.lossyScale,Vector3.one),.001f,"Probe assumes production's unit-scale product root");
+            return envelope;
+        }
+        private static Dictionary<Collider,float> BoxContactGaps(BoxCollider shape,Vector3 position,Quaternion rotation,
+            Collider[] supports,QueryTriggerInteraction triggers=QueryTriggerInteraction.Ignore)
+        {
+            // A cast measures separation without requiring an overlap. Restrict
+            // support to actual finite current/adjacent transport surfaces.
+            Vector3 center=position+rotation*shape.center;
+            RaycastHit[] hits=Physics.BoxCastAll(center+Vector3.up*ContactLift,shape.size*.5f,
+                Vector3.down,rotation,ContactSweep,~0,triggers);
+            Dictionary<Collider,float> gaps=supports.Distinct().ToDictionary(s=>s,s=>float.PositiveInfinity);
+            foreach (RaycastHit hit in hits)
+                if (gaps.ContainsKey(hit.collider)) gaps[hit.collider]=Mathf.Min(gaps[hit.collider],hit.distance-ContactLift);
+            return gaps;
+        }
+        private static bool HasSupport(Dictionary<Collider,float> gaps) =>
+            gaps.Values.Any(g=>g>=-ProductPenetrationLimit && g<=MaxSupportGap);
+        private static string GapText(float gap) => float.IsPositiveInfinity(gap)
+            ?"no finite-surface hit in 40mm sweep":gap.ToString("F6")+"m vertical gap";
+        private static string Penetrations(Collider probe,Vector3 position,Quaternion rotation,IEnumerable<Collider> obstacles)
+        {
+            StringBuilder text=new StringBuilder();
+            foreach (Collider obstacle in obstacles.Distinct())
+                if (Physics.ComputePenetration(probe,position,rotation,obstacle,obstacle.transform.position,
+                    obstacle.transform.rotation,out Vector3 direction,out float depth))
+                    text.AppendLine(ColliderPath(obstacle)+" depth="+depth.ToString("F6")+"m direction="+direction.ToString("F6"));
+            return text.Length==0?"none":text.ToString();
+        }
+        private static string ValidateSphereProbe(SphereCollider sphere,BoxCollider box)
+        {
+            box.center=Vector3.zero; box.size=Vector3.one;
+            Physics.SyncTransforms();
+            bool overlap=Physics.ComputePenetration(sphere,Vector3.up*.60f,Quaternion.identity,
+                box,Vector3.zero,Quaternion.identity,out Vector3 direction,out float depth);
+            Assert.IsTrue(overlap,"Enabled raw SphereCollider positive overlap control failed");
+            Assert.That(depth,Is.EqualTo(.02f).Within(.0002f));
+            Assert.Greater(Vector3.Dot(direction,Vector3.up),.99f);
+            Assert.IsFalse(Physics.ComputePenetration(sphere,Vector3.up*.63f,Quaternion.identity,
+                box,Vector3.zero,Quaternion.identity,out _,out _),"Separated raw probe control failed");
+            return "enabled sphere: overlap depth="+depth.ToString("F6")+"m; separated=false";
+        }
+        private static string ValidateBoxProbe(BoxCollider shape)
+        {
+            GameObject control=new GameObject("P2_TEST_QUERY_CONTROL");
+            control.transform.position=ProbeParking+Vector3.right*8f;
+            StringBuilder observations=new StringBuilder();
+            try
+            {
+                BoxCollider support=control.AddComponent<BoxCollider>(); support.isTrigger=true;
+                shape.center=Vector3.zero; shape.size=Vector3.one;
+                foreach (bool enabled in new[] {true,false})
+                {
+                    shape.enabled=enabled; Physics.SyncTransforms();
+                    bool overlap=Physics.ComputePenetration(shape,Vector3.up*.9f,Quaternion.identity,
+                        support,Vector3.zero,Quaternion.identity,out Vector3 direction,out float depth);
+                    bool separated=Physics.ComputePenetration(shape,Vector3.up*1.1f,Quaternion.identity,
+                        support,Vector3.zero,Quaternion.identity,out _,out float separatedDepth);
+                    bool touching=Physics.ComputePenetration(shape,Vector3.up,Quaternion.identity,
+                        support,Vector3.zero,Quaternion.identity,out _,out float touchDepth);
+                    bool smallGap=Physics.ComputePenetration(shape,Vector3.up*1.001f,Quaternion.identity,
+                        support,Vector3.zero,Quaternion.identity,out _,out float gapDepth);
+                    observations.AppendLine("enabled="+enabled+" overlap="+overlap+" depth="+depth.ToString("F6")+
+                        " direction="+direction.ToString("F6")+" tangent="+touching+" tangentDepth="+touchDepth.ToString("F6")+
+                        " separatedOverlap="+separated+" separatedDepth="+separatedDepth.ToString("F6")+
+                        " 1mmGapOverlap="+smallGap+" gapDepth="+gapDepth.ToString("F6"));
+                    // Observe disabled behaviour rather than assume it matches
+                    // enabled geometry. Only the calibrated ENABLED probe is used
+                    // for all subsequent scene penetration verdicts.
+                    if (enabled)
+                    {
+                        Assert.IsTrue(overlap,"Enabled BoxCollider positive overlap control failed; "+observations);
+                        Assert.That(depth,Is.EqualTo(.1f).Within(.0002f));
+                        Assert.Greater(Vector3.Dot(direction,Vector3.up),.99f);
+                        Assert.IsFalse(separated,"Separated BoxCollider control failed; "+observations);
+                        if (touching) Assert.LessOrEqual(touchDepth,.0002f,"Tangent boxes must not have substantial penetration");
+                        Assert.IsFalse(smallGap,"1mm gap must not be penetration; "+observations);
+                    }
+                }
+                shape.enabled=true; Physics.SyncTransforms();
+                foreach (float gap in new[] {0f,.001f,.01f})
+                {
+                    Dictionary<Collider,float> measured=BoxContactGaps(shape,support.transform.position+Vector3.up*(1f+gap),
+                        Quaternion.identity,new Collider[] {support},QueryTriggerInteraction.Collide);
+                    Assert.That(measured[support],Is.EqualTo(gap).Within(.0002f),"Finite-surface cast calibration; "+observations);
+                    Assert.AreEqual(gap<=MaxSupportGap,HasSupport(measured),"Contact / 1mm gap / 10mm floating control; "+observations);
+                    observations.AppendLine("cast expectedGap="+gap.ToString("F6")+" actual="+GapText(measured[support]));
+                }
+                return observations.ToString();
+            }
+            finally { shape.enabled=true; Object.DestroyImmediate(control); }
+        }
+        private string CargoDetails(object record,SphereCollider sphere,string calibration)
+        {
+            Component cargo=(Component)Member(record,"Cargo");
+            Vector3 center=cargo.transform.position;
+            object[] legs=Items(Member(record,"Path"),"Legs");
+            int segment=(int)Member(record,"CurrentRouteSegment");
+            Collider[] obstacles=Physics.OverlapSphere(center,sphere.radius,~0,QueryTriggerInteraction.Ignore)
+                .Where(c=>!c.transform.IsChildOf(cargo.transform)).ToArray();
+            StringBuilder text=new StringBuilder("MaterialId="+Member(record,"MaterialId")+" type="+Member(record,"MaterialType")+
+                " state="+Member(record,"State")+" segment="+segment+" object="+cargo.name+
+                " center="+center.ToString("F6")+" radius="+sphere.radius.ToString("F6")+"\n");
+            for (int i=Mathf.Max(0,segment-1);i<=Mathf.Min(legs.Length-1,segment+1);i++)
+            {
+                Collider support=(Collider)Member(legs[i],"Support");
+                text.AppendLine("leg="+i+" support="+ColliderPath(support)+" start="+((Vector3)Member(legs[i],"A")).ToString("F6")+
+                    " end="+((Vector3)Member(legs[i],"B")).ToString("F6")+
+                    " surfaceGap="+(Vector3.Distance(center,support.ClosestPoint(center))-sphere.radius).ToString("F6"));
+            }
+            text.AppendLine("Actual penetrations: "+Penetrations(sphere,center,cargo.transform.rotation,obstacles));
+            return text.ToString()+"\nProbe calibration: "+calibration;
+        }
+        private static void CheckCargoVisual(SphereCollider sphere,Transform cargo,BoxCollider probe,MeshFilter visual,Func<string> details)
+        {
+            // These authored primitives are boxes. Use their mesh-local box and
+            // actual rotation, not a world AABB, including non-solid moving parts.
+            probe.center=Vector3.Scale(visual.sharedMesh.bounds.center,visual.transform.lossyScale);
+            probe.size=Vector3.Scale(visual.sharedMesh.bounds.size,visual.transform.lossyScale);
+            bool overlap=Physics.ComputePenetration(sphere,cargo.position,cargo.rotation,probe,
+                visual.transform.position,visual.transform.rotation,out Vector3 direction,out float depth);
+            Require(!overlap || depth<=RawPenetrationLimit,"Cargo penetrates visible "+visual.name+
+                " depth="+depth.ToString("F6")+"m direction="+direction.ToString("F6"),details);
+        }
+        private string OutputDetails(object batch,object machine,BoxCollider shape,string calibration)
+        {
+            Transform product=(Transform)Member(batch,"Product");
+            object[] sections=Items(machine,"OutputSections");
+            object[] legs=Items(Member(batch,"Path"),"Legs");
+            Collider[] surfaces=sections.Select(s=>(Collider)Member(s,"Surface")).Concat(new[] {(Collider)Member(machine,"ProcessBed")}).ToArray();
+            Dictionary<Collider,float> gaps=BoxContactGaps(shape,product.position,product.rotation,surfaces);
+            Collider[] obstacles=Physics.OverlapBox(product.TransformPoint(shape.center),shape.size*.5f,product.rotation,~0,QueryTriggerInteraction.Ignore)
+                .Where(c=>!c.transform.IsChildOf(product)).ToArray();
+            StringBuilder text=new StringBuilder("BatchId="+Member(batch,"BatchId")+" type="+Member(batch,"MaterialType")+
+                " segment="+Member(batch,"CurrentRouteSegment")+" object="+product.name+
+                " position="+product.position.ToString("F6")+" rotation="+product.rotation.ToString("F6")+
+                " envelopeCenter="+shape.center.ToString("F6")+" envelopeSize="+shape.size.ToString("F6")+"\n");
+            for (int i=0;i<sections.Length;i++)
+            {
+                Component section=(Component)sections[i]; Collider surface=(Collider)Member(section,"Surface");
+                text.AppendLine("section="+i+" "+section.name+" start="+((Transform)Member(section,"Start")).position.ToString("F6")+
+                    " end="+((Transform)Member(section,"End")).position.ToString("F6")+
+                    " actualPathStart="+((Vector3)Member(legs[i],"A")).ToString("F6")+" actualPathEnd="+((Vector3)Member(legs[i],"B")).ToString("F6")+
+                    " boundsCenter="+surface.bounds.center.ToString("F6")+" boundsSize="+surface.bounds.size.ToString("F6")+" "+GapText(gaps[surface]));
+            }
+            text.AppendLine("PROCESS_BED: "+GapText(gaps[(Collider)Member(machine,"ProcessBed")]));
+            text.AppendLine("Actual penetrations: "+Penetrations(shape,product.position,product.rotation,obstacles));
+            return text.ToString()+"\nProbe calibration: "+calibration;
         }
         internal static void AssertEquipmentConnections(Component geometry)
         {
@@ -203,36 +383,63 @@ namespace M6IntegrationTests
         }
         [UnityTest] public IEnumerator CargoFollowsRoute()
         {
-            Supply("Paper",1); object record=Materials.Single();
-            Component cargo=(Component)Member(record,"Cargo"); int identity=cargo.GetInstanceID();
-            Vector3 previous=cargo.transform.position;
-            Activate();
-            Collider[] surfaces=Items(geometry,"Sections").Select(s=>(Collider)Member(s,"Surface"))
-                .Concat(Items(geometry,"Machines").Select(m=>(Collider)Member(m,"ProcessBed"))).ToArray();
-            for (int i=0;i<600 && Member(record,"State").ToString()!="MachineInput";i++)
+            GameObject probes=new GameObject("P2_TEST_RAW_PROBES"); probes.transform.position=ProbeParking;
+            try
             {
-                Step();
-                Assert.AreEqual(identity,((Component)Member(record,"Cargo")).GetInstanceID());
-                Assert.Less(Vector3.Distance(previous,cargo.transform.position),.37f,"Cargo jumped between route segments");
-                previous=cargo.transform.position;
-                if (Member(record,"State").ToString()!="Spawned")
+                SphereCollider sphere=probes.AddComponent<SphereCollider>(); sphere.isTrigger=true;
+                sphere.radius=(float)GameType("C3TreasurePuzzle.C3RecyclingLineGeometry").GetField("RawRadius").GetRawConstantValue();
+                Assert.That(sphere.radius,Is.EqualTo(.12f).Within(.000001f));
+                GameObject visualProbe=new GameObject("P2_TEST_VISUAL_BOX"); visualProbe.transform.SetParent(probes.transform,false);
+                visualProbe.transform.localPosition=Vector3.right*4f;
+                BoxCollider box=visualProbe.AddComponent<BoxCollider>(); box.isTrigger=true;
+                string calibration=ValidateSphereProbe(sphere,box);
+                foreach (string kind in new[] {"Paper","Metal","Plastic"}) Supply(kind,1,"route-"+kind);
+                object[] records=Materials;
+                Dictionary<object,string> ids=records.ToDictionary(r=>r,r=>(string)Member(r,"MaterialId"));
+                Dictionary<object,string> types=records.ToDictionary(r=>r,r=>Member(r,"MaterialType").ToString());
+                Dictionary<object,int> identities=records.ToDictionary(r=>r,r=>((Component)Member(r,"Cargo")).GetInstanceID());
+                Dictionary<object,Vector3> positions=records.ToDictionary(r=>r,r=>((Component)Member(r,"Cargo")).transform.position);
+                MeshFilter[] visuals=Items(geometry,"Machines").SelectMany(m=>((Transform)Member(m,"Root")).GetComponentsInChildren<MeshFilter>())
+                    .Where(m=>new[] {"IDENTIFIER_UPRIGHT","IDENTIFIER_GANTRY","IDENTIFIER_SENSOR","COMPRESSION_PRESS","DIVERT_PUSHER"}.Contains(m.name)).ToArray();
+                Activate();
+                for (int i=0;i<600 && records.Any(r=>Member(r,"State").ToString()!="MachineInput");i++)
                 {
-                    float contact=surfaces.Min(s=>Mathf.Abs(Vector3.Distance(cargo.transform.position,s.ClosestPoint(cargo.transform.position))-.12f));
-                    Assert.Less(contact,.01f,"Cargo is floating or penetrates the real conveyor");
-                    foreach (Collider obstacle in Physics.OverlapSphere(cargo.transform.position,.12f,~0,QueryTriggerInteraction.Ignore))
-                        if (!obstacle.transform.IsChildOf(cargo.transform))
-                            Assert.GreaterOrEqual(Vector3.Distance(cargo.transform.position,obstacle.ClosestPoint(cargo.transform.position)),.119f,
-                                "Cargo penetrates "+obstacle.name);
-                    object machine=Items(geometry,"Machines")[0];
-                    Transform press=(Transform)Member(machine,"Press");
-                    Assert.Greater(Vector3.Distance(cargo.transform.position,press.GetComponent<Renderer>().bounds.ClosestPoint(cargo.transform.position)),.12f,
-                        "Transported cargo intersects raised compression head");
+                    Step();
+                    foreach (object record in records)
+                    {
+                        Component cargo=(Component)Member(record,"Cargo");
+                        Func<string> details=()=>CargoDetails(record,sphere,calibration);
+                        Require(identities[record]==cargo.GetInstanceID() && ids[record]==(string)Member(record,"MaterialId") &&
+                            ids[record]==(string)Member(cargo,"materialId"),"Raw identity changed",details);
+                        Require(types[record]==Member(record,"MaterialType").ToString() && types[record]==Member(cargo,"materialType").ToString(),
+                            "Raw material type changed",details);
+                        Require(Vector3.Distance(positions[record],cargo.transform.position)<.37f,"Cargo jumped between route segments",details);
+                        positions[record]=cargo.transform.position;
+                        if (Member(record,"State").ToString()=="Spawned") continue;
+                        Collider[] supports=RouteSupports(record);
+                        float contact=supports.Min(s=>Mathf.Abs(Vector3.Distance(cargo.transform.position,s.ClosestPoint(cargo.transform.position))-sphere.radius));
+                        Require(contact<.01f,"Cargo lost its actual current/adjacent conveyor support",details);
+                        foreach (Collider obstacle in Physics.OverlapSphere(cargo.transform.position,sphere.radius,~0,QueryTriggerInteraction.Ignore))
+                            if (!obstacle.transform.IsChildOf(cargo.transform) && Physics.ComputePenetration(sphere,cargo.transform.position,
+                                cargo.transform.rotation,obstacle,obstacle.transform.position,obstacle.transform.rotation,out Vector3 direction,out float depth))
+                                Require(depth<=RawPenetrationLimit,"Cargo penetrates "+ColliderPath(obstacle)+
+                                    " depth="+depth.ToString("F6")+"m direction="+direction.ToString("F6"),details);
+                        foreach (MeshFilter visual in visuals) CheckCargoVisual(sphere,cargo.transform,box,visual,details);
+                    }
+                    yield return null;
                 }
-                yield return null;
+                foreach (object record in records)
+                {
+                    Require(Member(record,"State").ToString()=="MachineInput","Raw material did not reach its machine",()=>CargoDetails(record,sphere,calibration));
+                    int lane=(int)Member(record,"TargetMachine");
+                    Assert.AreEqual(Member(record,"MaterialType").ToString()=="Paper"?0:Member(record,"MaterialType").ToString()=="Metal"?1:2,lane);
+                    Assert.Less(Vector3.Distance(((Component)Member(record,"Cargo")).transform.position,
+                        ((Transform)Member(Items(geometry,"Machines")[lane],"Tray")).position),.6f);
+                    CollectionAssert.AreEqual(new[] {"Spawned","Feeding","MainBelt","Identified","Diverting","MachineInput"},
+                        Items(record,"History").Select(x=>x.ToString()).ToArray());
+                }
             }
-            Assert.AreEqual("MachineInput",Member(record,"State").ToString());
-            CollectionAssert.AreEqual(new[] {"Spawned","Feeding","MainBelt","Identified","Diverting","MachineInput"},
-                Items(record,"History").Select(x=>x.ToString()).ToArray());
+            finally { Object.DestroyImmediate(probes); }
         }
         private IEnumerator Sorting(string kind,int expectedMachine,int legacyKind)
         {
@@ -279,15 +486,20 @@ namespace M6IntegrationTests
         }
         [UnityTest] public IEnumerator OutputConveyor()
         {
-            Supply("Paper",3,"paper"); Supply("Metal",3,"metal"); Supply("Plastic",3,"plastic"); Activate();
             int seen=0;
             Dictionary<string,int> identities=new Dictionary<string,int>();
             Dictionary<string,Vector3> positions=new Dictionary<string,Vector3>();
-            GameObject probe=new GameObject("P2_TEST_OUTPUT_SHAPE");
-            BoxCollider shape=probe.AddComponent<BoxCollider>(); shape.enabled=false;
+            Dictionary<int,string> batchIds=new Dictionary<int,string>();
+            Dictionary<string,string> types=new Dictionary<string,string>();
+            Dictionary<string,string[]> sources=new Dictionary<string,string[]>();
+            Dictionary<string,HashSet<int>> segments=new Dictionary<string,HashSet<int>>();
+            GameObject probe=new GameObject("P2_TEST_OUTPUT_SHAPE"); probe.transform.position=ProbeParking;
             try
             {
-                for (int i=0;i<1000 && Count("CollectedProducts")<3;i++)
+                BoxCollider shape=probe.AddComponent<BoxCollider>(); shape.isTrigger=true;
+                string calibration=ValidateBoxProbe(shape);
+                Supply("Paper",9,"paper"); Supply("Metal",9,"metal"); Supply("Plastic",9,"plastic"); Activate();
+                for (int i=0;i<1600 && Count("CollectedProducts")<9;i++)
                 {
                     Step();
                     foreach (object batch in Products)
@@ -295,31 +507,47 @@ namespace M6IntegrationTests
                         int lane=Member(batch,"MaterialType").ToString()=="Paper"?0:Member(batch,"MaterialType").ToString()=="Metal"?1:2;
                         object machine=Items(geometry,"Machines")[lane]; Transform product=(Transform)Member(batch,"Product");
                         string id=(string)Member(batch,"BatchId");
+                        string type=Member(batch,"MaterialType").ToString();
+                        Bounds envelope=ProductEnvelope(product);
+                        shape.center=envelope.center; shape.size=envelope.size;
+                        Func<string> details=()=>OutputDetails(batch,machine,shape,calibration);
                         if (identities.ContainsKey(id))
                         {
-                            Assert.AreEqual(identities[id],product.GetInstanceID(),"Output swapped product objects");
-                            Assert.Less(Vector3.Distance(positions[id],product.position),.18f,"Output product jumped");
+                            Require(identities[id]==product.GetInstanceID() && batchIds[product.GetInstanceID()]==id,"Output swapped product/Batch IDs",details);
+                            Require(Vector3.Distance(positions[id],product.position)<.18f,"Output product jumped",details);
+                            Require(types[id]==type && sources[id].SequenceEqual((string[])Member(batch,"SourceMaterialIds")),"Output material/source identities changed",details);
                         }
-                        else identities.Add(id,product.GetInstanceID());
+                        else
+                        {
+                            Require(!batchIds.ContainsKey(product.GetInstanceID()),"Existing product acquired a new Batch ID",details);
+                            identities.Add(id,product.GetInstanceID()); batchIds.Add(product.GetInstanceID(),id); types.Add(id,type);
+                            sources.Add(id,(string[])((string[])Member(batch,"SourceMaterialIds")).Clone()); segments.Add(id,new HashSet<int>());
+                            Require(sources[id].Length==3 && sources[id].Distinct().Count()==3,"Batch must retain three unique source IDs",details);
+                            Require(Vector3.Distance(product.position,((Transform)Member(machine,"Tray")).position)<.5f,"Product did not form inside its processing machine",details);
+                            Require(Materials.Count(r=>sources[id].Contains((string)Member(r,"MaterialId")) &&
+                                Member(r,"MaterialType").ToString()==type && (bool)Member(r,"ProcessingComplete") && (bool)Member(r,"Counted"))==3,
+                                "Unprocessed or wrong-type source in finished batch",details);
+                        }
+                        segments[id].Add((int)Member(batch,"CurrentRouteSegment"));
                         positions[id]=product.position;
-                        Assert.That(product.position.x,Is.EqualTo(((Transform)Member(machine,"Root")).position.x).Within(1f));
-                        Collider[] supports=Items(machine,"OutputSections").Select(s=>(Collider)Member(s,"Surface"))
-                            .Concat(new[] {(Collider)Member(machine,"ProcessBed")}).ToArray();
-                        MeshFilter[] meshes=product.GetComponentsInChildren<MeshFilter>();
-                        Assert.Greater(meshes.Length,0);
-                        Bounds envelope=new Bounds(Vector3.zero,Vector3.zero);
-                        foreach (MeshFilter mesh in meshes)
-                            foreach (Vector3 vertex in mesh.sharedMesh.vertices)
-                                envelope.Encapsulate(product.InverseTransformPoint(mesh.transform.TransformPoint(vertex)));
-                        shape.center=envelope.center; shape.size=envelope.size+Vector3.one*.006f;
-                        Assert.IsTrue(supports.Any(s=>Physics.ComputePenetration(shape,product.position,product.rotation,
-                            s,s.transform.position,s.transform.rotation,out _,out _)),
-                            "Finished product floats above its actual finite output surface");
-                        shape.size=envelope.size;
-                        foreach (Collider obstacle in Physics.OverlapBox(product.position,shape.size*.5f,product.rotation,~0,QueryTriggerInteraction.Ignore))
+                        Require(Mathf.Abs(product.position.x-((Transform)Member(machine,"Root")).position.x)<1f,"Product entered another machine's lane",details);
+                        Collider[] supports=RouteSupports(batch);
+                        if ((int)Member(batch,"CurrentRouteSegment")<=1) supports=supports.Concat(new[] {(Collider)Member(machine,"ProcessBed")}).Distinct().ToArray();
+                        object section=Items(machine,"OutputSections")[(int)Member(batch,"CurrentRouteSegment")];
+                        Collider surface=(Collider)Member(section,"Surface");
+                        float tilt=Vector3.Angle(product.up,surface.transform.up);
+                        float jointTilt=supports.Max(s=>Vector3.Angle(surface.transform.up,s.transform.up))*.5f;
+                        Vector3 a=((Transform)Member(section,"Start")).position,b=((Transform)Member(section,"End")).position;
+                        float along=Vector3.Dot(product.position-a,(b-a).normalized);
+                        float allowedTilt=along>.5f && along<Vector3.Distance(a,b)-.5f ? .1f : jointTilt+.1f;
+                        Require(tilt<=allowedTilt,"Product tilt disagrees with its real belt / adjacent joint",details);
+                        Dictionary<Collider,float> gaps=BoxContactGaps(shape,product.position,product.rotation,supports);
+                        foreach (Collider obstacle in Physics.OverlapBox(product.TransformPoint(shape.center),shape.size*.5f,product.rotation,~0,QueryTriggerInteraction.Ignore))
                             if (!obstacle.transform.IsChildOf(product) && Physics.ComputePenetration(shape,product.position,product.rotation,
-                                obstacle,obstacle.transform.position,obstacle.transform.rotation,out _,out float depth))
-                                Assert.LessOrEqual(depth,.01f,"Finished product penetrates "+obstacle.name);
+                                obstacle,obstacle.transform.position,obstacle.transform.rotation,out Vector3 direction,out float depth))
+                                Require(depth<=ProductPenetrationLimit,"Finished product penetrates "+ColliderPath(obstacle)+
+                                    " depth="+depth.ToString("F6")+"m direction="+direction.ToString("F6"),details);
+                        Require(HasSupport(gaps),"Finished product has no finite current/adjacent output surface within 3mm",details);
                         seen++;
                     }
                     yield return null;
@@ -327,14 +555,27 @@ namespace M6IntegrationTests
             }
             finally { Object.DestroyImmediate(probe); }
             Assert.Greater(seen,30,"Must observe actual transport, not only final counts");
-            Assert.AreEqual(3,Count("CollectedProducts"));
-            foreach (object batch in Products)
+            Assert.AreEqual(9,Count("CollectedProducts")); Assert.AreEqual(9,Products.Length);
+            Assert.AreEqual(27,sources.Values.SelectMany(s=>s).Distinct().Count());
+            for (int lane=0;lane<3;lane++)
             {
-                int lane=Member(batch,"MaterialType").ToString()=="Paper"?0:Member(batch,"MaterialType").ToString()=="Metal"?1:2;
-                Vector3 destination=((Transform)Member(Items(geometry,"Machines")[lane],"Collection")).position;
-                Transform product=(Transform)Member(batch,"Product");
-                Assert.That(product.position.z,Is.EqualTo(destination.z).Within(.01f));
-                Assert.IsTrue((bool)Member(batch,"OutputReached"));
+                string type=lane==0?"Paper":lane==1?"Metal":"Plastic";
+                object[] laneProducts=Products.Where(b=>Member(b,"MaterialType").ToString()==type).ToArray();
+                Assert.AreEqual(3,laneProducts.Length);
+                Vector3 collection=((Transform)Member(Items(geometry,"Machines")[lane],"Collection")).position;
+                float[] expectedSlots={collection.x-.65f,collection.x,collection.x+.65f};
+                float[] occupied=laneProducts.Select(b=>((Transform)Member(b,"Product")).position.x).OrderBy(x=>x).ToArray();
+                for (int slot=0;slot<3;slot++) Assert.That(occupied[slot],Is.EqualTo(expectedSlots[slot]).Within(.01f));
+                foreach (object batch in laneProducts)
+                {
+                    string id=(string)Member(batch,"BatchId");
+                    Vector3 destination=(Vector3)Member(Items(Member(batch,"Path"),"Legs").Last(),"B");
+                    Transform product=(Transform)Member(batch,"Product");
+                    Assert.That(product.position.x,Is.EqualTo(destination.x).Within(.01f));
+                    Assert.That(product.position.z,Is.EqualTo(collection.z).Within(.01f));
+                    Assert.IsTrue((bool)Member(batch,"OutputReached") && (bool)Member(batch,"Collected"));
+                    CollectionAssert.AreEquivalent(new[] {0,1,2,3},segments[id],"Must observe every real output section: "+id);
+                }
             }
         }
         [UnityTest] public IEnumerator MaterialAccounting()
