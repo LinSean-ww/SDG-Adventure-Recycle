@@ -654,7 +654,21 @@ namespace M6IntegrationTests
             Collider consoleCollider = console.GetComponent<Collider>();
             Collider southWall = GameObject.Find("C_Wall_1_Left").GetComponent<Collider>();
             Assert.That(consoleCollider.bounds.min.y, Is.EqualTo(0.55f).Within(0.015f));
-            Assert.That(consoleCollider.bounds.min.z, Is.EqualTo(southWall.bounds.max.z).Within(0.02f));
+            Assert.That(
+                console.transform.position.z,
+                Is.EqualTo(4.15f).Within(0.02f),
+                "Puzzle console must remain at its authored V11 position."
+            );
+
+            float southGap =
+                consoleCollider.bounds.min.z -
+                southWall.bounds.max.z;
+
+            Assert.Greater(
+                southGap,
+                0.02f,
+                "Puzzle console must not overlap the south wall."
+            );
             Vector3 eye = new Vector3(-20.9f, 2.05f, 2.3f);
             Vector3 target = console.GetComponent<Collider>().bounds.center;
             Vector3 direction = target - eye;
