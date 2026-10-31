@@ -255,18 +255,24 @@ namespace C3TreasurePuzzle
             for (int side=0;side<2;side++)
             {
                 float edge=side==0?west:east;
-                float columnX=edge+(side==0?-.22f:.22f);
-                float innerX=edge+(side==0?.50f:-.50f);
+                // Keep the east column clear of the wall at X=-.37 and end
+                // the post at the bracket bottom, rather than embedding the
+                // post through the bracket/deck. Walk/guard coordinates stay fixed.
+                float columnX=edge+(side==0?-.12f:.12f);
+                float innerX=edge+(side==0?.42f:-.42f);
                 float underside=WalkSurface-DeckThickness;
                 foreach (float z in new[] {13.75f,17.95f,21.2f})
                 {
+                    Box(supports,"COLUMN_BASE_PLATE",new Vector3(columnX,GroundSurface+.03f,z),
+                        new Vector3(.30f,.06f,.30f),frameMat);
+                    float bottom=GroundSurface+.06f,top=underside-.16f;
                     Box(supports,"COLUMN_"+(side==0?"WEST_":"EAST_")+z,
-                        new Vector3(columnX,(GroundSurface+underside)*.5f,z),
-                        new Vector3(.18f,underside-GroundSurface,.18f),frameMat);
+                        new Vector3(columnX,(bottom+top)*.5f,z),
+                        new Vector3(.16f,top-bottom,.16f),frameMat);
                     Box(supports,"DECK_JOINT_BRACKET",new Vector3((columnX+innerX)*.5f,underside-.08f,z),
                         new Vector3(Mathf.Abs(innerX-columnX)+.14f,.16f,.16f),frameMat);
-                    Vector3 low=new Vector3(columnX,underside-.80f,z);
-                    Vector3 high=new Vector3(innerX,underside-.10f,z);
+                    Vector3 low=new Vector3(columnX,underside-.90f,z);
+                    Vector3 high=new Vector3(innerX,underside-.16f,z);
                     Box(supports,"KNEE_BRACE",(low+high)*.5f,new Vector3(.10f,.10f,Vector3.Distance(low,high)),
                         frameMat,true,Quaternion.LookRotation(high-low));
                 }

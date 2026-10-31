@@ -48,6 +48,7 @@ namespace C3TreasurePuzzle
                 CreateMaterial("Plastic",new Color(.12f,.65f,.75f),.05f) };
             BuildElevatedInfeed();
             BuildMachines();
+            BuildTerminalGuards();
             Physics.SyncTransforms();
         }
 
@@ -119,6 +120,8 @@ namespace C3TreasurePuzzle
             BMaterialInterface=Marker("P2_B_HIGH_INFEED_INTERFACE",nodes[0]);
             MainEntry=Marker("P2_MAIN_ENTRY",nodes[nodes.Length-1]);
             for (int i=0;i<nodes.Length-1;i++) CommonSections.Add(Section("P2_INFEED_"+i,nodes[i],nodes[i+1],1.1f));
+            BuildInfeedCorner(CommonSections[1],CommonSections[2],1);
+            BuildInfeedCorner(CommonSections[2],CommonSections[3],2);
             MainBelt=Section("P2_MAIN_BELT",nodes[nodes.Length-1],new Vector3(-19.5f,5.8f,16.85f),1.52f);
             float edge=MainBelt.End.position.x;
             foreach (float center in MachineCenters)
@@ -153,6 +156,75 @@ namespace C3TreasurePuzzle
             foreach (float y in new[] {6.45f,8.15f})
                 Box("P2_INFEED_HEADER",new Vector3(-.3f,y,12.5f),new Vector3(.28f,.10f,1.9f),yellow);
             Marker("P2_APERTURE_CENTER",new Vector3(-.3f,7.30f,12.5f));
+        }
+
+        private void MemberBetween(string name,Vector3 a,Vector3 b,float width,float height,Material material,Transform parent,bool solid=true)
+        {
+            Vector3 delta=b-a;
+            if (delta.sqrMagnitude<.000001f) return;
+            Box(name,(a+b)*.5f,new Vector3(width,height,delta.magnitude),material,parent,solid,Quaternion.LookRotation(delta,Vector3.up));
+        }
+
+        private void BuildInfeedCorner(C3ConveyorSection incoming,C3ConveyorSection outgoing,int index)
+        {
+            // The verified 30 finite surfaces and all path endpoints stay intact.
+            // Complete the perimeter of their rectangular union, never close an
+            // entrance/exit with an end plate or put a post on the cargo centreline.
+            Vector3 joint=incoming.End.position;
+            Vector3 before=(incoming.End.position-incoming.Start.position).normalized;
+            Vector3 after=(outgoing.End.position-outgoing.Start.position).normalized;
+            Vector3 sideA=Vector3.Cross(Vector3.up,before),sideB=Vector3.Cross(Vector3.up,after);
+            float outer=-Mathf.Sign(Vector3.Dot(after,sideA));
+            Transform root=Marker("P21_INFEED_JUNCTION_"+index,Vector3.zero);
+            float offset=incoming.Width*.5f+.035f,cut=incoming.Width*.5f+.1f;
+            foreach (float sign in new[] {outer,-outer})
+            {
+                string edge=sign==outer?"OUTER":"INNER";
+                Vector3 corner=joint+(sideA+sideB)*(sign*offset);
+                Vector3 a=joint-before*cut+sideA*(sign*offset),b=joint+after*cut+sideB*(sign*offset);
+                MemberBetween(edge+"_GUARD_IN",a+Vector3.up*.14f,corner+Vector3.up*.14f,.07f,.40f,steel,root);
+                MemberBetween(edge+"_GUARD_OUT",corner+Vector3.up*.14f,b+Vector3.up*.14f,.07f,.40f,steel,root);
+                MemberBetween(edge+"_WARNING_IN",a+Vector3.up*.35f,corner+Vector3.up*.35f,.075f,.035f,yellow,root,false);
+                MemberBetween(edge+"_WARNING_OUT",corner+Vector3.up*.35f,b+Vector3.up*.35f,.075f,.035f,yellow,root,false);
+                float frameOffset=incoming.Width*.40f;
+                Vector3 frameCorner=joint+(sideA+sideB)*(sign*frameOffset)-Vector3.up*.26f;
+                MemberBetween(edge+"_FRAME_IN",joint-before*cut+sideA*(sign*frameOffset)-Vector3.up*.26f,
+                    frameCorner,.09f,.14f,steel,root);
+                MemberBetween(edge+"_FRAME_OUT",frameCorner,joint+after*cut+sideB*(sign*frameOffset)-Vector3.up*.26f,
+                    .09f,.14f,steel,root);
+            }
+            Vector3 anchor=joint+(sideA+sideB)*(outer*.66f);
+            Box("CORNER_ROOF_HANGER",new Vector3(anchor.x,9.06f,anchor.z),new Vector3(.10f,4.78f,.10f),steel,root);
+            Vector3 saddle=joint+(sideA+sideB)*(outer*.44f)-Vector3.up*.26f;
+            MemberBetween("CORNER_HANGER_SADDLE",new Vector3(anchor.x,6.74f,anchor.z),saddle,.14f,.14f,steel,root);
+            MemberBetween("CORNER_ROOF_TIE",new Vector3(anchor.x,11.45f,anchor.z),new Vector3(joint.x,11.45f,joint.z),.18f,.20f,steel,root);
+            // End cheeks are below the belt, with visible fasteners; no cap
+            // projects above the finite surface where material must turn.
+            foreach (Vector3 axis in new[] {sideA,sideB})
+                MemberBetween("BOLTED_UNDERSIDE_CROSSMEMBER",joint-axis*.61f-Vector3.up*.36f,
+                    joint+axis*.61f-Vector3.up*.36f,.10f,.12f,steel,root);
+        }
+
+        private void BuildTerminalGuards()
+        {
+            // The paper diversion is at X=-16.7. No supported material travels
+            // beyond it to this true main-belt dead end at X=-19.5.
+            TerminalGuard(MainBelt,"P21_MAIN_TERMINAL",.12f,.52f);
+            foreach (Machine machine in Machines)
+                TerminalGuard(machine.CollectionBed,"P21_COLLECTION_TERMINAL_"+machine.Index,ProductHalfLength+.12f,.36f);
+        }
+        private const float ProductHalfLength=.255f; // ProductSize.z / 2; keep the collection centre unchanged
+        private void TerminalGuard(C3ConveyorSection section,string name,float setback,float height)
+        {
+            Vector3 forward=(section.End.position-section.Start.position).normalized,up=section.Normal;
+            Quaternion rotation=Quaternion.LookRotation(forward,up);
+            Transform root=Marker(name,Vector3.zero);
+            Vector3 center=section.End.position+forward*setback+up*(height*.5f);
+            Box("END_STOP",center,new Vector3(section.Width+.14f,height,.10f),steel,root,true,rotation);
+            Box("YELLOW_WARNING_EDGE",center+up*(height*.5f-.025f),new Vector3(section.Width+.16f,.05f,.12f),yellow,root,false,rotation);
+            foreach (float sign in new[] {-1f,1f})
+                Box("END_STOP_MOUNT",center+(rotation*Vector3.right)*(sign*section.Width*.40f)-up*(height*.5f+.12f),
+                    new Vector3(.13f,.24f,.24f),steel,root,true,rotation);
         }
 
         private void MainFrontGuard(float from,float to)

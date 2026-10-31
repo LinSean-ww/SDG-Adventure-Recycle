@@ -1,5 +1,7 @@
 # SDG Adventure V11 Phase 2 — 工程交付與待驗收項目
 
+
+**Phase 2.1／2.2 開發基準：**使用者已確認 `201a9529c1b0fcc57b839d6e23650ea90d138337` 的 Phase 2 18／18、V9 5／5、V11 7／7，共30／30原生PASS，且首次九原料／三成品與原遊戲功能人工驗收正常。新Milestone結果不得沿用歷史PASS；最新工程記錄見文末 `V11 Phase 2.1 / 2.2 Factory Visual, Collision and Replay Development`。
 本報告區分**已實作**及**已驗收**。沒有 Unity Editor 的來源檢查不能代表編譯、PlayMode 或遊戲通過。
 
 **最新原生回報（5cd7328）：**使用者實測 CargoFollowsRoute PASS、Phase 2 **17 PASS／1 FAIL**、V9五項及V11七項PASS。OutputConveyor 在 BoxCast 零間隙校準即失敗（約 -2.496mm），尚未進入正式九成品輸送驗證。本次量測修正與所有新提交 NOT RUN 狀態見文末 **OutputConveyor Native Contact Calibration Repair**；以下歷史 PASS 不沿用到新提交。
@@ -450,3 +452,51 @@ Manual Gameplay: NOT RUN
 本環境沒有Unity Editor。分支維持 `feature/v11-phase2-recycling-line`，更新原Draft PR #3，Base仍為 `feature/v11-factory-rebuild`；PR #2、Phase 1及main不改，不強制推送、不另開分支／PR、不合併。
 
 使用者驗收：Pull新SHA→Unity 2023.1.22f1等待編譯、檢查Console→**先單跑 OutputConveyor，確認校準完成且九成品正式輸送全部完成**→全18項Phase 2→V9五項→V11七項→受影響VisualFPS／M6→人工觀察正式九原料／三成品、辨識架、加工、三出口與收集沒有懸空／穿模／跳位，並驗雙梯／走道／護欄／PVC／晶片／背包／武器。有失敗保留完整新診斷與XML，不先放寬容差或改正式模型。B→C完整關卡仍 `BLOCKED — Level02 scene unavailable`。推送後停止額外功能開發，維持Draft等待ChatGPT審查與使用者原生驗收。
+
+## V11 Phase 2.1 / 2.2 Factory Visual, Collision and Replay Development
+
+### A. 基準、附件與交付邊界
+
+基準 `201a9529c1b0fcc57b839d6e23650ea90d138337`。使用者 Windows Unity 2023.1.22f1：Phase 2 **18/18 PASS**、V9 **5/5 PASS**、V11 **7/7 PASS**。人工確認三項零件、解謎、啟動、九份高位進料、三分類／三加工／三正式輸出、雙梯、護欄、PVC、TAB／快捷欄、量子武器與彈藥操作。這些僅屬舊基準。
+
+已取得對話附件 `SDG_V11_Phase21_Images_For_Codex.zip`，讀取README並逐張檢查六張Screenshots及四張Assets PNG。圖像是使用者參考，不是現成Prefab；沒有執行附件中的程式。六張問題：01上層柱杆／UpperDistributionBox；02主帶末端；03 D入口裝飾橫架；04回收籠；05污染淨化設備；06高架轉角。四張素材：07棧板倉儲、08原料、09正面壓縮包、10立體側面壓縮包。
+
+原分支 `feature/v11-phase2-recycling-line`／Draft PR #3／Base `feature/v11-factory-rebuild`。Fetch後遠端HEAD與基準一致，工作目錄無使用者修改。PR #2、Phase 1及main不改，不強推、不合併。
+
+### B. Milestone A — 結構、物件盤點與碰撞
+
+完整前後位置、Hierarchy、生成方法、Renderer／Collider及目的見 [V11_Phase21_ObjectMap.csv](V11_Phase21_ObjectMap.csv)。所有座標是Unity世界公尺。
+
+| 圖 | 處理與來源狀態 | 仍需驗收 |
+| --- | --- | --- |
+| 01 | V11_EDGE_SUPPORTS的西／東柱由X=-24.32/-.43改為-24.22/-.53；柱體Y=.62..4.16，止於接合梁底，增加基板；東柱與牆面不再相交。梁撐留在平台底Y≤4.32。 | 已實作可確認的柱／梁接合；圖中細長杆件沒有唯一Hierarchy證據，已請使用者補名稱，未猜測批次刪除。原生／視覺NOT RUN。 |
+| 01 設備 | UpperDistributionBox原碰撞盒完整保留。截圖警告點(-7.78,5.50,20.22)對應原盒角落，玩家(-8.04,4.58,19.90)是在設備邊緣接觸。主走線Z=19.2距盒南邊1.015m，扣.3半徑+.08skin仍.635m。 | 沒有證據應移除設備；新增站／趴雙向走線實測，NOT RUN。 |
+| 02 | 真正主帶死端X=-19.5新增金屬擋板、黃邊及支座；最後分流X=-16.7仍在上游。三個收集端新增擋板，距原成品前緣70mm，三格目標不改。 | 真實原料／九成品、擋板碰撞NOT RUN。 |
+| 03 | 只停止生成SENSOR_LAB monitor gantry、MATERIAL_SCANNER active monitor與兩根Scanner gantry leg。它們是額外裝飾，原本無實體Collider。 | 真實檢測台、武器台、控制台、D門／標示／Trigger全部保留，新增原角色入口通行NOT RUN。 |
+| 04 | 三回收籠底板／四立柱／八橫條使用原尺寸13個BoxCollider，各實體與Renderer對齊；內容物不加細碎碰撞、不改外觀或位置。 | 站／趴CharacterController原生接觸NOT RUN；沒有整區大隱形盒。 |
+| 05 | 底座、三容器／法蘭、控制箱補局部原生碰撞；控制箱增加可見安裝臂，填補懸空接合；原排氣／歧管保留。 | 三容器原角色接觸、東梯／PVC及視覺接合NOT RUN。 |
+| 06 | 兩個90°高架轉角的內／外L護邊、黃邊、雙側底架、底橫梁、外側屋頂吊桿與鞍座／頂梁接合。 | 原30帶面、端點與運輸演算法不改；新增原生半徑.12m全高架支撐／碰撞測試NOT RUN。 |
+
+新增 `C3V11Phase21FactoryUpgradeTests` 五項：終端／收集淨空、高架轉角全半徑通行與原生支撐、D入口及真實互動保護、回收籠／淨化容器原CharacterController阻擋、支柱不上穿平台與站／趴上層雙向通行。沿用已驗收fixture隔離背包、輸入、游標、Time與場景，無Ignore或禁用舊測試。
+
+Milestone A來源檢查：`git diff --check` PASS；111個C# AST、949方法、130個IEnumerator檢查PASS（非型別編譯）；原Phase 2／V9／V11／VisualFPS／M6測試整檔及Scene／Packages／ProjectSettings比對保留；GUID唯一且新增meta成對。高架新增26個實體盒的1,505點來源幾何檢查預測無半徑.12m干涉，最小球表面淨空.301m。這是來源模型，不是完整Unity世界或PhysX測試。
+
+```text
+Unity Compilation: NOT RUN
+Unity PlayMode: NOT RUN
+Manual Gameplay: NOT RUN
+```
+
+本環境無Unity Editor。Milestone A可確認結構已來源實作；細杆唯一識別、相機／設備視覺及原生通行仍待驗收，不宣稱六張圖均已實際PASS。
+
+### C. Milestone B — 素材與正式視覺
+
+進行中；將記錄原始PNG、Mesh／UV／Material／Prefab、三類多種原料與成品包絡、後方棧板裝飾。此時尚未標示完成。
+
+### D. Milestone C — 控制台展示
+
+待實作；正式資料與展示Session必須隔離，共用既有運輸／加工，無正式收據／獎勵寫入，保留正式成品並可恢復。
+
+### E. 原生驗收與剩餘範圍
+
+每個Milestone提交後需使用者重新Pull。Unity編譯、新增測試、Phase 2全18項、V9五項、V11七項、VisualFPS／M6、Game／Scene View均NOT RUN，不沿用基準30/30 PASS。圖1細杆身份待Scene View／Hierarchy核對，其餘來源實作亦需原生驗收。B→C Full Level Transition: **BLOCKED — Level02 scene unavailable**；不屬本次九項改善完成判定。

@@ -139,8 +139,8 @@ namespace C3TreasurePuzzle
             Material mat,bool solid=false)
             => Shape(name,PrimitiveType.Cube,new Vector3(x,y,z),new Vector3(sx,sy,sz),mat,
                 null,solid);
-        private GameObject Cyl(string name,Vector3 pos,Vector3 scale,Material mat)
-            => Shape(name,PrimitiveType.Cylinder,pos,scale,mat);
+        private GameObject Cyl(string name,Vector3 pos,Vector3 scale,Material mat,bool solid=false)
+            => Shape(name,PrimitiveType.Cylinder,pos,scale,mat,null,solid);
         private void Beam(string name, Vector3 from,Vector3 to,float width,Material mat)
         {
             Vector3 delta=to-from;
@@ -408,18 +408,18 @@ namespace C3TreasurePuzzle
             {
                 float x=-19.50f+c*2.55f;
                 float z=22.10f;
-                Box("SORTING BIN - input refuse floor",x,.78f,z,1.18f,.18f,2.16f,steel);
+                Box("SORTING BIN - input refuse floor",x,.78f,z,1.18f,.18f,2.16f,steel,true);
                 for(int side=-1;side<=1;side+=2)
                 for(int end=-1;end<=1;end+=2)
                     Box("Refuse cage metal upright",x+side*.57f,1.27f,z+end*1.01f,
-                        .07f,.98f,.06f,graphite);
+                        .07f,.98f,.06f,graphite,true);
                 for(int h=0;h<2;h++)
                 for(int side=-1;side<=1;side+=2)
                 {
                     Box("Bin lateral welded rail",x,1.00f+h*.56f,z+side*1.02f,
-                        1.20f,.065f,.06f,stainless);
+                        1.20f,.065f,.06f,stainless,true);
                     Box("Bin end welded rail",x+side*.60f,1.00f+h*.56f,z,
-                        .07f,.06f,2.08f,stainless);
+                        .07f,.06f,2.08f,stainless,true);
                 }
                 for(int k=0;k<18;k++)
                 {
@@ -460,12 +460,11 @@ namespace C3TreasurePuzzle
             // Do NOT add a second pair of giant suspended signs above them.
             // Give the real benches physical visual context; glowing status rails
             // are purely cosmetic and never duplicate the F interaction target.
-            Box("SENSOR_LAB monitor gantry",-12.35f,1.90f,4.77f,2.55f,.22f,.17f,graphite);
-            Box("MATERIAL_SCANNER active monitor",-12.35f,1.81f,4.67f,1.06f,.50f,.10f,tealGlow);
+            // Screenshot 03's freestanding black bar, cyan panel and two legs
+            // were cosmetic duplicates in front of D. The REAL inspection and
+            // weapon benches (including their interaction components) remain.
             for(int side=-1;side<=1;side+=2)
             {
-                Box("Scanner gantry leg",-12.35f+side*1.21f,1.18f,4.82f,
-                    .10f,1.38f,.09f,steel);
                 Box("Quantum coil support",-6.80f+side*.94f,1.24f,3.05f,
                     .09f,1.13f,.11f,stainless);
             }
@@ -487,16 +486,16 @@ namespace C3TreasurePuzzle
         private void BuildPollutionSkid()
         {
             Box("WASTEWATER treatment grated foundation",-2.64f,.71f,17.60f,
-                2.90f,.23f,5.46f,graphite);
+                2.90f,.23f,5.46f,graphite,true);
             for(int i=0;i<3;i++)
             {
                 float z=15.88f+i*1.56f;
                 Cyl("POLLUTION stainless purification vessel",
-                    new Vector3(-2.70f,1.82f,z),new Vector3(.54f,1.00f,.54f),stainless);
+                    new Vector3(-2.70f,1.82f,z),new Vector3(.54f,1.00f,.54f),stainless,true);
                 Cyl("Purifier flange lower",new Vector3(-2.70f,.88f,z),
-                    new Vector3(.61f,.09f,.61f),graphite);
+                    new Vector3(.61f,.09f,.61f),graphite,true);
                 Cyl("Purifier flange upper",new Vector3(-2.70f,2.78f,z),
-                    new Vector3(.62f,.08f,.62f),pipe);
+                    new Vector3(.62f,.08f,.62f),pipe,true);
                 Beam("Purifier connected exhaust riser",new Vector3(-2.70f,2.8f,z),
                     new Vector3(-2.70f,6.72f,z),.105f,pipe);
                 if(i>0)
@@ -504,7 +503,9 @@ namespace C3TreasurePuzzle
                         new Vector3(-2.70f,3.34f,z-1.56f),
                         new Vector3(-2.70f,3.34f,z),.08f,pipe);
                 Box("POLLUTION pressure controller",-1.63f,1.64f,z,
-                    .39f,.69f,.42f,steel);
+                    .39f,.69f,.42f,steel,true);
+                Box("POLLUTION controller mounting arm",-2.13f,1.64f,z,
+                    .61f,.08f,.10f,steel,true);
                 Box("Scrubber status screen",-1.84f,1.66f,z,
                     .04f,.26f,.27f,tealGlow);
             }
