@@ -1,7 +1,7 @@
 # SDG Adventure V11 Phase 2 — 工程交付與待驗收項目
 
 
-**最新原生回報基準：**使用者在 Unity 2023.1.22f1 對 `ebe9aab6c2756bd3bd59b9f4c5befe05c84fcbdb` 確認 Phase 2 18／18、V9 5／5、V11 7／7、Recycling Art 6／6及排氣管兩項 PASS，共38項；另有三項明確 FAIL，其他10項逐項結果未提供。這些結果只屬於該 SHA。文末 **V11 Phase 2.1／2.2 — Unity Native Failure Repair** 記錄 R1／R2／R3 修正與完整51項結果表；新修正的 Unity 編譯、PlayMode、人工遊戲皆 NOT RUN。以下各舊章節保留當次交付歷史，不能當作目前驗收狀態。
+**最新原生回報基準：**使用者 Windows Unity 2023.1.22f1 對 `30c734aa1550af547adb14564a599d03a59a4bdc` 確認 **R1 PASS、R2 PASS、R3 FAIL**；其餘48項此次未提供新結果。文末 **R3 UGUI Raycast Native Failure — Diagnostic and Repair** 記錄本次僅限R3的診斷補丁；**R3 ROOT CAUSE: NOT YET CONFIRMED**。正式UI與已通過R1／R2保持不變，新提交的Unity編譯、全51項PlayMode與人工皆NOT RUN。`ebe9aab6`的38 PASS／3 FAIL／10項結果未提供及下列各章保留為各自SHA的歷史，不能沿用至新提交。
 本報告區分**已實作**及**已驗收**。沒有 Unity Editor 的來源檢查不能代表編譯、PlayMode 或遊戲通過。
 
 **歷史原生回報（5cd7328）：**使用者實測 CargoFollowsRoute PASS、Phase 2 **17 PASS／1 FAIL**、V9五項及V11七項PASS。OutputConveyor 在 BoxCast 零間隙校準即失敗（約 -2.496mm），尚未進入正式九成品輸送驗證。本次量測修正與所有新提交 NOT RUN 狀態見文末 **OutputConveyor Native Contact Calibration Repair**；以下歷史 PASS 不沿用到新提交。
@@ -627,6 +627,8 @@ Manual Gameplay: NOT RUN
 
 ## V11 Phase 2.1／2.2 — Unity Native Failure Repair
 
+> 以下為30c734aa交付當時的修補與NOT RUN記錄。其後使用者已確認該SHA的R1／R2 PASS、R3仍FAIL；最新原生結果及下一次R3診斷見後續專章。不要再以本節交付當時的NOT RUN代替使用者後續回報。
+
 ### A. 修正範圍、Git 基準與原生結果
 
 本次僅處理使用者回報的三項失敗，順序 R1 → R2 → R3。修改前本地與遠端 PR #3 HEAD 均為 `ebe9aab6c2756bd3bd59b9f4c5befe05c84fcbdb`；工作樹乾淨，fetch 後 HEAD...FETCH_HEAD 為 `0 / 0`，沒有未推送提交或需要覆蓋的使用者修改。
@@ -804,3 +806,98 @@ Manual Gameplay: NOT RUN
 **尚未確認：**三項修正的Unity型別編譯／PhysX／EventSystem實測；R2實際第一阻擋物／法線及原SideContacts過濾影響；舊R3空Raycast是否還有裁切之外的原因；其他十項舊新增測試的真實結果；新版完整51項、相關VisualFPS／M6、十輪資源數與人工操作。新診斷仍FAIL時保留缺陷，不把它改成自動成功。既有B→C完整關卡銜接仍BLOCKED（Level02場景不可用），與本次三項修正分開。
 
 交付僅正常Commit／Push至原Phase2分支並更新既有PR #3，維持Draft與原Base；不修改main、Phase1或PR #2，不強推、不rebase、不合併、不改Ready。完成本次修補後停止額外開發，等待ChatGPT審查及使用者Unity實際驗收。
+
+
+## R3 UGUI Raycast Native Failure — Diagnostic and Repair
+
+### A. 交付性質與版本邊界
+
+**R3 ROOT CAUSE: NOT YET CONFIRMED**
+
+本次依第二次審查指示，只交付R3診斷補丁、具成功條件的有界UI就緒等待，以及原測試的捲動／清理驗證補強。沒有Unity Editor，不能量得GraphicRaycaster直接結果、Graphic.depth／registry／cull、Raycaster註冊或真正滑鼠輸入，因此不再次猜測性修改正式UI。這不是已通過原生驗收的R3正式修復。
+
+修改前本地與遠端既有Draft PR #3 HEAD皆為 `30c734aa1550af547adb14564a599d03a59a4bdc`，分支 `feature/v11-phase2-recycling-line`，Base `feature/v11-factory-rebuild`；工作樹乾淨，未推送／落後提交為0／0，沒有其他UI修補需要合併或覆蓋。沿用A／B／C及排氣管歷史，不修改main／Phase1／PR #2，不重建分支／PR，不rebase／強推／合併或改Ready。
+
+| 受驗SHA | 原生環境／結果 | 不可沿用的界線 |
+| --- | --- | --- |
+| ebe9aab6c2756bd3bd59b9f4c5befe05c84fcbdb | 使用者Unity 2023.1.22f1：38 PASS、3 FAIL、10項結果未提供 | 只屬該SHA，含原30項、Art六項、排氣兩項PASS |
+| 30c734aa1550af547adb14564a599d03a59a4bdc | 使用者Windows Unity 2023.1.22f1：R1 PASS、R2 PASS、R3 FAIL | 其餘48項此次未提供完整新結果；不能沿用ebe9aab6結果 |
+| 本章所屬診斷提交（精確SHA見同次PR #3交付） | Unity Compilation／PlayMode／Manual Gameplay皆NOT RUN | 沒有新原生XML、registry／depth資料或滑鼠驗收；全51項及相關VisualFPS／M6皆NOT RUN |
+
+**R1／R2測試方法與整個Factory Upgrade檔案逐位元保留，相關輸送帶、淨化容器、recorder、排氣管與正式UI亦保持30c734aa原樣。**
+
+### B. 使用者已提供的R3原生證據
+
+唯一目標測試：`M6IntegrationTests.C3V11RecyclingPresentationTests.ProductionUguiReceivesARealClickWithoutReactivationOrPuzzleSubmission`。
+
+原30c734aa失敗於 `WheelButtonIntoView()` 第146行，由第268行呼叫：`Wheel over the real viewport cannot reach ScrollRect; Expected True; Actual False`。目前只有該函式／呼叫行號與日誌，未提供完整Stack Trace，不自行補造。
+
+- Screen **866×838**；Canvas `c3_treasure_puzzle Adapter/C3UiCanvas`，ScreenSpaceOverlay、sortingOrder600、active=True、scaleFactor1，GraphicRaycaster已啟用。
+- EventSystem `M2_Player/PlayerMenuEventSystem`，InputSystemUIInputModule，兩者皆啟用；PlayerInput Context=Gameplay。這不等於已證明BaseRaycaster註冊正常或真滑鼠已輸入。
+- 短Viewport：X91～775、Y541～721，尺寸684×180。中心指標 **(433,631)** 在Screen與Viewport內，Mask enabled=True且接受該點；Content高432、normalized=1，但 **EventSystem.RaycastAll=0**。
+- Presentation：X91～775、Y376～424，active／interactable／image.raycastTarget皆True，graphic.cull=True、不與Viewport相交。這是正確的裁切負向控制；前次測試已走過該反例後才在滾輪接收檢查失敗，不能將其解讀為應強行點擊裁切按鈕。
+- 首次布局前Content高0、Button100×100；更新後Content高432、Button684×48，兩次RaycastAll皆0。可確認矩形布局確實改變，不能據此確認Graphic深度已更新或認定唯一成因是Layout。
+
+**已排除的狹義情況：**回報的Viewport中心點不在有效區、Mask拒絕該中心點，以及Presentation按鈕未建立／未啟用。**尚未排除：**Graphic未註冊、depth=-1、Cull、顏色透明度相關繪製狀態、Transform方向／Display、過濾鏈、Raycaster註冊／生命週期、Canvas繪製時序、其他Canvas的差異。舊日誌只有EventSystem結果；GraphicRaycaster直接查詢尚無原生數值，不能虛構「兩者皆0」或宣稱已完成分流診斷。
+
+### C. 診斷補丁與測試方法補強
+
+僅修改 `Assets/_Modules_/05_Testing/PlayMode/C3V11RecyclingPresentationTests.cs` 中的R3方法及其UI helpers，其他七項展示方法（包括十輪、暫停／取消／重載）內容保留。
+
+**同一點、同一PointerEventData的雙查詢：**`QueryUi`分別呼叫目標 `GraphicRaycaster.Raycast(pointer, Direct)` 與 `EventSystem.RaycastAll(pointer, Events)`，使用不同List。保存每一個命中的完整Hierarchy、module型別／路徑、sortingOrder、depth、distance、screenPosition，以及同Canvas的直接命中是否也出現在EventSystem結果。查詢例外完整保留且不可滿足就緒條件；沒有人工RaycastResult或忽略空命中。
+
+**Graphic／Canvas診斷：**Viewport Image、PuzzlePanel Image、Presentation Button Image逐一記錄完整路徑／型別、active、raycastTarget、depth、cull、color.a、CanvasRenderer alpha、所屬Canvas、公開GraphicRegistry註冊狀態、RectTransform世界四角／螢幕矩形／位置／旋轉／lossyScale／forward、點包含測試、Graphic.Raycast與方向dot值。另記Canvas root、enabled、targetDisplay／pixelRect／尺寸／方向、Display.RelativeMouseAt、UGUI assembly、Unity版本、batch／graphicsDevice、Graphic數量與參與射線的預篩候選數。方向dot只是診斷資料，沒有關閉ignoreReversedGraphics或修改Transform。
+
+**過濾鏈：**列出各祖先ICanvasRaycastFilter的啟用與原始判定，CanvasGroup的alpha／blocksRaycasts／interactable／ignoreParentGroups、Canvas.overrideSorting。原始filter列舉不是自行組合Unity規則；Graphic.Raycast回傳值才是實際整條Graphic過濾結果，矩形包含、depth／cull、方向與Display則分開看。
+
+**Raycaster／EventSystem對照：**列出所有啟用／停用BaseRaycaster、IsActive()、eventCamera、rootRaycaster、GraphicRaycaster的ignoreReversedGraphics／blockingObjects／blockingMask、Canvas.rootCanvas／targetDisplay，以及每個啟用GraphicRaycaster在相同點的直接命中，包含PlayerMenuCanvas。另列所有EventSystem與目前選取者，方便辨識重複／錯誤current。
+
+專案manifest／lock指定內建UGUI **1.0.0**、Input System **1.7.0**，不修改Package。公開API參考比對UGUI 1.0.0來源：GraphicRegistry.GetGraphicsForCanvas、Graphic／GraphicRaycaster／BaseRaycaster公開狀態與射線介面。GetRaycastableGraphicsForCanvas若該內建修訂提供公開方法，診斷才讀取，否則標UNAVAILABLE；實際Unity內assembly資訊由日誌回報，不把外部來源當作Unity編譯驗證。
+
+RaycasterManager類型在參考UGUI 1.0.0是**internal**。只在測試診斷中以可失敗的唯讀反射呼叫GetRaycasters，記錄目標是否真的在註冊清單；不存在／讀取失敗即明列UNAVAILABLE。它不參與成功條件、不新增／刪除註冊項，不修改Unity套件，也沒有讓正式UI依賴私有API。
+
+**有界時序比較：**記錄開台當下、下一Frame尚未重建、Force前後、必要時再最多3個Frame、短Viewport、滾動後按鈕、恢復正常Viewport及忙碌重開。每階段保存frameCount、矩形高度／normalizedPosition、直接／Event命中、目標註冊／depth／cull／Graphic.Raycast與就緒結果；完整路徑／細節於失敗或最終診斷列一次，避免逐幀洗版。成功必須有真實有效Graphic及所需的正式Raycast接收者；沒有固定秒數延遲、WaitForEndOfFrame或無限等待。若3Frame內仍無效就FAIL，等待只用於觀測／控制初始化，沒有將根因預先歸類為時序問題。
+
+### D. 對照組、嚴格斷言與清理
+
+1. **正式正向控制：**先確認正常Viewport Image確實出現在直接與Event兩個清單，最高Event命中可經IScrollHandler父鏈到原ScrollRect。另查Panel可見邊框背景與一個可見的其他正式Button（正常可見時通常是Close；只查射線，不點擊）。若當前Viewport找不到另一個可見Button，明列NONE，不捏造控制組結果。
+2. **同Canvas暫時Image：**只有等待逾時且既有對照全部無命中時，才建立48×48、同正式Canvas下、不受Mask的半透明診斷Image。記錄放置結果／矩形／註冊／depth／cull與兩種查詢，最多額外觀察2個Frame。try/finally銷毀；**不使用其命中來捲動／點擊正式按鈕，之後仍保留原R3逾時FAIL**。移除後再保存一次正式狀態，避免把不同Frame的數值混寫。
+3. **短Viewport裁切反例：**保留RectMask2D，先取得Viewport正向接收證據，再要求裁切按鈕的Mask判定False、兩個射線清單都沒有任何可傳遞點擊到該Button的項目、ActivePresentation仍null。沒有只看最高項就漏掉後方非法Button命中的情況。
+4. **真滾輪與可見Button：**以真命中建立正常scrollDelta事件，要求ExecuteHierarchy到達原ScrollRect；同時量得Content.anchoredPosition的實際改變，方向／數值必須符合計算的pixels（0.5像素數值容差），不再只驗接收物件。捲動後採有界就緒檢查，要求Button在Screen／Viewport內且Mask接受、沒有更高UI遮住、兩種查詢都命中合法Button事件接收者。
+5. **指標與正式資料：**真命中後才送Down→用同Pointer再Raycast核對release→Up→Click，驗證ActivePresentation建立且IsPresentation、面板關閉、游標鎖回、下一Frame解除控制台對Gameplay的暫時阻擋、正式資料／收據／背包指紋不變、忙碌不能重啟、Activated僅一次、解謎提交數不增。合成PointerEventData只驗事件處理鏈，**不是硬體滑鼠或InputSystemUIInputModule完整輸入流程的驗收**；FPS與真滑鼠操作仍需人工。
+
+沿用原Phase2→SafeCirculation fixture。Viewport尺寸、normalizedPosition／Content位置、ScrollRect.velocity／inertia、EventSystem選取與Activated訂閱均在finally恢復；臨時Image必定移除。Time／Cursor／input Context／Runtime Singleton／inventory／quickSlots與場景仍由原fixture還原。Canvas本身、正式Image／Mask／Raycaster／EventSystem狀態沒有被診斷程式修改，也沒有新增EventSystem或另一套初始化。
+
+### E. 修改檔案與來源檢查
+
+| 檔案 | 修改類別 |
+| --- | --- |
+| Assets/_Modules_/05_Testing/PlayMode/C3V11RecyclingPresentationTests.cs | 診斷helpers＋R3測試的有界就緒、雙查詢、控制組、實際捲動／指標／清理斷言；其餘七項方法不變 |
+| Assets/_Modules_/07_Docs/DevelopmentReports/V11_Phase2_Report.md | 此專章及最新歷史基準提醒，分離原生回報、假說與尚未執行的觀測 |
+
+**正式UI修補：無。**C3UiView（含Color.clear Viewport Image）、PlayerMenuCanvas／PlayerInputService、PuzzleConsole、正式Session／收據、工廠／資產／Scene／Packages全部保持30c734aa原樣。Factory Upgrade整檔、R1／R2及recorder逐位元保留。沒有Ignore／刪測試，沒有移除Mask、改Button階層、調不透明背景或停用其他Canvas。
+
+來源檢查：114個C#檔AST、1030方法、154個IEnumerator無語法樹錯誤；537個meta GUID唯一，沒有新資產／meta。51項指定名稱／數量維持18＋5＋7＋7＋6＋8，只有R3測試方法內容改變；17個直接相關保護檔逐位元比對、限定兩檔差異、git diff --check通過。公開API來源比對與反射簽名檢查只屬來源檢查，不能代替Unity型別編譯。
+
+```text
+R3 ROOT CAUSE: NOT YET CONFIRMED
+Unity Compilation: NOT RUN
+Unity PlayMode: NOT RUN
+Manual Gameplay: NOT RUN
+```
+
+新提交的R3、全部51項（包括R1／R2與十輪）及VisualFPS／M6均NOT RUN；原30c734aa的R1／R2 PASS保留，但沒有自動沿用到本診斷提交。新裁切、滾輪、pointer與temporary Image對照亦尚未實際執行，不能以程式已加入斷言宣稱它們已PASS。
+
+### F. 下一次唯一優先測試與最小回報
+
+先Pull本次診斷SHA，停止Play，Unity 2023.1.22f1匯入及編譯成功後，**只優先單跑**：
+
+`M6IntegrationTests.C3V11RecyclingPresentationTests.ProductionUguiReceivesARealClickWithoutReactivationOrPuzzleSubmission`
+
+請回報該完整SHA、Game View尺寸與Test Runner執行方式、完整失敗Stack Trace／行號，以及一次完整R3診斷區塊（含frame時序、Direct／Event各清單、三個Graphic的registry／depth／cull／過濾、所有Raycaster、若觸發則暫時Image對照）。若PASS也保留成功log中的正常／短Viewport、Content位移及指標鏈證據；不只提供PASS／FAIL。
+
+讀取分流：Direct有命中但Event無命中，先看目標註冊清單／IsActive與EventSystem流程；兩者皆無命中，依序看Graphic註冊、depth、cull、矩形／方向／Display與filters；其他正式Graphic可命中只有Viewport無命中，先看該Image及其局部鏈。若只有跨Frame後才有有效depth／射線，先用時序log證明，再決定是否屬測試時序。這些是診斷方向，不是本次已確認根因。
+
+取得原生資料後才決定最小正式修補。R3通過後再跑Presentation八項→Factory七項→Art六項→原Phase2 18→V9 5→V11 7（合計51，排氣兩項不重算），以及VisualFPS／M6。人工至少1920×1080、1280×720、**866×838**、640×360確認正常滾輪／拖曳／滑鼠點擊；小尺寸不可用即列正式UI缺陷。共用TaskSheet的P鍵／文字／捲動、控制台解謎／啟動／展示／ESC、完成畫面文字／重新開始／返回選關及透明Image是否遮擋，都需回歸；本次未改共用正式UI也不代表已完成這些人工驗收。
+
+完成本次diagnostic Commit／Push並更新既有Draft PR #3後停止推測性開發，等待ChatGPT審查與使用者原生資料。
