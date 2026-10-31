@@ -120,34 +120,84 @@ namespace M6IntegrationTests
             => string.Join("\n",hits.Select(h=>"  "+UiPath(h.gameObject?h.gameObject.transform:null)+
                 " module="+(h.module?h.module.GetType().FullName+"@"+UiPath(h.module.transform):"MISSING")+
                 " order="+h.sortingOrder+" depth="+h.depth+" distance="+h.distance.ToString("F6")+" screen="+h.screenPosition));
+        private static int CountRaycastCandidates(Canvas canvas)
+        {
+            // UGUI IndexedSet implements IList, but its enumerator can throw.
+            IList<Graphic> graphics=GraphicRegistry.GetGraphicsForCanvas(canvas);
+            int count=0;
+            for (int i=0;i<graphics.Count;i++)
+            {
+                Graphic graphic=graphics[i];
+                if (graphic && graphic.isActiveAndEnabled && graphic.raycastTarget && graphic.depth>=0 && !graphic.canvasRenderer.cull)
+                    count++;
+            }
+            return count;
+        }
+        private static T[] CopyIndexedOrNull<T>(object source)
+        {
+            if (!(source is IList<T> list)) return null;
+            T[] result=new T[list.Count];
+            for (int i=0;i<result.Length;i++) result[i]=list[i];
+            return result;
+        }
+        private static bool IsAssertionFailure(Exception error)
+        {
+            for (Exception current=error;current!=null;current=current.InnerException)
+                if (current is AssertionException) return true;
+            return false;
+        }
+        private static string DiagnosticField(string field,Func<string> read)
+        {
+            // Only optional diagnostic reads belong here. Required UI checks,
+            // raycasts, scrolling, pointer dispatch and assertions stay outside.
+            try { return read(); }
+            catch (Exception error) when (!IsAssertionFailure(error))
+            { return "UNAVAILABLE: "+field+" ["+error.GetType().FullName+"]\n"+error; }
+        }
         private static Graphic[] RaycastGraphicRegistry(Canvas canvas,out string status)
         {
             // GetGraphicsForCanvas is public. Some bundled UGUI revisions also
             // expose a separate public raycast registry; read it if available.
-            MethodInfo get=typeof(GraphicRegistry).GetMethod("GetRaycastableGraphicsForCanvas",BindingFlags.Static|BindingFlags.Public);
-            if (get==null) { status="UNAVAILABLE: public raycast-registry API"; return null; }
+            string operation="public raycast-registry method lookup";
             try
             {
-                Graphic[] result=((IEnumerable)get.Invoke(null,new object[] {canvas})).Cast<Graphic>().ToArray();
-                status="public GetRaycastableGraphicsForCanvas"; return result;
+                MethodInfo get=typeof(GraphicRegistry).GetMethod("GetRaycastableGraphicsForCanvas",BindingFlags.Static|BindingFlags.Public);
+                if (get==null) { status="UNAVAILABLE: public GetRaycastableGraphicsForCanvas method missing"; return null; }
+                operation="public raycast-registry reflection invocation";
+                object source=get.Invoke(null,new object[] {canvas});
+                if (source==null) { status="UNAVAILABLE: GetRaycastableGraphicsForCanvas returned null"; return null; }
+                operation="public raycast-registry indexed copy";
+                Graphic[] result=CopyIndexedOrNull<Graphic>(source);
+                if (result==null) { status="UNAVAILABLE: raycast-registry return type "+source.GetType().FullName+" does not implement IList<Graphic>"; return null; }
+                status="public GetRaycastableGraphicsForCanvas; returnType="+source.GetType().FullName+"; indexed count="+result.Length; return result;
             }
-            catch (Exception error) { status="UNAVAILABLE: "+error; return null; }
+            catch (Exception error) when (!IsAssertionFailure(error))
+            { status="UNAVAILABLE: "+operation+" failed ["+error.GetType().FullName+"]\n"+error; return null; }
         }
         private static BaseRaycaster[] RegisteredRaycasters(out string status)
         {
             // RaycasterManager is INTERNAL in UGUI 1.0.0. This read-only,
             // optional diagnostic must never register/remove a raycaster.
-            Type manager=typeof(EventSystem).Assembly.GetType("UnityEngine.EventSystems.RaycasterManager");
-            MethodInfo get=manager?.GetMethod("GetRaycasters",BindingFlags.Static|BindingFlags.Public|BindingFlags.NonPublic);
-            if (get==null) { status="UNAVAILABLE: RaycasterManager.GetRaycasters"; return null; }
+            string operation="internal raycaster-manager method lookup";
             try
             {
-                BaseRaycaster[] result=((IEnumerable)get.Invoke(null,null)).Cast<BaseRaycaster>().ToArray();
-                status="read-only reflection; internal RaycasterManager"; return result;
+                Type manager=typeof(EventSystem).Assembly.GetType("UnityEngine.EventSystems.RaycasterManager");
+                MethodInfo get=manager?.GetMethod("GetRaycasters",BindingFlags.Static|BindingFlags.Public|BindingFlags.NonPublic);
+                if (get==null) { status="UNAVAILABLE: RaycasterManager.GetRaycasters method missing"; return null; }
+                operation="internal raycaster-manager reflection invocation";
+                object source=get.Invoke(null,null);
+                if (source==null) { status="UNAVAILABLE: RaycasterManager.GetRaycasters returned null"; return null; }
+                operation="internal raycaster-manager indexed copy";
+                BaseRaycaster[] result=CopyIndexedOrNull<BaseRaycaster>(source);
+                if (result==null) { status="UNAVAILABLE: raycaster-manager return type "+source.GetType().FullName+" does not implement IList<BaseRaycaster>"; return null; }
+                status="read-only reflection; internal RaycasterManager; returnType="+source.GetType().FullName+"; indexed count="+result.Length; return result;
             }
-            catch (Exception error) { status="UNAVAILABLE: "+error; return null; }
+            catch (Exception error) when (!IsAssertionFailure(error))
+            { status="UNAVAILABLE: "+operation+" failed ["+error.GetType().FullName+"]\n"+error; return null; }
         }
         private static string GraphicState(Graphic graphic,Vector2 point,Camera camera,bool filters=false)
+            => DiagnosticField("GraphicState "+UiPath(graphic?graphic.transform:null),()=>GraphicStateDetails(graphic,point,camera,filters));
+        private static string GraphicStateDetails(Graphic graphic,Vector2 point,Camera camera,bool filters)
         {
             if (!graphic) return "MISSING Graphic";
             Canvas canvas=graphic.canvas; Graphic[] raycast=canvas?RaycastGraphicRegistry(canvas,out _):null;
@@ -232,11 +282,10 @@ namespace M6IntegrationTests
             foreach (Graphic graphic in new Graphic[] {scroll.viewport.GetComponent<Image>(),scroll.transform.parent.GetComponent<Image>(),button.image})
                 text.AppendLine(GraphicState(graphic,point,raycaster?raycaster.eventCamera:null,true));
             Graphic[] raycastGraphics=RaycastGraphicRegistry(canvas,out string graphicsStatus);
-            text.AppendLine("GraphicRegistry all="+GraphicRegistry.GetGraphicsForCanvas(canvas).Count+
+            text.AppendLine(DiagnosticField("GraphicRegistry summary",()=>"GraphicRegistry all="+GraphicRegistry.GetGraphicsForCanvas(canvas).Count+
                 " raycastRegistry="+(raycastGraphics==null?"UNAVAILABLE":raycastGraphics.Length.ToString())+" API="+graphicsStatus+
-                " candidatesBeforeRectAndFilters="+GraphicRegistry.GetGraphicsForCanvas(canvas).Count(g=>g && g.isActiveAndEnabled &&
-                    g.raycastTarget && g.depth>=0 && !g.canvasRenderer.cull)+
-                " descendants="+canvas.GetComponentsInChildren<Graphic>(true).Length);
+                " candidatesBeforeRectAndFilters="+CountRaycastCandidates(canvas)+
+                " descendants="+canvas.GetComponentsInChildren<Graphic>(true).Length));
             BaseRaycaster[] registered=RegisteredRaycasters(out string registryStatus);
             text.AppendLine("Raycaster registry: "+registryStatus+" entries="+(registered==null?"UNAVAILABLE":registered.Length.ToString()));
             foreach (BaseRaycaster rc in Object.FindObjectsOfType<BaseRaycaster>(true))
@@ -250,7 +299,8 @@ namespace M6IntegrationTests
                 if (owner && gr && gr.isActiveAndEnabled)
                 {
                     UiRaycastEvidence other=QueryUi(owner,events,point);
-                    text.AppendLine("  otherCanvas direct="+other.Direct.Count+" allGraphics="+GraphicRegistry.GetGraphicsForCanvas(owner).Count+
+                    text.AppendLine("  otherCanvas direct="+other.Direct.Count+" allGraphics="+
+                        DiagnosticField("other Canvas GraphicRegistry count",()=>GraphicRegistry.GetGraphicsForCanvas(owner).Count.ToString())+
                         "\n"+HitDetails(other.Direct)+"\n"+other.Errors);
                 }
             }
@@ -354,10 +404,11 @@ namespace M6IntegrationTests
                 float pixels=Mathf.Clamp(viewport.center.y-target.center.y,-scroll.content.anchoredPosition.y,hidden-scroll.content.anchoredPosition.y);
                 Vector2 point=RectTransformUtility.WorldToScreenPoint(null,scroll.viewport.TransformPoint(viewport.center));
                 UiRaycastEvidence query=QueryUi(canvas,events,point); List<RaycastResult> hits=query.Events;
-                string evidence=history+"\n"+UiDiagnostics(canvas,scroll,button,events,point,query);
-                Assert.IsTrue(scroll.vertical && scroll.scrollSensitivity>0f,"ScrollRect cannot scroll\n"+evidence);
-                Assert.IsTrue(hits.Count>0 && ExecuteEvents.GetEventHandler<IScrollHandler>(hits[0].gameObject)==scroll.gameObject,
-                    "Wheel over the real viewport cannot reach ScrollRect\n"+evidence);
+                Func<string> evidence=()=>history+"\n"+UiDiagnostics(canvas,scroll,button,events,point,query);
+                bool canScroll=scroll.vertical && scroll.scrollSensitivity>0f;
+                Assert.IsTrue(canScroll,canScroll?null:"ScrollRect cannot scroll\n"+evidence());
+                bool wheelReceiver=hits.Count>0 && ExecuteEvents.GetEventHandler<IScrollHandler>(hits[0].gameObject)==scroll.gameObject;
+                Assert.IsTrue(wheelReceiver,wheelReceiver?null:"Wheel over the real viewport cannot reach ScrollRect\n"+evidence());
                 Vector2 before=scroll.content.anchoredPosition; float beforeNormalized=scroll.verticalNormalizedPosition;
                 PointerEventData wheel=query.Pointer; wheel.scrollDelta=new Vector2(0f,-pixels/scroll.scrollSensitivity);
                 wheel.pointerCurrentRaycast=hits[0];
@@ -366,17 +417,22 @@ namespace M6IntegrationTests
                 Vector2 after=scroll.content.anchoredPosition;
                 history.AppendLine(phase+" wheel pixels="+pixels+" contentBefore="+before+" contentAfter="+after+
                     " normalizedBefore="+beforeNormalized+" normalizedAfter="+scroll.verticalNormalizedPosition);
-                Assert.Greater(Mathf.Abs(after.y-before.y),.5f,"Wheel receiver did not move Content\n"+evidence);
-                Assert.That(after.y-before.y,Is.EqualTo(pixels).Within(.5f),"Unexpected wheel movement\n"+evidence);
+                float movement=after.y-before.y;
+                Assert.Greater(Mathf.Abs(movement),.5f,Mathf.Abs(movement)>.5f?null:"Wheel receiver did not move Content\n"+evidence());
+                Assert.That(movement,Is.EqualTo(pixels).Within(.5f),
+                    Math.Abs((double)movement-pixels)<=.5?null:"Unexpected wheel movement\n"+evidence());
             }
             yield return AwaitUiReady(canvas,scroll,button,events,history,phase+" visible button",true);
             Vector2 buttonPoint=ButtonPoint(button); UiRaycastEvidence final=QueryUi(canvas,events,buttonPoint);
-            string details=history+"\n"+UiDiagnostics(canvas,scroll,button,events,buttonPoint,final);
-            Assert.IsTrue(button.gameObject.activeInHierarchy && button.interactable && button.image && button.image.raycastTarget,"Button unavailable\n"+details);
-            Assert.IsTrue(RectTransformUtility.RectangleContainsScreenPoint(scroll.viewport,buttonPoint,null) &&
+            Func<string> details=()=>history+"\n"+UiDiagnostics(canvas,scroll,button,events,buttonPoint,final);
+            bool available=button.gameObject.activeInHierarchy && button.interactable && button.image && button.image.raycastTarget;
+            Assert.IsTrue(available,available?null:"Button unavailable\n"+details());
+            bool visible=RectTransformUtility.RectangleContainsScreenPoint(scroll.viewport,buttonPoint,null) &&
                 scroll.viewport.GetComponent<RectMask2D>().IsRaycastLocationValid(buttonPoint,null) &&
-                new Rect(0f,0f,Screen.width,Screen.height).Contains(buttonPoint),"Button centre is clipped/off-screen\n"+details);
-            Assert.IsTrue(HitsButton(final.Events,button),"No unobstructed Button event receiver at the visible point\n"+details);
+                new Rect(0f,0f,Screen.width,Screen.height).Contains(buttonPoint);
+            Assert.IsTrue(visible,visible?null:"Button centre is clipped/off-screen\n"+details());
+            bool receivesClick=HitsButton(final.Events,button);
+            Assert.IsTrue(receivesClick,receivesClick?null:"No unobstructed Button event receiver at the visible point\n"+details());
         }
         private sealed class NativeOutputProbe : IDisposable
         {
@@ -470,10 +526,13 @@ namespace M6IntegrationTests
                 RecordUiStage(history,"OpenPanel next frame before rebuild",canvas,scroll,button,events);
                 yield return AwaitUiReady(canvas,scroll,button,events,history,"normal viewport");
                 RecordFormalControls(history,canvas,scroll,button,events);
-                string initial=history+"\n"+UiDiagnostics(canvas,scroll,button,events,ButtonPoint(button),QueryUi(canvas,events,ButtonPoint(button)));
-                Assert.IsNotNull(events,initial); Assert.IsTrue(events.isActiveAndEnabled,initial); Assert.IsNotNull(events.currentInputModule,initial);
-                Assert.IsTrue(events.currentInputModule.isActiveAndEnabled,initial);
-                Assert.IsTrue(canvas.GetComponent<GraphicRaycaster>().isActiveAndEnabled,initial);
+                Func<string> initial=()=>history+"\n"+UiDiagnostics(canvas,scroll,button,events,ButtonPoint(button),QueryUi(canvas,events,ButtonPoint(button)));
+                Assert.IsNotNull(events,events?null:initial());
+                Assert.IsTrue(events.isActiveAndEnabled,events.isActiveAndEnabled?null:initial());
+                Assert.IsNotNull(events.currentInputModule,events.currentInputModule?null:initial());
+                Assert.IsTrue(events.currentInputModule.isActiveAndEnabled,events.currentInputModule.isActiveAndEnabled?null:initial());
+                Assert.IsTrue(canvas.GetComponent<GraphicRaycaster>().isActiveAndEnabled,
+                    canvas.GetComponent<GraphicRaycaster>().isActiveAndEnabled?null:initial());
                 Assert.AreEqual("回收產線控制",content.Find("Title").GetComponent<Text>().text);
                 foreach (string name in new[] {"Choice0","Choice1","Choice2","Confirm","Retry","Activate"}) Assert.IsFalse(content.Find(name).gameObject.activeSelf,name);
                 Assert.IsTrue(button.interactable);
@@ -490,11 +549,13 @@ namespace M6IntegrationTests
                     RebuildScroll(scroll); scroll.verticalNormalizedPosition=1f; RebuildScroll(scroll);
                     yield return AwaitUiReady(canvas,scroll,button,events,history,"short viewport");
                     Vector2 clipped=ButtonPoint(button); UiRaycastEvidence clippedQuery=QueryUi(canvas,events,clipped);
-                    string evidence=history+"\n"+UiDiagnostics(canvas,scroll,button,events,clipped,clippedQuery);
+                    Func<string> evidence=()=>history+"\n"+UiDiagnostics(canvas,scroll,button,events,clipped,clippedQuery);
                     Assert.IsTrue(scroll.viewport.GetComponent<RectMask2D>().enabled);
-                    Assert.IsFalse(scroll.viewport.GetComponent<RectMask2D>().IsRaycastLocationValid(clipped,null),"Negative control did not clip the button\n"+evidence);
-                    Assert.IsFalse(clippedQuery.Direct.Concat(clippedQuery.Events).Any(h=>
-                        ExecuteEvents.GetEventHandler<IPointerClickHandler>(h.gameObject)==button.gameObject),"An invisible button still receives raycasts\n"+evidence);
+                    bool maskAccepts=scroll.viewport.GetComponent<RectMask2D>().IsRaycastLocationValid(clipped,null);
+                    Assert.IsFalse(maskAccepts,maskAccepts?"Negative control did not clip the button\n"+evidence():null);
+                    bool clippedReceivesClick=clippedQuery.Direct.Concat(clippedQuery.Events).Any(h=>
+                        ExecuteEvents.GetEventHandler<IPointerClickHandler>(h.gameObject)==button.gameObject);
+                    Assert.IsFalse(clippedReceivesClick,clippedReceivesClick?"An invisible button still receives raycasts\n"+evidence():null);
                     Assert.IsNull(Member(line,"ActivePresentation"));
                     history.AppendLine("Clipped button control: maskRejects=True direct="+clippedQuery.Direct.Count+" event="+clippedQuery.Events.Count+
                         " Presentation receiver absent, ActivePresentation null\n"+HitDetails(clippedQuery.Direct)+"\n"+HitDetails(clippedQuery.Events));
@@ -514,7 +575,8 @@ namespace M6IntegrationTests
                     yield return AwaitUiReady(canvas,scroll,button,events,history,"restored normal viewport");
                     yield return WheelButtonIntoView(canvas,scroll,button,events,history,"normal viewport");
                     Vector2 point=ButtonPoint(button); UiRaycastEvidence query=QueryUi(canvas,events,point); List<RaycastResult> hits=query.Events;
-                    Assert.IsTrue(UiReady(canvas,scroll,button,query,true),history+"\n"+UiDiagnostics(canvas,scroll,button,events,point,query));
+                    bool ready=UiReady(canvas,scroll,button,query,true);
+                    Assert.IsTrue(ready,ready?null:history+"\n"+UiDiagnostics(canvas,scroll,button,events,point,query));
                     PointerEventData pointer=query.Pointer; pointer.pressPosition=point; pointer.eligibleForClick=true;
                     pointer.pointerCurrentRaycast=hits[0]; pointer.pointerPressRaycast=hits[0];
                     GameObject press=ExecuteEvents.ExecuteHierarchy(hits[0].gameObject,pointer,ExecuteEvents.pointerDownHandler);

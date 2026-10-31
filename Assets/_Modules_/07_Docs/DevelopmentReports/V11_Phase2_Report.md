@@ -1,7 +1,7 @@
 # SDG Adventure V11 Phase 2 — 工程交付與待驗收項目
 
 
-**最新原生回報基準：**使用者 Windows Unity 2023.1.22f1 對 `30c734aa1550af547adb14564a599d03a59a4bdc` 確認 **R1 PASS、R2 PASS、R3 FAIL**；其餘48項此次未提供新結果。文末 **R3 UGUI Raycast Native Failure — Diagnostic and Repair** 記錄本次僅限R3的診斷補丁；**R3 ROOT CAUSE: NOT YET CONFIRMED**。正式UI與已通過R1／R2保持不變，新提交的Unity編譯、全51項PlayMode與人工皆NOT RUN。`ebe9aab6`的38 PASS／3 FAIL／10項結果未提供及下列各章保留為各自SHA的歷史，不能沿用至新提交。
+**最新原生回報基準：**使用者 Windows Unity 2023.1.22f1／UGUI 1.0.0 對 `333d1cbb38b9a32162b22f1e9ee833b1100affc9` 的R3測得診斷程式 `IndexedSet.GetEnumerator → LINQ Count(predicate) → UiDiagnostics` 的 NotImplementedException。這個診斷工具缺陷已確認；真正UI Raycast根因仍未確認。本次修復見文末 **R3 Diagnostic IndexedSet Enumeration Exception Repair**。`30c734aa`的R1／R2 PASS、R3 FAIL及更早`ebe9aab6`的結果各自保留；新提交的Unity編譯、完整51項、VisualFPS／M6及人工皆NOT RUN，不沿用歷史PASS。
 本報告區分**已實作**及**已驗收**。沒有 Unity Editor 的來源檢查不能代表編譯、PlayMode 或遊戲通過。
 
 **歷史原生回報（5cd7328）：**使用者實測 CargoFollowsRoute PASS、Phase 2 **17 PASS／1 FAIL**、V9五項及V11七項PASS。OutputConveyor 在 BoxCast 零間隙校準即失敗（約 -2.496mm），尚未進入正式九成品輸送驗證。本次量測修正與所有新提交 NOT RUN 狀態見文末 **OutputConveyor Native Contact Calibration Repair**；以下歷史 PASS 不沿用到新提交。
@@ -810,6 +810,8 @@ Manual Gameplay: NOT RUN
 
 ## R3 UGUI Raycast Native Failure — Diagnostic and Repair
 
+> 本章保留333d1cbb診斷補丁交付時的來源記錄。其後使用者實測在UiDiagnostics的IndexedSet列舉處中斷；下一章記錄本次定點修復。尚未取得後續短Viewport、捲動、點擊或Session啟動的原生結果。
+
 ### A. 交付性質與版本邊界
 
 **R3 ROOT CAUSE: NOT YET CONFIRMED**
@@ -901,3 +903,117 @@ Manual Gameplay: NOT RUN
 取得原生資料後才決定最小正式修補。R3通過後再跑Presentation八項→Factory七項→Art六項→原Phase2 18→V9 5→V11 7（合計51，排氣兩項不重算），以及VisualFPS／M6。人工至少1920×1080、1280×720、**866×838**、640×360確認正常滾輪／拖曳／滑鼠點擊；小尺寸不可用即列正式UI缺陷。共用TaskSheet的P鍵／文字／捲動、控制台解謎／啟動／展示／ESC、完成畫面文字／重新開始／返回選關及透明Image是否遮擋，都需回歸；本次未改共用正式UI也不代表已完成這些人工驗收。
 
 完成本次diagnostic Commit／Push並更新既有Draft PR #3後停止推測性開發，等待ChatGPT審查與使用者原生資料。
+
+
+## R3 Diagnostic IndexedSet Enumeration Exception Repair
+
+### A. 原生失敗、版本與範圍
+
+```text
+R3 DIAGNOSTIC HARNESS EXCEPTION: CONFIRMED
+R3 UI RAYCAST ROOT CAUSE: NOT YET CONFIRMED
+```
+
+確認的是333d1cbb診斷工具例外的根因；本次來源修正尚未經Unity重新驗證。修改前本地／遠端HEAD均為 `333d1cbb38b9a32162b22f1e9ee833b1100affc9`，工作樹乾淨、未推送／落後提交0／0，既有PR #3為Draft、Base=`feature/v11-factory-rebuild`。沿用 `feature/v11-phase2-recycling-line`，沒有其他待保留的IndexedSet修補或使用者未提交變更。
+
+使用者Windows Unity **2023.1.22f1**、**com.unity.ugui@1.0.0** 的唯一目標測試：
+
+`M6IntegrationTests.C3V11RecyclingPresentationTests.ProductionUguiReceivesARealClickWithoutReactivationOrPuzzleSubmission`
+
+提供的錯誤鏈如下（只保留已提供內容，不補造完整路徑）：
+
+```text
+System.NotImplementedException: The method or operation is not implemented.
+UnityEngine.UI.Collections.IndexedSet<T>.GetEnumerator()
+  com.unity.ugui@1.0.0/.../IndexedSet.cs:99
+System.Linq.Enumerable.Count(predicate)
+C3V11RecyclingPresentationTests.UiDiagnostics() :235
+ProductionUguiReceivesARealClickWithoutReactivationOrPuzzleSubmission :473
+```
+
+**根因已確認：**新增的候選數量診斷對GraphicRegistry回傳的IList<Graphic>使用LINQ Count(predicate)，底層IndexedSet的GetEnumerator尚未實作，導致診斷例外遮蔽R3真正結果。Count屬性與索引器可以正常使用。公開UGUI 1.0.0參考來源也顯示GetGraphicsForCanvas／GetRaycastableGraphicsForCanvas回傳IList<Graphic>，IndexedSet.Count／索引器讀取內部List，Contains讀Dictionary，但GetEnumerator直接throw NotImplementedException；RaycasterManager.GetRaycasters宣告回傳List<BaseRaycaster>。參考IndexedSet blob為 `7673a0da791f39817049fb45f8ed99cef0238c8e`，僅存scratch核對，沒有修改Unity套件；實際原生錯誤以使用者的Package／行號為準。
+
+第471行AwaitUiReady(normal viewport)在第473行之前，依路徑可推測一般Viewport就緒等待已繼續往下執行；**沒有獨立取得該階段的Direct／Event數值，也不能推定短Viewport、捲動、Button Raycast、PointerClick或Session已通過。**
+
+### B. Count／索引及反射集合修復
+
+原寫法需要GetEnumerator：
+
+```csharp
+GraphicRegistry.GetGraphicsForCanvas(canvas)
+    .Count(g => g && g.isActiveAndEnabled && g.raycastTarget &&
+        g.depth >= 0 && !g.canvasRenderer.cull)
+```
+
+改由 `CountRaycastCandidates(canvas)` 取得IList<Graphic>，使用 `for (int i=0; i<graphics.Count; i++)` 及 `graphics[i]` 累計。五個候選條件完全不變：物件有效、isActiveAndEnabled、raycastTarget、depth≥0、非cull。原 `candidatesBeforeRectAndFilters` 欄位保留，仍是矩形／過濾前候選數，不是最終命中數；實際命中仍取真GraphicRaycaster.Raycast／EventSystem.RaycastAll。
+
+新增 `CopyIndexedOrNull<T>(object source)`：僅接受IList<T>，按Count配置陣列、以索引逐筆複製；不使用foreach、Cast、ToArray或任何IEnumerable退回路徑。List<T>、T[]及支援該介面的IndexedSet都可用；不支援索引介面就回傳null，不將其當成萬用IEnumerable複製器。
+
+- `RaycastGraphicRegistry`：Reflection回傳集合以 `CopyIndexedOrNull<Graphic>` 複製，避免舊Cast<Graphic>().ToArray再次呼叫IndexedSet列舉器。
+- `RegisteredRaycasters`：同樣以 `CopyIndexedOrNull<BaseRaycaster>` 複製；仍只讀內部清單，不新增／移除／停用Raycaster，不改Package或正式UI。
+- 兩方法都把查找與Invoke放在可選診斷邊界內，分別記錄「方法缺少」「反射呼叫失敗」「回傳null」「型別未實作IList<T>」「索引複製失敗」；成功則記回傳型別及indexed count。成功零筆是非null空陣列／indexed count=0，不標API不存在。
+- 例外保留操作階段、型別與ToString堆疊；AssertionException及其InnerException鏈不會被可選診斷catch吞掉。
+
+### C. 全檔集合來源掃描
+
+| 來源 | 本次處理與保留理由 |
+| --- | --- |
+| GetGraphicsForCanvas(canvas) 的原始IList<Graphic> | 候選統計只用Count與索引；原Count屬性、原生Contains(graphic)保留，沒有改用會列舉的LINQ |
+| 反射GetRaycastableGraphicsForCanvas的原始結果 | 驗證IList<Graphic>後索引複製；下游Contains等操作面對正常Graphic[] |
+| 反射RaycasterManager.GetRaycasters的原始結果 | 驗證IList<BaseRaycaster>後索引複製；下游面對正常BaseRaycaster[] |
+| Direct／Event命中、控制組命中 | 明確List<RaycastResult>；原Any／All／Select／Concat保留 |
+| 世界四角、FindObjectsOfType、GetComponents、Items等結果 | 正常陣列；相關LINQ／foreach不改 |
+| 正式紀錄、庫存、收據、工作槽、測試快照 | 原List／陣列／Dictionary／HashSet及已物化Items陣列；與本次IndexedSet來源不同，不全面移除LINQ |
+
+已掃描Count(predicate)、Where、Select、Cast、ToArray、Any、First及foreach的來源，沒有留下這三個Registry來源的直接列舉。這是來源檢查，仍須Unity重新確認沒有其他實際例外。
+
+### D. 診斷不得遮蔽斷言
+
+檢查UiDiagnostics全部七類呼叫位置，僅調整訊息建立與可選欄位，不重寫R3流程：
+
+| 位置 | 處理 |
+| --- | --- |
+| AwaitUiReady逾時 | 原本已在必要條件失敗後才組完整診斷，保持整個等待方法原樣 |
+| WheelButtonIntoView滾輪、位移及按鈕檢查 | 詳細訊息改Func<string>，先判原條件；失敗才執行。位移仍用原Greater及同一0.5像素EqualConstraint，沒有放寬容差 |
+| 開台後原第473行initial | 不再無條件執行完整UiDiagnostics，改延後到必要Assert失敗時 |
+| 裁切負向控制 | 先取得原Mask／Button接收判斷，失敗才組完整診斷；反例條件不變 |
+| 正式點擊前UiReady斷言 | 先取得原就緒結果，只有False才組訊息 |
+| 正常成功log | 保留必要的最終完整資料，不把可選反射失敗當成測試失敗 |
+
+可選GraphicState、Registry統計等欄位由 `DiagnosticField` 個別讀取；單一欄位例外只標UNAVAILABLE及型別／堆疊，其他資料照常輸出。這個捕捉邊界不包住正式Assert、實際Raycast、捲動、Pointer或Session。AssertionException（含反射包裝內層）繼續傳出，沒有把失敗轉為PASS。
+
+`QueryUi`、`UiReady`、`AwaitUiReady`、RecordUiStage／正式控制組／暫時Image／RebuildScroll均與333d1cbb逐位元保留；相同PointerEventData的雙查詢、三個Frame等待、裁切反例、真滾輪／Content位移、Down／Up／Click、ActivePresentation、正式指紋與FPS恢復斷言及finally清理保留。Pointer事件起點之後的整段程式、其他七項展示方法亦逐位元不變。沒有忽略空命中、假RaycastResult、onClick.Invoke或以StartPresentation替代UI點擊。
+
+### E. 修改檔案、來源檢查與執行狀態
+
+僅兩檔：
+
+- `Assets/_Modules_/05_Testing/PlayMode/C3V11RecyclingPresentationTests.cs`：候選索引統計、兩個索引快照、可選診斷欄位／例外邊界及訊息延後建立。
+- `Assets/_Modules_/07_Docs/DevelopmentReports/V11_Phase2_Report.md`：本章與歷史狀態更新。
+
+正式C3UiView、PuzzleConsole、Line／Geometry／ReferenceFactory、Scene／Art／Packages／ProjectSettings、背包／武器／Session／收據不改；R1／R2整個Factory Upgrade檔案及recorder不改。來源檢查：114個C#檔AST、1035方法、154個IEnumerator無語法樹錯誤；537個meta GUID唯一，沒有新資產／meta；51項名稱／數量完整保留（18＋5＋7＋7＋6＋8），無Ignore／Skip。17個相關保護檔逐位元比對、其餘七項展示方法及核心查詢／等待／Pointer段保留，原Assert種類／數量與條件保留，git diff --check與兩檔範圍檢查通過。這些不是Unity型別編譯或原生PASS。
+
+| SHA | 已知原生結果 |
+| --- | --- |
+| 30c734aa1550af547adb14564a599d03a59a4bdc | 使用者R1 PASS、R2 PASS、R3 FAIL；只屬該SHA |
+| 333d1cbb38b9a32162b22f1e9ee833b1100affc9 | 使用者R3因診斷IndexedSet列舉例外FAIL；後續UI流程尚無結果 |
+| 本章所屬修正提交（完整SHA見同次PR #3交付） | 全部Unity驗證NOT RUN；原生例外是否消失、真正Raycast／捲動／點擊／Session結果仍待取得 |
+
+```text
+Unity Compilation: NOT RUN
+Unity PlayMode: NOT RUN
+VisualFPS / M6: NOT RUN
+Manual Gameplay: NOT RUN
+```
+
+新版完整51項，包括R3、R1／R2及十輪展示，均尚未原生執行。修復診斷例外不等於正式UI已通過。
+
+### F. 下一次唯一優先原生測試
+
+Pull新SHA、停止Play、等待Unity 2023.1.22f1編譯且Console無紅字，再只優先執行：
+
+`M6IntegrationTests.C3V11RecyclingPresentationTests.ProductionUguiReceivesARealClickWithoutReactivationOrPuzzleSubmission`
+
+回報新完整SHA、第一個失敗行號／Stack Trace及完整診斷。先確認沒有IndexedSet.GetEnumerator例外，候選統計與兩個反射快照可讀（或有精確UNAVAILABLE原因），再依最新首個失敗點區分：其他診斷集合存取、Direct=0、Direct有／Event=0、捲動失敗、Button／Pointer失敗或Session失敗；新的UI FAIL不自動代表這次列舉修補無效。
+
+取得Direct／Event、Registry、depth／cull等真實資料後再判定正式UI根因。R3通過後，才跑Presentation8→Factory7→Art6→原Phase2 18→V9 5→V11 7（共51，排氣兩項不重算），以及VisualFPS／M6與人工驗收。正常Commit／Push至原Phase2分支、更新原Draft PR #3後停止額外開發，等待ChatGPT審查及使用者Unity原生結果；不合併、不修改main／Phase1／PR #2。
