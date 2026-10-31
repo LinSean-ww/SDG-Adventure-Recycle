@@ -491,6 +491,131 @@ namespace M6IntegrationTests
             Assert.AreEqual(3,(int)Get(line,"ProcessedBatches"),"Finite input must not produce endless timer credits");
         }
 
+        private static string CollisionPath(Transform item)
+        {
+            string path = item.name;
+            for (Transform parent = item.parent; parent != null; parent = parent.parent)
+                path = parent.name + "/" + path;
+            return path;
+        }
+
+        private static string CollisionState(Collider collider)
+        {
+            if (!collider) return "MISSING collider";
+            return CollisionPath(collider.transform) + " id=" + collider.GetInstanceID() +
+                " type=" + collider.GetType().Name + " enabled=" + collider.enabled +
+                " active=" + collider.gameObject.activeInHierarchy + " trigger=" + collider.isTrigger +
+                " layer=" + collider.gameObject.layer + " position=" + collider.transform.position.ToString("F6") +
+                " scale=" + collider.transform.lossyScale.ToString("F6") +
+                " bounds=" + collider.bounds.min.ToString("F6") + ".." + collider.bounds.max.ToString("F6");
+        }
+
+        private static void AssertSpawnCeilingCollision(GameObject player, CharacterController character)
+        {
+            Component factory = Find("C3TreasurePuzzle.C3ReferenceFactoryEnvironment");
+            Component circulation = Find("C3TreasurePuzzle.C3V3Circulation");
+            Assert.IsNotNull(factory, "Factory Awake must install the reference environment.");
+            Assert.IsNotNull(circulation, "Factory Awake must install the current circulation.");
+            Assert.IsNotNull(factory.transform.Find("C3_ReferenceRecyclingFactory_Visuals"));
+            GameObject art = GameObject.Find("C_Factory_Art");
+            Assert.IsNotNull(art);
+            Transform lens = art.transform.Find("Lighting/Cyan_Console/IndicatorLens");
+            Assert.IsNotNull(lens, "Missing authored legacy lamp.");
+            Assert.AreSame(lens.parent.gameObject, GameObject.Find("Cyan_Console"), "Legacy lamp identity is ambiguous.");
+            Collider retired = lens.GetComponent<Collider>();
+            Transform deck = circulation.transform.Find("C3_V3_VerifiedCirculation/2F_CONNECTING_REAR_ROUTE");
+            Assert.IsNotNull(deck, "Circulation Awake must build the current rear deck.");
+            BoxCollider ceiling = deck.GetComponent<BoxCollider>();
+            Assert.IsNotNull(retired);
+            Assert.IsNotNull(ceiling);
+            Physics.SyncTransforms();
+            string setup = "M6 spawn collision (explicit upward Move, not the normal jump arc)\nlegacy=" + CollisionState(retired) +
+                "\nceiling=" + CollisionState(ceiling) + "\nplayer=" + CollisionState(character) +
+                " center=" + character.center.ToString("F6") + " height=" + character.height + " radius=" + character.radius +
+                " skinWidth=" + character.skinWidth + " stepOffset=" + character.stepOffset +
+                " ignoredLayers=" + Physics.GetIgnoreLayerCollision(player.layer, ceiling.gameObject.layer) +
+                " ignoredPair=" + Physics.GetIgnoreCollision(character, ceiling);
+            Debug.Log(setup);
+            // V11 deliberately retires this invisible lamp's collision. Its bounds
+            // cannot define the blocking height of the replacement circulation.
+            Assert.IsFalse(retired.enabled, "The retired lamp must not become an invisible obstacle.\n" + setup);
+            Assert.IsTrue(ceiling.enabled && ceiling.gameObject.activeInHierarchy && !ceiling.isTrigger, setup);
+            Renderer deckRenderer = deck.GetComponent<Renderer>();
+            Assert.IsNotNull(deckRenderer, setup);
+            Assert.IsTrue(deckRenderer.enabled, "The blocking deck must remain visible.\n" + setup);
+            Assert.IsTrue(character.enabled && character.detectCollisions, setup);
+            Assert.AreEqual(Vector3.one, character.transform.lossyScale, "The production capsule sweep assumes unit scale.\n" + setup);
+            Assert.IsFalse(Physics.GetIgnoreLayerCollision(player.layer, ceiling.gameObject.layer), setup);
+            Assert.IsFalse(Physics.GetIgnoreCollision(character, ceiling), setup);
+
+            MonoBehaviour movement = (MonoBehaviour)player.GetComponent(RuntimeType("C3TreasurePuzzle.C3FirstPersonController"));
+            Assert.IsNotNull(movement, setup);
+            bool movementEnabled = movement.enabled;
+            Vector3 start = player.transform.position;
+            bool cursorVisible = Cursor.visible;
+            CursorLockMode cursorLock = Cursor.lockState;
+            C3V11CollisionRecorder contacts = null;
+            try
+            {
+                movement.enabled = false;
+                Physics.SyncTransforms();
+                Bounds before = character.bounds;
+                float clearance = ceiling.bounds.min.y - before.max.y;
+                Assert.Greater(clearance, 0.02f, "The spawn capsule must start below the live deck.\n" + setup);
+                Assert.That(before.center.x, Is.InRange(ceiling.bounds.min.x, ceiling.bounds.max.x), setup);
+                Assert.That(before.center.z, Is.InRange(ceiling.bounds.min.z, ceiling.bounds.max.z), setup);
+                // Reach beyond the real underside even if gravity changed the spawn
+                // height. The old fixed 2m move could end below this V11 deck.
+                Vector3 requested = Vector3.up * (clearance + character.radius);
+                Vector3 center = character.transform.TransformPoint(character.center);
+                float halfSegment = Mathf.Max(0f, character.height * 0.5f - character.radius);
+                Vector3 bottom = center - Vector3.up * halfSegment, top = center + Vector3.up * halfSegment;
+                Collider[] overlaps = Physics.OverlapCapsule(bottom, top, character.radius, ~0, QueryTriggerInteraction.Ignore);
+                RaycastHit[] sweep = Physics.CapsuleCastAll(bottom, top, character.radius, Vector3.up,
+                    requested.y, ~0, QueryTriggerInteraction.Ignore);
+                string approach = setup + "\nstart=" + start.ToString("F6") + " clearance=" + clearance +
+                    " requested=" + requested.ToString("F6") + "\ninitial full-radius overlaps (including floor/skin contacts):";
+                foreach (Collider hit in overlaps) approach += "\n  " + CollisionState(hit);
+                foreach (RaycastHit hit in sweep)
+                    approach += "\nsweep=" + CollisionPath(hit.collider.transform) + " distance=" + hit.distance +
+                        " point=" + hit.point.ToString("F6") + " normal=" + hit.normal.ToString("F6");
+                Assert.IsFalse(Array.Exists(overlaps, hit => hit == ceiling), approach);
+                Assert.IsTrue(Array.Exists(sweep, hit => hit.collider == ceiling && hit.normal.y < -0.9f),
+                    "The requested capsule path must intersect the live deck underside.\n" + approach);
+                contacts = player.AddComponent<C3V11CollisionRecorder>();
+                contacts.CaptureDetails = true;
+                CollisionFlags flags = character.Move(requested);
+                string result = approach + "\nactual=" + (player.transform.position - start).ToString("F6") +
+                    " flags=" + flags + " final=" + CollisionState(character);
+                foreach (C3V11CollisionRecorder.ContactEvidence hit in contacts.DetailedContacts)
+                    result += "\ncontact=" + CollisionPath(hit.Collider.transform) + " point=" + hit.Point.ToString("F6") +
+                        " normal=" + hit.Normal.ToString("F6") + " direction=" + hit.MoveDirection.ToString("F6") +
+                        " length=" + hit.MoveLength;
+                Assert.IsTrue((flags & CollisionFlags.Above) != 0, "Upward Move must report a ceiling collision.\n" + result);
+                Assert.IsTrue(contacts.DetailedContacts.Exists(hit => hit.Collider == ceiling && hit.Normal.y < -0.9f),
+                    "An unrelated blocker must not substitute for contact with the live deck.\n" + result);
+                Assert.Greater(character.bounds.max.y, before.max.y + 0.02f, "The controller must actually move upward.\n" + result);
+                Assert.LessOrEqual(character.bounds.max.y, ceiling.bounds.min.y + character.skinWidth,
+                    "The capsule must not pass through the live deck beyond its production skin width.\n" + result);
+                Debug.Log(result);
+            }
+            finally
+            {
+                if (contacts)
+                {
+                    contacts.enabled = false;
+                    UnityEngine.Object.Destroy(contacts);
+                }
+                character.enabled = false;
+                player.transform.position = start;
+                character.enabled = true;
+                Physics.SyncTransforms();
+                movement.enabled = movementEnabled;
+                Cursor.lockState = cursorLock;
+                Cursor.visible = cursorVisible;
+            }
+        }
+
         [UnityTest]
         public IEnumerator RelocatedSpawnConsoleAndDoorTriggerAreReachable()
         {
@@ -510,14 +635,7 @@ namespace M6IntegrationTests
             Vector3 capsuleTop = player.transform.position + Vector3.up * 1.44f;
             foreach (Collider hit in Physics.OverlapCapsule(capsuleBase, capsuleTop, 0.25f, ~0, QueryTriggerInteraction.Ignore))
                 Assert.IsTrue(hit.transform.IsChildOf(player.transform), "Spawn overlaps " + hit.name);
-            Collider blue = GameObject.Find("Cyan_Console").transform.Find("IndicatorLens").GetComponent<Collider>();
-            Assert.IsNotNull(blue);
-            Assert.IsFalse(blue.isTrigger);
-            Assert.Greater(blue.bounds.min.y - character.bounds.max.y, 0.02f);
-            MonoBehaviour spawnMovement = (MonoBehaviour)player.GetComponent(RuntimeType("C3TreasurePuzzle.C3FirstPersonController"));
-            spawnMovement.enabled = false;
-            character.Move(Vector3.up * 2f);
-            Assert.LessOrEqual(character.bounds.max.y, blue.bounds.min.y + 0.1f, "Jump must not pass through the wall fixture.");
+            AssertSpawnCeilingCollision(player, character);
             character.enabled = false;
             player.transform.position = new Vector3(-0.9f, 0.58f, 18.95f);
             character.enabled = true;
