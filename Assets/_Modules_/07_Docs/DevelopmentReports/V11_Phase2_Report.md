@@ -2,6 +2,8 @@
 
 本報告區分**已實作**及**已驗收**。沒有 Unity Editor 的來源檢查不能代表編譯、PlayMode 或遊戲通過。
 
+**最新原生回報（5cd7328）：**使用者實測 CargoFollowsRoute PASS、Phase 2 **17 PASS／1 FAIL**、V9五項及V11七項PASS。OutputConveyor 在 BoxCast 零間隙校準即失敗（約 -2.496mm），尚未進入正式九成品輸送驗證。本次量測修正與所有新提交 NOT RUN 狀態見文末 **OutputConveyor Native Contact Calibration Repair**；以下歷史 PASS 不沿用到新提交。
+
 **後續實測更新：**使用者在 `aee6dc70b0a2b2792e8e18edffc9b0d57127ee49` 回報 Phase 2 **16 PASS／2 FAIL**、V9 **5 PASS**、V11 **7 PASS**。兩項失敗已確認，修正分析及新提交的 NOT RUN 狀態見文末 **Phase 2 Unity PlayMode — Cargo Collision and Output Contact Repair**。以下 A–G 保留初次交付紀錄，不能沿用為新提交 PASS。
 
 - Phase 1 基準：`ed26bfc9e281737e96421be149f7b539eb79326c`。
@@ -324,3 +326,127 @@ Manual Gameplay: NOT RUN
 Windows Unity 2023.1.22f1驗收順序：拉取新SHA→等待編譯；**先單跑 CargoFollowsRoute，再單跑 OutputConveyor（含探測器校準），兩項通過才跑全18項Phase 2→V9五項→V11七項→受影響的VisualFPS／M6流程測試**。有失敗時保留本次完整診斷及XML，不先放寬門檻。
 
 人工再檢查九件正式演示料經三座辨識架無穿模、各三份加工為一成品、壓頭動作、各出口／收集無懸空跳位，以及原啟動／背包／武器／雙梯／二樓走道／PVC／地面入口。正式B→C關卡轉場仍BLOCKED；C側演示不代表B關通關。完成此次提交後停止額外功能開發，維持Draft等待ChatGPT審查與使用者原生驗收。
+
+## OutputConveyor Native Contact Calibration Repair
+
+### A. 原始失敗與原生證據
+
+基準 `5cd7328c27ca8aaa870001b7a46faf9732160336`，使用者在 Windows Unity 2023.1.22f1 回報：
+
+| 項目 | 使用者原生結果（只適用該基準） |
+| --- | --- |
+| CargoFollowsRoute | PASS |
+| OutputConveyor | FAIL |
+| Phase 2 18項 | 17 PASS／1 FAIL |
+| V9五項 | PASS |
+| V11七項 | PASS |
+
+```text
+OutputConveyor (0.573s) — Finite-surface cast calibration
+enabled=True overlap=True depth=0.100000
+direction=(0.000000, 1.000000, 0.000000)
+tangent=True tangentDepth=0.000000
+separatedOverlap=False 1mmGapOverlap=False
+enabled=False overlap=False
+Expected: 0.0f +/- 0.000199999995f
+But was: -0.00249572657f
+ValidateBoxProbe(): 原行211；OutputConveyor(): 原行500
+```
+
+已知幾何為0mm間隙，舊 `hit.distance - ContactLift` 卻回報 **-2.49572657mm**。失敗發生在正式供料前；不能由此推論九件成品已驗證，亦不能推論正式成品真的懸空或穿透。
+
+### B. 根因判斷界線
+
+- **CONFIRMED：**該次啟用探測器成功量得100mm穿透，分離／1mm間隙不算穿透，停用探測器時重疊回false；零間隙 BoxCast 原始距離不符合原±0.2mm校準。
+- **CONFIRMED（來源）：**舊支撐量測直接用掃掠距離減起點高度，沒有把一般命中、起始重疊、無目標及非目標命中獨立分類，且不能依該一次誤差建立通用修正常數。
+- **LIKELY：**未經獨立校準便把 BoxCast 距離當毫米級幾何標尺，是測試方法不可靠的方向；具體 PhysX 數值機制仍需原生資料。
+- **NOT VERIFIED：**contactOffset 是否造成偏差、偏差是否隨尺寸／角度／高度變化，以及正式 Evaluate 是否產生錯誤位置。未硬編碼 +0.00249572657，未改 Physics.defaultContactOffset／Collider.contactOffset，也未改正式成品或帶面高度。
+
+### C. 新的獨立支撐與穿透驗證
+
+量測改為**啟用 BoxCollider＋Physics.ComputePenetration 的受控虛擬位移搜尋**，不再使用 BoxCast 的 hit.distance 決定支撐。所有測試 shape 與真正成品包絡的 size、local center、世界旋轉／位置及scale一致；不搬動正式成品。
+
+1. 從兩個實際 BoxCollider 的 center／size／世界旋轉／scale建立精確旋轉盒；有剪切、無效尺寸／探測器、無實體帶面或不適合承重的垂直面均拒絕。不使用 world AABB 當精確接觸距離。
+2. **保持舊的世界Y距離定義**：正值是成品沿世界 -Y 接近有限帶面所需距離，負值是原位置已低於該上方接觸邊界。不是改用法線距離；斜坡的法線與世界Y距離不混用。沿 -Y 是否能接觸，逐一對真正有限帶面判斷。
+3. 固定尺寸／旋轉下，兩凸盒沿一條直線的正體積重疊集合是單一凸區間。15個分離軸的線性不等式只用來找該有限區間；若側向足跡完全錯開、只有退化邊緣、或沒有正重疊區間，不能假設平移必能接觸。
+4. 搜尋前必須以**原生查詢**確認上方括號分離、區間內見證點真正重疊、第二內部樣本一致，且分離方向朝上並與帶面法線合理相容。側面／端蓋不明接觸回 AmbiguousContact；不是靠解析數字直接PASS。
+5. 只在「已分離→第一個內部重疊見證」的單調子區間做至多32次二分。括號目標寬度20µm是數值停止條件，**不是已證實的原生精度，也不加到3mm上限**。原生校準仍要求已知間隙誤差≤0.2mm。
+6. 接受的條件是間隙**上界≤原3mm**；若不確定區間跨過3mm，回 AmbiguousContact 並FAIL，而非自動放寬。0.5mm括號／見證偏移僅用來建立經查證的搜尋區間，並非加在量測結果的偏差補償。
+
+結果明確分成 ValidSupport、Unsupported、ExcessiveGap、ExcessivePenetration、InvalidProbe、NoSurface、AmbiguousContact，並獨立保存原位置是否穿透、深度及方向。ValidSupport不代表沒有穿透；原本對所有鄰近實體的 OverlapBox＋ComputePenetration 檢查仍須另外通過，成品穿透上限仍10mm、未放寬。明確穿入20mm必須回報；完全位於帶面下方但已分離的物件判Unsupported，不能誤報為接觸或原位置穿透。
+
+正式測試仍只允許 current／相鄰帶面及原有合理加工床提供支撐。可由其中一段獨立承重，不要求所有鄰段都一定接觸；不把護邊、機殼、支架或其他成品當帶面。
+
+**BoxCast保留為只讀診斷**：記錄 probe名稱／enabled／isTrigger／local center／size／scale、parked pose與查詢pose、支撐collider／Bounds／位置／旋轉／法線／contactOffset、Physics.defaultContactOffset、起始center／halfExtents／方向／範圍、hit.distance／point／normal及未信任的舊間隙；校準另外記錄已知間隙及原始BoxCast差值。Native ComputePenetration先辨識起始重疊，區分NormalHit／InitialOverlap／NoValidTargetHit／NonTargetHit；啟用／停用探測器均觀察原始查詢，停用時的起點狀態標示未驗證，不拿零距離當合法接觸。
+
+### D. 原生校準矩陣（已實作，全部尚未執行）
+
+| 校準案例 | 應有結果 | 本環境結果 |
+| --- | --- | --- |
+| 0mm接觸 | 支撐；不要求切線ComputePenetration一定回true | NOT RUN |
+| 1mm／2mm／2.9mm | 支撐 | NOT RUN |
+| 3.1mm／10mm | 拒絕 | NOT RUN |
+| 20mm明確穿入 | 獨立穿透旗標／深度及ExcessivePenetration，不能當正常接觸 | NOT RUN |
+| 無允許的帶面／帶面外側 | NoSurface或Unsupported | NOT RUN |
+| 分離但位於帶面下方 | Unsupported，原位置穿透=false | NOT RUN |
+| 停用探測器 | InvalidProbe；啟用／停用查詢影響另記錄 | NOT RUN |
+| 水平單位盒與實際成品尺寸 | 已知間隙結果一致 | NOT RUN |
+| ±30°傾斜、不同位置／非等比支撐scale | 維持相同世界Y間隙標準 | NOT RUN |
+| 旋轉成品、非零local center、15°成品對30°帶面 | 真旋轉盒量測，不用AABB | NOT RUN |
+| 小型有限支撐面／部分外緣 | 有真實接觸才支撐 | NOT RUN |
+| 完全越出有限外緣 | 拒絕 | NOT RUN |
+| 平接點、水平接斜坡、只有相鄰段承重 | 合法段可獨立承重，端蓋不明接觸不硬當有效 | NOT RUN |
+| 中間無帶面的斷接點 | 拒絕 | NOT RUN |
+| 只有非目標護邊／已收集成品 | 不算帶面；其真實穿透正向控制另查 | NOT RUN |
+| 5／20／80mm掃掠起高、尺寸／角度變化 | 觀察BoxCast原始差異，不用固定偏差修正 | NOT RUN |
+
+九組已知幾何系列各測六種間隙，共54個原生間隙條件，加上上述正反控制，均在 OutputConveyor 正式供料前執行。校準失敗會提供 Case、Expected／Measured／差值、完整查詢參數、原生見證、邊界上下界／分類、起始重疊及不同掃掠高度資料；正常影格不刷Log。
+
+控制物件清楚命名為P2_TEST_QUERY_CONTROL／CONTACT_GUARD／COLLECTED_PRODUCT／CONTACT_JOINT。啟用探測器為工廠外Trigger、無Rigidbody，不改全域物理設定、加工統計或事件訂閱；所有臨時物件皆由finally清理，失敗亦清理。
+
+### E. 正式成品驗證與生產程式比較
+
+保留 `27份手動測試原料→9成品`（每類9→3）的逐幀壓力測試，原九成品／1600取樣上限、Batch ID／Material Type／三個Source ID／GO身份、<.18m單步、加工後才形成、全部四個出口段、三個收集格及左→右→中順序均保留。正式遊戲仍是原九份演示→三成品。
+
+| 正式項目 | 最新提交原生結果 |
+| --- | --- |
+| Paper／Metal／Plastic各出口 | NOT RUN |
+| 九成品容量／ID與來源身份 | NOT RUN |
+| 加工床→出料床→機內斜帶→正式出口→收集床 | NOT RUN |
+| 連續位移／旋轉／有限帶面支撐 | NOT RUN |
+| 機殼／護邊／支架／其他成品穿透 | NOT RUN |
+| 收集格位置／完成狀態 | NOT RUN |
+
+如校準通過後正式成品失敗，診斷除上述資料外，提供Batch／Type／Source IDs、路段、名稱、位置／旋轉、收集狀態、各段端點／實際Path端點、支撐collider、原位置穿透深度／方向。並只讀重查原 `TransportPath.Evaluate`、依未改動來源重建其起始高度／halfExtents／方向／範圍，列出正式BoxCast允許／非目標命中及回傳位置對實際位置的差異，與獨立量測比較。
+
+**沒有修改正式 Evaluate、Move、PrepareProduct、TickProducts 或設備。**原生校準在此環境未執行，沒有證據可改正式帶面／成品高度；正式成品是否真的懸空／穿透仍是NOT VERIFIED。
+
+### F. 保護範圍、來源檢查與交付
+
+只修改：
+
+- `Assets/_Modules_/05_Testing/PlayMode/C3V11Phase2RecyclingLineTests.cs`
+- `Assets/_Modules_/07_Docs/DevelopmentReports/V11_Phase2_Report.md`
+
+CargoFollowsRoute及其helper、其餘17項UnityTest本體、V9／V11整檔、所有生產程式／Scene／meta／Packages／ProjectSettings均與5cd7328比對保留；OutputConveyor本體只有量測結果型別由float改為具狀態／上下界的結果，原逐幀與最終斷言保留。辨識架、30段設備、3→1／2.5秒、ID／收據、左→右→中、樓梯／護欄／柱管線／PVC／晶片／工作台／背包／FPS／武器／進度皆未改。
+
+| 檢查 | 本次結果及界線 |
+| --- | --- |
+| git diff --check | PASS（來源格式） |
+| C# AST／IEnumerator來源檢查 | PASS（來源）；110個檔、936個方法、122個IEnumerator；不是型別／Unity編譯 |
+| 範圍／原斷言／metadata／無不必要檔案 | PASS（來源）；僅兩檔，無新資源或meta需求 |
+| Unity 2023.1 API來源檢查 | 使用既有ComputePenetration／BoxCastAll與標準Collider／Transform／Math API，無新增套件或NUnit屬性；編譯仍NOT RUN |
+| 支撐上限／全域設定 | 3mm原值不變，未加固定BoxCast偏差，未寫入任何全域Physics參數 |
+| 數學區間／正反案例來源驗證 | PASS（來源）；42個已知間隙、斜坡與相對旋轉條件，以及外緣／斷帶／永真永假查詢替身拒絕；不是Unity／PhysX執行 |
+| 原生校準矩陣／OutputConveyor／全18項Phase 2 | NOT RUN（新提交） |
+| V9五項／V11七項／VisualFPS／M6輔助回歸 | NOT RUN（新提交），不沿用使用者基準PASS |
+
+```text
+Unity Compilation: NOT RUN
+Unity PlayMode: NOT RUN
+Manual Gameplay: NOT RUN
+```
+
+本環境沒有Unity Editor。分支維持 `feature/v11-phase2-recycling-line`，更新原Draft PR #3，Base仍為 `feature/v11-factory-rebuild`；PR #2、Phase 1及main不改，不強制推送、不另開分支／PR、不合併。
+
+使用者驗收：Pull新SHA→Unity 2023.1.22f1等待編譯、檢查Console→**先單跑 OutputConveyor，確認校準完成且九成品正式輸送全部完成**→全18項Phase 2→V9五項→V11七項→受影響VisualFPS／M6→人工觀察正式九原料／三成品、辨識架、加工、三出口與收集沒有懸空／穿模／跳位，並驗雙梯／走道／護欄／PVC／晶片／背包／武器。有失敗保留完整新診斷與XML，不先放寬容差或改正式模型。B→C完整關卡仍 `BLOCKED — Level02 scene unavailable`。推送後停止額外功能開發，維持Draft等待ChatGPT審查與使用者原生驗收。
