@@ -118,7 +118,7 @@ namespace M6IntegrationTests
                 Assert.Greater(station.GetComponents<MonoBehaviour>().Length,0,"Real interaction removed: "+name);
                 Assert.IsTrue(station.GetComponent<Collider>().enabled);
             }
-            Assert.IsNotNull(Find("C3TreasurePuzzle.C3ExitDoor"));
+            Assert.IsNotNull(Find("C3TreasurePuzzle.C3ExitTrigger"));
             StartAt(new Vector3(-12.35f,.60f,2.1f));
             yield return WalkTo(new Vector3(-12.35f,.56f,6.1f));
             yield return WalkTo(new Vector3(-12.35f,.56f,2.1f));
@@ -128,6 +128,12 @@ namespace M6IntegrationTests
             Collider[] cages=Object.FindObjectsOfType<BoxCollider>().Where(c=>c.name=="Bin lateral welded rail" ||
                 c.name=="Bin end welded rail" || c.name=="Refuse cage metal upright" || c.name=="SORTING BIN - input refuse floor").Cast<Collider>().ToArray();
             Assert.AreEqual(39,cages.Length); Assert.IsTrue(cages.All(c=>c.enabled && !c.isTrigger));
+            foreach (Collider c in cages)
+            {
+                Renderer renderer=c.GetComponent<Renderer>(); Assert.IsNotNull(renderer);
+                Assert.Less(Vector3.Distance(c.bounds.center,renderer.bounds.center),.001f);
+                Assert.Less(Vector3.Distance(c.bounds.size,renderer.bounds.size),.001f);
+            }
             foreach (float height in new[] {1.8f,.75f})
             {
                 StartAt(new Vector3(-19.5f,.60f,20.1f),height);
@@ -145,6 +151,9 @@ namespace M6IntegrationTests
             Assert.AreEqual(3,vessels.Length); Assert.IsTrue(vessels.All(c=>c.enabled && !c.isTrigger));
             foreach (Collider vessel in vessels)
             {
+                Renderer renderer=vessel.GetComponent<Renderer>();
+                Assert.Less(Vector3.Distance(vessel.bounds.center,renderer.bounds.center),.001f);
+                Assert.Less(Vector3.Distance(vessel.bounds.size,renderer.bounds.size),.001f);
                 StartAt(new Vector3(-3.8f,.84f,vessel.transform.position.z));
                 contacts.SideContacts.Clear();
                 bool touched=false;
@@ -156,11 +165,13 @@ namespace M6IntegrationTests
                 Assert.IsTrue(touched && contacts.SideContacts.Contains(vessel),"No native player/vessel contact");
                 Assert.Less(player.transform.position.x,-3.15f,"Player entered purifier body");
             }
-            foreach (string name in new[] {"WASTEWATER treatment grated foundation","POLLUTION pressure controller","POLLUTION controller mounting arm"})
+            foreach (string name in new[] {"WASTEWATER treatment grated foundation","POLLUTION pressure controller","POLLUTION controller mounting arm","Purifier flange lower","Purifier flange upper"})
             {
                 Collider[] parts=Object.FindObjectsOfType<Collider>().Where(c=>c.name==name).ToArray();
                 Assert.AreEqual(name.StartsWith("WASTEWATER")?1:3,parts.Length,name);
                 Assert.IsTrue(parts.All(c=>c.enabled && !c.isTrigger),name);
+                foreach (Collider part in parts)
+                    Assert.Less(Vector3.Distance(part.bounds.size,part.GetComponent<Renderer>().bounds.size),.001f,"Oversized invisible collider: "+name);
             }
         }
         [UnityTest] public IEnumerator UpperSupportsStayBelowDeckAndLeaveBothStancesAThroughRoute()

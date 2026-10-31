@@ -17,7 +17,7 @@ namespace M6IntegrationTests
             for (int i=0;i<count;i++) Call(line,"AdvanceSimulation",.05f);
             Physics.SyncTransforms();
         }
-        internal static void Activate(Component device)
+        internal static void Activate(Component device,bool run=true)
         {
             Component progress=Find("C3TreasurePuzzle.C3TreasureProgress");
             foreach (string id in new[] {"fuse","control_chip","filter_module"}) Assert.IsTrue((bool)Call(progress,"TryCollect",id,id));
@@ -25,7 +25,7 @@ namespace M6IntegrationTests
             string[] names={"Sorting","Recycling","PollutionTreatment"};
             for (int i=0;i<3;i++) answer.SetValue(Enum.Parse(step,names[i]),i);
             Assert.IsTrue((bool)Call(Find("C3TreasurePuzzle.C3PuzzleState"),"SubmitAnswer",answer));
-            Assert.IsTrue((bool)Call(device,"TryActivate")); Call(device,"NotifyStartupFinished");
+            Assert.IsTrue((bool)Call(device,"TryActivate")); if (run) Call(device,"NotifyStartupFinished");
         }
         internal static void Supply(Component line,string kind,int units=3,string prefix="art")
         {

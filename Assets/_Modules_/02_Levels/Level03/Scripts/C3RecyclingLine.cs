@@ -149,13 +149,75 @@ namespace C3TreasurePuzzle
                 position.y=startY-drop+.001f;
             }
         }
-        private sealed class MachineWork
+        internal sealed class MachineWork
         {
             public readonly MaterialRecord[] Slots=new MaterialRecord[UnitsPerBale];
             public bool Processing;
             public float Elapsed;
             public int Completed;
             public FinishedBatch Prepared;
+        }
+        public sealed class RecyclingSession
+        {
+            public string SessionId { get; private set; }
+            public bool IsPresentation { get; private set; }
+            public Transform ObjectRoot { get; internal set; }
+            public IReadOnlyList<MaterialRecord> Materials => Records;
+            public IReadOnlyList<FinishedBatch> Products => Batches;
+            public float ElapsedSeconds { get; internal set; }
+            public int ReceiptsCommitted { get; internal set; }
+            public int MaximumObjectCount { get; internal set; }
+            internal readonly List<MaterialRecord> Records;
+            internal readonly List<FinishedBatch> Batches;
+            internal readonly HashSet<string> Accepted;
+            internal readonly MachineWork[] Work;
+            internal float ReleaseClock;
+            internal RecyclingSession(string id,bool presentation,Transform root,List<MaterialRecord> input=null,
+                List<FinishedBatch> output=null,HashSet<string> ids=null,MachineWork[] machines=null)
+            {
+                SessionId=id; IsPresentation=presentation; ObjectRoot=root;
+                Records=input??new List<MaterialRecord>(); Batches=output??new List<FinishedBatch>();
+                Accepted=ids??new HashSet<string>(StringComparer.Ordinal);
+                Work=machines??new[] {new MachineWork(),new MachineWork(),new MachineWork()};
+            }
+        }
+        public enum PresentationState { None,Running,Completed,Cancelled,Failed }
+        public sealed class PresentedMaterial
+        {
+            public string MaterialId { get; internal set; }
+            public EcoRecycleCargo.Kind MaterialType { get; internal set; }
+            public int ObjectId { get; internal set; }
+            public int TargetMachine { get; internal set; }
+            public C3MaterialState[] History { get; internal set; }
+            public bool ProcessingComplete { get; internal set; }
+            public bool Counted { get; internal set; }
+        }
+        public sealed class PresentedProduct
+        {
+            public string BatchId { get; internal set; }
+            public EcoRecycleCargo.Kind MaterialType { get; internal set; }
+            public string[] SourceMaterialIds { get; internal set; }
+            public int ObjectId { get; internal set; }
+            public Vector3 Position { get; internal set; }
+            public Quaternion Rotation { get; internal set; }
+            public bool Collected { get; internal set; }
+            public bool OutputReached { get; internal set; }
+        }
+        public sealed class PresentationResult
+        {
+            public string SessionId { get; internal set; }
+            public PresentationState State { get; internal set; }
+            public PresentedMaterial[] Materials { get; internal set; }
+            public PresentedProduct[] Products { get; internal set; }
+            public int ReceiptsCommitted { get; internal set; }
+            public int MaximumObjectCount { get; internal set; }
+            public float ElapsedSeconds { get; internal set; }
+            public string Failure { get; internal set; }
+        }
+        private sealed class FormalVisibility
+        {
+            public GameObject Object;
+            public bool Active;
         }
         private C3DeviceState device;
         private C3RecyclingLineGeometry geometry;
@@ -166,8 +228,29 @@ namespace C3TreasurePuzzle
         private readonly HashSet<string> accepted=new HashSet<string>(StringComparer.Ordinal);
         private readonly MachineWork[] work={new MachineWork(),new MachineWork(),new MachineWork()};
         private bool supplied;
-        private float releaseClock;
         private string runId;
+        private RecyclingSession official,presentation;
+        private readonly List<FormalVisibility> formalVisibility=new List<FormalVisibility>();
+        public RecyclingSession ActivePresentation => presentation;
+        public PresentationResult LastPresentation { get; private set; }
+        public PresentationState PresentationStatus => presentation!=null?PresentationState.Running:
+            LastPresentation!=null?LastPresentation.State:PresentationState.None;
+        public bool FirstProductionCollected => records.Count==9 && batches.Count==3 &&
+            records.All(r=>r.ProcessingComplete && r.Counted && r.State==C3MaterialState.Collected) && batches.All(b=>b.Collected);
+        public bool CanStartPresentation => isActiveAndEnabled && device && device.FactoryState==C3FactoryState.Running &&
+            FirstProductionCollected && presentation==null && !C3CompletionScreen.BlocksGameplayInputThisFrame;
+        public string PresentationProgress
+        {
+            get
+            {
+                if (presentation!=null) return "展示進行中：進料 "+presentation.Records.Count(r=>r.State!=C3MaterialState.Spawned)+
+                    "/9，加工 "+presentation.Batches.Count+"/3，收集 "+presentation.Batches.Count(b=>b.Collected)+"/3。";
+                if (!device || device.FactoryState!=C3FactoryState.Running) return "工廠尚未進入運作狀態。";
+                if (!FirstProductionCollected) return "請等待第一次正式加工及三件成品收集完成。";
+                if (LastPresentation!=null && LastPresentation.State==PresentationState.Failed) return "展示已停止，可再次播放。";
+                return LastPresentation!=null && LastPresentation.State==PresentationState.Completed?"展示已完成，可再次播放。":"可開始產線展示。";
+            }
+        }
         private EcoRecycleCargo.Kind lastCompleted=EcoRecycleCargo.Kind.Plastic;
         // Envelope includes the visible bale straps; body is slightly inset.
         public static readonly Vector3 ProductSize=new Vector3(.52f,.43f,.51f);
@@ -206,12 +289,19 @@ namespace C3TreasurePuzzle
             runId=Guid.NewGuid().ToString("N");
             cargoRoot=new GameObject("P2_TRACKED_MATERIALS").transform;
             cargoRoot.SetParent(geometry.BuildRoot,false);
+            official=new RecyclingSession(runId,false,cargoRoot,records,batches,accepted,work);
+        }
+        private void OnEnable() { if (device) device.Completed+=CancelPresentation; }
+        private void OnDisable()
+        {
+            if (device) device.Completed-=CancelPresentation;
+            CancelPresentation();
         }
         private bool CanAccept(string id,EcoRecycleCargo.Kind kind)
         {
             EcoAdventureRuntime runtime=EcoAdventureRuntime.Instance;
             int machine=MachineIndex(kind);
-            return gameObject.activeInHierarchy && device.FactoryState!=C3FactoryState.Completed &&
+            return gameObject.activeInHierarchy && presentation==null && device.FactoryState!=C3FactoryState.Completed &&
                 runtime && machine>=0 && !string.IsNullOrWhiteSpace(id) && id.Length<=128 &&
                 !accepted.Contains(id) && !runtime.HasRecyclingReceipt(id) &&
                 records.Count(r=>r.TargetMachine==machine)<UnitsPerBale*BalesPerMachineCapacity &&
@@ -220,15 +310,19 @@ namespace C3TreasurePuzzle
         public bool TrySupply(string id,EcoRecycleCargo.Kind kind)
         {
             if (!CanAccept(id,kind)) return false;
-            GameObject item=new GameObject("P2_RAW_"+id);
-            item.transform.SetParent(cargoRoot,false);
+            CreateCargo(official,id,kind); return true;
+        }
+        private void CreateCargo(RecyclingSession session,string id,EcoRecycleCargo.Kind kind)
+        {
+            GameObject item=new GameObject((session.IsPresentation?"P22_RAW_":"P2_RAW_")+id);
+            item.transform.SetParent(session.ObjectRoot,false);
             item.transform.position=geometry.BMaterialInterface.position+Vector3.up*C3RecyclingLineGeometry.RawRadius;
             try
             {
-                visuals.CreateRaw(kind,records.Count(r=>r.MaterialType==kind)%C3RecyclingVisuals.VariantsPerMaterial,item.transform);
+                visuals.CreateRaw(kind,session.Records.Count(r=>r.MaterialType==kind)%C3RecyclingVisuals.VariantsPerMaterial,item.transform);
                 EcoRecycleCargo cargo=item.AddComponent<EcoRecycleCargo>();
                 cargo.materialId=id; cargo.materialType=kind;
-                Admit(cargo); return true;
+                Admit(cargo,session);
             }
             catch { item.SetActive(false); Destroy(item); throw; }
         }
@@ -245,12 +339,13 @@ namespace C3TreasurePuzzle
                 Vector3.Distance(cargo.transform.lossyScale,Vector3.one)>.001f) return false;
             Renderer[] renderers=cargo.GetComponentsInChildren<Renderer>(true);
             if (renderers.Length==0 || renderers.Any(r=>r.bounds.size.magnitude>.43f) || !C3RecyclingVisuals.FitsRawEnvelope(cargo.transform)) return false;
-            Admit(cargo); return true;
+            Admit(cargo,official); return true;
         }
-        private void Admit(EcoRecycleCargo cargo)
+        private void Admit(EcoRecycleCargo cargo,RecyclingSession session)
         {
-            accepted.Add(cargo.materialId); cargo.lineOwned=true;
-            cargo.transform.SetParent(cargoRoot,true);
+            if (!session.Accepted.Add(cargo.materialId)) throw new InvalidOperationException("Duplicate session material ID");
+            cargo.lineOwned=true;
+            cargo.transform.SetParent(session.ObjectRoot,true);
             MaterialRecord record=new MaterialRecord {MaterialId=cargo.materialId,MaterialType=cargo.materialType,
                 TargetMachine=MachineIndex(cargo.materialType),Cargo=cargo,State=C3MaterialState.Spawned};
             record.Visual=C3RecyclingVisuals.UnifyRawVisualRoot(cargo.transform);
@@ -261,7 +356,7 @@ namespace C3TreasurePuzzle
             record.Path.Legs.Add(new Leg {A=geometry.MainBelt.Start.position,
                 B=geometry.Machines[record.TargetMachine].Chute.Start.position,Support=geometry.MainBelt.Surface});
             record.Cargo.gameObject.SetActive(false);
-            records.Add(record);
+            session.Records.Add(record);
         }
         private static void Transition(MaterialRecord record,C3MaterialState next)
         {
@@ -280,17 +375,37 @@ namespace C3TreasurePuzzle
                 for (int i=0;i<9;i++) TrySupply("DEMO-"+runId+"-"+i,
                     i%3==0?EcoRecycleCargo.Kind.Plastic:i%3==1?EcoRecycleCargo.Kind.Metal:EcoRecycleCargo.Kind.Paper);
             }
-            releaseClock+=dt;
-            MaterialRecord waiting=records.FirstOrDefault(r=>r.State==C3MaterialState.Spawned);
-            if (waiting!=null && releaseClock>=.45f && records.Where(OnPrimary).All(r=>r.Distance>MinimumSpacing))
+            if (presentation!=null)
             {
-                releaseClock=0f; Transition(waiting,C3MaterialState.Feeding);
+                if (device.FactoryState!=C3FactoryState.Running) { CancelPresentation(); return; }
+                try
+                {
+                    TickSession(presentation,dt);
+                    if (presentation.Batches.Count==3 && presentation.Batches.All(b=>b.Collected))
+                        FinishPresentation(PresentationState.Completed,"");
+                }
+                catch (Exception error)
+                {
+                    FinishPresentation(PresentationState.Failed,error.Message);
+                    Debug.LogException(error,this);
+                }
+            }
+            else TickSession(official,dt);
+        }
+        private void TickSession(RecyclingSession session,float dt)
+        {
+            List<MaterialRecord> records=session.Records; MachineWork[] work=session.Work;
+            session.ElapsedSeconds+=dt; session.ReleaseClock+=dt;
+            MaterialRecord waiting=records.FirstOrDefault(r=>r.State==C3MaterialState.Spawned);
+            if (waiting!=null && session.ReleaseClock>=.45f && records.Where(OnPrimary).All(r=>r.Distance>MinimumSpacing))
+            {
+                session.ReleaseClock=0f; Transition(waiting,C3MaterialState.Feeding);
                 waiting.Cargo.gameObject.SetActive(true); PlaceRaw(waiting);
             }
             MaterialRecord[] alreadyDiverting=records.Where(r=>r.State==C3MaterialState.Diverting).ToArray();
             foreach (MaterialRecord record in records.Where(OnPrimary).OrderByDescending(r=>r.Distance).ToArray())
             {
-                if (record.State==C3MaterialState.Identified) { TryDivert(record); continue; }
+                if (record.State==C3MaterialState.Identified) { TryDivert(record,session); continue; }
                 float next=Mathf.Min(record.Path.Length,record.Distance+TransportSpeed*dt);
                 foreach (MaterialRecord ahead in records.Where(OnPrimary))
                     if (ahead!=record && ahead.Distance>record.Distance+.001f) next=Mathf.Min(next,ahead.Distance-MinimumSpacing);
@@ -300,7 +415,7 @@ namespace C3TreasurePuzzle
                 if (record.Distance>=record.Path.Length-.0001f)
                 {
                     if (record.State==C3MaterialState.Feeding) Transition(record,C3MaterialState.MainBelt);
-                    Transition(record,C3MaterialState.Identified); TryDivert(record);
+                    Transition(record,C3MaterialState.Identified); TryDivert(record,session);
                 }
             }
             foreach (MaterialRecord record in alreadyDiverting)
@@ -314,8 +429,8 @@ namespace C3TreasurePuzzle
                     r.State==C3MaterialState.Diverting && r.Distance<geometry.Machines[lane].Chute.Length);
                 geometry.SetDiverter(lane,atGate!=null?atGate.Distance/geometry.Machines[lane].Chute.Length:0f,atGate!=null,dt);
             }
-            TickProducts(dt);
-            TickMachines(dt);
+            TickProducts(session,dt);
+            TickMachines(session,dt);
             geometry.AnimateRollers(dt);
         }
         private static bool OnPrimary(MaterialRecord record) => record.State==C3MaterialState.Feeding ||
@@ -333,9 +448,9 @@ namespace C3TreasurePuzzle
                 C3RecyclingLineGeometry.RawRadius,Vector3.zero,out segment);
             record.CurrentRouteSegment=segment;
         }
-        private void TryDivert(MaterialRecord record)
+        private void TryDivert(MaterialRecord record,RecyclingSession session)
         {
-            MachineWork machine=work[record.TargetMachine];
+            MachineWork machine=session.Work[record.TargetMachine];
             int slot=Array.FindIndex(machine.Slots,r=>r==null);
             if (slot<0) return;
             machine.Slots[slot]=record; record.Slot=slot;
@@ -346,8 +461,9 @@ namespace C3TreasurePuzzle
                 B=model.Tray.position+new Vector3((slot-1)*.32f,0f,-.2f),Support=model.ProcessBed});
             record.Distance=0f; Transition(record,C3MaterialState.Diverting); PlaceRaw(record);
         }
-        private void TickMachines(float dt)
+        private void TickMachines(RecyclingSession session,float dt)
         {
+            MachineWork[] work=session.Work;
             for (int lane=0;lane<work.Length;lane++)
             {
                 MachineWork machine=work[lane];
@@ -371,33 +487,44 @@ namespace C3TreasurePuzzle
                         new Vector3((record.Slot-1)*.32f,C3RecyclingLineGeometry.RawRadius*squash,-.2f);
                 }
                 if (machine.Elapsed<ProcessingSeconds) continue;
-                if (machine.Prepared==null) machine.Prepared=PrepareProduct(lane,machine);
-                EcoAdventureRuntime runtime=EcoAdventureRuntime.Instance;
+                if (machine.Prepared==null) machine.Prepared=PrepareProduct(lane,machine,session);
                 FinishedBatch batch=machine.Prepared;
-                if (!runtime || !runtime.TryCommitRecyclingBatch(batch.BatchId,batch.MaterialType,batch.SourceMaterialIds))
+                if (!CommitBatch(session,batch))
                 {
                     LastBlockedReason="Processing receipt rejected; no output or duplicate credit emitted: "+batch.BatchId;
                     continue;
                 }
                 foreach (MaterialRecord record in machine.Slots)
                 {
-                    record.Counted=record.ProcessingComplete=record.ProductCreated=true;
+                    record.Counted=!session.IsPresentation;
+                    record.ProcessingComplete=record.ProductCreated=true;
                     record.BatchId=batch.BatchId; record.Cargo.processed=true;
                     record.CurrentRouteSegment=0;
                     Transition(record,C3MaterialState.OutputReady);
                     record.Cargo.gameObject.SetActive(false);
                 }
-                batch.Product.gameObject.SetActive(true); batches.Add(batch);
-                lastCompleted=batch.MaterialType; machine.Completed++;
+                batch.Product.gameObject.SetActive(true); session.Batches.Add(batch);
+                if (!session.IsPresentation) lastCompleted=batch.MaterialType;
+                machine.Completed++;
                 machine.Processing=false; machine.Elapsed=0f; machine.Prepared=null;
                 Array.Clear(machine.Slots,0,machine.Slots.Length);
                 geometry.SetPress(lane,0f); LastBlockedReason="";
-                BatchCompleted?.Invoke(batch.BatchId);
+                if (!session.IsPresentation) BatchCompleted?.Invoke(batch.BatchId);
+                else session.MaximumObjectCount=Mathf.Max(session.MaximumObjectCount,session.ObjectRoot.GetComponentsInChildren<Transform>(true).Length);
             }
         }
-        private FinishedBatch PrepareProduct(int lane,MachineWork machine)
+        private bool CommitBatch(RecyclingSession session,FinishedBatch batch)
         {
-            string id=runId+"/"+lane+"/"+machine.Completed;
+            // This is a behavioural boundary, not merely a different ID prefix.
+            // Presentations NEVER enter the runtime transaction or formal events.
+            if (session.IsPresentation) return true;
+            EcoAdventureRuntime runtime=EcoAdventureRuntime.Instance;
+            if (!runtime || !runtime.TryCommitRecyclingBatch(batch.BatchId,batch.MaterialType,batch.SourceMaterialIds)) return false;
+            session.ReceiptsCommitted++; return true;
+        }
+        private FinishedBatch PrepareProduct(int lane,MachineWork machine,RecyclingSession session)
+        {
+            string id=session.SessionId+"/"+lane+"/"+machine.Completed;
             FinishedBatch batch=new FinishedBatch {BatchId=id,MaterialType=machine.Slots[0].MaterialType,
                 SourceMaterialIds=machine.Slots.Select(r=>r.MaterialId).ToArray(),
                 Path=new TransportPath {ExitForward=Vector3.back}};
@@ -411,24 +538,24 @@ namespace C3TreasurePuzzle
             // Validate the physical output before allocating scene objects. A
             // broken/missing surface must not leak a new hidden bale each retry.
             batch.Path.Evaluate(0f,0f,ProductSize,out Vector3 position,out Quaternion rotation,out _);
-            GameObject item=new GameObject("P2_FINISHED_"+machine.Slots[0].MaterialType+"_"+id);
-            item.transform.SetParent(cargoRoot,false); item.SetActive(false);
+            GameObject item=new GameObject((session.IsPresentation?"P22_FINISHED_":"P2_FINISHED_")+machine.Slots[0].MaterialType+"_"+id);
+            item.transform.SetParent(session.ObjectRoot,false); item.SetActive(false);
             try { visuals.CreateBale(batch.MaterialType,item.transform); }
             catch { item.SetActive(false); Destroy(item); throw; }
             batch.Product=item.transform;
             item.transform.SetPositionAndRotation(position,rotation);
             return batch;
         }
-        private void TickProducts(float dt)
+        private void TickProducts(RecyclingSession session,float dt)
         {
-            foreach (FinishedBatch batch in batches)
+            foreach (FinishedBatch batch in session.Batches)
             {
                 if (batch.Collected) continue;
                 int segment;
                 batch.Distance=batch.Path.Move(batch.Product,batch.Distance,
                     Mathf.Min(batch.Path.Length,batch.Distance+2f*dt),2f*dt,0f,ProductSize,out segment);
                 batch.CurrentRouteSegment=segment;
-                MaterialRecord[] source=records.Where(r=>r.BatchId==batch.BatchId).ToArray();
+                MaterialRecord[] source=session.Records.Where(r=>r.BatchId==batch.BatchId).ToArray();
                 foreach (MaterialRecord record in source) record.CurrentRouteSegment=segment;
                 if (!batch.OutputReached && batch.Distance>=batch.OutputDistance)
                 {
@@ -441,8 +568,86 @@ namespace C3TreasurePuzzle
                 BoxCollider collider=batch.Product.gameObject.AddComponent<BoxCollider>(); collider.size=ProductSize;
             }
         }
+        internal bool TryStartPresentation(C3PuzzleConsole console)
+        {
+            if (!CanStartPresentation || !console || !console.AuthorizesPresentation(this,device)) return false;
+            string id="PRESENTATION-"+Guid.NewGuid().ToString("N");
+            Transform root=new GameObject("P22_PRESENTATION_"+id).transform; root.SetParent(geometry.BuildRoot,false);
+            presentation=new RecyclingSession(id,true,root);
+            try
+            {
+                foreach (FinishedBatch batch in batches)
+                {
+                    GameObject product=batch.Product.gameObject;
+                    formalVisibility.Add(new FormalVisibility {Object=product,Active=product.activeSelf});
+                    // Inactive objects remove BOTH renderers and colliders from
+                    // the world; their individual enabled states remain intact.
+                    product.SetActive(false);
+                }
+                for (int i=0;i<9;i++)
+                    CreateCargo(presentation,id+"/raw/"+i,i%3==0?EcoRecycleCargo.Kind.Plastic:
+                        i%3==1?EcoRecycleCargo.Kind.Metal:EcoRecycleCargo.Kind.Paper);
+                presentation.MaximumObjectCount=root.GetComponentsInChildren<Transform>(true).Length;
+                return true;
+            }
+            catch (Exception error)
+            {
+                FinishPresentation(PresentationState.Failed,error.Message);
+                Debug.LogException(error,this); return false;
+            }
+        }
+        public void CancelPresentation()
+        {
+            if (presentation!=null) FinishPresentation(PresentationState.Cancelled,"");
+        }
+        private void FinishPresentation(PresentationState state,string failure)
+        {
+            RecyclingSession session=presentation;
+            if (session==null) return;
+            presentation=null;
+            try
+            {
+                LastPresentation=new PresentationResult {
+                    SessionId=session.SessionId,State=state,ReceiptsCommitted=session.ReceiptsCommitted,
+                    MaximumObjectCount=session.MaximumObjectCount,ElapsedSeconds=session.ElapsedSeconds,Failure=failure,
+                    Materials=session.Records.Select(r=>new PresentedMaterial {
+                        MaterialId=r.MaterialId,MaterialType=r.MaterialType,TargetMachine=r.TargetMachine,
+                        ObjectId=r.Cargo?r.Cargo.GetInstanceID():0,History=r.History.ToArray(),
+                        ProcessingComplete=r.ProcessingComplete,Counted=r.Counted }).ToArray(),
+                    Products=session.Batches.Select(b=>new PresentedProduct {
+                        BatchId=b.BatchId,MaterialType=b.MaterialType,SourceMaterialIds=(string[])b.SourceMaterialIds.Clone(),
+                        ObjectId=b.Product?b.Product.GetInstanceID():0,Position=b.Product?b.Product.position:Vector3.zero,
+                        Rotation=b.Product?b.Product.rotation:Quaternion.identity,Collected=b.Collected,OutputReached=b.OutputReached }).ToArray()
+                };
+            }
+            finally
+            {
+                try
+                {
+                    if (session.ObjectRoot) { session.ObjectRoot.gameObject.SetActive(false); Destroy(session.ObjectRoot.gameObject); }
+                    session.ObjectRoot=null;
+                    foreach (MachineWork machine in session.Work)
+                    {
+                        Array.Clear(machine.Slots,0,machine.Slots.Length); machine.Prepared=null;
+                        machine.Processing=false; machine.Elapsed=0; machine.Completed=0;
+                    }
+                    session.Records.Clear(); session.Batches.Clear(); session.Accepted.Clear();
+                }
+                finally
+                {
+                    foreach (FormalVisibility saved in formalVisibility)
+                        if (saved.Object) saved.Object.SetActive(saved.Active);
+                    formalVisibility.Clear();
+                    if (geometry && geometry.BuildRoot)
+                        for (int lane=0;lane<geometry.Machines.Count;lane++)
+                            if (geometry.Machines[lane].Press && geometry.Machines[lane].Pusher)
+                            { geometry.SetPress(lane,0f); geometry.SetDiverter(lane,0f,false,1f); }
+                }
+            }
+        }
         private void OnDestroy()
         {
+            CancelPresentation();
             if (cargoRoot) { cargoRoot.gameObject.SetActive(false); Destroy(cargoRoot.gameObject); }
         }
     }

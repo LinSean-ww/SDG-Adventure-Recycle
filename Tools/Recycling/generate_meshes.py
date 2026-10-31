@@ -33,7 +33,7 @@ def guid(path, importer='DefaultImporter', extra=''):
     meta=path.with_name(path.name+'.meta')
     if not meta.exists():
         meta.write_text('fileFormatVersion: 2\nguid: '+uuid.uuid4().hex+'\n'+importer+':\n'+extra+
-                        '  externalObjects: {}\n  userData: \n  assetBundleName: \n  assetBundleVariant: \n')
+                        '  externalObjects: {}\n  userData:\n  assetBundleName:\n  assetBundleVariant:\n')
     return next(x.split(': ',1)[1] for x in meta.read_text().splitlines() if x.startswith('guid: '))
 
 def uv(rect, u, v, atlas):
@@ -223,7 +223,7 @@ def model_meta(path):
     template=template.replace('materialImportMode: 2','materialImportMode: 0').replace('isReadable: 0','isReadable: 1')
     template=template.replace('useFileUnits: 1','useFileUnits: 0').replace('useFileScale: 1','useFileScale: 0')
     template=template.replace('importAnimation: 1','importAnimation: 0').replace('preserveHierarchy: 0','preserveHierarchy: 1')
-    meta.write_text(template)
+    meta.write_text('\n'.join(line.rstrip() for line in template.splitlines())+'\n')
 
 def material(name,atlas=None,metal=0,gloss=.3,color=(1,1,1)):
     path=OUT/'Materials'/f'{name}.mat'
@@ -299,8 +299,8 @@ if __name__=='__main__':
     wrapV: 1
     wrapW: 1
   userData: Owner reference; UVs use interior samples; opaque Standard material
-  assetBundleName: 
-  assetBundleVariant: 
+  assetBundleName:
+  assetBundleVariant:
 ''')
     for kind,metal,gloss in (('Metal',.75,.5),('Plastic',.03,.43),('Paper',0,.18)):
         for prefix,atlas in (('Raw','08'),('BaleFront','09'),('BaleSide','10'),('Stock','07')):

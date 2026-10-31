@@ -140,7 +140,15 @@ namespace C3TreasurePuzzle
             => Shape(name,PrimitiveType.Cube,new Vector3(x,y,z),new Vector3(sx,sy,sz),mat,
                 null,solid);
         private GameObject Cyl(string name,Vector3 pos,Vector3 scale,Material mat,bool solid=false)
-            => Shape(name,PrimitiveType.Cylinder,pos,scale,mat,null,solid);
+        {
+            // A primitive Cylinder starts with a CapsuleCollider. On a shallow
+            // flange its minimum diameter can exceed the visible height. Use a
+            // small local box proxy matching this cylinder mesh's unit bounds;
+            // never leave a hidden, tall capsule around the flat flange.
+            GameObject g=Shape(name,PrimitiveType.Cylinder,pos,scale,mat);
+            if (solid) g.AddComponent<BoxCollider>().size=new Vector3(1f,2f,1f);
+            return g;
+        }
         private void Beam(string name, Vector3 from,Vector3 to,float width,Material mat)
         {
             Vector3 delta=to-from;

@@ -4,7 +4,7 @@
 **Phase 2.1／2.2 開發基準：**使用者已確認 `201a9529c1b0fcc57b839d6e23650ea90d138337` 的 Phase 2 18／18、V9 5／5、V11 7／7，共30／30原生PASS，且首次九原料／三成品與原遊戲功能人工驗收正常。新Milestone結果不得沿用歷史PASS；最新工程記錄見文末 `V11 Phase 2.1 / 2.2 Factory Visual, Collision and Replay Development`。
 本報告區分**已實作**及**已驗收**。沒有 Unity Editor 的來源檢查不能代表編譯、PlayMode 或遊戲通過。
 
-**最新原生回報（5cd7328）：**使用者實測 CargoFollowsRoute PASS、Phase 2 **17 PASS／1 FAIL**、V9五項及V11七項PASS。OutputConveyor 在 BoxCast 零間隙校準即失敗（約 -2.496mm），尚未進入正式九成品輸送驗證。本次量測修正與所有新提交 NOT RUN 狀態見文末 **OutputConveyor Native Contact Calibration Repair**；以下歷史 PASS 不沿用到新提交。
+**歷史原生回報（5cd7328）：**使用者實測 CargoFollowsRoute PASS、Phase 2 **17 PASS／1 FAIL**、V9五項及V11七項PASS。OutputConveyor 在 BoxCast 零間隙校準即失敗（約 -2.496mm），尚未進入正式九成品輸送驗證。本次量測修正與所有新提交 NOT RUN 狀態見文末 **OutputConveyor Native Contact Calibration Repair**；以下歷史 PASS 不沿用到新提交。
 
 **後續實測更新：**使用者在 `aee6dc70b0a2b2792e8e18edffc9b0d57127ee49` 回報 Phase 2 **16 PASS／2 FAIL**、V9 **5 PASS**、V11 **7 PASS**。兩項失敗已確認，修正分析及新提交的 NOT RUN 狀態見文末 **Phase 2 Unity PlayMode — Cargo Collision and Output Contact Repair**。以下 A–G 保留初次交付紀錄，不能沿用為新提交 PASS。
 
@@ -491,7 +491,7 @@ Manual Gameplay: NOT RUN
 
 ### C. Milestone B — 素材與正式視覺
 
-**Milestone B已來源實作，Unity匯入／外觀與原生測試NOT RUN。**完整41個模型與14個材質對照見 [V11_Phase21_ArtCatalog.csv](V11_Phase21_ArtCatalog.csv)，尺寸／UV來源及SHA256見 `Assets/_Modules_/02_Levels/Level03/Art/Recycling/MeshManifest.json`。
+**Milestone B已來源實作，Unity匯入／外觀與原生測試NOT RUN。** Commit：`bad8ab70d83fbcd366ca6ac4ee524e5c9d484865`。完整41個模型與14個材質對照見 [V11_Phase21_ArtCatalog.csv](V11_Phase21_ArtCatalog.csv)，尺寸／UV來源及SHA256見 `Assets/_Modules_/02_Levels/Level03/Art/Recycling/MeshManifest.json`。
 
 - 四張使用者PNG原檔逐位元保留於 `Art/Recycling/SourceImages`；不重新合成圖片或拿整張圖當Quad。Texture預設sRGB albedo、保留來源alpha、mipmap／aniso4／Clamp／2048上限；UV只取物件內部，避開透明輪廓與色邊。專案GraphicsSettings無自訂Render Pipeline，使用Built-in Standard opaque材質。塑膠以光滑不透明材質處理小型運動件，避免透明排序；最終質感／照片烘焙光線仍需Game View驗收。
 - 模型在 `Art/Recycling/Resources/RecyclingArt/Meshes`，材質在同根 `Materials`。15種原料，每種Body+Details：Metal鋁罐／壓扁罐／罐頭／皇冠蓋／扁食品罐；Plastic寶特瓶／杯／清潔瓶／盒／壓扁瓶；Paper報紙／開紙盒／摺紙箱／紙袋／蛋盒。每類以正式到貨次序mod5選擇，九份首次演示各類三種，不用隨機數。沒有玻璃或新enum。
@@ -514,8 +514,73 @@ Manual Gameplay: NOT RUN
 
 ### D. Milestone C — 控制台展示
 
-待實作；正式資料與展示Session必須隔離，共用既有運輸／加工，無正式收據／獎勵寫入，保留正式成品並可恢復。
+**Milestone C已來源實作，所有原生行為與三／十輪資源結果仍NOT RUN。**本階段另修正新結構測試的出口反射型別為真正的C3ExitTrigger，並將實體圓柱／扁法蘭改用局部Box(1,2,1)代理：避免Cylinder原生Capsule在扁比例下因最小直徑限制形成過高隱形碰撞。原造型及位置不變，新增每件Renderer／Collider Bounds對齊斷言；不是全區碰撞封鎖。
+
+**控制台：**明確ConsoleMode = Puzzle／Activation／ProductionControl。未解謎和待啟動保持原流程；Starting／Running後可重新靠近原控制台，按自訂互動鍵（預設F）顯示「回收產線控制」。只在Running、正式9原料／3成品收集完成、沒有展示、完成畫面未開啟、真實控制台面板有權限且Gameplay輸入有效時可開始。Already activated不再顯示解謎或重新觸發首次啟動。UGUI沿用Canvas／字體／選項順序、F提示、游標及FPS封鎖；ESC關閉、展示中按鈕停用、重開顯示即時進料／加工／收集進度。點擊後自動關面板供觀看，不取消展示。背包／暫停接管輸入會關閉ProductionControl而不搶回游標；完成畫面優先，禁止重新開台。
+
+```mermaid
+flowchart LR
+    F[正式 Session：原資料保留] --> T[TickSession 共用運輸／分流／加工／出口]
+    P[展示 Session：獨立九原料／三成品] --> T
+    T --> C{CommitBatch}
+    C -->|正式| R[原 Runtime 收據交易與正式事件]
+    C -->|展示| N[直接完成演示狀態；不寫收據／正式事件]
+```
+
+**Session資料與共用邏輯：**C3RecyclingLine.RecyclingSession保存SessionId、IsPresentation、ObjectRoot、Records／Batches、Accepted、三組MachineWork／Slots／Elapsed／Completed、ReleaseClock與資源峰值。正式Session直接引用原records／batches／accepted／work，沒有清空／替換原容器；展示以新GUID和新容器建立。兩者共用同一TickSession、TryDivert、TickMachines、PrepareProduct、TickProducts、TransportPath及同一機台／素材。保留0.45秒供料節奏、4.5m/s原料、2m/s成品、1m間距、3→1與2.5秒壓縮。原TransportPath（含Evaluate／Move）及30帶面／機台端點方法與201a952逐位元比對不變。正式資料不因展示重置，也沒有只把supplied改false或另寫假動畫。
+
+**收據邊界：**CommitBatch在IsPresentation時於存取EcoAdventureRuntime之前return；展示Counted=false，正式BatchCompleted與lastCompleted只在非展示更新。這不是單靠不同ID避免重複：展示根本不呼叫正式TryCommitRecyclingBatch，不產生正式分類／材料資格／背包／彈藥／快捷欄／任務結果。EcoRecycleCargo仍lineOwned，原入口Sorter不能再發放兼容獎勵。公開正式計數仍只讀原容器；UI展示進度獨立讀ActivePresentation。
+
+**正式成品共存：**開始時保存三件正式GameObject的activeSelf，暫時SetActive(false)，因此Renderer與Collider一起退出世界；不刪除FinishedBatch、不改Batch／Source ID、不逐件寫Renderer／Collider.enabled。展示根命名P22_PRESENTATION_PRESENTATION-{GUID}，九原料及三成品在其下。最後三件到達原收集格時先複製值型證據到LastPresentation（ID、來源、物件Instance ID、歷史、位置／旋轉、收集狀態、無收據數及物件峰值），立即停用並Destroy展示根，恢復正式物件原activeSelf，原Renderer／Collider.enabled自然保留；不把正式隱藏碰撞留在展示路徑中。
+
+**清理與生命週期：**正常完成、CancelPresentation、OnDisable、OnDestroy、正式LevelCompleted事件與處理例外均走FinishPresentation的finally；清除展示records／batches／accepted／slots／prepared、還原正式顯示、復位共用壓頭／推桿。只保留上一輪不含Unity物件引用的結果快照；新Session重新取得空機台容量，沒有輪次上限。沒有新增持久事件訂閱，Completed在OnEnable／OnDisable成對訂閱解除。Time.timeScale≤0時AdvanceSimulation在共用積分前返回，運輸／加工／壓頭／滾輪全部停止。取消／完成不改FactoryState；Completed仍是原正式關卡完成。展示不載入場景。
+
+新增 `C3V11RecyclingPresentationTests` **八項**（全部NOT RUN）：
+
+| 測試 | 主要原生斷言與需求 |
+| --- | --- |
+| PresentationRequiresRunningCollectedProductionAndTheOpenRealConsole | Dormant／Starting／尚未正式收集皆拒絕，啟動後可互動且無解謎重提交，Completed拒絕與完成游標優先 |
+| ProductionUguiReceivesARealClickWithoutReactivationOrPuzzleSubmission | 真EventSystem Raycast點擊產線展示、ProductionControl隱藏解謎／啟動，重開顯示進度且按鈕停用，Activated只一次 |
+| TenCompleteNativeSessionsPreserveRewardsIdsPhysicsAndBoundedResources | 連續十輪（包含前三輪）各9→3、三類各三、正確Source Type／Target Machine、原2.5秒壓頭、每幀原生有限支撐／穿透與ID／位移、四出口段／三收集位置、正式記錄／收據／分類／背包／武器／彈藥／快捷欄／任務指紋不變 |
+| PauseCloseReopenAndLeavingConsoleDoNotRestartOrCancelTheSession | 真加工階段暫停原料／機台計時／壓頭、成品出料暫停、關台／離開不取消、重開進度、其他輸入Context接管 |
+| DisableAndCancellationRestoreFormalActiveRendererAndColliderStates | 保留正式三件資料，停用／取消恢復原activeSelf和單獨enabled狀態，清accepted／slots後可再啟動 |
+| FailedNativeRouteCleansTheSessionAndRestoresFormalProducts | 測試隔離停用實際帶面，期待原生查詢失敗，確認例外清理與正式成品恢復；finally還原測試Collider |
+| LevelCompletionCancelsReplayAndKeepsCompletionInputPriority | 真出口完成API取消展示，保留Completed／完成UI與游標優先，不能開控制台 |
+| SceneReloadDropsAllReplayStateAndKeepsSharedAssetsBounded | 真Unity場景重載後舊根銷毀，新Line無展示／結果、不遺留Session根，初始Dormant |
+
+十輪測試先執行既有原生Box／Sphere校準，再逐步呼叫同一正式積分器並用實際Collider查詢；原料支撐／穿透限及成品3mm／10mm限均不放寬。每輪Debug.Log僅記錄一次peakObjects、sceneObjects、remainingSessionRoots、sharedModels／sharedMaterials；斷言收尾整個場景Transform數回到起始值、展示根為0、已清空accepted與slots、共用資源數不成長。**這些數量是待Unity執行的觀測，雲端沒有填入偽造的三輪／十輪PASS或物件數。**
 
 ### E. 原生驗收與剩餘範圍
 
-每個Milestone提交後需使用者重新Pull。Unity編譯、新增測試、Phase 2全18項、V9五項、V11七項、VisualFPS／M6、Game／Scene View均NOT RUN，不沿用基準30/30 PASS。圖1細杆身份待Scene View／Hierarchy核對，其餘來源實作亦需原生驗收。B→C Full Level Transition: **BLOCKED — Level02 scene unavailable**；不屬本次九項改善完成判定。
+最終來源檢查：包含新增檔案的完整Commit範圍 `git diff 201a952 --check` PASS；本次新metadata／CSV統一LF與無尾端空白，GUID值保持不變；114個C# AST／997方法／149個IEnumerator PASS（不等同型別編譯），30個新測試反射型別名稱與真實宣告對照PASS；全GUID唯一、新素材與meta成對，四PNG雜湊保留。保護比對包含原Phase 2／V9／V11／VisualFPS／M6整檔、Scene、Packages、ProjectSettings，運輸Evaluate／Move與原機台／帶面方法亦比對保留。新增測試共19項：結構5、素材6、展示8，均NOT RUN。
+
+| 九項需求 | 來源交付狀態 | 原生／人工 |
+| --- | --- | --- |
+| 1 真終點擋板與收料 | 已實作，待Unity驗收 | NOT RUN |
+| 2 高架轉角／機架／護邊 | 已實作，待Unity驗收 | NOT RUN |
+| 3 D入口無用橫架 | 已安全停止生成指定裝飾，待Unity驗收 | NOT RUN |
+| 4 回收籠／污染設備 | 已實作局部碰撞與可見安裝接合，待Unity驗收 | NOT RUN |
+| 5 二樓柱／支架／UpperDistributionBox | **部分完成**：可確認柱腳／梁接合／東牆淨空已修；設備正常接觸保留；截圖細桿唯一Hierarchy仍待提供／核對，未猜測刪除 | NOT RUN |
+| 6 後方三類包／木棧板裝飾 | 已實作，待Unity驗收 | NOT RUN |
+| 7 多種立體原料 | 已實作15種＋VisualRoot，待Unity匯入／驗收 | NOT RUN |
+| 8 真正立體正式壓縮包 | 已實作三類，原尺寸／身份不變，待Unity驗收 | NOT RUN |
+| 9 不限輪次控制台展示 | 已實作Session／UGUI／隔離／恢復與十輪測試，待Unity驗收 | NOT RUN |
+
+```text
+Unity Asset Import: NOT RUN
+Unity Compilation: NOT RUN
+Unity PlayMode: NOT RUN
+Manual Gameplay: NOT RUN
+```
+
+沒有Unity Editor，未量得新版角色碰撞、畫面質感、原生包絡或資源數。圖1細杆身份仍需使用者Hierarchy／Scene View；已發出文字詢問，沒有因此覆蓋或任意刪物。B→C Full Level Transition: **BLOCKED — Level02 scene unavailable**，不屬本次九項改善完成判定。
+
+### F. 使用者Unity驗收順序
+
+1. GitHub Desktop切回既有Phase 2分支，保留自己的本地修改，Fetch／Pull本PR最新HEAD；比對Milestone A／B／C SHA。不要切main、重建PR或重套舊修補。
+2. Unity 2023.1.22f1開啟專案，等待四PNG／41 OBJ／14材質匯入與腳本編譯；Console確認無紅字。若Safe Mode，保留第一個完整編譯錯誤，不直接按Exit Safe Mode掩蓋。
+3. Test Runner先單跑原OutputConveyor（原生校準＋27→9），再原Phase 2全18項→V9五項→V11七項。接著跑Phase21FactoryUpgrade五項、RecyclingArt六項、RecyclingPresentation八項（十輪較久），以及受影響VisualFPS／M6。匯出XML與失敗完整診斷／每輪資源Log；無執行不標PASS。
+4. Game／Scene View對六張圖逐項核對ObjectMap：終點與通料轉角分開、D門／真工作台保留、籠／淨化設備碰撞、站／趴雙向上層與雙梯／護欄／PVC；對圖1細桿提供唯一Hierarchy後再決定針對性修正，不刪整組設備。
+5. 啟動前檢視15種原料／三種壓縮包／木棧板的前、側、俯視UV、法線、厚度、金屬／塑膠／紙材質與包絡；正式進料每類三種，全部子Mesh一起壓縮，正式Batch／Source ID與出口保留。
+6. 遊戲正常取得三零件→解謎→首次啟動→等九原料與三成品收集；靠近原控制台按F或自訂互動鍵→「產線展示」。確認面板自動關閉且9→三分類→2.5秒加工→3成品完整播放；重開可見進度、不能重複啟動。完成後重播第三輪，核對正式統計／背包／武器／彈藥／快捷欄不增；測暫停恢復、ESC、離開控制台與正式完成畫面優先。
+7. 核對正式成品顯示／Collider恢復、無展示堆疊或殘留，TAB／1～5／Q-E／Z／射擊／瞄準／換彈及原任務正常。所有未執行、FAIL及圖1未識別項保留明確狀態；維持Draft等待ChatGPT程式碼審查與使用者原生驗收，停止額外功能開發。
