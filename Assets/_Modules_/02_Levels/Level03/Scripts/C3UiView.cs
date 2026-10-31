@@ -277,8 +277,13 @@ namespace C3TreasurePuzzle
         }
         private static RectTransform ScrollContent(Transform parent, float margin)
         {
-            GameObject viewport = new GameObject("Viewport", typeof(RectTransform), typeof(RectMask2D), typeof(ScrollRect));
+            GameObject viewport = new GameObject("Viewport", typeof(RectTransform), typeof(Image), typeof(RectMask2D), typeof(ScrollRect));
             viewport.transform.SetParent(parent, false); Stretch((RectTransform)viewport.transform, margin);
+            // Text is deliberately not a raycast target. Give the viewport its
+            // own transparent hit surface so wheel/drag events over text or blank
+            // space reach ScrollRect even when all buttons are below the mask.
+            viewport.GetComponent<Image>().color = Color.clear;
+            viewport.GetComponent<Image>().raycastTarget = true;
             GameObject content = new GameObject("Content", typeof(RectTransform), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
             content.transform.SetParent(viewport.transform, false); RectTransform rect = (RectTransform)content.transform;
             rect.anchorMin = new Vector2(0, 1); rect.anchorMax = new Vector2(1, 1); rect.pivot = new Vector2(0.5f, 1); rect.sizeDelta = Vector2.zero;

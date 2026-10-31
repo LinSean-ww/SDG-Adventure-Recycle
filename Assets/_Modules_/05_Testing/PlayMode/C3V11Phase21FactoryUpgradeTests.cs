@@ -1,6 +1,9 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -85,6 +88,81 @@ namespace M6IntegrationTests
                 }
             }
         }
+        private sealed class RawIntrusion
+        {
+            internal Collider Collider;
+            internal float Depth;
+            internal Vector3 Direction;
+        }
+        private static RawIntrusion[] RawIntrusions(SphereCollider sphere,Vector3 center)
+        {
+            return Physics.OverlapSphere(center,sphere.radius,~0,QueryTriggerInteraction.Ignore)
+                .Select(c=>Physics.ComputePenetration(sphere,center,Quaternion.identity,c,c.transform.position,c.transform.rotation,
+                    out Vector3 direction,out float depth)?new RawIntrusion {Collider=c,Depth=depth,Direction=direction}:null)
+                .Where(hit=>hit!=null && hit.Depth>.001f).ToArray();
+        }
+        private static Vector3 RawPose(object path,float distance,out int segment)
+        {
+            // Out parameters require explicit by-ref types at this assembly boundary.
+            MethodInfo evaluate=path.GetType().GetMethod("Evaluate",BindingFlags.Instance|BindingFlags.NonPublic,null,
+                new[] {typeof(float),typeof(float),typeof(Vector3),typeof(Vector3).MakeByRefType(),
+                    typeof(Quaternion).MakeByRefType(),typeof(int).MakeByRefType()},null);
+            Assert.IsNotNull(evaluate,"Production TransportPath.Evaluate signature changed");
+            object[] args={distance,.12f,Vector3.zero,Vector3.zero,Quaternion.identity,0};
+            evaluate.Invoke(path,args); segment=(int)args[5]; return (Vector3)args[3];
+        }
+        private static string RawDiagnostics(object path,int segment,SphereCollider sphere,Vector3 center)
+        {
+            object[] legs=Items(path,"Legs"); StringBuilder text=new StringBuilder();
+            text.AppendLine("sphere center="+center.ToString("F6")+" radius="+sphere.radius.ToString("F6")+" segment="+segment);
+            for (int i=Mathf.Max(0,segment-1);i<=Mathf.Min(legs.Length-1,segment+1);i++)
+            {
+                Collider surface=(Collider)Member(legs[i],"Support"); Vector3 a=(Vector3)Member(legs[i],"A"),b=(Vector3)Member(legs[i],"B");
+                Vector3 closest=surface.ClosestPoint(center),normal=surface.transform.up;
+                text.AppendLine((i==segment?"CurrentSection":i>segment?"NextSection":"PreviousSection")+"="+HierarchyPath(surface.transform.parent)+
+                    " surface="+HierarchyPath(surface.transform)+" start="+a.ToString("F6")+" end="+b.ToString("F6")+
+                    " normal="+normal.ToString("F6")+" bounds="+surface.bounds.ToString("F6")+" closest="+closest.ToString("F6")+
+                    " finiteDistance="+Vector3.Distance(center,closest).ToString("F6")+" signedPlaneDistance="+Vector3.Dot(center-a,normal).ToString("F6"));
+                if (i<legs.Length-1) text.AppendLine("next normal angle="+Vector3.Angle(normal,((Collider)Member(legs[i+1],"Support")).transform.up).ToString("F6"));
+            }
+            foreach (Collider hit in Physics.OverlapSphere(center,sphere.radius+.003f,~0,QueryTriggerInteraction.Ignore))
+            {
+                bool penetration=Physics.ComputePenetration(sphere,center,Quaternion.identity,hit,hit.transform.position,hit.transform.rotation,
+                    out Vector3 direction,out float depth);
+                text.AppendLine("HitSurface="+HierarchyPath(hit.transform)+" expectedAdjacentSupport="+
+                    legs.Skip(Mathf.Max(0,segment-1)).Take(segment==0?2:3).Any(l=>(Collider)Member(l,"Support")==hit)+
+                    " bounds="+hit.bounds.ToString("F6")+" closest="+hit.ClosestPoint(center).ToString("F6")+
+                    " penetration="+penetration+" depth="+depth.ToString("F6")+" direction="+direction.ToString("F6"));
+            }
+            return text.ToString();
+        }
+        private static void AssertRawContact(object path,int segment,SphereCollider sphere,Vector3 center)
+        {
+            object[] legs=Items(path,"Legs");
+            Collider[] supports=legs.Skip(Mathf.Max(0,segment-1)).Take(segment==0?2:3).Select(l=>(Collider)Member(l,"Support")).ToArray();
+            bool supported=supports.Any(c=>c.enabled && !c.isTrigger && c.gameObject.activeInHierarchy &&
+                Mathf.Abs(Vector3.Distance(center,c.ClosestPoint(center))-sphere.radius)<=.003f);
+            RawIntrusion[] intrusions=RawIntrusions(sphere,center);
+            if (!supported || intrusions.Length>0)
+                Assert.Fail((!supported?"Missing finite current/adjacent support":"Raw cargo penetrates a solid by more than 1mm")+"\n"+
+                    RawDiagnostics(path,segment,sphere,center));
+        }
+        private static string SolidDetails(Collider collider)
+        {
+            Renderer renderer=collider.GetComponent<Renderer>();
+            return HierarchyPath(collider.transform)+" collider="+collider.bounds.ToString("F6")+
+                " renderer="+(renderer?renderer.bounds.ToString("F6"):"MISSING")+" enabled="+collider.enabled+" trigger="+collider.isTrigger;
+        }
+        private static void AssertVisibleSolid(Collider collider)
+        {
+            Assert.IsNotNull(collider); Renderer renderer=collider.GetComponent<Renderer>(); Assert.IsNotNull(renderer);
+            Assert.IsTrue(collider.enabled && !collider.isTrigger && collider.gameObject.activeInHierarchy && renderer.enabled,SolidDetails(collider));
+            Assert.Less(Vector3.Distance(collider.bounds.center,renderer.bounds.center),.001f,SolidDetails(collider));
+            Assert.Less(Vector3.Distance(collider.bounds.size,renderer.bounds.size),.001f,SolidDetails(collider));
+        }
+        private RaycastHit[] VesselApproach(Vector3 start,float radius)
+            => Physics.SphereCastAll(start,radius,Vector3.right,1.6f,~0,QueryTriggerInteraction.Ignore)
+                .Where(h=>!h.collider.transform.IsChildOf(player.transform)).OrderBy(h=>h.distance).ToArray();
         [UnityTest] public IEnumerator EndStopsProtectDeadEndsWithoutClosingLiveTransfers()
         {
             object main=Member(geometry,"MainBelt");
@@ -118,18 +196,51 @@ namespace M6IntegrationTests
                 SphereCollider sphere=probe.AddComponent<SphereCollider>(); sphere.isTrigger=true; sphere.radius=.12f;
                 Physics.SyncTransforms();
                 object[] common=Items(geometry,"CommonSections");
-                for (int i=0;i<common.Length;i++)
+                Component line=Find("C3TreasurePuzzle.C3RecyclingLine");
+                foreach (string kind in new[] {"Paper","Metal","Plastic"}) C3Phase21TestDriver.Supply(line,kind,3,"handoff-");
+                object[] records=Items(line,"Materials"); object path=Member(records[0],"Path");
+                object[] legs=Items(path,"Legs"); Assert.AreEqual(6,legs.Length);
+                Assert.AreEqual("P2_INFEED_4",((Collider)Member(legs[4],"Support")).transform.parent.name);
+                Assert.AreSame(Member(Member(geometry,"MainBelt"),"Surface"),Member(legs[5],"Support"));
+                float distance=0f;
+                for (int i=0;i<legs.Length;i++)
                 {
-                    Vector3 a=((Transform)Member(common[i],"Start")).position,b=((Transform)Member(common[i],"End")).position;
-                    Collider support=(Collider)Member(common[i],"Surface");
+                    Vector3 a=(Vector3)Member(legs[i],"A"),b=(Vector3)Member(legs[i],"B");
+                    float length=Vector3.Distance(a,b),sampleLength=i==common.Length?Mathf.Min(.6f,length):length;
                     for (int sample=0;sample<=60;sample++)
                     {
-                        Vector3 center=Vector3.Lerp(a,b,sample/60f)+support.transform.up*.121f;
-                        Assert.LessOrEqual(Vector3.Distance(center,support.ClosestPoint(center)),.123f,"Missing finite infeed surface");
-                        foreach (Collider c in Physics.OverlapSphere(center,.12f,~0,QueryTriggerInteraction.Ignore))
-                            if (Physics.ComputePenetration(sphere,center,Quaternion.identity,c,c.transform.position,c.transform.rotation,out _,out float depth))
-                                Assert.LessOrEqual(depth,.001f,"Infeed cargo blocked by "+c.name+" at "+center);
+                        // Production resolves the finite neighbouring surfaces by
+                        // SphereCast. A per-section normal offset embeds the sphere
+                        // in the next horizontal belt at the descending handoff.
+                        Vector3 center=RawPose(path,distance+sampleLength*sample/60f,out int segment);
+                        AssertRawContact(path,segment,sphere,center);
                     }
+                    distance+=length;
+                }
+                float handoff=legs.Take(5).Sum(l=>Vector3.Distance((Vector3)Member(l,"A"),(Vector3)Member(l,"B")));
+                Collider slope=(Collider)Member(legs[4],"Support"),main=(Collider)Member(legs[5],"Support");
+                Vector3 slopeA=(Vector3)Member(legs[4],"A"),slopeB=(Vector3)Member(legs[4],"B");
+                // Sample 59/60 rounds to the user's (-6.26,5.91,16.85).
+                Vector3 oldCenter=Vector3.Lerp(slopeA,slopeB,59f/60f)+slope.transform.up*.121f;
+                Assert.IsTrue(Physics.ComputePenetration(sphere,oldCenter,Quaternion.identity,main,main.transform.position,main.transform.rotation,
+                    out _,out float oldDepth) && oldDepth>.001f,"Negative control must reproduce the old synthetic overlap");
+                Vector3 safe=RawPose(path,handoff,out int atJoint);
+                AssertRawContact(path,atJoint,sphere,safe);
+                Vector3 beforeJoint=RawPose(path,handoff-Vector3.Distance(slopeA,slopeB)/60f,out int beforeSegment);
+                AssertRawContact(path,beforeSegment,sphere,beforeJoint);
+                Debug.Log("R1 old 59/60 per-normal sample (negative control)\n"+RawDiagnostics(path,4,sphere,oldCenter)+
+                    "Production pose at the same route parameter\n"+RawDiagnostics(path,beforeSegment,sphere,beforeJoint)+
+                    "Production joint pose\n"+RawDiagnostics(path,atJoint,sphere,safe));
+                foreach (string name in new[] {"BELT_SURFACE","SIDE_GUARD","P2_ROOF_HANGER"})
+                {
+                    GameObject obstacle=new GameObject(name); obstacle.transform.SetParent(probe.transform,false);
+                    obstacle.transform.position=safe; BoxCollider blocker=obstacle.AddComponent<BoxCollider>(); blocker.size=Vector3.one*.04f;
+                    try
+                    {
+                        Physics.SyncTransforms();
+                        Assert.IsTrue(RawIntrusions(sphere,safe).Any(hit=>hit.Collider==blocker),"Missed illegal penetration: "+name);
+                    }
+                    finally { Object.DestroyImmediate(obstacle); }
                 }
                 foreach (int index in new[] {1,2})
                 {
@@ -144,6 +255,29 @@ namespace M6IntegrationTests
                         Assert.Less(Vector3.Distance(c.bounds.size,renderer.bounds.size),.001f);
                     }
                 }
+                Assert.AreEqual(30,Items(geometry,"Sections").Length); Assert.IsTrue((bool)Call(geometry,"ConnectionsMatch",.001f));
+                C3Phase21TestDriver.Activate(Find("C3TreasurePuzzle.C3DeviceState"));
+                HashSet<string> approached=new HashSet<string>(),crossed=new HashSet<string>();
+                Dictionary<string,Vector3> previous=records.ToDictionary(r=>(string)Member(r,"MaterialId"),r=>((Component)Member(r,"Cargo")).transform.position);
+                for (int tick=0;tick<1600 && (int)Member(line,"CollectedProducts")<3;tick++)
+                {
+                    C3Phase21TestDriver.Tick(line);
+                    foreach (object record in records)
+                    {
+                        string state=Member(record,"State").ToString();
+                        if (state!="Feeding" && state!="MainBelt" && state!="Identified") continue;
+                        int segment=(int)Member(record,"CurrentRouteSegment");
+                        Transform cargo=((Component)Member(record,"Cargo")).transform;
+                        AssertRawContact(Member(record,"Path"),segment,sphere,cargo.position);
+                        string id=(string)Member(record,"MaterialId");
+                        Assert.Less(Vector3.Distance(previous[id],cargo.position),.37f,"Real material jumped at "+HierarchyPath(cargo)); previous[id]=cargo.position;
+                        if (segment==4) approached.Add((string)Member(record,"MaterialId"));
+                        if (segment==5) crossed.Add((string)Member(record,"MaterialId"));
+                    }
+                    if (tick%25==0) yield return null;
+                }
+                Assert.AreEqual(9,approached.Count); Assert.AreEqual(9,crossed.Count,"All nine real materials must traverse this handoff");
+                Assert.AreEqual(9,Member(line,"ProcessedUnits")); Assert.AreEqual(3,Member(line,"CollectedProducts"));
             }
             finally { Object.DestroyImmediate(probe); }
             yield return null;
@@ -189,22 +323,93 @@ namespace M6IntegrationTests
             }
             Collider[] vessels=Object.FindObjectsOfType<Collider>().Where(c=>c.name=="POLLUTION stainless purification vessel").ToArray();
             Assert.AreEqual(3,vessels.Length); Assert.IsTrue(vessels.All(c=>c.enabled && !c.isTrigger));
-            foreach (Collider vessel in vessels)
+            GameObject probe=new GameObject("P21_TEST_VESSEL_PROBE"); probe.transform.position=Vector3.one*128f;
+            try
             {
-                Renderer renderer=vessel.GetComponent<Renderer>();
-                Assert.Less(Vector3.Distance(vessel.bounds.center,renderer.bounds.center),.001f);
-                Assert.Less(Vector3.Distance(vessel.bounds.size,renderer.bounds.size),.001f);
-                StartAt(new Vector3(-3.8f,.84f,vessel.transform.position.z));
-                contacts.SideContacts.Clear();
-                bool touched=false;
-                for (int i=0;i<65;i++)
+                SphereCollider sphere=probe.AddComponent<SphereCollider>(); sphere.isTrigger=true; sphere.radius=body.radius;
+                Collider foundation=Object.FindObjectsOfType<Collider>().Single(c=>c.name=="WASTEWATER treatment grated foundation");
+                Collider[] scene=Object.FindObjectsOfType<Collider>();
+                int vesselIndex=0;
+                foreach (Collider vessel in vessels.OrderBy(c=>c.transform.position.z))
                 {
-                    CollisionFlags flags=body.Move(Vector3.right*.03f+Vector3.down*.025f);
-                    touched|=(flags&CollisionFlags.Sides)!=0; yield return null;
+                    float z=vessel.transform.position.z;
+                    Collider lower=scene.Single(c=>c.name=="Purifier flange lower" && Mathf.Abs(c.transform.position.z-z)<.001f);
+                    Collider upper=scene.Single(c=>c.name=="Purifier flange upper" && Mathf.Abs(c.transform.position.z-z)<.001f);
+                    Collider[] assembly=scene.Where(c=>Mathf.Abs(c.transform.position.z-z)<.001f &&
+                        (c==vessel || c==lower || c==upper || c.name=="POLLUTION pressure controller" || c.name=="POLLUTION controller mounting arm")).ToArray();
+                    foreach (Collider part in assembly.Concat(new[] {foundation})) AssertVisibleSolid(part);
+                    // Test the vessel separately between the flanges, at full
+                    // player radius. No other structure may shield this approach.
+                    Vector3 origin=new Vector3(-3.8f,vessel.bounds.center.y,z);
+                    Assert.Greater(origin.y-sphere.radius,lower.bounds.max.y);
+                    Assert.Less(origin.y+sphere.radius,upper.bounds.min.y);
+                    Assert.Greater(Vector3.Distance(origin,vessel.ClosestPoint(origin)),sphere.radius,"Probe starts inside the vessel");
+                    Physics.SyncTransforms(); RaycastHit[] approach=VesselApproach(origin,sphere.radius);
+                    Assert.IsNotEmpty(approach,"No full-radius native approach hit: "+SolidDetails(vessel));
+                    Assert.AreSame(vessel,approach[0].collider,"Body-height approach obstructed by "+HierarchyPath(approach[0].collider.transform));
+                    Assert.That(approach[0].distance,Is.EqualTo(vessel.bounds.min.x-sphere.radius-origin.x).Within(.003f));
+                    Assert.Less(approach[0].normal.x,-.9f);
+                    Vector3 contactCenter=origin+Vector3.right*approach[0].distance;
+                    Assert.IsTrue(Physics.ComputePenetration(sphere,contactCenter+Vector3.right*.03f,Quaternion.identity,
+                        vessel,vessel.transform.position,vessel.transform.rotation,out Vector3 direction,out float penetration) && penetration>.015f,
+                        "Independent vessel proxy must reject a 30mm intrusion: "+SolidDetails(vessel));
+                    bool wasEnabled=vessel.enabled;
+                    try
+                    {
+                        vessel.enabled=false; Physics.SyncTransforms();
+                        Assert.IsFalse(VesselApproach(origin,sphere.radius).Any(h=>h.collider==vessel),"Disabled-vessel negative control was not detected");
+                    }
+                    finally { vessel.enabled=wasEnabled; Physics.SyncTransforms(); }
+                    RaycastHit[] restored=VesselApproach(origin,sphere.radius);
+                    Assert.IsNotEmpty(restored,"Vessel not restored after negative control: "+SolidDetails(vessel));
+                    Assert.AreSame(vessel,restored[0].collider,"Vessel not restored after negative control");
+                    StartAt(new Vector3(-3.8f,.84f,z)); contacts.SideContacts.Clear(); contacts.CaptureDetails=true;
+                    Vector3 start=player.transform.position; bool touched=false; Collider firstSide=null; Vector3 firstNormal=Vector3.zero;
+                    Collider firstResisting=null; Vector3 resistingNormal=Vector3.zero;
+                    HashSet<Collider> unique=new HashSet<Collider>(); StringBuilder moves=new StringBuilder();
+                    string setup="R2 vessel index="+(vesselIndex++)+" Z="+z.ToString("F2")+"\n"+string.Join("\n",new[] {vessel,lower,upper,foundation}.Select(SolidDetails))+
+                        "\nCC start="+start.ToString("F6")+" radius="+body.radius+" height="+body.height+" skinWidth="+body.skinWidth+
+                        " stepOffset="+body.stepOffset+" independent hit="+contactCenter.ToString("F6")+" intrusion="+penetration+" direction="+direction.ToString("F6");
+                    try
+                    {
+                        for (int i=0;i<65;i++)
+                        {
+                            Vector3 before=player.transform.position; contacts.DetailedContacts.Clear();
+                            CollisionFlags flags=body.Move(Vector3.right*.03f+Vector3.down*.025f);
+                            touched|=(flags&CollisionFlags.Sides)!=0;
+                            moves.AppendLine("move="+i+" requested=(0.03,-0.025,0) actual="+(player.transform.position-before).ToString("F6")+" flags="+flags);
+                            foreach (C3V11CollisionRecorder.ContactEvidence hit in contacts.DetailedContacts)
+                            {
+                                unique.Add(hit.Collider);
+                                if (!firstSide && Mathf.Abs(hit.Normal.y)<.6f) { firstSide=hit.Collider; firstNormal=hit.Normal; }
+                                if (!firstResisting && hit.Normal.x<-.5f) { firstResisting=hit.Collider; resistingNormal=hit.Normal; }
+                                moves.AppendLine("  hit="+HierarchyPath(hit.Collider.transform)+" normal="+hit.Normal.ToString("F6")+
+                                    " point="+hit.Point.ToString("F6")+" moveDirection="+hit.MoveDirection.ToString("F6")+" moveLength="+hit.MoveLength);
+                            }
+                            yield return null;
+                        }
+                        Vector3 end=player.transform.position,atBodyHeight=new Vector3(end.x,origin.y,z);
+                        float nearest=Vector3.Distance(atBodyHeight,vessel.ClosestPoint(atBodyHeight));
+                        bool overlaps=Physics.ComputePenetration(sphere,atBodyHeight,Quaternion.identity,vessel,vessel.transform.position,vessel.transform.rotation,
+                            out Vector3 overlapDirection,out float overlapDepth);
+                        string summary=setup+"\nend="+end.ToString("F6")+" firstSide="+(firstSide?HierarchyPath(firstSide.transform):"NONE")+
+                            " firstNormal="+firstNormal.ToString("F6")+" uniqueContacts="+string.Join(";",unique.Select(c=>HierarchyPath(c.transform)))+
+                            " firstResisting="+(firstResisting?HierarchyPath(firstResisting.transform):"NONE")+" resistingNormal="+resistingNormal.ToString("F6")+
+                            " flagsSidesSeen="+touched+" legacySideContacts="+string.Join(";",contacts.SideContacts.Select(c=>HierarchyPath(c.transform)))+
+                            " nearestVesselDistance="+nearest.ToString("F6")+" bodyRadius="+sphere.radius+" penetration="+overlaps+
+                            " depth="+overlapDepth+" direction="+overlapDirection.ToString("F6");
+                        Func<string> details=()=>summary+"\n"+moves;
+                        // Accept only this vessel's actual equipment, with a
+                        // resisting side normal; unrelated Sides cannot pass.
+                        if (!firstResisting || !assembly.Contains(firstResisting)) Assert.Fail("No native resisting contact with this purifier assembly\n"+details());
+                        if (end.x>=-3.15f || nearest<body.radius-body.skinWidth-.005f || (overlaps && overlapDepth>body.skinWidth+.005f))
+                            Assert.Fail("Player entered purifier beyond the original controller skin\n"+details());
+                        Debug.Log(summary); // Full per-Move trace is emitted only on failure.
+                    }
+                    finally { contacts.CaptureDetails=false; contacts.DetailedContacts.Clear(); }
                 }
-                Assert.IsTrue(touched && contacts.SideContacts.Contains(vessel),"No native player/vessel contact");
-                Assert.Less(player.transform.position.x,-3.15f,"Player entered purifier body");
             }
+            finally { contacts.CaptureDetails=false; contacts.DetailedContacts.Clear(); Object.DestroyImmediate(probe); }
             foreach (string name in new[] {"WASTEWATER treatment grated foundation","POLLUTION pressure controller","POLLUTION controller mounting arm","Purifier flange lower","Purifier flange upper"})
             {
                 Collider[] parts=Object.FindObjectsOfType<Collider>().Where(c=>c.name==name).ToArray();

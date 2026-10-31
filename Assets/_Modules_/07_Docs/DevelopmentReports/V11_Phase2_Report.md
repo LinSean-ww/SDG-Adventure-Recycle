@@ -1,7 +1,7 @@
 # SDG Adventure V11 Phase 2 — 工程交付與待驗收項目
 
 
-**Phase 2.1／2.2 開發基準：**使用者已確認 `201a9529c1b0fcc57b839d6e23650ea90d138337` 的 Phase 2 18／18、V9 5／5、V11 7／7，共30／30原生PASS，且首次九原料／三成品與原遊戲功能人工驗收正常。新Milestone結果不得沿用歷史PASS；最新工程記錄見文末 `V11 Phase 2.1 / 2.2 Factory Visual, Collision and Replay Development`。
+**最新原生回報基準：**使用者在 Unity 2023.1.22f1 對 `ebe9aab6c2756bd3bd59b9f4c5befe05c84fcbdb` 確認 Phase 2 18／18、V9 5／5、V11 7／7、Recycling Art 6／6及排氣管兩項 PASS，共38項；另有三項明確 FAIL，其他10項逐項結果未提供。這些結果只屬於該 SHA。文末 **V11 Phase 2.1／2.2 — Unity Native Failure Repair** 記錄 R1／R2／R3 修正與完整51項結果表；新修正的 Unity 編譯、PlayMode、人工遊戲皆 NOT RUN。以下各舊章節保留當次交付歷史，不能當作目前驗收狀態。
 本報告區分**已實作**及**已驗收**。沒有 Unity Editor 的來源檢查不能代表編譯、PlayMode 或遊戲通過。
 
 **歷史原生回報（5cd7328）：**使用者實測 CargoFollowsRoute PASS、Phase 2 **17 PASS／1 FAIL**、V9五項及V11七項PASS。OutputConveyor 在 BoxCast 零間隙校準即失敗（約 -2.496mm），尚未進入正式九成品輸送驗證。本次量測修正與所有新提交 NOT RUN 狀態見文末 **OutputConveyor Native Contact Calibration Repair**；以下歷史 PASS 不沿用到新提交。
@@ -455,6 +455,8 @@ Manual Gameplay: NOT RUN
 
 ## V11 Phase 2.1 / 2.2 Factory Visual, Collision and Replay Development
 
+> 本節 A～G 保留 Milestone A／B／C 與排氣管交付當時的來源檢查／NOT RUN 記錄。其後使用者已在 `ebe9aab6` 完成38項原生 PASS 並回報三項 FAIL；最新結果及本次修正請見下一章 Unity Native Failure Repair。
+
 ### A. 基準、附件與交付邊界
 
 基準 `201a9529c1b0fcc57b839d6e23650ea90d138337`。使用者 Windows Unity 2023.1.22f1：Phase 2 **18/18 PASS**、V9 **5/5 PASS**、V11 **7/7 PASS**。人工確認三項零件、解謎、啟動、九份高位進料、三分類／三加工／三正式輸出、雙梯、護欄、PVC、TAB／快捷欄、量子武器與彈藥操作。這些僅屬舊基準。
@@ -621,3 +623,184 @@ Manual Gameplay: NOT RUN
 ```
 
 **使用者驗收：**Stop Play後Pull此修正→Unity等待編譯、Console無紅字→Test Runner先單跑上述兩項，再跑結構全部7項與原Phase2 18／V9 5／V11 7、相關VisualFPS／M6及素材／展示回歸。Play Mode依Z逐一核對原三個同名stub已縮至Y2.8..3.6，新立管在X=-.5且通往屋頂，站／趴往返東側與後方走道、Q/E視線不穿管；逐張核對圖1其他構件，不因已修這根就宣稱整張圖全部PASS。若掃描失敗，保留完整Hierarchy、Renderer Bounds、角色位置／姿態與XML。PR #3保持Draft，不改PR #2／Phase1／main，等待ChatGPT審查與原生驗收。
+
+
+## V11 Phase 2.1／2.2 — Unity Native Failure Repair
+
+### A. 修正範圍、Git 基準與原生結果
+
+本次僅處理使用者回報的三項失敗，順序 R1 → R2 → R3。修改前本地與遠端 PR #3 HEAD 均為 `ebe9aab6c2756bd3bd59b9f4c5befe05c84fcbdb`；工作樹乾淨，fetch 後 HEAD...FETCH_HEAD 為 `0 / 0`，沒有未推送提交或需要覆蓋的使用者修改。
+
+沿用 `feature/v11-phase2-recycling-line`、既有 Draft PR #3，Base 是 `feature/v11-factory-rebuild`。Milestone A `7e116c06386204d882988ca86f2833d8c934da59`、B `bad8ab70d83fbcd366ca6ac4ee524e5c9d484865`、C `da677344fd77e68866116ed8928c5c65999946a5` 及排氣修正 `ebe9aab6c2756bd3bd59b9f4c5befe05c84fcbdb` 均保留在歷史中。
+
+**使用者 Unity 2023.1.22f1 對 ebe9aab6 的真實基準：**
+
+| 套件 | 總數 | PASS | 已知 FAIL | 逐項結果未提供 |
+| --- | ---: | ---: | ---: | ---: |
+| C3V11Phase2RecyclingLineTests | 18 | 18 | 0 | 0 |
+| C3V9VisibleIndustrialRouteTests | 5 | 5 | 0 | 0 |
+| C3V11SafeCirculationTests | 7 | 7 | 0 | 0 |
+| C3V11Phase21FactoryUpgradeTests | 7 | 2（排氣管） | 2（R1、R2） | 3 |
+| C3V11RecyclingArtTests | 6 | 6 | 0 | 0 |
+| C3V11RecyclingPresentationTests | 8 | 0（未獲逐項證據） | 1（R3） | 7 |
+| 合計 | 51 | 38 | 3 | 10 |
+
+排氣兩項已含在 Factory Upgrade 七項，沒有重複加算。舊30項在此 SHA 明確是 PASS；不是找不到、未知或 NOT RUN。其他10項只缺少結果資料，不能推定已過或未過。
+
+**本章所附 R1～R3 修正提交：全部51項 NOT RUN。**精確交付 SHA 由同次 PR #3 更新及交付回覆記錄；本章隨該修正提交追蹤。雲端沒有 Unity Editor，沒有新版 XML、PhysX 實測或 UI 點擊結果。歷史 PASS／FAIL 不會自動改標為新版 PASS。
+
+### B. R1 — P2_INFEED_4 接入主帶
+
+原失敗：`HighCornersHaveNativeSupportAndClearFullRadiusCargo`，舊檔第131行：`Infeed cargo blocked by BELT_SURFACE at (-6.26, 5.91, 16.85)`；允許 `0.00100000005m`，原生回報 `0.00642809272m`。完整 Stack Trace 未提供，不能自行重建。
+
+**已確認的來源缺陷：測試球心不等於正式運輸球心。**下降段從 `(-4.80,7.00,16.85)` 到 `(-6.20,5.80,16.85)`，再接水平主帶。舊測試以每段自己的 normal×0.121m 放球，忽略相鄰水平帶的承接。來源計算的斜面法線 `(-0.650791,0.759257,0)`，接續角約40.6013°；59/60樣本球心 `(-6.255412,5.911870,16.85)` 四捨五入恰為回報位置。該球心相對主帶的有限 Box 幾何已產生交叉，來源預測深度約8.130mm；這不是使用者 PhysX 的6.428mm，也沒有宣稱雲端重現相同原生數值。
+
+正式 `TransportPath.Evaluate` 早已對目前及相鄰的有限帶面做 SphereCast，求出承接位置，再留1mm抬升；這段正式求位／Move／拓撲逐位元保留。**沒有因為 Collider 名稱是 BELT_SURFACE 就忽略碰撞，也沒有認定所有相鄰帶面的穿透都合法。**正式幾何本次不改；若新原生查詢仍找到不合理穿透，新斷言會保留 FAIL。
+
+測試修正與診斷：
+
+- 使用正式 MaterialRecord 的 TransportPath，透過明確 by-ref 簽名反射呼叫 Evaluate，取代自行編造球心。掃描五段進料及接入後0.6m主帶；所有 Collider 的穿透仍須≤1mm，實際目前／相鄰有限面須在3mm內支撐，原料半徑仍0.12m。
+- 保留30段數量、ConnectionsMatch、兩個90°轉角全部可見護邊／吊架 Collider Bounds 斷言。沒有重建 P21_INFEED_JUNCTION_1／2，也沒有改任何端點、分類出口、ID或狀態機。
+- 舊59/60錯誤球心作負向控制，必須對真正主帶測得>1mm交叉。另在已求出的安全位置建立測試專用 BELT_SURFACE、SIDE_GUARD、P2_ROOF_HANGER 阻擋，三者都必須被同一嚴格查詢抓到；finally 銷毀。
+- 同時輸出舊59/60樣本、相同路程的正式球心、正式交點球心。診斷包含球心／半徑、Current／Next／Previous Section、完整 Collider Hierarchy、A/B端點、法線／接續角、Bounds、ClosestPoint、有限／有號平面距離，以及所有命中 Collider 的穿透方向／深度與是否為相鄰支撐。故障時同樣輸出第三方護邊／機架碰撞。
+- 再讓正式九件原料經過同一積分器，逐步檢查真球心的支撐、1mm穿透和<0.37m單步位移；九個 ID 均須出現在接續前／後的路段，最終9件加工、3件收集。原 CargoFollowsRoute、ContinuousConveyorRoute、ElevatedInfeed 保留原樣，仍需重新跑。
+
+分類：**B（測試放置邏輯缺陷，來源可確認）**；正式交接幾何的新版原生驗收 **NOT RUN**，不能宣稱 PhysX 已通過。
+
+### C. R2 — 三座淨化容器與原角色
+
+原失敗：`RefuseCagesAndPurifiersStopTheOriginalPlayer`，舊檔第205行：`No native player/vessel contact; Expected True; Actual False`。回收籠已有 `Bin lateral welded rail`／`SORTING BIN - input refuse floor` 真接觸日誌；不能據此說整座設備無碰撞。完整 Stack Trace 未提供。
+
+**已確認的是斷言過度限定；第一個實際阻擋物仍待原生日誌。**舊測試只接受 SideContacts.Contains(vessel)，無法接受相同設備法蘭的合理阻擋，也看不到 abs(normal.y)≥0.6 被既有 recorder 過濾的接觸。來源中本體直徑0.54m、Y0.82～2.82；下法蘭直徑0.61m、Y0.79～0.97；上法蘭直徑0.62m、Y2.70～2.86；底座頂Y0.825。下法蘭比本體向外多35mm，但原 CharacterController 有0.3m radius、0.08m skinWidth、0.3m stepOffset與圓形底部；僅靠 Bounds 不能唯一證明首次接觸必然是下法蘭。本次不把這個假說寫成已量得的根因。
+
+測試分兩層，三座 Z15.88／17.44／19.00 都驗證：
+
+1. **容器本體獨立驗證：**保留並要求可見 Renderer、啟用非Trigger Collider，以及 Bounds 尺寸／中心匹配。以原玩家相同0.3m半徑球，在Y1.82、上下法蘭之間，從X=-3.8沿X正方向 SphereCast；起點必須在容器外，第一個實際命中必須是指定容器，不能由其他設備遮住。來源預測接觸距離0.53m，原生測試容差3mm。再要求額外30mm侵入會被 ComputePenetration 抓到；暫時停用該 Collider 的負向控制不得仍命中該容器，finally立即恢復並重新確認命中。這只改測試場景中的短暫狀態，正式容器 Collider 不修改。
+2. **設備整體阻擋：**原 CharacterController 仍從 `(-3.8,0.84,z)` 走65步，radius／skin／stepOffset不改。須有來自該座本體／法蘭／已驗證安裝件的真實回呼，法線X<-0.5抵抗行進；第一個抵抗接觸若是其他場景障礙即 FAIL。不以任意 CollisionFlags.Sides 判PASS。保留終點X<-3.15，另檢查本體高度的最近距離及侵入量不能超過角色原有skin（另5mm查詢數值餘量）。回收籠39個Collider及站／趴真接觸斷言完整保留。
+
+`C3V11CollisionRecorder` 僅增加預設關閉的詳細捕捉：每次 Move 前清空，每步保存真實位移、CollisionFlags、所有 Collider 完整路徑、接觸法線／點及 moveDirection／moveLength。原 SideContacts 的 abs(normal.y)<0.6 規則完全保留，其他原回歸預設不開詳細捕捉。每座成功只輸出一次摘要（index、Z、全組Bounds、起終點、原CC參數、首側接觸、首抵抗接觸、唯一物件、最近距離／侵入量）；失敗才附65步完整明細。finally關閉捕捉並清空，不洗版重複Console。
+
+分類：**B（目標限定缺陷，已修測試）＋D（原生第一接觸次序尚未確認）**。正式 `BuildPollutionSkid`、Collider、容器／法蘭／底座／控制器、三根新排氣路線、平台／護欄／樓梯／PVC全部逐位元保留。獨立測試與回呼尚未執行，不能宣稱正式容器已重新通過。
+
+### D. R3 — 可捲動的 Presentation Button
+
+原失敗：`ProductionUguiReceivesARealClickWithoutReactivationOrPuzzleSubmission`，舊檔第166行：`Expected: not <empty>; But was: <empty>`，發生在 RaycastAll 後、實際點擊前。UI 路徑為 `C3UiCanvas/PuzzlePanel/Viewport/Content/Presentation`；完整 Stack Trace、當時 Screen 尺寸／捲動位置未提供。
+
+**已確認兩個來源問題：**測試未先確認按鈕在 RectMask2D 可視範圍內；正式 ScrollContent 的 Viewport 只有 RectMask2D／ScrollRect，沒有 Graphic。說明文字均 raycastTarget=false，若短視窗內只剩文字、所有按鈕在裁切區外，頂層 Panel 的 Image 是 ScrollRect 的父物件，從該命中向上傳遞滾輪不會進入子 Viewport 的 ScrollRect。這個正式捲動接收缺口可以由物件／事件階層確認。至於舊空 Raycast 是否還有其他 EventSystem／遮擋原因，仍待新原生診斷，不能唯一歸因於某個未知 Game View 尺寸。
+
+**正式修正只有 C3UiView.ScrollContent：**既有 Viewport 增加透明且 raycastTarget=true 的 Image，使空白／說明文字上的滾輪與拖曳能經正常 UGUI 命中／父鏈傳到原 ScrollRect。RectMask2D、Layout、正式按鈕callback與所有權限不關閉、不繞過。這個共用方法也用於任務表及完成面板，需要 VisualFPS／M6／人工捲動回歸；沒有改解謎、啟動、Session或收據程式。
+
+測試修正：
+
+- 使用真正 EventSystem.current、啟用 InputModule／GraphicRaycaster，以及正式 Overlay Canvas。等待面板 Update，再 ForceUpdateCanvases／ForceRebuildLayoutImmediate，記錄輸入Context。
+- 保留正式 RectMask2D，把同一 Viewport 在測試內暫時縮至最多180像素，走正常 ScrollRect 頂部位置；被裁切的按鈕必須無有效點擊接收者，也不能啟動展示。這是短可視範圍控制，不冒稱已在多個真Game View解析度跑過。
+- 在可見 Viewport 上做真正 Raycast，要求命中物件可經 ExecuteEvents 的 IScrollHandler 父鏈到達原 ScrollRect；傳遞正常 wheel scrollDelta，將按鈕捲入可見區。未直接平移按鈕、改父物件或移除Mask。finally還原Viewport尺寸／捲動位置、停止慣性。
+- 在原Game View尺寸再次確認按鈕active／interactable／raycastTarget、中心在Screen與Viewport內、Mask接受該點，並要求最高優先命中的 IPointerClickHandler 是真Presentation Button。允許合法的子Graphic事件接收鏈，不要求永遠是Button根Image。
+- 只有通過該點的真實Raycast，才送 pointerDown→重新Raycast核對同按鈕→pointerUp→pointerClick。沒有呼叫button.onClick.Invoke，也未用console.StartPresentation代替這次UI互動。
+- 原有真正建立Session、面板自關、游標鎖定、忙碌不能再啟動、進度、解謎提交數不增、Activated僅一次的斷言保留；finally關台、解除handler、還原EventSystem原選取物件。其他七項展示測試（包括十輪）方法內容逐位元保留。
+
+每階段診斷包含Screen寬高、Canvas renderMode／sortingOrder／scaleFactor、CanvasScaler、active／GraphicRaycaster、EventSystem／InputModule型別與啟用、Panel、Viewport／Button世界四角及螢幕範圍、Content高度／anchoredPosition／normalizedPosition、按鈕狀態／Image／cull、可視相交／Mask判定、Raycast數與前五個完整Hierarchy／排序，以及所有啟用Canvas，便於區分裁切、布局、事件環境和遮擋。
+
+分類：**A（正式空白區捲動接收缺口）＋B/C（測試未先捲到可視範圍與布局條件）**；舊環境唯一成因及新版實際點擊驗收仍待原生確認。
+
+### E. 修改檔案與保護界線
+
+| 檔案 | 類別／必要原因 |
+| --- | --- |
+| Assets/_Modules_/02_Levels/Level03/Scripts/C3UiView.cs | 正式UI；只在ScrollContent補透明Viewport hit surface，恢復正常wheel／drag事件接收 |
+| Assets/_Modules_/05_Testing/PlayMode/C3V11Phase21FactoryUpgradeTests.cs | 只調R1／R2方法及必要helpers；正式求位、有限支撐、嚴格穿透、反例與真設備接觸診斷 |
+| Assets/_Modules_/05_Testing/PlayMode/C3V11CollisionRecorder.cs | 測試診斷；沿用原fixture，加預設關閉的每Move完整接觸資料，原SideContacts規則不變 |
+| Assets/_Modules_/05_Testing/PlayMode/C3V11RecyclingPresentationTests.cs | 只調R3方法及必要helpers；可視／裁切反例、正常滾輪、Raycast與pointer事件、清理與UI診斷 |
+| Assets/_Modules_/07_Docs/DevelopmentReports/V11_Phase2_Report.md | 本章與歷史／新版結果分離，列明根因證據、未確認事項與逐項驗收表 |
+
+沒有新資產或meta。沒有修改其他場景、PNG／OBJ／材質、Packages／ProjectSettings、武器／背包、正式統計、機台／帶面／30節點、正式原料ID／成品Source ID、Session隔離／收據、上下樓平台、雙梯、護欄、PVC或三根已通過的排氣管。既有Phase 2／V9／V11／Art／VisualFPS／M6測試整檔保留；Factory其餘五項（含排氣兩項）和Presentation其餘七項測試方法保留。
+
+所有測試沿用既有 Phase2→SafeCirculation fixture：原場景生命週期、Runtime Singleton／inventory／quickSlots、Time.timeScale、Cursor、input Context與角色狀態由原fixture清理；本次新增的probe／阻擋物、短暫Collider狀態、詳細回呼、Viewport／選取狀態都有try/finally還原。不新增EventSystem或另一套場景初始化。
+
+### F. 新版實際執行狀態及51項明細
+
+```text
+Unity Compilation: NOT RUN
+Unity PlayMode: NOT RUN
+Manual Gameplay: NOT RUN
+```
+
+新版執行環境：雲端未安裝Unity Editor，沒有執行Unity 2023.1.22f1；下表新版欄的全部NOT RUN均指本章所屬修正提交（精確SHA見同次PR交付）。`ebe9aab6`欄只記使用者該完整SHA在Unity 2023.1.22f1的實際回報。**BLOCKED在歷史欄代表結果資料未提供，不是聲稱當時沒有執行。**三個FAIL的原錯誤／舊行號／座標／Stack Trace缺漏見B、C、D節；新版沒有執行故無新錯誤或Stack Trace，不將來源檢查填成原生PASS。
+
+| Test Suite | Test Name | ebe9aab6歷史結果 | 本次修正提交 |
+| --- | --- | --- | --- |
+| C3V11Phase2RecyclingLineTests | ElevatedInfeed | PASS | NOT RUN |
+| C3V11Phase2RecyclingLineTests | WallOpeningClearance | PASS | NOT RUN |
+| C3V11Phase2RecyclingLineTests | ContinuousConveyorRoute | PASS | NOT RUN |
+| C3V11Phase2RecyclingLineTests | IngressIdentityAndTriggerDedup | PASS | NOT RUN |
+| C3V11Phase2RecyclingLineTests | CargoFollowsRoute | PASS | NOT RUN |
+| C3V11Phase2RecyclingLineTests | PaperSorting | PASS | NOT RUN |
+| C3V11Phase2RecyclingLineTests | MetalSorting | PASS | NOT RUN |
+| C3V11Phase2RecyclingLineTests | PlasticSorting | PASS | NOT RUN |
+| C3V11Phase2RecyclingLineTests | ProcessingState | PASS | NOT RUN |
+| C3V11Phase2RecyclingLineTests | MachineOutput | PASS | NOT RUN |
+| C3V11Phase2RecyclingLineTests | OutputConveyor | PASS | NOT RUN |
+| C3V11Phase2RecyclingLineTests | MaterialAccounting | PASS | NOT RUN |
+| C3V11Phase2RecyclingLineTests | ActivationState | PASS | NOT RUN |
+| C3V11Phase2RecyclingLineTests | ReloadSafety | PASS | NOT RUN |
+| C3V11Phase2RecyclingLineTests | UpperWalkwayClearance | PASS | NOT RUN |
+| C3V11Phase2RecyclingLineTests | ChipAndGuardRegression | PASS | NOT RUN |
+| C3V11Phase2RecyclingLineTests | ProneWalkwayClearance | PASS | NOT RUN |
+| C3V11Phase2RecyclingLineTests | Regression | PASS | NOT RUN |
+| C3V9VisibleIndustrialRouteTests | ReplacementStairsHaveMatchingPhysicalTreadsOnBothSides | PASS | NOT RUN |
+| C3V9VisibleIndustrialRouteTests | BReceivingBeltActuallyExistsOnCFrontFaceAndMeetsMainHighBelt | PASS | NOT RUN |
+| C3V9VisibleIndustrialRouteTests | ReplacementDeckWorldBoundsMatchBothStairExitsAndRearBay | PASS | NOT RUN |
+| C3V9VisibleIndustrialRouteTests | PlayerCanClimbRightStairAndReachRearMaintenanceBridge | PASS | NOT RUN |
+| C3V9VisibleIndustrialRouteTests | PriorFloorStripeIsPassable | PASS | NOT RUN |
+| C3V11SafeCirculationTests | WalkACollectExactlyOneChipAndReturnDownB | PASS | NOT RUN |
+| C3V11SafeCirculationTests | WalkBThenRearConnectionAndDescendA | PASS | NOT RUN |
+| C3V11SafeCirculationTests | GroundBCDoorApproachRemainsOpenUnderTheEastFlight | PASS | NOT RUN |
+| C3V11SafeCirculationTests | EveryGuardStopsStandingAndProneCapsulesIncludingCorners | PASS | NOT RUN |
+| C3V11SafeCirculationTests | WorldGeometryMatchesEnabledCollidersAndHasNoHeadObstructions | PASS | NOT RUN |
+| C3V11SafeCirculationTests | LegacyCleanupPreservesFloorTriggersAndSurvivesSceneReload | PASS | NOT RUN |
+| C3V11SafeCirculationTests | OriginalPartsConsoleSortingBenchesAndWeaponStillOperate | PASS | NOT RUN |
+| C3V11Phase21FactoryUpgradeTests | EndStopsProtectDeadEndsWithoutClosingLiveTransfers | BLOCKED（結果未提供） | NOT RUN |
+| C3V11Phase21FactoryUpgradeTests | HighCornersHaveNativeSupportAndClearFullRadiusCargo | FAIL（R1） | NOT RUN |
+| C3V11Phase21FactoryUpgradeTests | DEntranceLosesOnlyTheDuplicateDecorativeFrame | BLOCKED（結果未提供） | NOT RUN |
+| C3V11Phase21FactoryUpgradeTests | RefuseCagesAndPurifiersStopTheOriginalPlayer | FAIL（R2） | NOT RUN |
+| C3V11Phase21FactoryUpgradeTests | UpperSupportsStayBelowDeckAndLeaveBothStancesAThroughRoute | BLOCKED（結果未提供） | NOT RUN |
+| C3V11Phase21FactoryUpgradeTests | AllThreeExhaustRoutesAvoidDeckRailsAndJoinTheExistingRoofHeader | PASS | NOT RUN |
+| C3V11Phase21FactoryUpgradeTests | ReroutedExhaustLeavesRealStandingProneAndEyeLeanEnvelopesClear | PASS | NOT RUN |
+| C3V11RecyclingArtTests | FifteenImportedVariantsUseRealVolumeSharedMaterialsAndSafeProxy | PASS | NOT RUN |
+| C3V11RecyclingArtTests | OfficialNineInputsKeepTypesIdsAndDeterministicVisualVariety | PASS | NOT RUN |
+| C3V11RecyclingArtTests | MultiMeshBottleCapsAndBodiesCompressTogether | PASS | NOT RUN |
+| C3V11RecyclingArtTests | ExternalCargoRetainsStrictEnvelopeAndWholeVisualRoot | PASS | NOT RUN |
+| C3V11RecyclingArtTests | RealBalesRetainProductEnvelopeProvenanceAndCollection | PASS | NOT RUN |
+| C3V11RecyclingArtTests | BackOfMachineStockIsDecorationAndLeavesRearMaintenanceAisle | PASS | NOT RUN |
+| C3V11RecyclingPresentationTests | PresentationRequiresRunningCollectedProductionAndTheOpenRealConsole | BLOCKED（結果未提供） | NOT RUN |
+| C3V11RecyclingPresentationTests | ProductionUguiReceivesARealClickWithoutReactivationOrPuzzleSubmission | FAIL（R3） | NOT RUN |
+| C3V11RecyclingPresentationTests | TenCompleteNativeSessionsPreserveRewardsIdsPhysicsAndBoundedResources | BLOCKED（結果未提供） | NOT RUN |
+| C3V11RecyclingPresentationTests | PauseCloseReopenAndLeavingConsoleDoNotRestartOrCancelTheSession | BLOCKED（結果未提供） | NOT RUN |
+| C3V11RecyclingPresentationTests | DisableAndCancellationRestoreFormalActiveRendererAndColliderStates | BLOCKED（結果未提供） | NOT RUN |
+| C3V11RecyclingPresentationTests | FailedNativeRouteCleansTheSessionAndRestoresFormalProducts | BLOCKED（結果未提供） | NOT RUN |
+| C3V11RecyclingPresentationTests | LevelCompletionCancelsReplayAndKeepsCompletionInputPriority | BLOCKED（結果未提供） | NOT RUN |
+| C3V11RecyclingPresentationTests | SceneReloadDropsAllReplayStateAndKeepsSharedAssetsBounded | BLOCKED（結果未提供） | NOT RUN |
+
+
+上述六套件檔案都位於 `Assets/_Modules_/05_Testing/PlayMode/`，檔名為Suite名稱加 `.cs`。三項針對性測試的源碼修補與新斷言已實作，**原生重新驗證仍NOT RUN**。原30項也沒有在新版真正執行。VisualFPS整套與M6FlowTests整套同為 **NOT RUN**，不計入51項；沒有任何新測試被Ignore、略過或刪除。
+
+已執行的**來源檢查**（僅來源PASS）：
+
+- C# tree-sitter AST：114檔、1021方法、151個IEnumerator，語法樹沒有error；這不是型別／Unity編譯。Evaluate的6個反射參數明列float／float／Vector3／out Vector3／out Quaternion／out int，對照真宣告。
+- 指定51個方法名稱／數量與ebe9aab6完全相同，只有R1／R2／R3方法內容改動；十輪等其他展示測試及兩項排氣回歸逐位元保留，沒有Ignore。原舊30項及相關VisualFPS／M6整檔保留。
+- 正式Geometry／Line／ReferenceFactory（含新排氣）／V3Circulation／PuzzleConsole／RecyclingVisuals／EcoRecycleCargo與ebe9aab6逐位元相同；C3UiView只有ScrollContent一個正式方法改變。運輸、收據隔離和Session清理來源檢查保留。
+- 獨立有限Box來源模型定位舊59/60樣本及其主帶交叉，並確認三容器相同尺寸、Y1.82的0.3m球不碰上下法蘭，預測本體接觸距離0.53m；未替代PhysX或CharacterController。
+- 全537個meta GUID唯一，沒有新增／缺失meta；沒有Scene／資源／套件異動。`git diff --check`與允許的五檔修改範圍檢查通過。
+
+### G. 使用者原生驗收順序與仍待確認事項
+
+1. 保留自己的本地修改，在原Phase2分支Fetch／Pull本次PR #3 HEAD，記錄完整SHA。用Unity 2023.1.22f1開啟、等待編譯；有紅字即先保存第一個完整錯誤，未編譯成功前不標PlayMode PASS。
+2. 先逐一跑R1、R2、R3；各自重跑確認隔離。保存XML、完整失敗Stack Trace及R1／R2／R3診斷。R1核對同路程舊／正式球心與所有第三方碰撞；R2核對每座第一側接觸／抵抗接觸，確認是否真由法蘭先擋；R3核對Mask／正常滾輪／最高Raycast接收者與真指標事件。
+3. 跑Factory Upgrade七項→Art六項→Presentation八項（包含十輪），共21項；兩項排氣不重複算。仍有任何其他FAIL都保留名稱／診斷，不能推定未提供的其他十項全過。
+4. 在新SHA重跑原Phase2 18→V9 5→V11 7，然後受影響VisualFPS／M6與其他控制台／玩家操作／場景清理測試。完成才可給新版51項PASS；不要用舊38項或來源AST代替。
+5. Game／Scene View檢查斜坡接主帶真9→3移動不跳起／下陷／卡住，護邊／支撐保留；三淨化容器／法蘭／底座都實體阻擋且沒有巨大隱形牆；東梯／PVC／站趴平台／護欄與三根排氣路線正常。
+6. 正常收零件→解謎→啟動→正式9→3收集→F或自訂鍵開台。在1280×720、960×540、640×360等Game View尺寸檢查可見說明區的滾輪與拖曳、按鈕捲入後可滑鼠點擊；完成展示後三輪重播正式收據／背包不增，正式三成品恢復。檢查ESC、TAB、1～5、Q/E、Z、射擊、瞄準、換彈、暫停及完成畫面優先。
+
+**尚未確認：**三項修正的Unity型別編譯／PhysX／EventSystem實測；R2實際第一阻擋物／法線及原SideContacts過濾影響；舊R3空Raycast是否還有裁切之外的原因；其他十項舊新增測試的真實結果；新版完整51項、相關VisualFPS／M6、十輪資源數與人工操作。新診斷仍FAIL時保留缺陷，不把它改成自動成功。既有B→C完整關卡銜接仍BLOCKED（Level02場景不可用），與本次三項修正分開。
+
+交付僅正常Commit／Push至原Phase2分支並更新既有PR #3，維持Draft與原Base；不修改main、Phase1或PR #2，不強推、不rebase、不合併、不改Ready。完成本次修補後停止額外開發，等待ChatGPT審查及使用者Unity實際驗收。

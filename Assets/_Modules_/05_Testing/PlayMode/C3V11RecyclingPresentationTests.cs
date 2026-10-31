@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using UnityEngine;
@@ -77,6 +78,86 @@ namespace M6IntegrationTests
             object[] legs=Items(Member(record,"Path"),"Legs"); int segment=(int)Member(record,"CurrentRouteSegment");
             return legs.Skip(Mathf.Max(0,segment-1)).Take(segment==0?2:3).Select(l=>(Collider)Member(l,"Support")).Distinct().ToArray();
         }
+        private static string UiPath(Transform item)
+        {
+            string path=item.name; for (Transform parent=item.parent;parent;parent=parent.parent) path=parent.name+"/"+path;
+            return path;
+        }
+        private static Rect ScreenRect(RectTransform rect,out Vector3[] corners)
+        {
+            corners=new Vector3[4]; rect.GetWorldCorners(corners);
+            Vector2[] screen=corners.Select(p=>RectTransformUtility.WorldToScreenPoint(null,p)).ToArray();
+            return Rect.MinMaxRect(screen.Min(p=>p.x),screen.Min(p=>p.y),screen.Max(p=>p.x),screen.Max(p=>p.y));
+        }
+        private static Vector2 ButtonPoint(Button button)
+        {
+            RectTransform rect=(RectTransform)button.transform;
+            return RectTransformUtility.WorldToScreenPoint(null,rect.TransformPoint(rect.rect.center));
+        }
+        private static List<RaycastResult> UiHits(EventSystem events,Vector2 point)
+        {
+            List<RaycastResult> hits=new List<RaycastResult>(); events.RaycastAll(new PointerEventData(events) {position=point},hits); return hits;
+        }
+        private static bool HitsButton(List<RaycastResult> hits,Button button)
+            => hits.Count>0 && ExecuteEvents.GetEventHandler<IPointerClickHandler>(hits[0].gameObject)==button.gameObject;
+        private static string UiDiagnostics(Canvas canvas,ScrollRect scroll,Button button,EventSystem events,Vector2 point,List<RaycastResult> hits)
+        {
+            Rect viewport=ScreenRect(scroll.viewport,out Vector3[] viewportCorners),target=ScreenRect((RectTransform)button.transform,out Vector3[] buttonCorners);
+            RectMask2D mask=scroll.viewport.GetComponent<RectMask2D>(); GraphicRaycaster raycaster=canvas.GetComponent<GraphicRaycaster>();
+            CanvasScaler scaler=canvas.GetComponent<CanvasScaler>(); StringBuilder text=new StringBuilder();
+            text.AppendLine("R3 screen="+Screen.width+"x"+Screen.height+" canvas="+UiPath(canvas.transform)+" renderMode="+canvas.renderMode+
+                " sortingOrder="+canvas.sortingOrder+" active="+canvas.gameObject.activeInHierarchy+" scaleFactor="+canvas.scaleFactor+
+                " CanvasScaler.scaleFactor="+(scaler?scaler.scaleFactor.ToString():"MISSING")+" GraphicRaycaster.enabled="+(raycaster && raycaster.isActiveAndEnabled));
+            text.AppendLine("EventSystem="+(events?UiPath(events.transform):"MISSING")+" enabled="+(events && events.isActiveAndEnabled)+
+                " inputModule="+(events && events.currentInputModule?events.currentInputModule.GetType().FullName:"MISSING")+
+                " inputModuleEnabled="+(events && events.currentInputModule && events.currentInputModule.isActiveAndEnabled)+
+                " panelActive="+scroll.transform.parent.gameObject.activeInHierarchy);
+            text.AppendLine("viewportWorld="+string.Join(";",viewportCorners.Select(p=>p.ToString("F3")))+" viewportScreen="+viewport+
+                " contentHeight="+scroll.content.rect.height+" contentPosition="+scroll.content.anchoredPosition+
+                " normalized="+scroll.verticalNormalizedPosition+" scrollEnabled="+scroll.isActiveAndEnabled);
+            text.AppendLine("button="+UiPath(button.transform)+" active="+button.gameObject.activeInHierarchy+" interactable="+button.interactable+
+                " image.raycastTarget="+(button.image && button.image.raycastTarget)+" graphicCulled="+(button.image && button.image.canvasRenderer.cull)+
+                " buttonWorld="+string.Join(";",buttonCorners.Select(p=>p.ToString("F3")))+" buttonScreen="+target+" point="+point+
+                " overlapsViewport="+viewport.Overlaps(target)+" maskEnabled="+(mask && mask.enabled)+
+                " maskAcceptsPoint="+(mask && mask.IsRaycastLocationValid(point,null)));
+            text.AppendLine("RaycastAll count="+hits.Count+" firstHits="+string.Join(";",hits.Take(5).Select(h=>UiPath(h.gameObject.transform)+
+                " order="+h.sortingOrder+" depth="+h.depth+" module="+h.module.GetType().Name)));
+            text.AppendLine("Active canvases="+string.Join(";",Object.FindObjectsOfType<Canvas>().Where(c=>c.isActiveAndEnabled)
+                .Select(c=>UiPath(c.transform)+" order="+c.sortingOrder+" mode="+c.renderMode)));
+            return text.ToString();
+        }
+        private static void RebuildScroll(ScrollRect scroll)
+        {
+            Canvas.ForceUpdateCanvases(); LayoutRebuilder.ForceRebuildLayoutImmediate(scroll.content); Canvas.ForceUpdateCanvases();
+        }
+        private static void WheelButtonIntoView(Canvas canvas,ScrollRect scroll,Button button,EventSystem events)
+        {
+            RebuildScroll(scroll); scroll.StopMovement();
+            Bounds target=RectTransformUtility.CalculateRelativeRectTransformBounds(scroll.viewport,button.transform);
+            Rect viewport=scroll.viewport.rect;
+            if (target.min.y<viewport.yMin+2f || target.max.y>viewport.yMax-2f)
+            {
+                float hidden=Mathf.Max(0f,scroll.content.rect.height-viewport.height);
+                float pixels=Mathf.Clamp(viewport.center.y-target.center.y,-scroll.content.anchoredPosition.y,hidden-scroll.content.anchoredPosition.y);
+                Vector2 point=RectTransformUtility.WorldToScreenPoint(null,scroll.viewport.TransformPoint(viewport.center));
+                List<RaycastResult> hits=UiHits(events,point);
+                string evidence=UiDiagnostics(canvas,scroll,button,events,point,hits);
+                Assert.IsTrue(scroll.vertical && scroll.scrollSensitivity>0f,"ScrollRect cannot scroll\n"+evidence);
+                Assert.IsTrue(hits.Count>0 && ExecuteEvents.GetEventHandler<IScrollHandler>(hits[0].gameObject)==scroll.gameObject,
+                    "Wheel over the real viewport cannot reach ScrollRect\n"+evidence);
+                PointerEventData wheel=new PointerEventData(events) {position=point,scrollDelta=new Vector2(0f,-pixels/scroll.scrollSensitivity)};
+                Assert.AreSame(scroll.gameObject,ExecuteEvents.ExecuteHierarchy(hits[0].gameObject,wheel,ExecuteEvents.scrollHandler));
+                scroll.StopMovement(); RebuildScroll(scroll);
+            }
+            Vector2 buttonPoint=ButtonPoint(button); List<RaycastResult> finalHits=UiHits(events,buttonPoint);
+            string details=UiDiagnostics(canvas,scroll,button,events,buttonPoint,finalHits);
+            Assert.IsTrue(button.gameObject.activeInHierarchy && button.interactable && button.image && button.image.raycastTarget,"Button unavailable\n"+details);
+            Assert.IsTrue(RectTransformUtility.RectangleContainsScreenPoint(scroll.viewport,buttonPoint,null) &&
+                scroll.viewport.GetComponent<RectMask2D>().IsRaycastLocationValid(buttonPoint,null) &&
+                new Rect(0f,0f,Screen.width,Screen.height).Contains(buttonPoint),"Button centre is clipped/off-screen\n"+details);
+            Assert.IsTrue(HitsButton(finalHits,button),"No unobstructed Button event receiver at the visible point\n"+details);
+            Debug.Log(details);
+        }
         private sealed class NativeOutputProbe : IDisposable
         {
             private readonly GameObject owner;
@@ -149,6 +230,7 @@ namespace M6IntegrationTests
         {
             int activations=0; Action activated=()=>activations++;
             EventInfo evt=device.GetType().GetEvent("Activated"); evt.AddEventHandler(device,activated);
+            EventSystem eventOwner=EventSystem.current; GameObject previousSelection=eventOwner?eventOwner.currentSelectedGameObject:null;
             try
             {
                 yield return FirstProduction();
@@ -159,12 +241,50 @@ namespace M6IntegrationTests
                 Assert.AreEqual("回收產線控制",content.Find("Title").GetComponent<Text>().text);
                 foreach (string name in new[] {"Choice0","Choice1","Choice2","Confirm","Retry","Activate"}) Assert.IsFalse(content.Find(name).gameObject.activeSelf,name);
                 Button button=content.Find("Presentation").GetComponent<Button>(); Assert.IsTrue(button.interactable);
-                Canvas.ForceUpdateCanvases();
-                Vector2 point=RectTransformUtility.WorldToScreenPoint(null,((RectTransform)button.transform).TransformPoint(((RectTransform)button.transform).rect.center));
-                EventSystem events=Object.FindObjectOfType<EventSystem>(); Assert.IsNotNull(events);
-                PointerEventData pointer=new PointerEventData(events) {position=point}; List<RaycastResult> hits=new List<RaycastResult>(); events.RaycastAll(pointer,hits);
-                Assert.IsNotEmpty(hits); Assert.AreEqual(button.gameObject,hits[0].gameObject);
-                ExecuteEvents.Execute(button.gameObject,pointer,ExecuteEvents.pointerClickHandler);
+                Canvas canvas=content.GetComponentInParent<Canvas>(); ScrollRect scroll=content.parent.GetComponent<ScrollRect>();
+                Assert.IsNotNull(scroll); Assert.IsNotNull(canvas); Assert.AreEqual(RenderMode.ScreenSpaceOverlay,canvas.renderMode);
+                EventSystem events=EventSystem.current;
+                string initial=UiDiagnostics(canvas,scroll,button,events,ButtonPoint(button),new List<RaycastResult>());
+                Assert.IsNotNull(events,initial); Assert.IsTrue(events.isActiveAndEnabled,initial); Assert.IsNotNull(events.currentInputModule,initial);
+                Assert.IsTrue(events.currentInputModule.isActiveAndEnabled,initial);
+                Assert.IsTrue(canvas.GetComponent<GraphicRaycaster>().isActiveAndEnabled,initial);
+                Debug.Log("R3 Input context="+(input?Member(input,"Context").ToString():"No PlayerInputService")+"\n"+initial);
+                RebuildScroll(scroll);
+                // Exercise a short real viewport even when this test runs in a
+                // tall Game View. The production mask stays enabled throughout.
+                Vector2 originalMin=scroll.viewport.offsetMin,originalMax=scroll.viewport.offsetMax;
+                float originalPosition=scroll.verticalNormalizedPosition;
+                try
+                {
+                    float shortHeight=Mathf.Min(180f,scroll.viewport.rect.height);
+                    scroll.viewport.offsetMin=new Vector2(originalMin.x,((RectTransform)scroll.viewport.parent).rect.height+originalMax.y-shortHeight);
+                    RebuildScroll(scroll); scroll.verticalNormalizedPosition=1f; RebuildScroll(scroll);
+                    Vector2 clipped=ButtonPoint(button); List<RaycastResult> clippedHits=UiHits(events,clipped);
+                    string evidence=UiDiagnostics(canvas,scroll,button,events,clipped,clippedHits);
+                    Assert.IsTrue(scroll.viewport.GetComponent<RectMask2D>().enabled);
+                    Assert.IsFalse(scroll.viewport.GetComponent<RectMask2D>().IsRaycastLocationValid(clipped,null),"Negative control did not clip the button\n"+evidence);
+                    Assert.IsFalse(HitsButton(clippedHits,button),"An invisible button still receives raycasts\n"+evidence);
+                    Assert.IsNull(Member(line,"ActivePresentation")); Debug.Log("R3 clipped negative control\n"+evidence);
+                    WheelButtonIntoView(canvas,scroll,button,events);
+                    // The viewport hit surface is necessary: a wheel event over
+                    // non-raycast text must reach the same production ScrollRect.
+                    Assert.IsTrue(scroll.viewport.GetComponent<Image>().raycastTarget);
+                }
+                finally
+                {
+                    scroll.viewport.offsetMin=originalMin; scroll.viewport.offsetMax=originalMax;
+                    RebuildScroll(scroll); scroll.verticalNormalizedPosition=originalPosition; scroll.StopMovement(); RebuildScroll(scroll);
+                }
+                WheelButtonIntoView(canvas,scroll,button,events);
+                Vector2 point=ButtonPoint(button); List<RaycastResult> hits=UiHits(events,point);
+                Assert.IsTrue(HitsButton(hits,button),UiDiagnostics(canvas,scroll,button,events,point,hits));
+                PointerEventData pointer=new PointerEventData(events) {position=point,pressPosition=point,button=PointerEventData.InputButton.Left,
+                    eligibleForClick=true,pointerCurrentRaycast=hits[0],pointerPressRaycast=hits[0]};
+                GameObject press=ExecuteEvents.ExecuteHierarchy(hits[0].gameObject,pointer,ExecuteEvents.pointerDownHandler);
+                Assert.AreSame(button.gameObject,press); pointer.pointerPress=press; pointer.rawPointerPress=hits[0].gameObject;
+                List<RaycastResult> release=UiHits(events,point); Assert.IsTrue(HitsButton(release,button));
+                ExecuteEvents.Execute(press,pointer,ExecuteEvents.pointerUpHandler);
+                ExecuteEvents.Execute(press,pointer,ExecuteEvents.pointerClickHandler);
                 Assert.IsNotNull(Member(line,"ActivePresentation")); Assert.IsFalse((bool)Member(console,"PanelOpen"));
                 Assert.AreEqual(CursorLockMode.Locked,Cursor.lockState);
                 Assert.IsFalse((bool)Call(console,"StartPresentation"));
@@ -174,7 +294,12 @@ namespace M6IntegrationTests
                 Assert.AreEqual(attempts,Member(Find("C3TreasurePuzzle.C3PuzzleState"),"SubmissionCount")); Assert.AreEqual(1,activations);
                 Call(console,"ClosePanel");
             }
-            finally { evt.RemoveEventHandler(device,activated); }
+            finally
+            {
+                Call(console,"ClosePanel");
+                if (eventOwner) eventOwner.SetSelectedGameObject(previousSelection);
+                evt.RemoveEventHandler(device,activated);
+            }
         }
         [UnityTest] public IEnumerator TenCompleteNativeSessionsPreserveRewardsIdsPhysicsAndBoundedResources()
         {
