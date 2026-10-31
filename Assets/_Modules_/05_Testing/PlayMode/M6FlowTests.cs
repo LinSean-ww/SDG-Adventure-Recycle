@@ -29,12 +29,14 @@ namespace M6IntegrationTests
         private static object Coordinator => RuntimeType("SDGAdventure.ModuleSystem.ModuleCoordinator")
             .GetProperty("Instance").GetValue(null);
 
-        private static IEnumerator WaitForScene(string path)
+        private static IEnumerator WaitForScene(string path, int previousHandle = -1)
         {
             float until = Time.realtimeSinceStartup + 15f;
-            while (SceneManager.GetActiveScene().path != path && Time.realtimeSinceStartup < until)
+            while ((SceneManager.GetActiveScene().path != path || SceneManager.GetActiveScene().handle == previousHandle) &&
+                Time.realtimeSinceStartup < until)
                 yield return null;
             Assert.AreEqual(path, SceneManager.GetActiveScene().path);
+            Assert.AreNotEqual(previousHandle, SceneManager.GetActiveScene().handle, "Scene reload did not complete.");
         }
 
         private static void Launch(object coordinator)
@@ -45,23 +47,74 @@ namespace M6IntegrationTests
 
         private static IEnumerator ClickVisibleButton(Transform content, string name, float scrollPosition)
         {
+            // Let C3UiView.Update apply the current panel mode before rebuilding layout.
+            yield return null;
+            Canvas.ForceUpdateCanvases();
             ScrollRect scroll = content.parent.GetComponent<ScrollRect>();
-            scroll.verticalNormalizedPosition = scrollPosition;
+            Assert.IsNotNull(scroll, name + ": missing ScrollRect");
+            Assert.IsTrue(scroll.isActiveAndEnabled, name + ": inactive ScrollRect");
+            EventSystem events = EventSystem.current;
+            Assert.IsNotNull(events, name + ": missing EventSystem after scene load");
+            Assert.IsTrue(events.isActiveAndEnabled, name + ": inactive EventSystem");
+            Assert.IsNotNull(events.currentInputModule, name + ": missing input module");
+            Assert.AreEqual("InputSystemUIInputModule", events.currentInputModule.GetType().Name, name);
+            Assert.IsTrue(events.currentInputModule.isActiveAndEnabled, name + ": inactive input module");
+            scroll.StopMovement();
+            float hidden = Mathf.Max(0f, scroll.content.rect.height - scroll.viewport.rect.height);
+            float pixels = (1f - scrollPosition) * hidden - scroll.content.anchoredPosition.y;
+            if (Mathf.Abs(pixels) > 0.5f)
+            {
+                Assert.Greater(scroll.scrollSensitivity, 0f, name);
+                var wheel = new PointerEventData(events) {
+                    position = RectTransformUtility.WorldToScreenPoint(null,
+                        scroll.viewport.TransformPoint(scroll.viewport.rect.center)),
+                    scrollDelta = new Vector2(0f, -pixels / scroll.scrollSensitivity)
+                };
+                var wheelHits = new List<RaycastResult>();
+                events.RaycastAll(wheel, wheelHits);
+                Assert.IsNotEmpty(wheelHits, name + ": viewport received no wheel raycast");
+                wheel.pointerCurrentRaycast = wheelHits[0];
+                float before = scroll.content.anchoredPosition.y;
+                Assert.AreSame(scroll.gameObject, ExecuteEvents.ExecuteHierarchy(
+                    wheelHits[0].gameObject, wheel, ExecuteEvents.scrollHandler),
+                    name + ": top raycast does not route wheel events to ScrollRect");
+                Assert.That(scroll.content.anchoredPosition.y - before, Is.EqualTo(pixels).Within(0.5f),
+                    name + ": wheel did not move Content to the requested position");
+            }
+            scroll.StopMovement();
             for (int frame = 0; frame < 5; frame++) yield return null;
             Canvas.ForceUpdateCanvases();
             Button button = content.Find(name).GetComponent<Button>();
-            Assert.IsTrue(button.IsInteractable(), name);
-            var pointer = new PointerEventData(EventSystem.current) {
-                position = RectTransformUtility.WorldToScreenPoint(null, button.transform.position),
+            Assert.IsTrue(button.gameObject.activeInHierarchy, name + ": inactive button");
+            Assert.IsTrue(button.IsInteractable(), name + ": button not interactable");
+            var pointer = new PointerEventData(events) {
+                position = RectTransformUtility.WorldToScreenPoint(null,
+                    ((RectTransform)button.transform).TransformPoint(((RectTransform)button.transform).rect.center)),
                 button = PointerEventData.InputButton.Left
             };
             var hits = new List<RaycastResult>();
-            EventSystem.current.RaycastAll(pointer, hits);
-            Assert.IsNotEmpty(hits, name + " received no raycast");
-            Assert.AreEqual(button.gameObject, hits[0].gameObject, name + " was blocked by " + hits[0].gameObject.name);
-            ExecuteEvents.Execute(hits[0].gameObject, pointer, ExecuteEvents.pointerDownHandler);
-            ExecuteEvents.Execute(hits[0].gameObject, pointer, ExecuteEvents.pointerUpHandler);
-            ExecuteEvents.Execute(hits[0].gameObject, pointer, ExecuteEvents.pointerClickHandler);
+            events.RaycastAll(pointer, hits);
+            Canvas canvas = button.GetComponentInParent<Canvas>();
+            GraphicRaycaster raycaster = canvas.GetComponent<GraphicRaycaster>();
+            Assert.IsNotNull(raycaster, name + ": missing GraphicRaycaster");
+            var direct = new List<RaycastResult>();
+            raycaster.Raycast(pointer, direct);
+            string details = name + " scene=" + SceneManager.GetActiveScene().handle +
+                " point=" + pointer.position + " screen=" + Screen.width + "x" + Screen.height +
+                " content=" + scroll.content.anchoredPosition + " normalized=" + scroll.verticalNormalizedPosition +
+                " cull=" + button.image.canvasRenderer.cull + " depth=" + button.image.depth +
+                " raycastTarget=" + button.image.raycastTarget + " raycaster=" + raycaster.isActiveAndEnabled +
+                " direct=" + string.Join(",", direct.ConvertAll(hit => hit.gameObject.name)) +
+                " event=" + string.Join(",", hits.ConvertAll(hit => hit.gameObject.name));
+            Assert.IsTrue(scroll.viewport.GetComponent<RectMask2D>().IsRaycastLocationValid(pointer.position, raycaster.eventCamera), details);
+            Assert.IsNotEmpty(direct, details);
+            Assert.AreEqual(button.gameObject, direct[0].gameObject, details);
+            Assert.IsNotEmpty(hits, details);
+            Assert.AreEqual(button.gameObject, hits[0].gameObject, details);
+            pointer.pointerCurrentRaycast = hits[0];
+            Assert.IsTrue(ExecuteEvents.Execute(hits[0].gameObject, pointer, ExecuteEvents.pointerDownHandler), details);
+            Assert.IsTrue(ExecuteEvents.Execute(hits[0].gameObject, pointer, ExecuteEvents.pointerUpHandler), details);
+            Assert.IsTrue(ExecuteEvents.Execute(hits[0].gameObject, pointer, ExecuteEvents.pointerClickHandler), details);
         }
 
         [UnityTest]
@@ -97,16 +150,27 @@ namespace M6IntegrationTests
                 Assert.AreEqual(0, ((System.Collections.ICollection)Get(console, "Selection")).Count);
                 yield return ClickVisibleButton(content, "Close", 0f);
                 Assert.IsFalse((bool)Get(console, "PanelOpen"));
-                Assert.IsTrue((bool)Call(console, "OpenPanel"));
-                yield return ClickVisibleButton(content, "Choice0", 1f);
-                yield return ClickVisibleButton(content, "Choice1", 1f);
-                yield return ClickVisibleButton(content, "Choice2", 1f);
-                yield return ClickVisibleButton(content, "Confirm", 0f);
+                Assert.IsTrue((bool)Call(console, "OpenPanel"), "Puzzle panel must reopen after Close.");
+                // Slots are shuffled on every scene entry; click the semantic answer through the UI.
+                Component view = Find("C3TreasurePuzzle.C3UiView");
+                foreach (string step in new[] { "Sorting", "Recycling", "PollutionTreatment" })
+                {
+                    int slot = Array.FindIndex(new[] { 0, 1, 2 }, i => Call(view, "GetOptionAt", i).ToString() == step);
+                    Assert.GreaterOrEqual(slot, 0, "No displayed choice for " + step);
+                    int before = ((System.Collections.ICollection)Get(console, "Selection")).Count;
+                    yield return ClickVisibleButton(content, "Choice" + slot, 1f);
+                    Assert.AreEqual(before + 1, ((System.Collections.ICollection)Get(console, "Selection")).Count,
+                        "Pointer click did not select " + step);
+                }
                 Assert.That(content.Find("Confirm").position.y, Is.EqualTo(content.Find("Retry").position.y).Within(0.5f));
                 Assert.That(content.Find("Retry").position.y, Is.EqualTo(content.Find("Close").position.y).Within(0.5f));
-                Assert.IsTrue((bool)Get(Find("C3TreasurePuzzle.C3PuzzleState"), "PuzzleSolved"));
+                yield return ClickVisibleButton(content, "Confirm", 0f);
+                Assert.IsTrue((bool)Get(Find("C3TreasurePuzzle.C3PuzzleState"), "PuzzleSolved"),
+                    "The semantic answer must solve the puzzle through the Confirm button.");
+                Assert.IsTrue((bool)Get(console, "IsActivationPanel"), "Confirm must enter activation mode.");
                 yield return ClickVisibleButton(content, "Close", 0f);
-                Assert.IsTrue((bool)Call(console, "OpenPanel"));
+                Assert.IsFalse((bool)Get(console, "PanelOpen"), "Activation Close callback must close the panel.");
+                Assert.IsTrue((bool)Call(console, "OpenPanel"), "Activation panel must reopen after Close.");
                 yield return ClickVisibleButton(content, "Activate", 0f);
                 Component device = Find("C3TreasurePuzzle.C3DeviceState");
                 Assert.IsFalse((bool)Get(device, "LevelCompleted"));
@@ -117,8 +181,9 @@ namespace M6IntegrationTests
                 Assert.That(ui.transform.Find("CompletionBackdrop").GetComponent<Image>().color.a, Is.EqualTo(0.82f).Within(0.001f));
                 float margin = Mathf.Min(20f, Mathf.Min(Screen.width, Screen.height) * 0.04f);
                 Assert.That(((RectTransform)complete.parent.parent).rect.width, Is.EqualTo(Screen.width - 2 * margin).Within(0.1f));
+                int previousHandle = SceneManager.GetActiveScene().handle;
                 yield return ClickVisibleButton(complete, run == 0 ? "Restart" : "Selection", 0f);
-                yield return WaitForScene(run == 0 ? C3 : Selection);
+                yield return WaitForScene(run == 0 ? C3 : Selection, previousHandle);
                 yield return null;
             }
         }
@@ -161,9 +226,13 @@ namespace M6IntegrationTests
             Assert.IsNotNull(EventSystem.current.currentInputModule);
             Assert.AreEqual("InputSystemUIInputModule", EventSystem.current.currentInputModule.GetType().Name);
             Assert.IsTrue(EventSystem.current.currentInputModule.isActiveAndEnabled);
-            Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(null, target.position);
+            Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(null,
+                target.TransformPoint(((RectTransform)target).rect.center));
             var hits = new List<RaycastResult>();
-            EventSystem.current.RaycastAll(new PointerEventData(EventSystem.current) { position = screenPoint }, hits);
+            var pointer = new PointerEventData(EventSystem.current) { position = screenPoint };
+            EventSystem.current.RaycastAll(pointer, hits);
+            var direct = new List<RaycastResult>();
+            canvas.GetComponent<GraphicRaycaster>().Raycast(pointer, direct);
             var viewport = (RectTransform)canvas.transform.Find("PuzzlePanel/Viewport");
             var corners = new Vector3[4]; viewport.GetWorldCorners(corners);
             Image targetImage = button.GetComponent<Image>();
@@ -172,7 +241,17 @@ namespace M6IntegrationTests
                 " screen=" + Screen.width + "x" + Screen.height + " viewport=" + corners[0] + "/" + corners[2] +
                 " active=" + button.gameObject.activeInHierarchy + " cull=" + targetImage.canvasRenderer.cull +
                 " raycast=" + targetImage.raycastTarget + " depth=" + targetImage.depth + " display=" + canvas.GetComponent<Canvas>().targetDisplay + " raycaster=" + canvas.GetComponent<GraphicRaycaster>().isActiveAndEnabled +
+                " direct=" + string.Join(",", direct.ConvertAll(hit => hit.gameObject.name).ToArray()) +
                 " hits=" + string.Join(",", hits.ConvertAll(hit => hit.gameObject.name).ToArray()));
+            // Membership alone cannot detect an overlay above the choice. Exercise the top hit and callback too.
+            Component console = Find("C3TreasurePuzzle.C3PuzzleConsole");
+            yield return ClickVisibleButton(target.parent, "Choice0", 1f);
+            Assert.AreEqual(1, ((System.Collections.ICollection)Get(console, "Selection")).Count,
+                "Choice0 pointer click must select exactly one step.");
+            object selected = Get(console, "Selection");
+            Assert.AreEqual(Call(Find("C3TreasurePuzzle.C3UiView"), "GetOptionAt", 0),
+                selected.GetType().GetProperty("Item").GetValue(selected, new object[] { 0 }),
+                "The pointer callback must select the displayed step.");
         }
 
         [Test]
