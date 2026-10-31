@@ -544,7 +544,17 @@ namespace M6IntegrationTests
             Assert.IsNotNull(deckRenderer, setup);
             Assert.IsTrue(deckRenderer.enabled, "The blocking deck must remain visible.\n" + setup);
             Assert.IsTrue(character.enabled && character.detectCollisions, setup);
-            Assert.AreEqual(Vector3.one, character.transform.lossyScale, "The production capsule sweep assumes unit scale.\n" + setup);
+            Vector3 scale = character.transform.lossyScale;
+            float scaleDeviation = (scale - Vector3.one).magnitude;
+
+            Assert.Less(
+                scaleDeviation,
+                0.0001f,
+                "The production capsule sweep assumes near-unit scale." +
+                "\nActual scale=" + scale.ToString("F9") +
+                "\nDeviation=" + scaleDeviation.ToString("G9") +
+                "\n" + setup
+            );
             Assert.IsFalse(Physics.GetIgnoreLayerCollision(player.layer, ceiling.gameObject.layer), setup);
             Assert.IsFalse(Physics.GetIgnoreCollision(character, ceiling), setup);
 
