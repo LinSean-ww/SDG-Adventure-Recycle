@@ -159,6 +159,7 @@ namespace C3TreasurePuzzle
         }
         private C3DeviceState device;
         private C3RecyclingLineGeometry geometry;
+        private C3RecyclingVisuals visuals;
         private Transform cargoRoot;
         private readonly List<MaterialRecord> records=new List<MaterialRecord>();
         private readonly List<FinishedBatch> batches=new List<FinishedBatch>();
@@ -200,6 +201,8 @@ namespace C3TreasurePuzzle
         {
             device=GetComponent<C3DeviceState>(); geometry=GetComponent<C3RecyclingLineGeometry>();
             if (!device || !geometry || !geometry.BuildRoot) throw new InvalidOperationException("Recycling line requires device and built geometry");
+            visuals=geometry.Visuals;
+            if (!visuals) throw new InvalidOperationException("Recycling visual library is not ready");
             runId=Guid.NewGuid().ToString("N");
             cargoRoot=new GameObject("P2_TRACKED_MATERIALS").transform;
             cargoRoot.SetParent(geometry.BuildRoot,false);
@@ -220,14 +223,14 @@ namespace C3TreasurePuzzle
             GameObject item=new GameObject("P2_RAW_"+id);
             item.transform.SetParent(cargoRoot,false);
             item.transform.position=geometry.BMaterialInterface.position+Vector3.up*C3RecyclingLineGeometry.RawRadius;
-            GameObject model=GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            model.name="RAW_MATERIAL"; model.transform.SetParent(item.transform,false);
-            model.transform.localScale=Vector3.one*(C3RecyclingLineGeometry.RawRadius*2f);
-            model.GetComponent<Renderer>().sharedMaterial=geometry.MaterialFor(MachineIndex(kind));
-            Collider collider=model.GetComponent<Collider>(); collider.enabled=false; Destroy(collider);
-            EcoRecycleCargo cargo=item.AddComponent<EcoRecycleCargo>();
-            cargo.materialId=id; cargo.materialType=kind;
-            Admit(cargo); return true;
+            try
+            {
+                visuals.CreateRaw(kind,records.Count(r=>r.MaterialType==kind)%C3RecyclingVisuals.VariantsPerMaterial,item.transform);
+                EcoRecycleCargo cargo=item.AddComponent<EcoRecycleCargo>();
+                cargo.materialId=id; cargo.materialType=kind;
+                Admit(cargo); return true;
+            }
+            catch { item.SetActive(false); Destroy(item); throw; }
         }
         public bool TryAcceptCargo(EcoRecycleCargo cargo)
         {
@@ -241,7 +244,7 @@ namespace C3TreasurePuzzle
                 cargo.GetComponentsInChildren<Rigidbody>(true).Any(b=>!b.isKinematic) ||
                 Vector3.Distance(cargo.transform.lossyScale,Vector3.one)>.001f) return false;
             Renderer[] renderers=cargo.GetComponentsInChildren<Renderer>(true);
-            if (renderers.Length==0 || renderers.Any(r=>r.bounds.size.magnitude>.43f)) return false;
+            if (renderers.Length==0 || renderers.Any(r=>r.bounds.size.magnitude>.43f) || !C3RecyclingVisuals.FitsRawEnvelope(cargo.transform)) return false;
             Admit(cargo); return true;
         }
         private void Admit(EcoRecycleCargo cargo)
@@ -250,7 +253,7 @@ namespace C3TreasurePuzzle
             cargo.transform.SetParent(cargoRoot,true);
             MaterialRecord record=new MaterialRecord {MaterialId=cargo.materialId,MaterialType=cargo.materialType,
                 TargetMachine=MachineIndex(cargo.materialType),Cargo=cargo,State=C3MaterialState.Spawned};
-            record.Visual=cargo.GetComponentInChildren<Renderer>(true).transform;
+            record.Visual=C3RecyclingVisuals.UnifyRawVisualRoot(cargo.transform);
             record.VisualScale=record.Visual.localScale;
             record.History.Add(record.State);
             record.Path=new TransportPath {ExitNormal=geometry.Machines[record.TargetMachine].Chute.Normal};
@@ -410,22 +413,8 @@ namespace C3TreasurePuzzle
             batch.Path.Evaluate(0f,0f,ProductSize,out Vector3 position,out Quaternion rotation,out _);
             GameObject item=new GameObject("P2_FINISHED_"+machine.Slots[0].MaterialType+"_"+id);
             item.transform.SetParent(cargoRoot,false); item.SetActive(false);
-            GameObject body=GameObject.CreatePrimitive(PrimitiveType.Cube);
-            body.name=lane==0?"PAPER_COMPRESSED_BALE":lane==1?"METAL_COMPRESSED_BLOCK":"PLASTIC_COMPRESSED_BALE";
-            body.transform.SetParent(item.transform,false); body.transform.localScale=new Vector3(.52f,.42f,.50f);
-            body.GetComponent<Renderer>().sharedMaterial=geometry.MaterialFor(lane);
-            Collider c=body.GetComponent<Collider>(); c.enabled=false; Destroy(c);
-            int straps=lane==1?1:2;
-            for (int i=0;i<straps;i++)
-            {
-                GameObject band=GameObject.CreatePrimitive(PrimitiveType.Cube);
-                band.name=lane==1?"METAL_PRESS_SEAM":"BALE_BINDING";
-                band.transform.SetParent(item.transform,false);
-                band.transform.localPosition=new Vector3(straps==1?0f:(i==0?-.16f:.16f),0f,0f);
-                band.transform.localScale=new Vector3(.025f,.43f,.51f);
-                band.GetComponent<Renderer>().sharedMaterial=geometry.BindingMaterial;
-                Collider collider=band.GetComponent<Collider>(); collider.enabled=false; Destroy(collider);
-            }
+            try { visuals.CreateBale(batch.MaterialType,item.transform); }
+            catch { item.SetActive(false); Destroy(item); throw; }
             batch.Product=item.transform;
             item.transform.SetPositionAndRotation(position,rotation);
             return batch;

@@ -465,7 +465,7 @@ Manual Gameplay: NOT RUN
 
 ### B. Milestone A — 結構、物件盤點與碰撞
 
-完整前後位置、Hierarchy、生成方法、Renderer／Collider及目的見 [V11_Phase21_ObjectMap.csv](V11_Phase21_ObjectMap.csv)。所有座標是Unity世界公尺。
+Milestone A Commit：`7e116c06386204d882988ca86f2833d8c934da59`。完整前後位置、Hierarchy、生成方法、Renderer／Collider及目的見 [V11_Phase21_ObjectMap.csv](V11_Phase21_ObjectMap.csv)。所有座標是Unity世界公尺。
 
 | 圖 | 處理與來源狀態 | 仍需驗收 |
 | --- | --- | --- |
@@ -491,7 +491,26 @@ Manual Gameplay: NOT RUN
 
 ### C. Milestone B — 素材與正式視覺
 
-進行中；將記錄原始PNG、Mesh／UV／Material／Prefab、三類多種原料與成品包絡、後方棧板裝飾。此時尚未標示完成。
+**Milestone B已來源實作，Unity匯入／外觀與原生測試NOT RUN。**完整41個模型與14個材質對照見 [V11_Phase21_ArtCatalog.csv](V11_Phase21_ArtCatalog.csv)，尺寸／UV來源及SHA256見 `Assets/_Modules_/02_Levels/Level03/Art/Recycling/MeshManifest.json`。
+
+- 四張使用者PNG原檔逐位元保留於 `Art/Recycling/SourceImages`；不重新合成圖片或拿整張圖當Quad。Texture預設sRGB albedo、保留來源alpha、mipmap／aniso4／Clamp／2048上限；UV只取物件內部，避開透明輪廓與色邊。專案GraphicsSettings無自訂Render Pipeline，使用Built-in Standard opaque材質。塑膠以光滑不透明材質處理小型運動件，避免透明排序；最終質感／照片烘焙光線仍需Game View驗收。
+- 模型在 `Art/Recycling/Resources/RecyclingArt/Meshes`，材質在同根 `Materials`。15種原料，每種Body+Details：Metal鋁罐／壓扁罐／罐頭／皇冠蓋／扁食品罐；Plastic寶特瓶／杯／清潔瓶／盒／壓扁瓶；Paper報紙／開紙盒／摺紙箱／紙袋／蛋盒。每類以正式到貨次序mod5選擇，九份首次演示各類三種，不用隨機數。沒有玻璃或新enum。
+- 實際罐壁、罐緣、拉環、瓶頸／蓋、紙層／摺片／蛋格都有厚度；每份兩個Mesh一起放入RAW_MATERIAL_VISUAL_ROOT。正式MaterialRecord.Visual指向整個根，原2.5秒壓縮會帶動全部子件。正式原料Transform／ID／Kind／路徑／速度／間距／分流不變。
+- 全部原料頂點在0.118m球內，沿用RawRadius=.12m。外部TryAcceptCargo保留每Renderer .43m AABB上限與原固體／剛體檢查，額外驗證所有真實Mesh頂點聯集與偏移，拒絕不可讀／未知Renderer或根Renderer，不能用多個分散小Mesh繞過尺寸限制；成功轉交仍保留同一EcoRecycleCargo身份，統一視覺分支，不停用遭拒的碰撞體。
+- 正式成品由立體起伏Shell、正面Relief與實體環繞綁帶組成。09正面、10側／頂材質；綁帶均在包絡內，合併尺寸**恰為(.52,.43,.51)m、中心零**。保留原Product Transform、Batch／Source IDs、出現時機、出口／收集、原生支撐與穿透斷言。Evaluate／Move／TickMachines／TickProducts在此階段未改。
+- 07的三種壓縮包與木材用於獨立 `M3_Treasure/C3_P2_RecyclingLine/P21_STORAGE_DECORATION/STORAGE_DECOR_{Paper|Metal|Plastic}`。每機背後一棧板，X=-17.9/-13/-8.1、Z18.75、棧板底Y=.56、尺寸.96/.14/.84；包尺寸為正式包x1.35。機背Z16.75至棧板前緣有1.58m、後緣至籠前有1.85m，留Z20地面維修通道；不擋外緣支柱或正式輸送。裝飾僅兩個匹配Collider，不建立Cargo／Material／Batch／收據／背包資料。
+- 無另存.prefab：共用C3RecyclingVisuals生成器直接實例化**已匯入OBJ模型資源**與14個共享.mat；沒有每輪建立Mesh／Texture／Material。所有OBJ可讀，供既有ProductEnvelope真正頂點檢查；無匯入Collider、無每影格模型分配。可重製來源為 `Tools/Recycling/generate_meshes.py`（Python3+numpy）；不修改PNG像素，保留已有GUID。
+
+新增 `C3V11RecyclingArtTests` 六項：15種匯入模型／材質／球包絡、九原料類型／ID與可重現差異、多Mesh整組壓縮、外來物料嚴格包絡與身份、三種正式成品包絡／來源／收集、靜態棧板不入正式統計及維修通道。舊30項與原18項測試整檔均未修改。最終還需原CargoFollowsRoute／九成品OutputConveyor對新視覺執行完整原生回歸。
+
+Milestone B來源檢查：41個OBJ共33,512三角形，頂點／UV／單位法線／面朝向有效，所有原料半徑≤.118m，三種成品聯集仍(.52,.43,.51)m；PNG原檔SHA256一致，14材質GUID可解析，新增meta成對且全GUID唯一。C# AST為113檔、971方法、138個IEnumerator；原受保護測試、Scene、Packages、ProjectSettings比對保留。這些是**來源檢查PASS**，不是Unity匯入／編譯／原生幾何／畫面品質PASS。
+
+```text
+Unity Asset Import: NOT RUN
+Unity Compilation: NOT RUN
+Unity PlayMode: NOT RUN
+Manual Gameplay: NOT RUN
+```
 
 ### D. Milestone C — 控制台展示
 

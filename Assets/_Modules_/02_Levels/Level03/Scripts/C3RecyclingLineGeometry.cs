@@ -22,6 +22,7 @@ namespace C3TreasurePuzzle
         public Transform BMaterialInterface { get; private set; }
         public Transform MainEntry { get; private set; }
         public C3ConveyorSection MainBelt { get; private set; }
+        public C3RecyclingVisuals Visuals { get; private set; }
         public readonly List<C3ConveyorSection> CommonSections=new List<C3ConveyorSection>();
         public readonly List<C3ConveyorSection> Sections=new List<C3ConveyorSection>();
         public readonly List<Machine> Machines=new List<Machine>();
@@ -46,9 +47,12 @@ namespace C3TreasurePuzzle
             types=new[] { CreateMaterial("Paper",new Color(.72f,.51f,.29f),0f),
                 CreateMaterial("Metal",new Color(.59f,.68f,.74f),.7f),
                 CreateMaterial("Plastic",new Color(.12f,.65f,.75f),.05f) };
+            Visuals=GetComponent<C3RecyclingVisuals>();
+            if (!Visuals) Visuals=gameObject.AddComponent<C3RecyclingVisuals>();
             BuildElevatedInfeed();
             BuildMachines();
             BuildTerminalGuards();
+            BuildStorageDecoration();
             Physics.SyncTransforms();
         }
 
@@ -214,6 +218,13 @@ namespace C3TreasurePuzzle
                 TerminalGuard(machine.CollectionBed,"P21_COLLECTION_TERMINAL_"+machine.Index,ProductHalfLength+.12f,.36f);
         }
         private const float ProductHalfLength=.255f; // ProductSize.z / 2; keep the collection centre unchanged
+        private void BuildStorageDecoration()
+        {
+            Transform root=Marker("P21_STORAGE_DECORATION",Vector3.zero);
+            EcoRecycleCargo.Kind[] kinds={EcoRecycleCargo.Kind.Paper,EcoRecycleCargo.Kind.Metal,EcoRecycleCargo.Kind.Plastic};
+            for (int lane=0;lane<Machines.Count;lane++)
+                Visuals.CreateStorage(kinds[lane],root,new Vector3(MachineCenters[lane],.56f,18.75f));
+        }
         private void TerminalGuard(C3ConveyorSection section,string name,float setback,float height)
         {
             Vector3 forward=(section.End.position-section.Start.position).normalized,up=section.Normal;
