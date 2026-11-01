@@ -3,7 +3,7 @@ using UnityEngine;
 namespace C3TreasurePuzzle
 {
     // A bounded, line-of-sight cue only. Does not implement any pickup or reward.
-    // Capture after the visual owners' Start has finished adding cache geometry.
+    // Later additions are registered explicitly; execution order is not a readiness signal.
     [DefaultExecutionOrder(250)]
     [DisallowMultipleComponent]
     public sealed class C3ProximityHint : MonoBehaviour
@@ -32,6 +32,14 @@ namespace C3TreasurePuzzle
 
         private void Start() => visuals = new C3HintVisuals(transform);
         private void OnEnable() => visuals?.SetCue(Color.black, 0f);
+
+        public void RegisterVisuals(Transform root)
+        {
+            if (!root || !root.IsChildOf(transform)) return;
+            // Before Start, leave initialization to the normal whole-owner scan.
+            // After ReleaseVisuals, do not recreate a disposed hint.
+            visuals?.RegisterRenderers(root);
+        }
 
         internal static bool VisibleFrom(Transform player, Transform target, Vector3 point, RaycastHit[] buffer)
         {

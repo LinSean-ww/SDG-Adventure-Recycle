@@ -30,7 +30,8 @@ namespace C3TreasurePuzzle
             public void Restore()
             {
                 if(!Sign)return;
-                Sign.SetParent(Parent,false);
+                if (Sign.parent != Parent)
+                    Sign.SetParent(Parent, false);
                 if(Parent)
                 {Sign.localPosition=LocalPosition;Sign.localRotation=LocalRotation;}
                 else Sign.SetPositionAndRotation(WorldPosition,WorldRotation);
@@ -85,7 +86,15 @@ namespace C3TreasurePuzzle
             float width=kind==0?2.15f:kind==3?1.45f:1.65f;
             float depth=kind==0?.76f:.90f;
             Table(root,width,depth);
-            if(kind==0)Console(root);
+            if(kind==0)
+            {
+                // The replacement table was visual-only while the original
+                // interaction collider covers a smaller footprint. Keep a
+                // separate solid *sibling* of the visual art, parented to the
+                // existing interactable, so F rays still resolve to the console.
+                InstallConsoleWorktopCollision(station.transform,root,width,depth);
+                Console(root);
+            }
             else if(kind==1)Inspection(root);
             else if(kind==2)Assembly(root);
             else Maintenance(root);
@@ -98,14 +107,61 @@ namespace C3TreasurePuzzle
                 label.transform.SetPositionAndRotation(platePosition,Quaternion.Euler(0,180,0));
             }
             else label=C3BakedSignFactory.AtWorld(sign,platePosition,Quaternion.Euler(0,180,0),width*.65f,.22f,false);
-            if(label)
+            if (label)
+{
+            if (!borrowed)
             {
-                label.transform.SetParent(root,true);
-                if(!borrowed)foreach(Renderer r in label.GetComponentsInChildren<Renderer>())
-                    foreach(Material m in r.sharedMaterials)if(m && !ownedSignMaterials.Contains(m))ownedSignMaterials.Add(m);
+                label.transform.SetParent(root, true);
+
+                foreach (Renderer renderer in label.GetComponentsInChildren<Renderer>())
+               {
+            foreach (Material material in renderer.sharedMaterials)
+            {
+                if (material && !ownedSignMaterials.Contains(material))
+                    ownedSignMaterials.Add(material);
             }
+        }
+    }
+}
+
             StationCount++;
         }
+        private void InstallConsoleWorktopCollision(Transform station,Transform visual,float width,float depth)
+        {
+            // Do not add collision to V11_StationArt: its primitives must
+            // remain ray/physics-neutral for the existing visual tests.
+            GameObject blocker=new GameObject("V11_ConsoleWorktopCollision");
+            blocker.layer=station.gameObject.layer;
+            Transform proxy=blocker.transform;
+            proxy.SetParent(station,false);
+            proxy.localPosition=visual.localPosition;
+            proxy.localRotation=visual.localRotation;
+            proxy.localScale=visual.localScale;
+            // A full-width solid collider blocked the M6 gameplay ray aimed
+            // from the south aisle at M4_PuzzleConsole's original collider.
+            // Two solid panels retain the same physical front and top extent,
+            // but leave a narrow center ray channel. The 0.18m channel is
+            // smaller than the player's 0.60m CharacterController diameter,
+            // so a player cannot walk through it. No raycast masks, triggers,
+            // or gameplay targeting rules are changed.
+            const float centerRayGap=.18f;
+            float panelWidth=(width-centerRayGap)*.5f;
+            float offset=(width+centerRayGap)*.25f;
+            for(int side=-1;side<=1;side+=2)
+            {
+                GameObject panel=new GameObject(side<0?
+                    "V11_ConsoleBarrier_Left":"V11_ConsoleBarrier_Right");
+                panel.layer=station.gameObject.layer;
+                panel.transform.SetParent(proxy,false);
+                panel.transform.localPosition=new Vector3(side*offset,0f,0f);
+                BoxCollider solid=panel.AddComponent<BoxCollider>();
+                solid.center=new Vector3(0f,.43f,0f);
+                solid.size=new Vector3(panelWidth,.86f,depth);
+                solid.isTrigger=false;
+            }
+            roots.Add(blocker); // destroyed with this visual upgrade, not gameplay
+        }
+
         private void Table(Transform r,float width,float depth)
         {
             art.Part(r,"WeatheredSteelWorktop",new Vector3(0,.80f,0),new Vector3(width,.10f,depth),"silver");
@@ -195,6 +251,8 @@ namespace C3TreasurePuzzle
                 Vector3 p=new Vector3((i%3-1)*.13f,.02f*(i/3),(i/3)*.16f);
                 if(kind==1)art.Bottle(r,p,.40f);else art.Can(r,p,.40f,i%2==0?"silver":"red");
             }
+            C3ProximityHint hint=go.GetComponent<C3ProximityHint>();
+            if(hint)hint.RegisterVisuals(r);
         }
         private void DecorateWear()
         {

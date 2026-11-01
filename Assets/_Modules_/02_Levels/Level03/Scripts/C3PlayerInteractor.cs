@@ -13,7 +13,17 @@ namespace C3TreasurePuzzle
         private C3Interactable currentTarget;
         private PlayerInputService sharedInput;
         private bool interactQueued;
+        private readonly RaycastHit[] reachHits = new RaycastHit[32];
         public C3Interactable CurrentTarget => currentTarget;
+        public bool HandlesInteractionInput => isActiveAndEnabled && playerCamera != null;
+        public Vector3 ReachOrigin
+        {
+            get
+            {
+                CharacterController capsule = GetComponent<CharacterController>();
+                return capsule ? transform.TransformPoint(capsule.center) : transform.position + Vector3.up;
+            }
+        }
 
         public void SetCamera(Camera value) => playerCamera = value;
         public void UseSharedInput(PlayerInputService service)
@@ -60,6 +70,35 @@ namespace C3TreasurePuzzle
                 // A collected target can disable itself in Interact; hide its prompt this frame.
                 if (currentTarget != null && !currentTarget.CanInteract(gameObject)) currentTarget = null;
             }
+            else if (interact && EcoAdventureRuntime.Instance != null)
+            {
+                // One input edge chooses ONE route. Never fall through to a
+                // cache after the quest target has disabled itself this frame.
+                EcoAdventureRuntime.Instance.InteractWorkshopFromPlayer(this);
+            }
+        }
+
+        // Body reach and body-to-target sight are separate from the orbit
+        // camera's selection ray. Only the player's and target owner's own
+        // colliders are excluded; walls/equipment/floors still block reach.
+        public bool CanReachPoint(Collider target, Vector3 point, float maximumDistance)
+        {
+            if (!target || !target.enabled || !target.gameObject.activeInHierarchy) return false;
+            Vector3 origin = ReachOrigin, delta = point - origin;
+            if (delta.sqrMagnitude > maximumDistance * maximumDistance) return false;
+            if (delta.sqrMagnitude < .0001f) return true;
+            C3Interactable quest = target.GetComponentInParent<C3Interactable>();
+            EcoWorkshopInteractable station = target.GetComponentInParent<EcoWorkshopInteractable>();
+            Transform owner = quest ? quest.transform : station ? station.transform : target.transform;
+            int count = Physics.RaycastNonAlloc(origin, delta.normalized, reachHits,
+                delta.magnitude, ~0, QueryTriggerInteraction.Ignore);
+            if (count == reachHits.Length) return false;
+            for (int i = 0; i < count; i++)
+            {
+                Collider blocker = reachHits[i].collider;
+                if (blocker && !blocker.transform.IsChildOf(transform) && !blocker.transform.IsChildOf(owner)) return false;
+            }
+            return true;
         }
 
         public C3Interactable FindTarget()
@@ -75,12 +114,15 @@ namespace C3TreasurePuzzle
             foreach (RaycastHit hit in hits)
             {
                 if (hit.collider.transform.IsChildOf(transform)) continue;
-                if (third && Vector3.Distance(transform.position + Vector3.up, hit.point) >
-                    interactionDistance) return null;
                 C3Interactable candidate = hit.collider.GetComponentInParent<C3Interactable>();
-                return candidate != null &&
-                    (!(candidate is C3CollectiblePart) || hit.distance <= partInteractionDistance) &&
-                    candidate.isActiveAndEnabled && candidate.CanInteract(gameObject) ? candidate : null;
+                if (candidate == null) return null;
+                float limit = candidate is C3CollectiblePart ? partInteractionDistance : interactionDistance;
+                if (third)
+                {
+                    if (!CanReachPoint(hit.collider, hit.point, limit)) return null;
+                }
+                else if (candidate is C3CollectiblePart && hit.distance > partInteractionDistance) return null;
+                return candidate.isActiveAndEnabled && candidate.CanInteract(gameObject) ? candidate : null;
             }
             return null;
         }

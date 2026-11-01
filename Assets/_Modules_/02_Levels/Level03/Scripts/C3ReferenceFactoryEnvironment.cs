@@ -56,6 +56,7 @@ namespace C3TreasurePuzzle
             // BuildUpperWalkways() was an obstructing visual overlay; do not call it.
             BuildOverheadPiping();
             BuildPendantLights();
+            BuildIndustrialAgeing(); // visual-only wear; preserve all gameplay colliders
             RenderSettings.ambientMode = AmbientMode.Flat;
             RenderSettings.ambientLight = new Color(.46f, .49f, .51f);
             RenderSettings.ambientIntensity = 1.0f;
@@ -76,15 +77,17 @@ namespace C3TreasurePuzzle
         }
         private void InitMaterials()
         {
-            floor = Mat("Concrete floor", new Color(.62f, .65f, .62f), .08f, .23f, "FactoryConcrete");
-            tile = Mat("Polished wet concrete", new Color(.66f, .66f, .59f), .22f, .51f, "FactoryConcrete");
-            wall = Mat("Factory light walls", new Color(.60f, .64f, .62f), .09f, .3f, "FactoryConcrete");
-            steel = Mat("Industrial painted steel", new Color(.70f, .77f, .79f), .63f, .4f, "FactorySteel");
-            stainless = Mat("Galvanized sorting plant", new Color(.92f, .96f, .98f), .76f, .56f, "FactorySteel");
-            graphite = Mat("Black structural steel", new Color(.23f, .29f, .32f), .55f, .37f, "FactorySteel");
-            belt = Mat("Dark conveyer rubber", new Color(.40f, .43f, .46f), .03f, .17f, "FactoryRubber");
-            yellow = Mat("Industrial railing yellow", new Color(.96f, .65f, .095f), .42f, .35f);
-            rust = Mat("Oxide equipment", new Color(.40f, .29f, .21f), .4f, .31f, "FactorySteel");
+            // Long-used but serviceable plant: faded paint and oxidized steel,
+            // without making active indicators, materials or safety lanes unreadable.
+            floor = Mat("Concrete floor", new Color(.49f, .50f, .47f), .05f, .13f, "FactoryConcrete");
+            tile = Mat("Polished wet concrete", new Color(.52f, .52f, .47f), .12f, .29f, "FactoryConcrete");
+            wall = Mat("Factory light walls", new Color(.52f, .53f, .48f), .04f, .17f, "FactoryConcrete");
+            steel = Mat("Industrial painted steel", new Color(.57f, .62f, .60f), .42f, .28f, "FactorySteel");
+            stainless = Mat("Galvanized sorting plant", new Color(.74f, .78f, .77f), .60f, .40f, "FactorySteel");
+            graphite = Mat("Black structural steel", new Color(.22f, .25f, .25f), .40f, .28f, "FactorySteel");
+            belt = Mat("Dark conveyer rubber", new Color(.36f, .38f, .37f), .02f, .14f, "FactoryRubber");
+            yellow = Mat("Industrial railing yellow", new Color(.82f, .62f, .19f), .24f, .22f);
+            rust = Mat("Oxide equipment", new Color(.36f, .23f, .15f), .20f, .20f, "FactorySteel");
             paper = Mat("Cardboard bale", new Color(.75f, .54f, .31f), .01f, .21f, "FactoryCardboard");
             plastic = Mat("Plastic pale blue", new Color(.36f, .73f, .80f), .06f, .42f);
             metalBale = Mat("Crushed aluminum", new Color(.47f, .59f, .72f), .65f, .55f, "FactorySteel");
@@ -578,6 +581,101 @@ namespace C3TreasurePuzzle
                     new Vector3(-.7f,10.45f,z),.11f,stainless);
             }
         }
+        // Every weathering mark is built through Shape(solid:false), which
+        // disables its collider immediately. These are thin surface marks, not
+        // a second factory layout, and never sit across the B/C or D doorway.
+        private void AgeMark(string name, Vector3 position, Vector3 dimensions, Material material,
+            float yaw = 0f)
+        {
+            GameObject mark = Shape("V11_AGE_" + name, PrimitiveType.Cube,
+                position, dimensions, material, Quaternion.Euler(0f, yaw, 0f));
+            Renderer renderer = mark.GetComponent<Renderer>();
+            if (renderer)
+            {
+                renderer.shadowCastingMode = ShadowCastingMode.Off;
+                renderer.receiveShadows = false;
+            }
+        }
+
+        private void BuildIndustrialAgeing()
+        {
+            Material oxidation = Mat("V11 aged oxide streak", new Color(.29f, .17f, .105f), .06f, .11f);
+            Material soot = Mat("V11 aged wall soot", new Color(.29f, .30f, .27f), .01f, .07f);
+            Material oilFilm = Mat("V11 aged oil film", new Color(.19f, .22f, .21f), .05f, .13f);
+            Material paintChip = Mat("V11 aged chipped enamel", new Color(.40f, .43f, .38f), .11f, .17f);
+            System.Random random = new System.Random(150922); // stable screenshots and layout
+
+            // Inside west wall, rust drips from the aged cladding seams.
+            // Its visible face is x=-24.58; marks are 1-2cm inside the hall.
+            for (int i = 0; i < 19; i++)
+            {
+                float z = 1.9f + i * 1.18f;
+                float y = 1.35f + (i % 5) * .91f;
+                AgeMark("WALL_W_" + i, new Vector3(-24.566f, y, z),
+                    new Vector3(.012f, .31f + (i % 4) * .14f, .13f + (i % 3) * .085f),
+                    i % 3 == 0 ? soot : oxidation);
+            }
+            // East wall has a real B/C passage at z=10.2..14.8: leave it open.
+            for (int i = 0; i < 12; i++)
+            {
+                float z = 2.1f + i * 1.95f;
+                if (z > 9.9f && z < 15.1f) continue;
+                AgeMark("WALL_E_" + i,
+                    new Vector3(-.433f, 1.55f + (i % 4) * 1.1f, z),
+                    new Vector3(.010f, .37f + (i % 3) * .19f, .16f + (i % 2) * .12f),
+                    i % 4 == 0 ? soot : oxidation);
+            }
+            // North end wall: uneven water runs on the concrete, not a solid panel.
+            for (int i = 0; i < 12; i++)
+            {
+                float x = -22.6f + i * 1.79f;
+                AgeMark("WALL_N_" + i,
+                    new Vector3(x, 2.25f + (i % 4) * .85f, 24.585f),
+                    new Vector3(.17f + (i % 3) * .09f, .35f + (i % 4) * .15f, .009f),
+                    i % 3 == 0 ? oxidation : soot);
+            }
+
+            // Low-profile deposits lie above the finished-floor render plane.
+            // All are decorative: no solid puddle, debris mesh or physics blocker.
+            for (int i = 0; i < 34; i++)
+            {
+                float x = -22.8f + (float)random.NextDouble() * 20.1f;
+                float z = 1.6f + (float)random.NextDouble() * 21.4f;
+                float sx = .20f + (float)random.NextDouble() * .58f;
+                float sz = .13f + (float)random.NextDouble() * .40f;
+                AgeMark("FLOOR_OIL_" + i,
+                    new Vector3(x, .5825f, z), new Vector3(sx, .003f, sz),
+                    i % 4 == 0 ? oxidation : oilFilm, (i * 47) % 180);
+            }
+            // Visible scuffed areas at the service bays, away from pickup rays.
+            for (int i = 0; i < 12; i++)
+            {
+                float x = -21.9f + i * 1.69f;
+                AgeMark("FLOOR_SCUFF_" + i,
+                    new Vector3(x, .5828f, i % 2 == 0 ? 6.60f : 19.55f),
+                    new Vector3(.38f, .003f, .085f), paintChip, (i % 3 - 1) * 11f);
+            }
+            // Aged collars on the high wall pipe supports. All remain above
+            // the elevated walkway and never obstruct stairs or the camera.
+            for (int i = 0; i < 10; i++)
+            {
+                float z = 3.1f + (i % 5) * 4.28f;
+                float x = i < 5 ? -24.55f : -.15f;
+                float y = 8.80f;
+                AgeMark("PIPE_" + i, new Vector3(x, y - .13f, z),
+                    new Vector3(.21f, .065f, .20f), oxidation);
+            }
+            // Worn kick-plates embedded against wall-side structural columns.
+            for (int i = 0; i < 12; i++)
+            {
+                float z = 1.0f + (i % 6) * 3.75f;
+                float x = i < 6 ? -24.578f : -.250f;
+                if (i >= 6 && Mathf.Abs(z - 12.5f) < 1f) continue;
+                AgeMark("COLUMN_" + i, new Vector3(x, .91f, z),
+                    new Vector3(.012f, .36f, .13f), i % 3 == 0 ? paintChip : oxidation);
+            }
+        }
+
         private void BuildPendantLights()
         {
             for(int i=0;i<12;i++)

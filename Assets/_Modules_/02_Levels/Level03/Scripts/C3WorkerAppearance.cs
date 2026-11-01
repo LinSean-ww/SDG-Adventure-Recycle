@@ -13,7 +13,13 @@ namespace C3TreasurePuzzle
     {
         private C3VisualBuilder art;
         private CharacterController motor;
-        private Transform body,head,hips,leftArm,rightArm,leftLeg,rightLeg,leftKnee,rightKnee;
+        private C3FirstPersonController controller;
+        private Transform body,head,hips,chest,leftArm,rightArm,leftLeg,rightLeg,leftKnee,rightKnee;
+        private Transform leftElbow,rightElbow,leftHand,rightHand,weaponAnchor;
+        private EcoQuantumWeaponView weaponOwner;
+        private const float UpperArmLength=.34f, ForearmLength=.33f;
+        private bool HoldingWeapon => weaponOwner && weaponOwner.UsesThirdPersonPresentation;
+        public float WeaponLeanAmount => controller?controller.VisualLeanAmount:0f;
         private float phase;
         private PlayerPerspectiveRig perspective;
         private Renderer[] legacyRenderers = Array.Empty<Renderer>();
@@ -27,6 +33,7 @@ namespace C3TreasurePuzzle
         private void Awake()
         {
             motor=GetComponent<CharacterController>();
+            controller=GetComponent<C3FirstPersonController>();
             if(!motor){enabled=false;return;}
             Transform legacy=transform.Find("fk");
             // Both the original white skin and M3_FirstPersonShadow are under fk.
@@ -47,7 +54,7 @@ namespace C3TreasurePuzzle
             art.Part(hips,"ToolBelt",new Vector3(0,.07f,0),new Vector3(.35f,.07f,.25f),"rust");
             art.Part(hips,"BeltBuckle",new Vector3(0,.07f,.132f),new Vector3(.065f,.05f,.016f),"silver");
             art.Part(hips,"ToolPouch",new Vector3(.20f,-.05f,0),new Vector3(.11f,.17f,.13f),"rust");
-            Transform chest=art.Group(hips,"WorkerChest",new Vector3(0,.28f,0));
+            chest=art.Group(hips,"WorkerChest",new Vector3(0,.28f,0));
             art.Part(chest,"DarkWorkJacket",Vector3.zero,new Vector3(.40f,.39f,.24f),"dark",PrimitiveType.Capsule);
             art.Part(chest,"OrangeSafetyVest",new Vector3(0,.005f,.008f),new Vector3(.40f,.36f,.255f),"orange");
             for(int side=-1;side<=1;side+=2)
@@ -69,6 +76,7 @@ namespace C3TreasurePuzzle
             art.Part(head,"HardHatBrim",new Vector3(0,.10f,.015f),new Vector3(.29f,.015f,.30f),"yellow",PrimitiveType.Cylinder);
             art.Recycle(head,new Vector3(0,.137f,.126f),.037f);
             leftArm=Arm(chest,-1);rightArm=Arm(chest,1);
+            weaponAnchor=art.Group(body,"V11_ThirdPersonWeaponAnchor",Vector3.zero);
             leftLeg=Leg(-1,out leftKnee);rightLeg=Leg(1,out rightKnee);
         }
 
@@ -112,18 +120,73 @@ namespace C3TreasurePuzzle
         {
             yield return null;
             while(player && rig && player.scene.isLoaded && !player.activeInHierarchy)yield return null;
-            if(!player || !rig || !player.scene.isLoaded)return;
-            C3WorkerAppearance replacement=player.GetComponent<C3WorkerAppearance>();
-            if(replacement && replacement.isActiveAndEnabled)return;
+            if (!player || !rig || !player.scene.isLoaded) yield break;
+
+            C3WorkerAppearance replacement =
+                player.GetComponent<C3WorkerAppearance>();
+
+            if (replacement && replacement.isActiveAndEnabled) yield break;
             for(int i=0;i<renderers.Length;i++)
                 if(renderers[i])rig.SetBodyRendererBaseline(renderers[i],enabledValues[i],casting[i]);
         }
         private Transform Arm(Transform chest,int side)
         {
             Transform joint=art.Group(chest,side<0?"LeftShoulder":"RightShoulder",new Vector3(side*.23f,.10f,0));
-            art.Part(joint,"WorkSleeve",new Vector3(0,-.14f,0),new Vector3(.13f,.30f,.14f),"dark",PrimitiveType.Capsule);
-            art.Part(joint,"ProtectiveGlove",new Vector3(0,-.34f,.025f),new Vector3(.12f,.14f,.11f),"yellow",PrimitiveType.Capsule);
+            art.Part(joint,"WorkSleeve",Vector3.down*(UpperArmLength*.5f),new Vector3(.13f,UpperArmLength,.14f),"dark",PrimitiveType.Capsule);
+            Transform elbow=art.Group(joint,side<0?"LeftElbow":"RightElbow",Vector3.down*UpperArmLength);
+            art.Part(elbow,"WorkForearm",Vector3.down*(ForearmLength*.5f),new Vector3(.11f,ForearmLength,.12f),"dark",PrimitiveType.Capsule);
+            Transform hand=art.Part(elbow,"ProtectiveGlove",Vector3.down*ForearmLength,new Vector3(.12f,.14f,.11f),"yellow",PrimitiveType.Capsule);
+            if(side<0){leftElbow=elbow;leftHand=hand;}else{rightElbow=elbow;rightHand=hand;}
             return joint;
+        }
+
+        // The equipped view owns the final weapon pose. Only this visual worker
+        // writes its arm joints; an outgoing weapon cannot release a newer owner.
+        public void SetWeaponPresentation(EcoQuantumWeaponView owner,bool active)
+        {
+            if(active)weaponOwner=owner;
+            else if(weaponOwner==owner)weaponOwner=null;
+        }
+
+        public Transform PrepareWeaponAnchor(Vector3 flatForward,float adsBlend)
+        {
+            if(!isActiveAndEnabled || !body || !chest || !weaponAnchor)return null;
+            flatForward=Vector3.ProjectOnPlane(flatForward,Vector3.up).normalized;
+            if(flatForward.sqrMagnitude<.001f)flatForward=body.forward;
+            Vector3 right=Vector3.Cross(Vector3.up,flatForward);
+            bool prone=motor.height<.85f;
+            Vector3 offset=right*Mathf.Lerp(.22f,.20f,adsBlend)+
+                Vector3.up*(prone?.22f:Mathf.Lerp(.17f,.185f,adsBlend))+
+                flatForward*Mathf.Lerp(.35f,.32f,adsBlend);
+            weaponAnchor.SetPositionAndRotation(chest.position+offset,Quaternion.LookRotation(flatForward));
+            return weaponAnchor;
+        }
+
+        public void ApplyWeaponHands(EcoQuantumWeaponView owner,Transform primary,Transform support)
+        {
+            if(!isActiveAndEnabled || weaponOwner!=owner || !primary || !support)return;
+            SolveArm(rightArm,rightElbow,rightHand,primary,1);
+            SolveArm(leftArm,leftElbow,leftHand,support,-1);
+        }
+
+        private void SolveArm(Transform shoulder,Transform elbow,Transform hand,Transform grip,int side)
+        {
+            Vector3 origin=shoulder.position,delta=grip.position-origin;
+            float distance=Mathf.Clamp(delta.magnitude,.03f,UpperArmLength+ForearmLength-.002f);
+            Vector3 direction=delta.sqrMagnitude>.0001f?delta.normalized:body.forward;
+            // Use an outward/downward elbow pole rather than a bend toward
+            // the chest. Clamp unreachable/degenerate targets.
+            Vector3 pole=body.right*side-Vector3.up*.35f-body.forward*.15f;
+            pole=Vector3.ProjectOnPlane(pole,direction);
+            if(pole.sqrMagnitude<.0001f)pole=Vector3.ProjectOnPlane(body.up,direction);
+            pole.Normalize();
+            float along=(UpperArmLength*UpperArmLength-ForearmLength*ForearmLength+distance*distance)/(2f*distance);
+            float height=Mathf.Sqrt(Mathf.Max(0f,UpperArmLength*UpperArmLength-along*along));
+            Vector3 bend=origin+direction*along+pole*height;
+            Vector3 end=origin+direction*distance;
+            shoulder.rotation=Quaternion.FromToRotation(Vector3.down,bend-origin);
+            elbow.rotation=Quaternion.FromToRotation(Vector3.down,end-bend);
+            hand.rotation=grip.rotation;
         }
         private Transform Leg(int side,out Transform knee)
         {
@@ -142,23 +205,39 @@ namespace C3TreasurePuzzle
             if(!motor || !body)return;
             Vector3 travel=Vector3.ProjectOnPlane(motor.velocity,Vector3.up);
             float speed=travel.magnitude;
+            if(HoldingWeapon && perspective && perspective.IsThirdPerson)
+                body.localRotation=Quaternion.LookRotation(transform.InverseTransformDirection(perspective.CameraFlatForward));
             if(speed>.15f)
             {
                 Vector3 local=transform.InverseTransformDirection(travel.normalized);
-                body.localRotation=Quaternion.RotateTowards(body.localRotation,Quaternion.LookRotation(local),Time.deltaTime*600f);
+                if(!HoldingWeapon)body.localRotation=Quaternion.RotateTowards(body.localRotation,Quaternion.LookRotation(local),Time.deltaTime*600f);
                 phase+=Time.deltaTime*Mathf.Lerp(5f,12f,Mathf.Clamp01(speed/7f));
             }
             float crouch=Mathf.Clamp01((1.8f-motor.height)/.7f);
             bool prone=motor.height<.85f;
             float stride=Mathf.Sin(phase)*Mathf.Clamp01(speed/4f)*(motor.isGrounded?1f:0f);
+            // Visual-only torso/head lean. Keep hips, legs, controller capsule and
+            // first-person camera on their existing paths, including while prone.
+            float lean=perspective && perspective.IsThirdPerson && controller
+                ? controller.VisualLeanAmount : 0f;
             hips.localPosition=new Vector3(0,prone?.36f:Mathf.Lerp(.88f,.55f,crouch),0);
             hips.localRotation=Quaternion.Euler(prone?82f:crouch*18f,0,0);
-            head.localRotation=Quaternion.Euler(prone?-65f:-crouch*12f,0,0);
+            chest.localPosition=new Vector3(lean*.075f,.28f,0);
+            chest.localRotation=Quaternion.Euler(0,0,-lean*12f);
+            head.localPosition=new Vector3(lean*.09f,.62f,0);
+            head.localRotation=Quaternion.Euler(prone?-65f:-crouch*12f,0,-lean*7f);
+            if(HoldingWeapon && perspective)
+                head.localRotation*=Quaternion.Euler(Mathf.Clamp(perspective.OrbitPitch*.25f,-15f,15f),0,0);
             leftLeg.localRotation=Quaternion.Euler(prone?-15f:crouch*-55f+stride*28f,0,0);
             rightLeg.localRotation=Quaternion.Euler(prone?15f:crouch*-55f-stride*28f,0,0);
             leftKnee.localRotation=rightKnee.localRotation=Quaternion.Euler(prone?20f:crouch*95f,0,0);
-            leftArm.localRotation=Quaternion.Euler(prone?-135f:-stride*24f-crouch*25f,0,prone?10f:5f);
-            rightArm.localRotation=Quaternion.Euler(prone?-135f:stride*24f-crouch*25f,0,prone?-10f:-5f);
+            if(!HoldingWeapon)
+            {
+                leftArm.localRotation=Quaternion.Euler(prone?-135f:-stride*24f-crouch*25f,0,prone?-10f:-5f);
+                rightArm.localRotation=Quaternion.Euler(prone?-135f:stride*24f-crouch*25f,0,prone?10f:5f);
+                leftElbow.localRotation=rightElbow.localRotation=Quaternion.identity;
+                leftHand.localRotation=rightHand.localRotation=Quaternion.identity;
+            }
         }
         private void OnDestroy()
         {

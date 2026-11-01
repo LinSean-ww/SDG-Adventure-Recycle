@@ -40,9 +40,11 @@ namespace C3TreasurePuzzle
             BuildRoot.SetParent(transform,true);
             BuildRoot.SetPositionAndRotation(Vector3.zero,Quaternion.identity);
             indicatorBlock=new MaterialPropertyBlock();
-            steel=CreateMaterial("P2 galvanized steel",new Color(.45f,.54f,.58f),.65f);
-            rubber=CreateMaterial("P2 conveyor rubber",new Color(.13f,.17f,.18f),.05f);
-            yellow=CreateMaterial("P2 machine safety",new Color(.98f,.65f,.08f),.25f);
+            // Age the existing active machinery, not its geometry or interactables.
+            // Keep rubber dark, identification colors and scanner lights readable.
+            steel=CreateMaterial("P2 galvanized steel",new Color(.40f,.47f,.47f),.48f);
+            rubber=CreateMaterial("P2 conveyor rubber",new Color(.13f,.16f,.16f),.05f);
+            yellow=CreateMaterial("P2 machine safety",new Color(.84f,.57f,.13f),.21f);
             glass=CreateMaterial("P2 scanner lens",new Color(.12f,.72f,.83f),.1f);
             types=new[] { CreateMaterial("Paper",new Color(.72f,.51f,.29f),0f),
                 CreateMaterial("Metal",new Color(.59f,.68f,.74f),.7f),

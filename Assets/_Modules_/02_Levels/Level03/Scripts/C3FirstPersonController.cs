@@ -48,6 +48,10 @@ namespace C3TreasurePuzzle
         private bool jumpQueued;
         private PlayerPerspectiveRig perspective;
 
+        // One authoritative Q/E value for both the camera and the third-person visual.
+        // This does not move the CharacterController or expose writable gameplay state.
+        public float VisualLeanAmount => leanAmount;
+
         public void SetViewTransform(Transform value) => viewTransform = value;
         public void UseSharedInput(PlayerInputService service)
         {
@@ -249,7 +253,7 @@ namespace C3TreasurePuzzle
         private void UpdateLean()
         {
             if (viewTransform == null) return;
-            if (perspective != null && perspective.IsThirdPerson) { leanAmount = 0f; return; }
+            bool thirdPerson = perspective != null && perspective.IsThirdPerson;
             Keyboard keyboard = Keyboard.current;
             bool enabledInput = keyboard != null &&
                 Cursor.lockState == CursorLockMode.Locked &&
@@ -264,7 +268,12 @@ namespace C3TreasurePuzzle
             }
             if (target != 0f)
             {
-                Vector3 candidate = viewTransform.position + transform.right * (target * leanOffset);
+                // Third-person cameras orbit away from the player; validate near the
+                // player's torso instead of testing the distant camera position.
+                Vector3 origin = thirdPerson
+                    ? transform.position + transform.up * Mathf.Min(characterController.height * .8f, 1.4f)
+                    : viewTransform.position;
+                Vector3 candidate = origin + transform.right * (target * leanOffset);
                 Collider[] hits = Physics.OverlapSphere(candidate, 0.10f,
                     ~0, QueryTriggerInteraction.Ignore);
                 foreach (Collider hit in hits)
@@ -275,6 +284,7 @@ namespace C3TreasurePuzzle
                     }
             }
             leanAmount = Mathf.MoveTowards(leanAmount, target, Time.deltaTime * 5.5f);
+            if (thirdPerson) return; // Only the worker mesh leans; never alter the orbit camera.
             Vector3 local = viewTransform.localPosition;
             local.x = leanAmount * leanOffset;
             viewTransform.localPosition = local;

@@ -168,6 +168,98 @@ namespace M6IntegrationTests
             finally {mode.SetValue(null,previous);rig.GetType().GetMethod("ApplyMode").Invoke(rig,null);}
             yield return null;
         }
+        [UnityTest] public IEnumerator ThirdPersonLeanAnimatesOnlyWorkerPresentation()
+        {
+            GameObject player=Player;
+            Component controller=player.GetComponent(Runtime("C3FirstPersonController"));
+            Component appearance=player.GetComponent(Runtime("C3WorkerAppearance"));
+            Assert.IsNotNull(controller);Assert.IsNotNull(appearance);
+            Transform worker=player.transform.Find("V11_RecyclingEngineer_Visual");
+            Transform chest=worker.Find("WorkerPelvis/WorkerChest");
+            Transform head=worker.Find("WorkerPelvis/WorkerHead");
+            Assert.IsNotNull(chest);Assert.IsNotNull(head);
+            CharacterController capsule=player.GetComponent<CharacterController>();
+            Camera camera=player.GetComponentInChildren<Camera>(true);
+            Vector3 playerPosition=player.transform.position, capsuleCenter=capsule.center;
+            float capsuleHeight=capsule.height, oldLean=(float)Get(controller,"leanAmount");
+            Component rig=Rig;
+            Type preference=rig.GetType().Assembly.GetType("SDGAdventure.SharedPlayer.PlayerViewPreference",true);
+            PropertyInfo mode=preference.GetProperty("Mode");object oldMode=mode.GetValue(null);
+            try
+            {
+                View(1);
+                Vector3 cameraPosition=camera.transform.localPosition;
+                Quaternion cameraRotation=camera.transform.localRotation;
+                foreach(float value in new[]{-1f,1f,0f})
+                {
+                    // Simulate the controller's accepted Q/E value without an OS key event.
+                    Set(controller,"leanAmount",value);Call(appearance,"LateUpdate");
+                    Assert.That(chest.localPosition.x,Is.EqualTo(value*.075f).Within(.001f));
+                    Assert.That(Mathf.DeltaAngle(0,chest.localEulerAngles.z),Is.EqualTo(-value*12f).Within(.1f));
+                    Assert.That(head.localPosition.x,Is.EqualTo(value*.09f).Within(.001f));
+                    Assert.AreEqual(playerPosition,player.transform.position);
+                    Assert.AreEqual(capsuleCenter,capsule.center);
+                    Assert.AreEqual(capsuleHeight,capsule.height);
+                    Assert.AreEqual(cameraPosition,camera.transform.localPosition);
+                    Assert.That(Quaternion.Angle(cameraRotation,camera.transform.localRotation),Is.LessThan(.01f));
+                }
+                View(0);Set(controller,"leanAmount",1f);Call(appearance,"LateUpdate");
+                Assert.That(chest.localPosition.x,Is.EqualTo(0f).Within(.001f),"First-person must not animate a third-person lean.");
+                Assert.That(Mathf.DeltaAngle(0,chest.localEulerAngles.z),Is.EqualTo(0f).Within(.1f));
+            }
+            finally
+            {
+                Set(controller,"leanAmount",oldLean);
+                mode.SetValue(null,oldMode);Call(rig,"ApplyMode");
+                Call(appearance,"LateUpdate");
+            }
+            yield return null;
+        }
+        [UnityTest] public IEnumerator ConsoleWorktopHasIndependentSolidCollisionWithoutBlockingInteraction()
+        {
+            GameObject station=GameObject.Find("M4_PuzzleConsole");Assert.IsNotNull(station);
+            Transform visual=station.transform.Find("V11_StationArt_M4_PuzzleConsole");
+            Transform proxy=station.transform.Find("V11_ConsoleWorktopCollision");
+            Assert.IsNotNull(visual);Assert.IsNotNull(proxy);
+            Assert.IsNull(proxy.GetComponent<Collider>(),
+                "The center line must remain unblocked for the legacy M6 interaction ray.");
+            BoxCollider[] barriers=proxy.GetComponentsInChildren<BoxCollider>(true);
+            Assert.AreEqual(2,barriers.Length,"Two side panels preserve the console footprint.");
+            BoxCollider left=barriers.Single(c=>c.name=="V11_ConsoleBarrier_Left");
+            BoxCollider right=barriers.Single(c=>c.name=="V11_ConsoleBarrier_Right");
+            Renderer top=visual.GetComponentsInChildren<Renderer>()
+                .Single(r=>r.name=="WeatheredSteelWorktop");
+            Physics.SyncTransforms();
+            foreach(BoxCollider barrier in barriers)
+            {
+                Assert.IsTrue(barrier.enabled && !barrier.isTrigger);
+                Assert.AreSame(station.GetComponent(Runtime("C3PuzzleConsole")),
+                    barrier.GetComponentInParent(Runtime("C3PuzzleConsole")));
+                Assert.That(barrier.bounds.max.y,
+                    Is.GreaterThanOrEqualTo(top.bounds.max.y-.005f));
+                Assert.That(barrier.bounds.min.y,
+                    Is.LessThanOrEqualTo(top.bounds.min.y-.55f));
+            }
+            float gap=right.bounds.min.x-left.bounds.max.x;
+            Assert.That(gap,Is.InRange(.12f,.24f),"Only a narrow ray gap is permitted.");
+            CharacterController player=GameObject.Find("M2_Player")
+                .GetComponent<CharacterController>();
+            Assert.Less(gap,player.radius*2f,
+                "The player capsule must be too wide to pass through the ray gap.");
+            Assert.IsFalse(visual.GetComponentsInChildren<Collider>(true).Any(c=>c.enabled));
+            // Same geometry and layer mask as the pre-existing M6 test; never
+            // weaken M6FlowTests.RelocatedSpawnConsoleAndDoorTriggerAreReachable.
+            Vector3 eye=new Vector3(-20.9f,2.05f,2.3f);
+            Vector3 target=station.GetComponent<Collider>().bounds.center;
+            Vector3 direction=target-eye;
+            Assert.Less(direction.magnitude,3f);
+            Assert.IsTrue(Physics.Raycast(eye,direction.normalized,
+                out RaycastHit rayHit,3f,~0,QueryTriggerInteraction.Ignore));
+            Assert.AreSame(station,rayHit.collider.gameObject,
+                "The original console must be the first ray hit, not a V11 collision panel.");
+            yield return null;
+        }
+
         [UnityTest] public IEnumerator FourOriginalStationsKeepTheirGameplayCollidersAndDoNotCreateCargo()
         {
             Component art=Find("C3WorkstationVisualUpgrade");Assert.IsNotNull(art);
@@ -189,6 +281,16 @@ namespace M6IntegrationTests
                 GameObject cache=GameObject.Find(name);
                 int sourceCount=cache.GetComponentsInChildren<Renderer>(true).Count(r=>!r.name.StartsWith("V11_HintOverlay_",StringComparison.Ordinal));
                 Assert.AreEqual(sourceCount,Overlays(cache).Length,"Hint capture ran before visual cache geometry was ready: "+name);
+                Renderer[] overlays=Overlays(cache);
+                Component hint=cache.GetComponent(Runtime("C3ProximityHint"));Assert.IsNotNull(hint,name);
+                Transform contents=cache.transform.Find("V11_CacheContents_Visual");Assert.IsNotNull(contents,name);
+                Call(hint,"RegisterVisuals",contents);
+                Call(hint,"RegisterVisuals",contents);
+                CollectionAssert.AreEquivalent(overlays,Overlays(cache),"Repeated registration replaced or duplicated overlays: "+name);
+                foreach(Renderer source in cache.GetComponentsInChildren<Renderer>(true)
+                    .Where(r=>!r.name.StartsWith("V11_HintOverlay_",StringComparison.Ordinal)))
+                    Assert.AreEqual(1,Overlays(source.gameObject).Count(r=>r.transform.parent==source.transform),
+                        "Each source must retain exactly one overlay: "+name+"/"+source.name);
             }
             yield return null;
         }

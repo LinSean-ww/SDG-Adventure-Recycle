@@ -21,13 +21,13 @@ namespace C3TreasurePuzzle
         }
 
         private readonly List<Surface> surfaces = new List<Surface>();
+        private readonly HashSet<Renderer> registered = new HashSet<Renderer>();
         private readonly MaterialPropertyBlock cue = new MaterialPropertyBlock();
         private Material material;
         private static readonly int Emission = Shader.PropertyToID("_EmissionColor");
 
         public C3HintVisuals(Transform owner)
         {
-            Renderer[] sources = owner.GetComponentsInChildren<Renderer>(true);
             Shader shader = Resources.Load<Shader>("V11Visual/C3HintOverlay");
             if (!shader)
             {
@@ -36,13 +36,23 @@ namespace C3TreasurePuzzle
             }
             material = new Material(shader) { name = "V11_OwnedHintOverlay" };
             material.EnableKeyword("_EMISSION");
+            RegisterRenderers(owner);
+        }
+
+        // Called after an owner finishes adding geometry, never from Update.
+        // Reuse the material and existing overlays; capture only new sources.
+        public void RegisterRenderers(Transform root)
+        {
+            if (!root || !material) return;
+            Renderer[] sources = root.GetComponentsInChildren<Renderer>(true);
             foreach (Renderer source in sources)
             {
-                if (source.name.StartsWith(OverlayPrefix, StringComparison.Ordinal)) continue;
+                if (!source || source.name.StartsWith(OverlayPrefix, StringComparison.Ordinal)) continue;
                 MeshFilter filter = source.GetComponent<MeshFilter>();
                 SkinnedMeshRenderer skin = source as SkinnedMeshRenderer;
                 Mesh mesh = skin ? skin.sharedMesh : filter ? filter.sharedMesh : null;
                 if (!mesh || (!(source is MeshRenderer) && !skin)) continue;
+                if (!registered.Add(source)) continue;
 
                 var state = new Surface
                 {
@@ -116,6 +126,7 @@ namespace C3TreasurePuzzle
                 UnityEngine.Object.Destroy(state.Overlay.gameObject);
             }
             surfaces.Clear();
+            registered.Clear();
             if (material) UnityEngine.Object.Destroy(material);
             material = null;
             // Originals need no write-back: no source reference/block was changed.

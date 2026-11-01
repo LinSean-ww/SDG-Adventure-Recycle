@@ -362,7 +362,13 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         if (keyboard.digit4Key.wasPressedThisFrame) selectedSlot = 3;
         if (keyboard.digit5Key.wasPressedThisFrame) selectedSlot = 4;
 
-        if (keyboard.fKey.wasPressedThisFrame)
+        // In C3 the existing action-service interactor dispatches quest OR
+        // workshop interaction. Retain raw-F fallback in other scenes or when
+        // that interactor is disabled; do not poll the same input twice.
+        C3PlayerInteractor c3Interactor = activeCamera != null
+            ? activeCamera.GetComponentInParent<C3PlayerInteractor>() : null;
+        if (keyboard.fKey.wasPressedThisFrame &&
+            (c3Interactor == null || !c3Interactor.HandlesInteractionInput))
             InteractWorkshop();
 
         if (WeaponEquipped())
@@ -404,7 +410,23 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         CharacterController character = activeCamera.GetComponentInParent<CharacterController>();
         if (character == null) return null;
         // Use the character position, not the orbiting third-person camera.
-        return EcoWorkshopInteractable.FindNearestMaterial(character.transform.position, 2.25f);
+        EcoWorkshopInteractable nearest = EcoWorkshopInteractable.FindNearestMaterial(character.transform.position, 2.25f);
+        PlayerPerspectiveRig rig = character.GetComponent<PlayerPerspectiveRig>();
+        C3PlayerInteractor interactor = character.GetComponent<C3PlayerInteractor>();
+        if (nearest != null && rig != null && rig.IsThirdPerson && interactor != null)
+        {
+            Collider volume = nearest.GetComponent<Collider>();
+            if (!volume || !interactor.CanReachPoint(volume, volume.ClosestPoint(interactor.ReachOrigin), 2.25f)) return null;
+        }
+        return nearest;
+    }
+
+    public void InteractWorkshopFromPlayer(C3PlayerInteractor interactor)
+    {
+        BindCamera();
+        if (!GameplayEnabled() || interactor == null || !interactor.HandlesInteractionInput ||
+            activeCamera == null || activeCamera.GetComponentInParent<C3PlayerInteractor>() != interactor) return;
+        InteractWorkshop();
     }
 
     private void InteractWorkshop()
@@ -417,6 +439,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             ~0, QueryTriggerInteraction.Collide);
         Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
         CharacterController player = activeCamera.GetComponentInParent<CharacterController>();
+        C3PlayerInteractor interactor = player != null ? player.GetComponent<C3PlayerInteractor>() : null;
         foreach (RaycastHit hit in hits)
         {
             if (player != null && hit.collider.transform.IsChildOf(player.transform)) continue;
@@ -426,6 +449,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
                 hit.collider.GetComponentInParent<EcoWorkshopInteractable>();
             if (target != null)
             {
+                if (third && interactor != null && !interactor.CanReachPoint(hit.collider, hit.point, 3.5f)) return;
                 target.Interact();
                 return;
             }
@@ -434,6 +458,10 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             if (hit.collider.GetComponentInParent<C3Interactable>() != null) return;
             break;
         }
+        // Third-person actions require the first camera hit AND body reach.
+        // Do not fall through a wall/missed aim to an off-ray nearby cache.
+        // Keep the accepted first-person proximity fallback below unchanged.
+        if (third) return;
         // Nearby materials can be picked up without requiring a tiny exact ray hit.
         // This respects the same material sorting/activation checks as normal F use.
         EcoWorkshopInteractable nearest = NearbyMaterialCache();
@@ -454,6 +482,12 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         {
             PlayerPerspectiveRig rig = activeCamera.GetComponentInParent<PlayerPerspectiveRig>();
             bool thirdPerson = rig != null && rig.IsThirdPerson;
+            EcoQuantumWeaponView visual = weaponModel.GetComponent<EcoQuantumWeaponView>();
+            if (visual != null)
+            {
+                visual.SetThirdPersonPresentation(rig, thirdPerson, aiming);
+                if (thirdPerson) return; // Final visual pose is owned by the view after the camera rig.
+            }
             Transform parent = thirdPerson ? rig.transform : activeCamera.transform;
             if (weaponModel.transform.parent != parent)
             {

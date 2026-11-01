@@ -20,6 +20,7 @@ namespace C3TreasurePuzzle
         private Text taskText, prompt, compactTask, notice, puzzleTitle, puzzleClue, puzzleOrder, puzzleFeedback, completeText;
         private Text taskProgress, taskHintTitle, taskHint;
         private readonly Text[] taskRows = new Text[5];
+        private float lastTaskTextWidth = -1f;
         private RectTransform puzzleControlsRow;
         private readonly Button[] choices = new Button[3];
         private Button confirm, retry, activate, cancelActivation, presentation;
@@ -143,6 +144,15 @@ namespace C3TreasurePuzzle
             puzzlePanel.SetActive(false); puzzleBackdrop.SetActive(false); taskPanel.SetActive(false); completionPanel.SetActive(false); completionBackdrop.SetActive(false);
         }
 
+        // The task sheet may occupy more than 44% of a small Game view; keep its
+        // actual edges on screen and let the scroll viewport handle extra height.
+        private static Vector2 CalculateTaskPanelSize(int width, int height)
+        {
+            float scale = Mathf.Clamp(Mathf.Min(width / 1920f, height / 1080f), 0.8f, 1.2f);
+            return new Vector2(Mathf.Max(0f, Mathf.Min(540f * scale, width - 32f * scale)),
+                Mathf.Max(0f, Mathf.Min(600f * scale, height - 32f * scale)));
+        }
+
         private void Update()
         {
             if (!console || !hud || !completion || !interactor || !puzzle) return;
@@ -157,7 +167,7 @@ namespace C3TreasurePuzzle
             float scale = Mathf.Clamp(Mathf.Min(Screen.width / 1920f, Screen.height / 1080f), 0.8f, 1.2f);
             RectTransform taskRect = (RectTransform)taskPanel.transform;
             taskRect.anchoredPosition = new Vector2(16 * scale, -16 * scale);
-            taskRect.sizeDelta = new Vector2(Mathf.Min(540 * scale, Screen.width * 0.44f), Mathf.Min(600 * scale, Screen.height - 32 * scale));
+            taskRect.sizeDelta = CalculateTaskPanelSize(Screen.width, Screen.height);
             RectTransform compactRect = (RectTransform)compactPanel.transform;
             compactRect.anchoredPosition = new Vector2(16 * scale, -16 * scale); compactRect.sizeDelta = new Vector2(82 * scale, 40 * scale);
             compactTask.fontSize = Mathf.RoundToInt(18 * scale);
@@ -183,17 +193,35 @@ namespace C3TreasurePuzzle
                 PlayerPauseMenu menu = interactor.GetComponent<PlayerPauseMenu>();
                 var journal = menu != null ? menu.Journal : null;
                 taskProgress.text = journal == null ? "" : "任務進度  " + journal.CompletedCount + "/" + journal.TotalCount;
+                float textWidth = Mathf.Max(40f, taskRect.sizeDelta.x - 32f); // viewport 6px, row 10px each side
+                bool widthChanged = !Mathf.Approximately(lastTaskTextWidth, textWidth);
+                int rowFont = Mathf.Clamp(Mathf.RoundToInt(19f * scale), 13, 19);
+                int hintFont = Mathf.Clamp(Mathf.RoundToInt(18f * scale), 13, 18);
+                taskProgress.fontSize = Mathf.Clamp(Mathf.RoundToInt(22f * scale), 16, 22);
                 for (int i = 0; i < taskRows.Length; i++)
                 {
                     bool hasTask = journal != null && i < journal.Tasks.Count;
                     taskRows[i].transform.parent.gameObject.SetActive(hasTask);
                     if (!hasTask) continue;
                     PlayerTaskItem task = journal.Tasks[i];
-                    taskRows[i].text = task.title + "：" + (task.completed ? "已完成" : "進行中") + "\n" + task.description;
+                    string rowText = task.title + "：" + (task.completed ? "已完成" : "進行中") + "\n" + task.description;
+                    if (widthChanged || taskRows[i].text != rowText || taskRows[i].fontSize != rowFont)
+                    {
+                        taskRows[i].text = rowText;
+                        taskRows[i].fontSize = rowFont;
+                        FitTaskBlock(taskRows[i], textWidth, 20f * scale, 52f * scale);
+                    }
                     taskRows[i].color = task.completed ? new Color(0.67f, 1f, 0.77f) : new Color(1f, 0.84f, 0.52f);
                 }
                 taskHintTitle.text = journal != null && journal.CompletedCount >= 3 ? "下一步" : "目前線索";
-                taskHint.text = hud.GuidanceText;
+                string hintText = hud.GuidanceText;
+                if (widthChanged || taskHint.text != hintText || taskHint.fontSize != hintFont)
+                {
+                    taskHint.text = hintText;
+                    taskHint.fontSize = hintFont;
+                    FitTaskBlock(taskHint, textWidth, 20f * scale, 72f * scale);
+                }
+                lastTaskTextWidth = textWidth;
             }
             if (showCompletion)
                 completeText.text = "零件收集結果：" + completion.PartsText +
@@ -267,6 +295,18 @@ namespace C3TreasurePuzzle
             text.verticalOverflow = VerticalWrapMode.Overflow; text.resizeTextForBestFit = false;
             text.raycastTarget = false; return text;
         }
+
+        // Measure at the current panel width instead of relying on the previous
+        // frame's stretched RectTransform. VerticalLayoutGroup then sizes each row.
+        private static void FitTaskBlock(Text label, float width, float padding, float minimumHeight)
+        {
+            if (!label || !label.font) return;
+            TextGenerationSettings settings = label.GetGenerationSettings(new Vector2(Mathf.Max(40f, width), 0f));
+            float preferred = label.cachedTextGeneratorForLayout.GetPreferredHeight(label.text, settings) / label.pixelsPerUnit;
+            LayoutElement layout = label.transform.parent.GetComponent<LayoutElement>();
+            if (layout) layout.preferredHeight = Mathf.Max(minimumHeight, Mathf.Ceil(preferred + padding));
+        }
+
         private static void Height(GameObject go, float height) { go.AddComponent<LayoutElement>().preferredHeight = height; }
         private Button ButtonItem(string name, Transform parent, string label, Action action)
         {
