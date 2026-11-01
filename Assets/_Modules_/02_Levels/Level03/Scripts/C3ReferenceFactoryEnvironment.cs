@@ -57,8 +57,8 @@ namespace C3TreasurePuzzle
             BuildOverheadPiping();
             BuildPendantLights();
             RenderSettings.ambientMode = AmbientMode.Flat;
-            RenderSettings.ambientLight = new Color(.66f, .69f, .71f);
-            RenderSettings.ambientIntensity = 1.25f;
+            RenderSettings.ambientLight = new Color(.46f, .49f, .51f);
+            RenderSettings.ambientIntensity = 1.0f;
             RenderSettings.fog = false;
         }
 
@@ -76,9 +76,9 @@ namespace C3TreasurePuzzle
         }
         private void InitMaterials()
         {
-            floor = Mat("Concrete floor", new Color(.91f, .94f, .93f), .08f, .23f, "FactoryConcrete");
-            tile = Mat("Polished wet concrete", new Color(.92f, .92f, .89f), .22f, .51f, "FactoryConcrete");
-            wall = Mat("Factory light walls", new Color(.82f, .87f, .87f), .09f, .3f, "FactoryConcrete");
+            floor = Mat("Concrete floor", new Color(.62f, .65f, .62f), .08f, .23f, "FactoryConcrete");
+            tile = Mat("Polished wet concrete", new Color(.66f, .66f, .59f), .22f, .51f, "FactoryConcrete");
+            wall = Mat("Factory light walls", new Color(.60f, .64f, .62f), .09f, .3f, "FactoryConcrete");
             steel = Mat("Industrial painted steel", new Color(.70f, .77f, .79f), .63f, .4f, "FactorySteel");
             stainless = Mat("Galvanized sorting plant", new Color(.92f, .96f, .98f), .76f, .56f, "FactorySteel");
             graphite = Mat("Black structural steel", new Color(.23f, .29f, .32f), .55f, .37f, "FactorySteel");
@@ -410,7 +410,6 @@ namespace C3TreasurePuzzle
         }
         private void BuildInputWasteCages()
         {
-            Material[] stuff={paper,metalBale,plastic};
             System.Random rnd=new System.Random(31528);
             for(int c=0;c<3;c++)
             {
@@ -433,35 +432,29 @@ namespace C3TreasurePuzzle
                 {
                     float px=x-.38f+(k%4)*.25f;
                     float pz=z-.74f+(k/4)*.35f;
-                    Material mat=stuff[(k+c)%3];
-                    Shape("Caged recycled packaging",k%4==1?PrimitiveType.Cylinder:PrimitiveType.Cube,
-                        new Vector3(px,1.02f+((k%3)*.14f),pz),
-                        new Vector3(.20f,.17f,.23f),mat,
+                    string[] samples={"Paper_FoldedCarton","Metal_CrushedCan","Plastic_CrushedBottle"};
+                    string[] kinds={"Paper","Metal","Plastic"};
+                    int lane=(k+c)%3;
+                    Transform visual=new GameObject("Caged recycled packaging / DECOR_ONLY").transform;
+                    visual.SetParent(root,false);
+                    visual.SetPositionAndRotation(new Vector3(px,1.02f+((k%3)*.14f),pz),
                         Quaternion.Euler(0f,(float)rnd.NextDouble()*90f,0));
+                    visual.localScale=Vector3.one*1.7f;
+                    foreach(string suffix in new[]{"_Body","_Details"})
+                    {
+                        GameObject mesh=Resources.Load<GameObject>("RecyclingArt/Meshes/"+samples[lane]+suffix);
+                        if(!mesh){Debug.LogError("Missing decorative waste model: "+samples[lane]+suffix);continue;}
+                        GameObject detail=Instantiate(mesh,visual,false);
+                        foreach(Renderer renderer in detail.GetComponentsInChildren<Renderer>())
+                            renderer.sharedMaterial=Resources.Load<Material>("RecyclingArt/Materials/Raw_"+kinds[lane]);
+                    }
+                    ++DecorativeObjects;
                 }
             }
         }
         private void BuildWorkStations()
         {
-            // The LEFT station is the ORIGINAL interactable M4 puzzle console;
-            // no new fake console is placed elsewhere.
-            GameObject puzzle=GameObject.Find("M4_PuzzleConsole");
-            Vector3 p=puzzle? puzzle.transform.position : new Vector3(-20.9f,1.0f,.67f);
-            Box("REAL PUZZLE CONTROL CABINET shell",p.x,1.24f,p.z+.48f,2.65f,1.42f,1.40f,steel);
-            for(int k=0;k<3;k++)
-            {
-                float x=p.x-0.80f+k*.80f;
-                Box("Recycling control computer bezel",x,2.03f,p.z+.18f,
-                    .72f,.53f,.10f,graphite);
-                Box("Recycling control monitor",x,2.03f,p.z+.113f,
-                    .64f,.44f,.05f,tealGlow);
-                Box("Control keypad with buttons",x,1.57f,p.z-.18f,
-                    .62f,.055f,.41f,stainless);
-                for(int key=0;key<6;key++)
-                    Box("Control desk physical pushbutton",x-.22f+key*.09f,1.61f,p.z-.31f,
-                        .06f,.025f,.06f,key%2==0?yellow:graphite);
-            }
-            Sign("ControlCenter",p.x,2.80f,p.z-.26f,3.05f,.63f);
+            // The four original stations receive scene-owned 3D art in C3WorkstationVisualUpgrade.
             // The actual checking and crafting benches are positioned by
             // EcoFactoryWorkshop at ground level, in front of the machine bank.
             // EcoFactoryWorkshop already fixes small plates directly on the two real benches.

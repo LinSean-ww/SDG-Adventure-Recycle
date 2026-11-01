@@ -52,6 +52,7 @@ namespace C3TreasurePuzzle
             line=GetComponent<C3RecyclingLine>();
             if (!line) line=gameObject.AddComponent<C3RecyclingLine>();
             if (!GetComponent<C3V3Circulation>()) gameObject.AddComponent<C3V3Circulation>();
+            if (!GetComponent<C3WorkstationVisualUpgrade>()) gameObject.AddComponent<C3WorkstationVisualUpgrade>();
         }
 
         private void OnEnable()

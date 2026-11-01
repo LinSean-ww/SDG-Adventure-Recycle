@@ -89,6 +89,7 @@ namespace C3TreasurePuzzle
             PlayerViewPreference.Mode = PlayerViewMode.FirstPerson;
             perspective = GetComponent<PlayerPerspectiveRig>();
             if (perspective == null) perspective = gameObject.AddComponent<PlayerPerspectiveRig>();
+            C3WorkerAppearance.Install(gameObject);
             perspective.Bind(viewTransform);
         }
 

@@ -502,7 +502,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         GameObject tracer = new GameObject("EcoQuantumTracer");
         LineRenderer line = tracer.AddComponent<LineRenderer>();
         Shader shader = Shader.Find("Sprites/Default");
-        if (shader != null) line.material = new Material(shader);
+        if (shader != null) C3OwnedVisualMaterial.Assign(line, new Material(shader));
         line.useWorldSpace = true;
         line.positionCount = 2;
         // Start the tracer slightly below/right of the reticle so it is visible
@@ -516,8 +516,8 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         line.SetPosition(1, destination);
         line.startWidth = 0.07f;
         line.endWidth = 0.006f;
-        line.startColor = new Color(0.1f, 1f, 0.8f);
-        line.endColor = Color.cyan;
+        line.startColor = new Color(0.2f, 1f, 0.25f);
+        line.endColor = new Color(0.1f, 0.65f, 0.18f);
         Destroy(tracer, 0.18f);
     }
 
@@ -559,18 +559,10 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
                 new Vector3(0.13f, 0.16f, 0.13f), color);
             return;
         }
-        AddGunPart(PrimitiveType.Cube, "RecycledHousing",
-            new Vector3(0, 0, 0), new Vector3(0.18f, 0.15f, 0.48f),
-            new Color(0.18f, 0.21f, 0.22f));
-        AddGunPart(PrimitiveType.Cylinder, "EnergyCoil",
-            new Vector3(0, 0.07f, 0.28f), new Vector3(0.10f, 0.29f, 0.10f),
-            new Color(0.04f, 0.85f, 0.78f), Quaternion.Euler(90, 0, 0), true);
-        AddGunPart(PrimitiveType.Cube, "InsulatedGrip",
-            new Vector3(0, -0.18f, -0.14f), new Vector3(0.10f, 0.26f, 0.11f),
-            new Color(0.12f, 0.14f, 0.15f));
-        AddGunPart(PrimitiveType.Cube, "RecycledMetalSight",
-            new Vector3(0, 0.105f, -0.12f), new Vector3(0.07f, 0.05f, 0.13f),
-            new Color(0.18f, 0.5f, 0.47f));
+        EcoQuantumWeaponView appearance = weaponModel.AddComponent<EcoQuantumWeaponView>();
+        appearance.AttachTo(activeCamera.transform);
+        appearance.SetVisible(true);
+        weaponModel.transform.localPosition = new Vector3(0.32f, -0.29f, 0.55f);
     }
 
     private void AddGunPart(PrimitiveType type, string name, Vector3 pos,
@@ -588,13 +580,14 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         Shader shader = Shader.Find("Standard");
         if (renderer != null && shader != null)
         {
-            renderer.material = new Material(shader);
-            renderer.material.color = color;
+            Material material = new Material(shader);
+            material.color = color;
             if (emissive)
             {
-                renderer.material.EnableKeyword("_EMISSION");
-                renderer.material.SetColor("_EmissionColor", color * 2f);
+                material.EnableKeyword("_EMISSION");
+                material.SetColor("_EmissionColor", color * 2f);
             }
+            C3OwnedVisualMaterial.Assign(renderer, material);
         }
     }
 

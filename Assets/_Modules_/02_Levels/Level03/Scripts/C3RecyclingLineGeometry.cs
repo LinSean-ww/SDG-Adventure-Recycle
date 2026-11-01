@@ -265,7 +265,7 @@ namespace C3TreasurePuzzle
                 foreach (int sign in new[] {-1,1})
                     Box("FRONT_COLUMN",new Vector3(x+sign*1.65f,2.48f,12.92f),new Vector3(1.05f,3.66f,.14f),steel,machine.Root);
                 Box("FRONT_TOP",new Vector3(x,3.7f,12.92f),new Vector3(2.25f,1.22f,.14f),types[lane],machine.Root);
-                GameObject label=C3BakedSignFactory.AtWorld(signs[lane],new Vector3(x,3.70f,12.82f),Quaternion.identity,2.05f,.55f,false);
+                GameObject label=C3BakedSignFactory.AtWorld(signs[lane],new Vector3(x,3.70f,12.82f),Quaternion.Euler(0f,180f,0f),2.05f,.55f,false);
                 if (label) { label.transform.SetParent(machine.Root,true); OwnSignMaterials(label); }
                 machine.Indicator=Box("PROCESS_INDICATOR",new Vector3(x+1.64f,3.7f,12.80f),new Vector3(.17f,.17f,.06f),glass,machine.Root,false).GetComponent<Renderer>();
                 Vector3 main=new Vector3(x+1.2f,5.8f,16.85f),intake=new Vector3(x+1.2f,4.45f,15.6f);
