@@ -12,7 +12,6 @@ namespace C3TreasurePuzzle
         private Transform workshopRoot;
         private Transform coreRotor;
         private Light coreLight;
-        private int observedCycles;
         private bool powerEstablished;
 
         public bool Powered => device != null &&
@@ -61,15 +60,8 @@ namespace C3TreasurePuzzle
                 if (coreRotor != null)
                     coreRotor.Rotate(Vector3.up, Powered ? 75f * Time.deltaTime : 0f);
             }
-            if (!Powered || presentation == null ||
-                EcoAdventureRuntime.Instance == null) return;
-            // CompletedCycles increments only when a physically visible item reaches its bin.
-            while (observedCycles < presentation.CompletedCycles)
-            {
-                int completedKind = observedCycles % 3; // plastic, metal, paper
-                EcoAdventureRuntime.Instance.ReceiveSortedMaterial(completedKind);
-                observedCycles++;
-            }
+            // Material credits are committed by the authoritative Phase 2 batch
+            // transaction. Never infer a material type from a cycle counter.
         }
 
         private void BuildWorkshop()

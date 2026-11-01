@@ -22,7 +22,7 @@ namespace C3TreasurePuzzle
         private readonly Text[] taskRows = new Text[5];
         private RectTransform puzzleControlsRow;
         private readonly Button[] choices = new Button[3];
-        private Button confirm, retry, activate, cancelActivation;
+        private Button confirm, retry, activate, cancelActivation, presentation;
         private static readonly string[] names = { "廢棄物分類", "資源回收", "污染處理" };
         // The same correct process applies, but the three displayed buttons are shuffled.
         // Persist the last layout to guarantee a different ordering on the next visit.
@@ -126,6 +126,8 @@ namespace C3TreasurePuzzle
             confirm = ButtonItem("Confirm", content, "確認", () => console.Confirm());
             retry = ButtonItem("Retry", content, "重試", () => console.Retry());
             activate = ButtonItem("Activate", content, "確認啟動設備", () => console.ConfirmActivation());
+            presentation = ButtonItem("Presentation", content, "產線展示", () => console.StartPresentation());
+            presentation.GetComponent<LayoutElement>().preferredHeight=48;
             cancelActivation = ButtonItem("Close", content, "關閉", () => console.ClosePanel());
             confirm.GetComponent<LayoutElement>().ignoreLayout = true; retry.GetComponent<LayoutElement>().ignoreLayout = true; cancelActivation.GetComponent<LayoutElement>().ignoreLayout = true;
             activate.GetComponent<LayoutElement>().preferredHeight = 48;
@@ -198,23 +200,27 @@ namespace C3TreasurePuzzle
                     "\n解謎嘗試次數：" + completion.PuzzleAttempts + "\n本次關卡遊玩時間：" +
                     C3CompletionScreen.FormatTime(completion.PlaySeconds) + "\n完成狀態：" + completion.CompletionText + "\n\n" + C3CompletionScreen.Knowledge;
             if (!showPuzzle) return;
-            bool activation = puzzle.PuzzleSolved && console.IsActivationPanel;
-            puzzleControlsRow.gameObject.SetActive(!activation);
-            cancelActivation.GetComponent<LayoutElement>().ignoreLayout = !activation;
+            bool production=console.Mode==C3PuzzleConsole.ConsoleMode.ProductionControl;
+            bool activation = !production && puzzle.PuzzleSolved && console.IsActivationPanel;
+            bool puzzleMode=!activation && !production;
+            puzzleControlsRow.gameObject.SetActive(puzzleMode);
+            cancelActivation.GetComponent<LayoutElement>().ignoreLayout = puzzleMode;
             cancelActivation.GetComponentInChildren<Text>().text = activation ? "暫不啟動／關閉" : "關閉";
-            puzzleClue.transform.parent.Find("Instruction").gameObject.SetActive(!activation);
-            puzzleTitle.text = activation ? "淨化設備待啟動" : "資源處理控制台";
-            puzzleClue.text = activation ? "三項零件已收齊，確認後啟動設備，待工廠恢復運作再前往出口。" : C3PuzzleConsole.Clue;
+            puzzleClue.transform.parent.Find("Instruction").gameObject.SetActive(puzzleMode);
+            puzzleTitle.text = production?"回收產線控制":activation ? "淨化設備待啟動" : "資源處理控制台";
+            puzzleClue.text = production?"觀看九件回收物完成分類、壓縮與出料。展示不增加材料獎勵；開始後會關閉面板，方便觀看。":
+                activation ? "三項零件已收齊，確認後啟動設備，待工廠恢復運作再前往出口。" : C3PuzzleConsole.Clue;
             for (int i = 0; i < choices.Length; i++)
             {
-                choices[i].gameObject.SetActive(!activation);
+                choices[i].gameObject.SetActive(puzzleMode);
                 choices[i].interactable = !puzzle.PuzzleSolved && !console.Selection.Contains(optionOrder[i]) && console.Selection.Count < 3;
             }
             string order = "";
             foreach (C3ProcessingStep step in console.Selection) order += (order.Length == 0 ? "" : " → ") + names[(int)step];
-            puzzleOrder.text = activation ? "" : "目前順序：" + (order.Length == 0 ? "尚未輸入" : order);
-            puzzleFeedback.text = console.Feedback;
-            confirm.gameObject.SetActive(!activation); retry.gameObject.SetActive(!activation); activate.gameObject.SetActive(activation);
+            puzzleOrder.text = puzzleMode?"目前順序："+(order.Length==0?"尚未輸入":order):"";
+            puzzleFeedback.text = production?console.ProductionStatus:console.Feedback;
+            confirm.gameObject.SetActive(puzzleMode); retry.gameObject.SetActive(puzzleMode); activate.gameObject.SetActive(activation);
+            presentation.gameObject.SetActive(production); presentation.interactable=console.CanStartPresentation;
             confirm.interactable = !puzzle.PuzzleSolved; retry.interactable = !puzzle.PuzzleSolved;
             cancelActivation.gameObject.SetActive(true);
         }
@@ -271,8 +277,13 @@ namespace C3TreasurePuzzle
         }
         private static RectTransform ScrollContent(Transform parent, float margin)
         {
-            GameObject viewport = new GameObject("Viewport", typeof(RectTransform), typeof(RectMask2D), typeof(ScrollRect));
+            GameObject viewport = new GameObject("Viewport", typeof(RectTransform), typeof(Image), typeof(RectMask2D), typeof(ScrollRect));
             viewport.transform.SetParent(parent, false); Stretch((RectTransform)viewport.transform, margin);
+            // Text is deliberately not a raycast target. Give the viewport its
+            // own transparent hit surface so wheel/drag events over text or blank
+            // space reach ScrollRect even when all buttons are below the mask.
+            viewport.GetComponent<Image>().color = Color.clear;
+            viewport.GetComponent<Image>().raycastTarget = true;
             GameObject content = new GameObject("Content", typeof(RectTransform), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
             content.transform.SetParent(viewport.transform, false); RectTransform rect = (RectTransform)content.transform;
             rect.anchorMin = new Vector2(0, 1); rect.anchorMax = new Vector2(1, 1); rect.pivot = new Vector2(0.5f, 1); rect.sizeDelta = Vector2.zero;

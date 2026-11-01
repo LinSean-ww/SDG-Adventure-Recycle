@@ -63,15 +63,7 @@ namespace C3TreasurePuzzle
                 new Vector3(-12.5f, 6.05f, 24.53f), Quaternion.Euler(0f, 180f, 0f), 3f, .6f, false);
             OwnSign(floorSign, buildRoot);
 
-            // Phase 1 does not redesign the working sorter, B-feed or output equipment.
-            Visual("V3_HopperShields", frameMat);
-            Visual("V3_InfeedCarrierFrame", mechanismMat);
-            Visual("V3_InfeedDrums", frameMat);
-            Visual("V3_OutfeedCarriers", mechanismMat);
-            Visual("V9_BDoorToSorterVisibleBelt", mechanismMat);
-            Visual("V9_BDoorToSorterSteelFrame", frameMat);
-            Visual("V9_BDoorToSorterYellowGuards", railMat);
-            Visual("V9_BDoorToSorterRollers", frameMat);
+            // Phase 2 owns the complete replacement equipment; retain the old OBJ assets only.
         }
 
         private static void RetireLegacyStructure()
@@ -257,26 +249,34 @@ namespace C3TreasurePuzzle
 
         private void BuildSupports(float west, float east)
         {
-            Transform supports = Group("V11_EDGE_SUPPORTS");
-            // Edge-mounted, entirely below deck; never in the upper walking envelope.
-            foreach (float x in new[] { west, east })
-                foreach (float z in new[] { 14.5f, 17.5f, 20.9f })
-                    Box(supports, "COLUMN_" + x + "_" + z,
-                        new Vector3(x, (GroundSurface + WalkSurface - DeckThickness) * .5f, z),
-                        new Vector3(.14f, WalkSurface - DeckThickness - GroundSurface, .14f), frameMat);
-        }
-
-        private void Visual(string filename, Material mat)
-        {
-            GameObject asset = Resources.Load<GameObject>("C3V3Models/" + filename);
-            if (!asset) { Debug.LogError("Retained factory mesh missing: " + filename); return; }
-            GameObject piece = Instantiate(asset, Vector3.zero, Quaternion.identity, buildRoot);
-            piece.name = filename;
-            foreach (Renderer renderer in piece.GetComponentsInChildren<Renderer>(true)) renderer.sharedMaterial = mat;
-            // Only these eight known decorative equipment meshes use this path.
-            // Never pass stairs, decks, railings, gameplay objects or triggers here.
-            foreach (Collider collider in piece.GetComponentsInChildren<Collider>(true))
-                if (!collider.isTrigger) collider.enabled = false;
+            Transform supports=Group("V11_EDGE_SUPPORTS");
+            // Consolidated outboard columns at deck joints, with visible
+            // cantilever brackets. Every member stays below the deck underside.
+            for (int side=0;side<2;side++)
+            {
+                float edge=side==0?west:east;
+                // Keep the east column clear of the wall at X=-.37 and end
+                // the post at the bracket bottom, rather than embedding the
+                // post through the bracket/deck. Walk/guard coordinates stay fixed.
+                float columnX=edge+(side==0?-.12f:.12f);
+                float innerX=edge+(side==0?.42f:-.42f);
+                float underside=WalkSurface-DeckThickness;
+                foreach (float z in new[] {13.75f,17.95f,21.2f})
+                {
+                    Box(supports,"COLUMN_BASE_PLATE",new Vector3(columnX,GroundSurface+.03f,z),
+                        new Vector3(.30f,.06f,.30f),frameMat);
+                    float bottom=GroundSurface+.06f,top=underside-.16f;
+                    Box(supports,"COLUMN_"+(side==0?"WEST_":"EAST_")+z,
+                        new Vector3(columnX,(bottom+top)*.5f,z),
+                        new Vector3(.16f,top-bottom,.16f),frameMat);
+                    Box(supports,"DECK_JOINT_BRACKET",new Vector3((columnX+innerX)*.5f,underside-.08f,z),
+                        new Vector3(Mathf.Abs(innerX-columnX)+.14f,.16f,.16f),frameMat);
+                    Vector3 low=new Vector3(columnX,underside-.90f,z);
+                    Vector3 high=new Vector3(innerX,underside-.16f,z);
+                    Box(supports,"KNEE_BRACE",(low+high)*.5f,new Vector3(.10f,.10f,Vector3.Distance(low,high)),
+                        frameMat,true,Quaternion.LookRotation(high-low));
+                }
+            }
         }
 
         private void OnDestroy()

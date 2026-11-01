@@ -29,12 +29,14 @@ namespace M6IntegrationTests
         private static object Coordinator => RuntimeType("SDGAdventure.ModuleSystem.ModuleCoordinator")
             .GetProperty("Instance").GetValue(null);
 
-        private static IEnumerator WaitForScene(string path)
+        private static IEnumerator WaitForScene(string path, int previousHandle = -1)
         {
             float until = Time.realtimeSinceStartup + 15f;
-            while (SceneManager.GetActiveScene().path != path && Time.realtimeSinceStartup < until)
+            while ((SceneManager.GetActiveScene().path != path || SceneManager.GetActiveScene().handle == previousHandle) &&
+                Time.realtimeSinceStartup < until)
                 yield return null;
             Assert.AreEqual(path, SceneManager.GetActiveScene().path);
+            Assert.AreNotEqual(previousHandle, SceneManager.GetActiveScene().handle, "Scene reload did not complete.");
         }
 
         private static void Launch(object coordinator)
@@ -45,23 +47,74 @@ namespace M6IntegrationTests
 
         private static IEnumerator ClickVisibleButton(Transform content, string name, float scrollPosition)
         {
+            // Let C3UiView.Update apply the current panel mode before rebuilding layout.
+            yield return null;
+            Canvas.ForceUpdateCanvases();
             ScrollRect scroll = content.parent.GetComponent<ScrollRect>();
-            scroll.verticalNormalizedPosition = scrollPosition;
+            Assert.IsNotNull(scroll, name + ": missing ScrollRect");
+            Assert.IsTrue(scroll.isActiveAndEnabled, name + ": inactive ScrollRect");
+            EventSystem events = EventSystem.current;
+            Assert.IsNotNull(events, name + ": missing EventSystem after scene load");
+            Assert.IsTrue(events.isActiveAndEnabled, name + ": inactive EventSystem");
+            Assert.IsNotNull(events.currentInputModule, name + ": missing input module");
+            Assert.AreEqual("InputSystemUIInputModule", events.currentInputModule.GetType().Name, name);
+            Assert.IsTrue(events.currentInputModule.isActiveAndEnabled, name + ": inactive input module");
+            scroll.StopMovement();
+            float hidden = Mathf.Max(0f, scroll.content.rect.height - scroll.viewport.rect.height);
+            float pixels = (1f - scrollPosition) * hidden - scroll.content.anchoredPosition.y;
+            if (Mathf.Abs(pixels) > 0.5f)
+            {
+                Assert.Greater(scroll.scrollSensitivity, 0f, name);
+                var wheel = new PointerEventData(events) {
+                    position = RectTransformUtility.WorldToScreenPoint(null,
+                        scroll.viewport.TransformPoint(scroll.viewport.rect.center)),
+                    scrollDelta = new Vector2(0f, -pixels / scroll.scrollSensitivity)
+                };
+                var wheelHits = new List<RaycastResult>();
+                events.RaycastAll(wheel, wheelHits);
+                Assert.IsNotEmpty(wheelHits, name + ": viewport received no wheel raycast");
+                wheel.pointerCurrentRaycast = wheelHits[0];
+                float before = scroll.content.anchoredPosition.y;
+                Assert.AreSame(scroll.gameObject, ExecuteEvents.ExecuteHierarchy(
+                    wheelHits[0].gameObject, wheel, ExecuteEvents.scrollHandler),
+                    name + ": top raycast does not route wheel events to ScrollRect");
+                Assert.That(scroll.content.anchoredPosition.y - before, Is.EqualTo(pixels).Within(0.5f),
+                    name + ": wheel did not move Content to the requested position");
+            }
+            scroll.StopMovement();
             for (int frame = 0; frame < 5; frame++) yield return null;
             Canvas.ForceUpdateCanvases();
             Button button = content.Find(name).GetComponent<Button>();
-            Assert.IsTrue(button.IsInteractable(), name);
-            var pointer = new PointerEventData(EventSystem.current) {
-                position = RectTransformUtility.WorldToScreenPoint(null, button.transform.position),
+            Assert.IsTrue(button.gameObject.activeInHierarchy, name + ": inactive button");
+            Assert.IsTrue(button.IsInteractable(), name + ": button not interactable");
+            var pointer = new PointerEventData(events) {
+                position = RectTransformUtility.WorldToScreenPoint(null,
+                    ((RectTransform)button.transform).TransformPoint(((RectTransform)button.transform).rect.center)),
                 button = PointerEventData.InputButton.Left
             };
             var hits = new List<RaycastResult>();
-            EventSystem.current.RaycastAll(pointer, hits);
-            Assert.IsNotEmpty(hits, name + " received no raycast");
-            Assert.AreEqual(button.gameObject, hits[0].gameObject, name + " was blocked by " + hits[0].gameObject.name);
-            ExecuteEvents.Execute(hits[0].gameObject, pointer, ExecuteEvents.pointerDownHandler);
-            ExecuteEvents.Execute(hits[0].gameObject, pointer, ExecuteEvents.pointerUpHandler);
-            ExecuteEvents.Execute(hits[0].gameObject, pointer, ExecuteEvents.pointerClickHandler);
+            events.RaycastAll(pointer, hits);
+            Canvas canvas = button.GetComponentInParent<Canvas>();
+            GraphicRaycaster raycaster = canvas.GetComponent<GraphicRaycaster>();
+            Assert.IsNotNull(raycaster, name + ": missing GraphicRaycaster");
+            var direct = new List<RaycastResult>();
+            raycaster.Raycast(pointer, direct);
+            string details = name + " scene=" + SceneManager.GetActiveScene().handle +
+                " point=" + pointer.position + " screen=" + Screen.width + "x" + Screen.height +
+                " content=" + scroll.content.anchoredPosition + " normalized=" + scroll.verticalNormalizedPosition +
+                " cull=" + button.image.canvasRenderer.cull + " depth=" + button.image.depth +
+                " raycastTarget=" + button.image.raycastTarget + " raycaster=" + raycaster.isActiveAndEnabled +
+                " direct=" + string.Join(",", direct.ConvertAll(hit => hit.gameObject.name)) +
+                " event=" + string.Join(",", hits.ConvertAll(hit => hit.gameObject.name));
+            Assert.IsTrue(scroll.viewport.GetComponent<RectMask2D>().IsRaycastLocationValid(pointer.position, raycaster.eventCamera), details);
+            Assert.IsNotEmpty(direct, details);
+            Assert.AreEqual(button.gameObject, direct[0].gameObject, details);
+            Assert.IsNotEmpty(hits, details);
+            Assert.AreEqual(button.gameObject, hits[0].gameObject, details);
+            pointer.pointerCurrentRaycast = hits[0];
+            Assert.IsTrue(ExecuteEvents.Execute(hits[0].gameObject, pointer, ExecuteEvents.pointerDownHandler), details);
+            Assert.IsTrue(ExecuteEvents.Execute(hits[0].gameObject, pointer, ExecuteEvents.pointerUpHandler), details);
+            Assert.IsTrue(ExecuteEvents.Execute(hits[0].gameObject, pointer, ExecuteEvents.pointerClickHandler), details);
         }
 
         [UnityTest]
@@ -97,16 +150,27 @@ namespace M6IntegrationTests
                 Assert.AreEqual(0, ((System.Collections.ICollection)Get(console, "Selection")).Count);
                 yield return ClickVisibleButton(content, "Close", 0f);
                 Assert.IsFalse((bool)Get(console, "PanelOpen"));
-                Assert.IsTrue((bool)Call(console, "OpenPanel"));
-                yield return ClickVisibleButton(content, "Choice0", 1f);
-                yield return ClickVisibleButton(content, "Choice1", 1f);
-                yield return ClickVisibleButton(content, "Choice2", 1f);
-                yield return ClickVisibleButton(content, "Confirm", 0f);
+                Assert.IsTrue((bool)Call(console, "OpenPanel"), "Puzzle panel must reopen after Close.");
+                // Slots are shuffled on every scene entry; click the semantic answer through the UI.
+                Component view = Find("C3TreasurePuzzle.C3UiView");
+                foreach (string step in new[] { "Sorting", "Recycling", "PollutionTreatment" })
+                {
+                    int slot = Array.FindIndex(new[] { 0, 1, 2 }, i => Call(view, "GetOptionAt", i).ToString() == step);
+                    Assert.GreaterOrEqual(slot, 0, "No displayed choice for " + step);
+                    int before = ((System.Collections.ICollection)Get(console, "Selection")).Count;
+                    yield return ClickVisibleButton(content, "Choice" + slot, 1f);
+                    Assert.AreEqual(before + 1, ((System.Collections.ICollection)Get(console, "Selection")).Count,
+                        "Pointer click did not select " + step);
+                }
                 Assert.That(content.Find("Confirm").position.y, Is.EqualTo(content.Find("Retry").position.y).Within(0.5f));
                 Assert.That(content.Find("Retry").position.y, Is.EqualTo(content.Find("Close").position.y).Within(0.5f));
-                Assert.IsTrue((bool)Get(Find("C3TreasurePuzzle.C3PuzzleState"), "PuzzleSolved"));
+                yield return ClickVisibleButton(content, "Confirm", 0f);
+                Assert.IsTrue((bool)Get(Find("C3TreasurePuzzle.C3PuzzleState"), "PuzzleSolved"),
+                    "The semantic answer must solve the puzzle through the Confirm button.");
+                Assert.IsTrue((bool)Get(console, "IsActivationPanel"), "Confirm must enter activation mode.");
                 yield return ClickVisibleButton(content, "Close", 0f);
-                Assert.IsTrue((bool)Call(console, "OpenPanel"));
+                Assert.IsFalse((bool)Get(console, "PanelOpen"), "Activation Close callback must close the panel.");
+                Assert.IsTrue((bool)Call(console, "OpenPanel"), "Activation panel must reopen after Close.");
                 yield return ClickVisibleButton(content, "Activate", 0f);
                 Component device = Find("C3TreasurePuzzle.C3DeviceState");
                 Assert.IsFalse((bool)Get(device, "LevelCompleted"));
@@ -117,8 +181,9 @@ namespace M6IntegrationTests
                 Assert.That(ui.transform.Find("CompletionBackdrop").GetComponent<Image>().color.a, Is.EqualTo(0.82f).Within(0.001f));
                 float margin = Mathf.Min(20f, Mathf.Min(Screen.width, Screen.height) * 0.04f);
                 Assert.That(((RectTransform)complete.parent.parent).rect.width, Is.EqualTo(Screen.width - 2 * margin).Within(0.1f));
+                int previousHandle = SceneManager.GetActiveScene().handle;
                 yield return ClickVisibleButton(complete, run == 0 ? "Restart" : "Selection", 0f);
-                yield return WaitForScene(run == 0 ? C3 : Selection);
+                yield return WaitForScene(run == 0 ? C3 : Selection, previousHandle);
                 yield return null;
             }
         }
@@ -161,9 +226,13 @@ namespace M6IntegrationTests
             Assert.IsNotNull(EventSystem.current.currentInputModule);
             Assert.AreEqual("InputSystemUIInputModule", EventSystem.current.currentInputModule.GetType().Name);
             Assert.IsTrue(EventSystem.current.currentInputModule.isActiveAndEnabled);
-            Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(null, target.position);
+            Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(null,
+                target.TransformPoint(((RectTransform)target).rect.center));
             var hits = new List<RaycastResult>();
-            EventSystem.current.RaycastAll(new PointerEventData(EventSystem.current) { position = screenPoint }, hits);
+            var pointer = new PointerEventData(EventSystem.current) { position = screenPoint };
+            EventSystem.current.RaycastAll(pointer, hits);
+            var direct = new List<RaycastResult>();
+            canvas.GetComponent<GraphicRaycaster>().Raycast(pointer, direct);
             var viewport = (RectTransform)canvas.transform.Find("PuzzlePanel/Viewport");
             var corners = new Vector3[4]; viewport.GetWorldCorners(corners);
             Image targetImage = button.GetComponent<Image>();
@@ -172,7 +241,17 @@ namespace M6IntegrationTests
                 " screen=" + Screen.width + "x" + Screen.height + " viewport=" + corners[0] + "/" + corners[2] +
                 " active=" + button.gameObject.activeInHierarchy + " cull=" + targetImage.canvasRenderer.cull +
                 " raycast=" + targetImage.raycastTarget + " depth=" + targetImage.depth + " display=" + canvas.GetComponent<Canvas>().targetDisplay + " raycaster=" + canvas.GetComponent<GraphicRaycaster>().isActiveAndEnabled +
+                " direct=" + string.Join(",", direct.ConvertAll(hit => hit.gameObject.name).ToArray()) +
                 " hits=" + string.Join(",", hits.ConvertAll(hit => hit.gameObject.name).ToArray()));
+            // Membership alone cannot detect an overlay above the choice. Exercise the top hit and callback too.
+            Component console = Find("C3TreasurePuzzle.C3PuzzleConsole");
+            yield return ClickVisibleButton(target.parent, "Choice0", 1f);
+            Assert.AreEqual(1, ((System.Collections.ICollection)Get(console, "Selection")).Count,
+                "Choice0 pointer click must select exactly one step.");
+            object selected = Get(console, "Selection");
+            Assert.AreEqual(Call(Find("C3TreasurePuzzle.C3UiView"), "GetOptionAt", 0),
+                selected.GetType().GetProperty("Item").GetValue(selected, new object[] { 0 }),
+                "The pointer callback must select the displayed step.");
         }
 
         [Test]
@@ -366,62 +445,184 @@ namespace M6IntegrationTests
         [UnityTest]
         public IEnumerator FactoryStartupAndThreeWasteTypesUseBoundedVisualPool()
         {
-            yield return SceneManager.LoadSceneAsync(C3, LoadSceneMode.Single);
+            yield return SceneManager.LoadSceneAsync(C3,LoadSceneMode.Single);
             yield return null;
-            Component device = Find("C3TreasurePuzzle.C3DeviceState");
-            Component progress = Find("C3TreasurePuzzle.C3TreasureProgress");
-            Component puzzle = Find("C3TreasurePuzzle.C3PuzzleState");
-            Component presentation = Find("C3TreasurePuzzle.C3FactoryPresentation");
-            Assert.IsNotNull(presentation);
-            Renderer steelSource = GameObject.Find("DarkServicePillar")?.GetComponent<Renderer>();
-            Renderer feedRail = GameObject.Find("B區輸送帶支架")?.GetComponent<Renderer>();
-            Assert.IsNotNull(steelSource, "The C-area dark steel source must exist.");
-            Assert.IsNotNull(feedRail, "The feed rail must use a visible renderer.");
-            Assert.AreSame(steelSource.sharedMaterial, feedRail.sharedMaterial,
-                "The feed rail should reuse existing industrial steel without editing a shared material.");
-            Type type = presentation.GetType();
-            type.GetField("lightRestoreSeconds", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(presentation, 0.1f);
-            type.GetField("motorStartSeconds", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(presentation, 0.1f);
-            type.GetField("cycleSeconds", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(presentation, 0.15f);
-            GameObject[] waste = (GameObject[])type.GetField("waste", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(presentation);
-            Transform[] marks = (Transform[])type.GetField("feedMarks", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(presentation);
-            Vector3 markBefore = marks[0].localPosition;
-            Light[] lights = (Light[])type.GetField("factoryLights", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(presentation);
-            float initialLight = lights[0].intensity;
-            Assert.AreEqual(3, waste.Length);
-            Assert.IsFalse((bool)Get(presentation, "MotorActive"));
-            foreach (GameObject item in waste) Assert.IsFalse(item.activeSelf);
-            foreach (string id in new[] { "fuse", "control_chip", "filter_module" })
-                Assert.IsTrue((bool)Call(progress, "TryCollect", id, id));
-            Type step = RuntimeType("C3TreasurePuzzle.C3ProcessingStep");
-            Array answer = Array.CreateInstance(step, 3);
-            answer.SetValue(Enum.Parse(step, "Sorting"), 0);
-            answer.SetValue(Enum.Parse(step, "Recycling"), 1);
-            answer.SetValue(Enum.Parse(step, "PollutionTreatment"), 2);
-            Assert.IsTrue((bool)Call(puzzle, "SubmitAnswer", answer));
-            Assert.IsTrue((bool)Call(device, "TryActivate"));
-            Assert.AreEqual("Starting", Get(device, "FactoryState").ToString());
-            yield return new WaitForSeconds(0.3f);
-            Assert.AreEqual("Running", Get(device, "FactoryState").ToString());
-            Assert.IsTrue((bool)Get(presentation, "MotorActive"));
-            Assert.Greater(lights[0].intensity, initialLight);
-            yield return new WaitForSeconds(0.1f);
-            Assert.Greater(Vector3.Distance(markBefore, marks[0].localPosition), 0.01f);
-            yield return new WaitForSeconds(0.65f);
-            Assert.GreaterOrEqual((int)Get(presentation, "CompletedCycles"), 3);
-            GameObject[,] markers = (GameObject[,])type.GetField("sortedMarkers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(presentation);
-            for (int i = 0; i < 3; i++) Assert.IsTrue(markers[i, 0].activeSelf, "Each sorted category must retain a visible result.");
-            GameObject[] same = (GameObject[])type.GetField("waste", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(presentation);
-            for (int i = 0; i < 3; i++) Assert.AreSame(waste[i], same[i]);
-            type.GetField("cycleSeconds", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(presentation, 10f);
-            for (int i = 0; i < 3; i++)
+            Component device=Find("C3TreasurePuzzle.C3DeviceState");
+            Component progress=Find("C3TreasurePuzzle.C3TreasureProgress");
+            Component puzzle=Find("C3TreasurePuzzle.C3PuzzleState");
+            Component presentation=Find("C3TreasurePuzzle.C3FactoryPresentation");
+            Component line=Find("C3TreasurePuzzle.C3RecyclingLine");
+            Assert.IsNotNull(line);
+            Physics.SyncTransforms();
+            C3V11Phase2RecyclingLineTests.AssertEquipmentConnections(Find("C3TreasurePuzzle.C3RecyclingLineGeometry"));
+            Assert.AreEqual(0,(int)Get(line,"AcceptedUnits"));
+            Type type=presentation.GetType();
+            type.GetField("lightRestoreSeconds",BindingFlags.NonPublic|BindingFlags.Instance).SetValue(presentation,.1f);
+            type.GetField("motorStartSeconds",BindingFlags.NonPublic|BindingFlags.Instance).SetValue(presentation,.1f);
+            Light[] lights=(Light[])type.GetField("factoryLights",BindingFlags.NonPublic|BindingFlags.Instance).GetValue(presentation);
+            float initial=lights[0].intensity;
+            Assert.IsFalse((bool)Get(presentation,"MotorActive"));
+            foreach (string id in new[] {"fuse","control_chip","filter_module"}) Assert.IsTrue((bool)Call(progress,"TryCollect",id,id));
+            Type step=RuntimeType("C3TreasurePuzzle.C3ProcessingStep");
+            Array answer=Array.CreateInstance(step,3);
+            string[] names={"Sorting","Recycling","PollutionTreatment"};
+            for (int i=0;i<3;i++) answer.SetValue(Enum.Parse(step,names[i]),i);
+            Assert.IsTrue((bool)Call(puzzle,"SubmitAnswer",answer)); Assert.IsTrue((bool)Call(device,"TryActivate"));
+            Assert.AreEqual("Starting",Get(device,"FactoryState").ToString());
+            float deadline=Time.realtimeSinceStartup+35f;
+            while ((int)Get(presentation,"CompletedCycles")<3 && Time.realtimeSinceStartup<deadline) yield return null;
+            Assert.IsTrue((bool)Get(presentation,"MotorActive")); Assert.Greater(lights[0].intensity,initial);
+            Assert.AreEqual(9,(int)Get(line,"AcceptedUnits")); Assert.AreEqual(3,(int)Get(line,"ProcessedBatches"));
+            object[] materials=C3V11Phase2RecyclingLineTests.Items(line,"Materials");
+            object[] products=C3V11Phase2RecyclingLineTests.Items(line,"Products");
+            Assert.AreEqual(3,products.Length);
+            int paper=0,metal=0,plastic=0;
+            foreach (object product in products)
             {
-                type.GetField("cycleIndex", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(presentation, i);
-                type.GetField("cycleTime", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(presentation, 9.8f);
-                yield return null;
-                Assert.IsTrue(waste[i].activeSelf);
-                Assert.That(waste[i].transform.localPosition.x, Is.EqualTo(-0.85f + i * 0.85f).Within(0.2f));
-                Assert.Greater(waste[i].transform.localPosition.z, 0.8f);
+                string kind=C3V11Phase2RecyclingLineTests.Member(product,"MaterialType").ToString();
+                if (kind=="Paper") paper++; else if (kind=="Metal") metal++; else if (kind=="Plastic") plastic++; else Assert.Fail(kind);
+                Assert.IsTrue(((Transform)C3V11Phase2RecyclingLineTests.Member(product,"Product")).gameObject.activeInHierarchy);
+            }
+            Assert.AreEqual(1,paper); Assert.AreEqual(1,metal); Assert.AreEqual(1,plastic);
+            yield return new WaitForSeconds(.3f);
+            object[] same=C3V11Phase2RecyclingLineTests.Items(line,"Materials");
+            Assert.AreEqual(materials.Length,same.Length);
+            for (int i=0;i<materials.Length;i++) Assert.AreSame(materials[i],same[i]);
+            Assert.AreEqual(3,(int)Get(line,"ProcessedBatches"),"Finite input must not produce endless timer credits");
+        }
+
+        private static string CollisionPath(Transform item)
+        {
+            string path = item.name;
+            for (Transform parent = item.parent; parent != null; parent = parent.parent)
+                path = parent.name + "/" + path;
+            return path;
+        }
+
+        private static string CollisionState(Collider collider)
+        {
+            if (!collider) return "MISSING collider";
+            return CollisionPath(collider.transform) + " id=" + collider.GetInstanceID() +
+                " type=" + collider.GetType().Name + " enabled=" + collider.enabled +
+                " active=" + collider.gameObject.activeInHierarchy + " trigger=" + collider.isTrigger +
+                " layer=" + collider.gameObject.layer + " position=" + collider.transform.position.ToString("F6") +
+                " scale=" + collider.transform.lossyScale.ToString("F6") +
+                " bounds=" + collider.bounds.min.ToString("F6") + ".." + collider.bounds.max.ToString("F6");
+        }
+
+        private static void AssertSpawnCeilingCollision(GameObject player, CharacterController character)
+        {
+            Component factory = Find("C3TreasurePuzzle.C3ReferenceFactoryEnvironment");
+            Component circulation = Find("C3TreasurePuzzle.C3V3Circulation");
+            Assert.IsNotNull(factory, "Factory Awake must install the reference environment.");
+            Assert.IsNotNull(circulation, "Factory Awake must install the current circulation.");
+            Assert.IsNotNull(factory.transform.Find("C3_ReferenceRecyclingFactory_Visuals"));
+            GameObject art = GameObject.Find("C_Factory_Art");
+            Assert.IsNotNull(art);
+            Transform lens = art.transform.Find("Lighting/Cyan_Console/IndicatorLens");
+            Assert.IsNotNull(lens, "Missing authored legacy lamp.");
+            Assert.AreSame(lens.parent.gameObject, GameObject.Find("Cyan_Console"), "Legacy lamp identity is ambiguous.");
+            Collider retired = lens.GetComponent<Collider>();
+            Transform deck = circulation.transform.Find("C3_V3_VerifiedCirculation/2F_CONNECTING_REAR_ROUTE");
+            Assert.IsNotNull(deck, "Circulation Awake must build the current rear deck.");
+            BoxCollider ceiling = deck.GetComponent<BoxCollider>();
+            Assert.IsNotNull(retired);
+            Assert.IsNotNull(ceiling);
+            Physics.SyncTransforms();
+            string setup = "M6 spawn collision (explicit upward Move, not the normal jump arc)\nlegacy=" + CollisionState(retired) +
+                "\nceiling=" + CollisionState(ceiling) + "\nplayer=" + CollisionState(character) +
+                " center=" + character.center.ToString("F6") + " height=" + character.height + " radius=" + character.radius +
+                " skinWidth=" + character.skinWidth + " stepOffset=" + character.stepOffset +
+                " ignoredLayers=" + Physics.GetIgnoreLayerCollision(player.layer, ceiling.gameObject.layer) +
+                " ignoredPair=" + Physics.GetIgnoreCollision(character, ceiling);
+            Debug.Log(setup);
+            // V11 deliberately retires this invisible lamp's collision. Its bounds
+            // cannot define the blocking height of the replacement circulation.
+            Assert.IsFalse(retired.enabled, "The retired lamp must not become an invisible obstacle.\n" + setup);
+            Assert.IsTrue(ceiling.enabled && ceiling.gameObject.activeInHierarchy && !ceiling.isTrigger, setup);
+            Renderer deckRenderer = deck.GetComponent<Renderer>();
+            Assert.IsNotNull(deckRenderer, setup);
+            Assert.IsTrue(deckRenderer.enabled, "The blocking deck must remain visible.\n" + setup);
+            Assert.IsTrue(character.enabled && character.detectCollisions, setup);
+            Vector3 scale = character.transform.lossyScale;
+            float scaleDeviation = (scale - Vector3.one).magnitude;
+
+            Assert.Less(
+                scaleDeviation,
+                0.0001f,
+                "The production capsule sweep assumes near-unit scale." +
+                "\nActual scale=" + scale.ToString("F9") +
+                "\nDeviation=" + scaleDeviation.ToString("G9") +
+                "\n" + setup
+            );
+            Assert.IsFalse(Physics.GetIgnoreLayerCollision(player.layer, ceiling.gameObject.layer), setup);
+            Assert.IsFalse(Physics.GetIgnoreCollision(character, ceiling), setup);
+
+            MonoBehaviour movement = (MonoBehaviour)player.GetComponent(RuntimeType("C3TreasurePuzzle.C3FirstPersonController"));
+            Assert.IsNotNull(movement, setup);
+            bool movementEnabled = movement.enabled;
+            Vector3 start = player.transform.position;
+            bool cursorVisible = Cursor.visible;
+            CursorLockMode cursorLock = Cursor.lockState;
+            C3V11CollisionRecorder contacts = null;
+            try
+            {
+                movement.enabled = false;
+                Physics.SyncTransforms();
+                Bounds before = character.bounds;
+                float clearance = ceiling.bounds.min.y - before.max.y;
+                Assert.Greater(clearance, 0.02f, "The spawn capsule must start below the live deck.\n" + setup);
+                Assert.That(before.center.x, Is.InRange(ceiling.bounds.min.x, ceiling.bounds.max.x), setup);
+                Assert.That(before.center.z, Is.InRange(ceiling.bounds.min.z, ceiling.bounds.max.z), setup);
+                // Reach beyond the real underside even if gravity changed the spawn
+                // height. The old fixed 2m move could end below this V11 deck.
+                Vector3 requested = Vector3.up * (clearance + character.radius);
+                Vector3 center = character.transform.TransformPoint(character.center);
+                float halfSegment = Mathf.Max(0f, character.height * 0.5f - character.radius);
+                Vector3 bottom = center - Vector3.up * halfSegment, top = center + Vector3.up * halfSegment;
+                Collider[] overlaps = Physics.OverlapCapsule(bottom, top, character.radius, ~0, QueryTriggerInteraction.Ignore);
+                RaycastHit[] sweep = Physics.CapsuleCastAll(bottom, top, character.radius, Vector3.up,
+                    requested.y, ~0, QueryTriggerInteraction.Ignore);
+                string approach = setup + "\nstart=" + start.ToString("F6") + " clearance=" + clearance +
+                    " requested=" + requested.ToString("F6") + "\ninitial full-radius overlaps (including floor/skin contacts):";
+                foreach (Collider hit in overlaps) approach += "\n  " + CollisionState(hit);
+                foreach (RaycastHit hit in sweep)
+                    approach += "\nsweep=" + CollisionPath(hit.collider.transform) + " distance=" + hit.distance +
+                        " point=" + hit.point.ToString("F6") + " normal=" + hit.normal.ToString("F6");
+                Assert.IsFalse(Array.Exists(overlaps, hit => hit == ceiling), approach);
+                Assert.IsTrue(Array.Exists(sweep, hit => hit.collider == ceiling && hit.normal.y < -0.9f),
+                    "The requested capsule path must intersect the live deck underside.\n" + approach);
+                contacts = player.AddComponent<C3V11CollisionRecorder>();
+                contacts.CaptureDetails = true;
+                CollisionFlags flags = character.Move(requested);
+                string result = approach + "\nactual=" + (player.transform.position - start).ToString("F6") +
+                    " flags=" + flags + " final=" + CollisionState(character);
+                foreach (C3V11CollisionRecorder.ContactEvidence hit in contacts.DetailedContacts)
+                    result += "\ncontact=" + CollisionPath(hit.Collider.transform) + " point=" + hit.Point.ToString("F6") +
+                        " normal=" + hit.Normal.ToString("F6") + " direction=" + hit.MoveDirection.ToString("F6") +
+                        " length=" + hit.MoveLength;
+                Assert.IsTrue((flags & CollisionFlags.Above) != 0, "Upward Move must report a ceiling collision.\n" + result);
+                Assert.IsTrue(contacts.DetailedContacts.Exists(hit => hit.Collider == ceiling && hit.Normal.y < -0.9f),
+                    "An unrelated blocker must not substitute for contact with the live deck.\n" + result);
+                Assert.Greater(character.bounds.max.y, before.max.y + 0.02f, "The controller must actually move upward.\n" + result);
+                Assert.LessOrEqual(character.bounds.max.y, ceiling.bounds.min.y + character.skinWidth,
+                    "The capsule must not pass through the live deck beyond its production skin width.\n" + result);
+                Debug.Log(result);
+            }
+            finally
+            {
+                if (contacts)
+                {
+                    contacts.enabled = false;
+                    UnityEngine.Object.Destroy(contacts);
+                }
+                character.enabled = false;
+                player.transform.position = start;
+                character.enabled = true;
+                Physics.SyncTransforms();
+                movement.enabled = movementEnabled;
+                Cursor.lockState = cursorLock;
+                Cursor.visible = cursorVisible;
             }
         }
 
@@ -444,14 +645,7 @@ namespace M6IntegrationTests
             Vector3 capsuleTop = player.transform.position + Vector3.up * 1.44f;
             foreach (Collider hit in Physics.OverlapCapsule(capsuleBase, capsuleTop, 0.25f, ~0, QueryTriggerInteraction.Ignore))
                 Assert.IsTrue(hit.transform.IsChildOf(player.transform), "Spawn overlaps " + hit.name);
-            Collider blue = GameObject.Find("Cyan_Console").transform.Find("IndicatorLens").GetComponent<Collider>();
-            Assert.IsNotNull(blue);
-            Assert.IsFalse(blue.isTrigger);
-            Assert.Greater(blue.bounds.min.y - character.bounds.max.y, 0.02f);
-            MonoBehaviour spawnMovement = (MonoBehaviour)player.GetComponent(RuntimeType("C3TreasurePuzzle.C3FirstPersonController"));
-            spawnMovement.enabled = false;
-            character.Move(Vector3.up * 2f);
-            Assert.LessOrEqual(character.bounds.max.y, blue.bounds.min.y + 0.1f, "Jump must not pass through the wall fixture.");
+            AssertSpawnCeilingCollision(player, character);
             character.enabled = false;
             player.transform.position = new Vector3(-0.9f, 0.58f, 18.95f);
             character.enabled = true;
@@ -460,7 +654,21 @@ namespace M6IntegrationTests
             Collider consoleCollider = console.GetComponent<Collider>();
             Collider southWall = GameObject.Find("C_Wall_1_Left").GetComponent<Collider>();
             Assert.That(consoleCollider.bounds.min.y, Is.EqualTo(0.55f).Within(0.015f));
-            Assert.That(consoleCollider.bounds.min.z, Is.EqualTo(southWall.bounds.max.z).Within(0.02f));
+            Assert.That(
+                console.transform.position.z,
+                Is.EqualTo(4.15f).Within(0.02f),
+                "Puzzle console must remain at its authored V11 position."
+            );
+
+            float southGap =
+                consoleCollider.bounds.min.z -
+                southWall.bounds.max.z;
+
+            Assert.Greater(
+                southGap,
+                0.02f,
+                "Puzzle console must not overlap the south wall."
+            );
             Vector3 eye = new Vector3(-20.9f, 2.05f, 2.3f);
             Vector3 target = console.GetComponent<Collider>().bounds.center;
             Vector3 direction = target - eye;

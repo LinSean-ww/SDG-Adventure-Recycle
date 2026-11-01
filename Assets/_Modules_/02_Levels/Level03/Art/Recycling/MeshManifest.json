@@ -1,0 +1,825 @@
+{
+  "units": "metres",
+  "raw_proxy_radius": 0.12,
+  "product_size": [
+    0.52,
+    0.43,
+    0.51
+  ],
+  "render_pipeline": "Built-in / Standard opaque",
+  "image_sha256": {
+    "07_Three_Bales_on_Pallets.png": "502ba40872c61915fbe71296c626f31533a5e48c78483e73fff2fcb64bb6637c",
+    "08_Mixed_Sorting_Trash_Sheet.png": "31858c3b65b6d0d4a8d7ecc72e315041188e1cce9900defd2615a44f81c7baef",
+    "09_Three_Bale_Fronts.png": "62fe22e0d6d4877500422936d203cc8e7cdd9cef2ff775dcc18c1a0db6faf3f8",
+    "10_Three_Bale_Angled.png": "c49a2dae0ed9b2a2c09dc3af3c55923ae0c31a289b2265e9e82a1c99b8a8aef0"
+  },
+  "models": [
+    {
+      "model": "Metal_AluminumCan_Body",
+      "triangles": 448,
+      "min": [
+        -0.06241925,
+        -0.10573907,
+        -0.06232925
+      ],
+      "max": [
+        0.06241925,
+        0.09891719,
+        0.06232925
+      ],
+      "max_radius": 0.11799999999999998,
+      "atlas": "08",
+      "kind": "Metal",
+      "variant": 0,
+      "role": "RawVisual",
+      "sha256": "43b95669ff29329804a242ca2cf5324212004e7bce88d0a8acbd4d9e587cb9f4"
+    },
+    {
+      "model": "Metal_AluminumCan_Details",
+      "triangles": 1152,
+      "min": [
+        -0.0575759,
+        -0.10369251,
+        -0.05684844
+      ],
+      "max": [
+        0.0570316,
+        0.10573907,
+        0.05775906
+      ],
+      "max_radius": 0.11710041099654324,
+      "atlas": "08",
+      "kind": "Metal",
+      "variant": 0,
+      "role": "RawVisual",
+      "sha256": "93ac69e5649e9c792e39199a09c30ad1e30bee050e0ec31f6369528276405bbb"
+    },
+    {
+      "model": "Metal_CrushedCan_Body",
+      "triangles": 448,
+      "min": [
+        -0.09642,
+        -0.08067442,
+        -0.09414376
+      ],
+      "max": [
+        0.09642,
+        0.07247635,
+        0.09414376
+      ],
+      "max_radius": 0.118,
+      "atlas": "08",
+      "kind": "Metal",
+      "variant": 1,
+      "role": "RawVisual",
+      "sha256": "e8b7f7f5fbd72c56e00387a5991818ffae95ad07b98f8dd72a97be18fbc27fc4"
+    },
+    {
+      "model": "Metal_CrushedCan_Details",
+      "triangles": 1152,
+      "min": [
+        -0.07686794,
+        -0.08148522,
+        -0.07187898
+      ],
+      "max": [
+        0.07448105,
+        0.08148522,
+        0.07947001
+      ],
+      "max_radius": 0.11170821129558801,
+      "atlas": "08",
+      "kind": "Metal",
+      "variant": 1,
+      "role": "RawVisual",
+      "sha256": "8e66301092f28fb871a21d8b9fbd58926c85b2b066c203b22557103e6007c446"
+    },
+    {
+      "model": "Metal_TinCan_Body",
+      "triangles": 576,
+      "min": [
+        -0.05472514,
+        -0.09717975,
+        -0.04190374
+      ],
+      "max": [
+        0.05472514,
+        0.08167869,
+        0.06693337
+      ],
+      "max_radius": 0.1133094456952682,
+      "atlas": "08",
+      "kind": "Metal",
+      "variant": 2,
+      "role": "RawVisual",
+      "sha256": "38ca24695c13a44ede0e8080db1272379a43caeee508db42c8a6cbe73909624f"
+    },
+    {
+      "model": "Metal_TinCan_Details",
+      "triangles": 1280,
+      "min": [
+        -0.04993649,
+        -0.09539117,
+        -0.06693337
+      ],
+      "max": [
+        0.05022423,
+        0.09717975,
+        0.0630371
+      ],
+      "max_radius": 0.11800000000000001,
+      "atlas": "08",
+      "kind": "Metal",
+      "variant": 2,
+      "role": "RawVisual",
+      "sha256": "06f75af953d156664d460bcd770e426637dd8f694ef88450f307d92688b9ec65"
+    },
+    {
+      "model": "Metal_CrownCap_Body",
+      "triangles": 256,
+      "min": [
+        -0.10768806,
+        -0.02159457,
+        -0.11026037
+      ],
+      "max": [
+        0.10768806,
+        0.02159457,
+        0.11026037
+      ],
+      "max_radius": 0.11799999999999997,
+      "atlas": "08",
+      "kind": "Metal",
+      "variant": 3,
+      "role": "RawVisual",
+      "sha256": "249aa588784fd48d95f833daecd560403fbbd1eed009f20025e4fabdbd11a9b0"
+    },
+    {
+      "model": "Metal_CrownCap_Details",
+      "triangles": 384,
+      "min": [
+        -0.09857914,
+        0.01162785,
+        -0.09589636
+      ],
+      "max": [
+        0.09078862,
+        0.02159457,
+        0.09347141
+      ],
+      "max_radius": 0.10014759575258597,
+      "atlas": "08",
+      "kind": "Metal",
+      "variant": 3,
+      "role": "RawVisual",
+      "sha256": "116634ab47e666310beb3c3705e5de2218cfc2833ffad11ad1c51cb846c8299f"
+    },
+    {
+      "model": "Metal_FoodTin_Body",
+      "triangles": 448,
+      "min": [
+        -0.10199844,
+        -0.06911042,
+        -0.06313563
+      ],
+      "max": [
+        0.10199844,
+        0.06208748,
+        0.06221992
+      ],
+      "max_radius": 0.118,
+      "atlas": "08",
+      "kind": "Metal",
+      "variant": 4,
+      "role": "RawVisual",
+      "sha256": "c99f1f58d3b3c93687103f22e7489d7ffa293a542205ccf955b3213b8be80ca2"
+    },
+    {
+      "model": "Metal_FoodTin_Details",
+      "triangles": 1152,
+      "min": [
+        -0.06527191,
+        -0.069805,
+        -0.0648272
+      ],
+      "max": [
+        0.06438248,
+        0.069805,
+        0.0648272
+      ],
+      "max_radius": 0.09365065168708311,
+      "atlas": "08",
+      "kind": "Metal",
+      "variant": 4,
+      "role": "RawVisual",
+      "sha256": "1d140fa81be6ad24c03c7c6e1d61b6d862fc23210d8a9ecbca1cb483496a6e38"
+    },
+    {
+      "model": "Plastic_PETBottle_Body",
+      "triangles": 512,
+      "min": [
+        -0.04988482,
+        -0.11408001,
+        -0.05007649
+      ],
+      "max": [
+        0.04988482,
+        0.09903649,
+        0.04952952
+      ],
+      "max_radius": 0.11800000000000001,
+      "atlas": "08",
+      "kind": "Plastic",
+      "variant": 0,
+      "role": "RawVisual",
+      "sha256": "1f907d0f2c91b55706543f1b6cd49dd8830c987f547efee41d1b4072c8a19b8b"
+    },
+    {
+      "model": "Plastic_PETBottle_Details",
+      "triangles": 1664,
+      "min": [
+        -0.04950194,
+        -0.07897847,
+        -0.04770637
+      ],
+      "max": [
+        0.04828092,
+        0.11408001,
+        0.05007649
+      ],
+      "max_radius": 0.11563168431344142,
+      "atlas": "08",
+      "kind": "Plastic",
+      "variant": 0,
+      "role": "RawVisual",
+      "sha256": "371156f0cd9b4cc16c5aeea5097218983e3875232515e9063e45c8cd73a2b995"
+    },
+    {
+      "model": "Plastic_DrinkCup_Body",
+      "triangles": 320,
+      "min": [
+        -0.06106315,
+        -0.11043336,
+        -0.06106315
+      ],
+      "max": [
+        0.06106315,
+        0.05456707,
+        0.06106315
+      ],
+      "max_radius": 0.118,
+      "atlas": "08",
+      "kind": "Plastic",
+      "variant": 1,
+      "role": "RawVisual",
+      "sha256": "6feee5f1995955586a31e744c95b25b1bb72127f858e6e50c0a4c19c10bb0f15"
+    },
+    {
+      "model": "Plastic_DrinkCup_Details",
+      "triangles": 512,
+      "min": [
+        -0.0649608,
+        -0.03897648,
+        -0.0649608
+      ],
+      "max": [
+        0.0649608,
+        0.11043336,
+        0.0649608
+      ],
+      "max_radius": 0.11135425521262333,
+      "atlas": "08",
+      "kind": "Plastic",
+      "variant": 1,
+      "role": "RawVisual",
+      "sha256": "eea7984aaec2b5c2a05783a4c488fb926330c3510f7d432735c20a99b815f90c"
+    },
+    {
+      "model": "Plastic_DetergentBottle_Body",
+      "triangles": 320,
+      "min": [
+        -0.08280555,
+        -0.1002383,
+        -0.03922368
+      ],
+      "max": [
+        0.05416604,
+        0.08031516,
+        0.03922368
+      ],
+      "max_radius": 0.11800000000000001,
+      "atlas": "08",
+      "kind": "Plastic",
+      "variant": 2,
+      "role": "RawVisual",
+      "sha256": "8ecefbcc0f79a037619b9b7b58aa2e7fd506f1243fe521a84c5616aa6ff18430"
+    },
+    {
+      "model": "Plastic_DetergentBottle_Details",
+      "triangles": 512,
+      "min": [
+        -0.04046888,
+        -0.0006226,
+        -0.02614912
+      ],
+      "max": [
+        0.08280555,
+        0.1002383,
+        0.02614912
+      ],
+      "max_radius": 0.10809924121304718,
+      "atlas": "08",
+      "kind": "Plastic",
+      "variant": 2,
+      "role": "RawVisual",
+      "sha256": "bbd02f09816d6dbaf51b8393fd730cc2b80b5da8f9a03026cbbe987c08d368e8"
+    },
+    {
+      "model": "Plastic_Clamshell_Body",
+      "triangles": 12,
+      "min": [
+        -0.08991787,
+        -0.03200018,
+        -0.05818215
+      ],
+      "max": [
+        0.08991787,
+        0.0156034,
+        0.05818215
+      ],
+      "max_radius": 0.111778343965347,
+      "atlas": "08",
+      "kind": "Plastic",
+      "variant": 3,
+      "role": "RawVisual",
+      "sha256": "1b0707b16704b6080b254a8bf31a40871e4735d2178c24d50d63f4481c9491fa"
+    },
+    {
+      "model": "Plastic_Clamshell_Details",
+      "triangles": 120,
+      "min": [
+        -0.09520716,
+        0.01824804,
+        -0.06347144
+      ],
+      "max": [
+        0.09520716,
+        0.03200018,
+        0.06347144
+      ],
+      "max_radius": 0.118,
+      "atlas": "08",
+      "kind": "Plastic",
+      "variant": 3,
+      "role": "RawVisual",
+      "sha256": "e9a390ce3e7a7a421bc88ea3dc645cc57c420848ce9dae357a7eb4432f9dad55"
+    },
+    {
+      "model": "Plastic_CrushedBottle_Body",
+      "triangles": 512,
+      "min": [
+        -0.05578069,
+        -0.11356279,
+        -0.05473161
+      ],
+      "max": [
+        0.05578069,
+        0.09858748,
+        0.05473161
+      ],
+      "max_radius": 0.118,
+      "atlas": "08",
+      "kind": "Plastic",
+      "variant": 4,
+      "role": "RawVisual",
+      "sha256": "0c55f1d84d1a32d1a71c3385728d31bf6e65ba88c9ede8b839f27939a1051a51"
+    },
+    {
+      "model": "Plastic_CrushedBottle_Details",
+      "triangles": 1664,
+      "min": [
+        -0.05029055,
+        -0.07862039,
+        -0.04572308
+      ],
+      "max": [
+        0.04704898,
+        0.11356279,
+        0.05161645
+      ],
+      "max_radius": 0.11545620679428568,
+      "atlas": "08",
+      "kind": "Plastic",
+      "variant": 4,
+      "role": "RawVisual",
+      "sha256": "c840049c512bc6ccb63283b4a55848ae6fb70adc1e87c2e2097ce147ba546900"
+    },
+    {
+      "model": "Paper_Newspaper_Body",
+      "triangles": 72,
+      "min": [
+        -0.09181893,
+        -0.03110254,
+        -0.0623518
+      ],
+      "max": [
+        0.09181893,
+        0.01210636,
+        0.06727493
+      ],
+      "max_radius": 0.118,
+      "atlas": "08",
+      "kind": "Paper",
+      "variant": 0,
+      "role": "RawVisual",
+      "sha256": "83bcd89120e3141a93cf9cfbbf202a82628c6222b4bdbd1f7d120f5749ae8948"
+    },
+    {
+      "model": "Paper_Newspaper_Details",
+      "triangles": 12,
+      "min": [
+        -0.0810167,
+        0.00931353,
+        -0.06727493
+      ],
+      "max": [
+        0.0810167,
+        0.03110254,
+        0.0505936
+      ],
+      "max_radius": 0.10604824188497301,
+      "atlas": "08",
+      "kind": "Paper",
+      "variant": 0,
+      "role": "RawVisual",
+      "sha256": "620a00402ec22c8ef0fea8ef6b3f2a96571a1c941a7d3e95cbf918d43e9b7999"
+    },
+    {
+      "model": "Paper_CardboardBox_Body",
+      "triangles": 60,
+      "min": [
+        -0.06619593,
+        -0.06666361,
+        -0.05646123
+      ],
+      "max": [
+        0.06619593,
+        0.04431191,
+        0.05646123
+      ],
+      "max_radius": 0.10636939491693038,
+      "atlas": "08",
+      "kind": "Paper",
+      "variant": 1,
+      "role": "RawVisual",
+      "sha256": "65329504903c965046042a93c5b6f91c98164a457a84f95aac2b6a9199523d89"
+    },
+    {
+      "model": "Paper_CardboardBox_Details",
+      "triangles": 48,
+      "min": [
+        -0.07057654,
+        0.0190017,
+        -0.09221861
+      ],
+      "max": [
+        0.07057654,
+        0.06666361,
+        0.09221861
+      ],
+      "max_radius": 0.118,
+      "atlas": "08",
+      "kind": "Paper",
+      "variant": 1,
+      "role": "RawVisual",
+      "sha256": "9900088d853392b2e7b89def6af6ffcffb52475dcf61d5795398bbf8e8cd9a2b"
+    },
+    {
+      "model": "Paper_FoldedCarton_Body",
+      "triangles": 60,
+      "min": [
+        -0.09328063,
+        -0.03264822,
+        -0.06172983
+      ],
+      "max": [
+        0.09328063,
+        0.02880725,
+        0.06447338
+      ],
+      "max_radius": 0.11799999999999997,
+      "atlas": "08",
+      "kind": "Paper",
+      "variant": 2,
+      "role": "RawVisual",
+      "sha256": "62c8bc9132f0129a28f708def2b6351a2aedefba1130db3611ba9f2150f2186f"
+    },
+    {
+      "model": "Paper_FoldedCarton_Details",
+      "triangles": 720,
+      "min": [
+        -0.0910858,
+        -0.025515,
+        -0.06447338
+      ],
+      "max": [
+        0.0910858,
+        0.03264822,
+        -0.0600837
+      ],
+      "max_radius": 0.11627272020547663,
+      "atlas": "08",
+      "kind": "Paper",
+      "variant": 2,
+      "role": "RawVisual",
+      "sha256": "89c3c50ad95c56a0dce77f6fc85eeb6993b6f5eb26aff0c9a2dc5a5412d0da7d"
+    },
+    {
+      "model": "Paper_PaperBag_Body",
+      "triangles": 256,
+      "min": [
+        -0.07490818,
+        -0.10466996,
+        -0.04370928
+      ],
+      "max": [
+        0.07490818,
+        0.10466996,
+        0.04370928
+      ],
+      "max_radius": 0.118,
+      "atlas": "08",
+      "kind": "Paper",
+      "variant": 3,
+      "role": "RawVisual",
+      "sha256": "bde4eff7fba219205b40f2333c810ff7f245b061c6394c4906c39ff9e0a4a102"
+    },
+    {
+      "model": "Paper_PaperBag_Details",
+      "triangles": 24,
+      "min": [
+        -0.05182244,
+        -0.09699416,
+        -0.03228131
+      ],
+      "max": [
+        0.04726512,
+        0.09141176,
+        0.03052067
+      ],
+      "max_radius": 0.11461027516033051,
+      "atlas": "08",
+      "kind": "Paper",
+      "variant": 3,
+      "role": "RawVisual",
+      "sha256": "7958d95d6a3472407c9301ed88cc7ebeaca574528f84b8bbf23123e43362caf5"
+    },
+    {
+      "model": "Paper_EggCarton_Body",
+      "triangles": 396,
+      "min": [
+        -0.08217489,
+        -0.04932972,
+        -0.06883216
+      ],
+      "max": [
+        0.08217489,
+        -0.00437522,
+        0.032678
+      ],
+      "max_radius": 0.118,
+      "atlas": "08",
+      "kind": "Paper",
+      "variant": 4,
+      "role": "RawVisual",
+      "sha256": "b40d0cae2de90e22d0c3049c1b95c4d156848b4437e3cbeb23af44013457439c"
+    },
+    {
+      "model": "Paper_EggCarton_Details",
+      "triangles": 12,
+      "min": [
+        -0.08217489,
+        -0.03874489,
+        0.01295881
+      ],
+      "max": [
+        0.08217489,
+        0.04932972,
+        0.06883216
+      ],
+      "max_radius": 0.11257689464632818,
+      "atlas": "08",
+      "kind": "Paper",
+      "variant": 4,
+      "role": "RawVisual",
+      "sha256": "8a32de16461f2deef6ba0b3cb9d99087aa3cbc1f8c3e1aaf6e7cabb1f9aa6902"
+    },
+    {
+      "model": "Bale_Metal_Shell",
+      "triangles": 2520,
+      "min": [
+        -0.26,
+        -0.21,
+        -0.25
+      ],
+      "max": [
+        0.26,
+        0.21,
+        0.25
+      ],
+      "max_radius": 0.4173727350941841,
+      "atlas": "10",
+      "kind": "Metal",
+      "role": "OfficialBale",
+      "sha256": "a43ccf36f34e8a675db60812919c8c3419f9256df1e367ad8892a507bfee7c68"
+    },
+    {
+      "model": "Bale_Metal_Front",
+      "triangles": 504,
+      "min": [
+        -0.26,
+        -0.21,
+        -0.25
+      ],
+      "max": [
+        0.26,
+        0.21,
+        -0.24705806
+      ],
+      "max_radius": 0.4173727350941841,
+      "atlas": "09",
+      "kind": "Metal",
+      "role": "OfficialBale",
+      "sha256": "013ecc3b6cb2a359d46791293a55d5fb5adba4f5d9889244fcd776b3e345325a"
+    },
+    {
+      "model": "Stock_Metal",
+      "triangles": 3024,
+      "min": [
+        -0.26,
+        -0.21,
+        -0.25
+      ],
+      "max": [
+        0.26,
+        0.21,
+        0.25
+      ],
+      "max_radius": 0.4173727350941841,
+      "atlas": "07",
+      "kind": "Metal",
+      "role": "DecorativeStock",
+      "sha256": "a3be6e6c66b86e41b9176ea26cac3e58acf44598a64fe7ba0f523f34de4a41c1"
+    },
+    {
+      "model": "Bale_Plastic_Shell",
+      "triangles": 2520,
+      "min": [
+        -0.26,
+        -0.21,
+        -0.25
+      ],
+      "max": [
+        0.26,
+        0.21,
+        0.25
+      ],
+      "max_radius": 0.4173727350941841,
+      "atlas": "10",
+      "kind": "Plastic",
+      "role": "OfficialBale",
+      "sha256": "2828e4705a7135418c7d38a721ab8221e641d0121b3d17d201e403053cd6880f"
+    },
+    {
+      "model": "Bale_Plastic_Front",
+      "triangles": 504,
+      "min": [
+        -0.26,
+        -0.21,
+        -0.25
+      ],
+      "max": [
+        0.26,
+        0.21,
+        -0.24705806
+      ],
+      "max_radius": 0.4173727350941841,
+      "atlas": "09",
+      "kind": "Plastic",
+      "role": "OfficialBale",
+      "sha256": "1266b2dbb2d018399de13b38fb88f2344037993d8853039b3ff9f499491bdb17"
+    },
+    {
+      "model": "Stock_Plastic",
+      "triangles": 3024,
+      "min": [
+        -0.26,
+        -0.21,
+        -0.25
+      ],
+      "max": [
+        0.26,
+        0.21,
+        0.25
+      ],
+      "max_radius": 0.4173727350941841,
+      "atlas": "07",
+      "kind": "Plastic",
+      "role": "DecorativeStock",
+      "sha256": "98d5a9a8e5f817ad340a37c9bf0ef1009b49f9e671bf315c13fcfc3a613fc976"
+    },
+    {
+      "model": "Bale_Paper_Shell",
+      "triangles": 2520,
+      "min": [
+        -0.26,
+        -0.21,
+        -0.25
+      ],
+      "max": [
+        0.26,
+        0.21,
+        0.25
+      ],
+      "max_radius": 0.4173727350941841,
+      "atlas": "10",
+      "kind": "Paper",
+      "role": "OfficialBale",
+      "sha256": "e8bbf0a3b9a6f36a37bdd0df9b80f221912dfca41e8d94b7756088a65a7a7f56"
+    },
+    {
+      "model": "Bale_Paper_Front",
+      "triangles": 504,
+      "min": [
+        -0.26,
+        -0.21,
+        -0.25
+      ],
+      "max": [
+        0.26,
+        0.21,
+        -0.24705806
+      ],
+      "max_radius": 0.4173727350941841,
+      "atlas": "09",
+      "kind": "Paper",
+      "role": "OfficialBale",
+      "sha256": "7de98927b8c4e0797f1756c99b3f19a1ef2b1c0dcc6733913e6dddecf2126dfc"
+    },
+    {
+      "model": "Stock_Paper",
+      "triangles": 3024,
+      "min": [
+        -0.26,
+        -0.21,
+        -0.25
+      ],
+      "max": [
+        0.26,
+        0.21,
+        0.25
+      ],
+      "max_radius": 0.4173727350941841,
+      "atlas": "07",
+      "kind": "Paper",
+      "role": "DecorativeStock",
+      "sha256": "14fc3008cb3b6efde1b170e3f83cb1de4bcf9df5a10bdde6ce9309974c5ecbb8"
+    },
+    {
+      "model": "Bale_Straps",
+      "triangles": 96,
+      "min": [
+        -0.1725,
+        -0.215,
+        -0.255
+      ],
+      "max": [
+        0.1725,
+        0.215,
+        0.255
+      ],
+      "max_radius": 0.3755079892625455,
+      "atlas": "07",
+      "role": "SharedStraps",
+      "sha256": "3e684872f0ae3112b0f1e6eaf872784f5807f28682203644c3dc589ce4d86615"
+    },
+    {
+      "model": "Wood_Pallet",
+      "triangles": 168,
+      "min": [
+        -0.48,
+        0.0,
+        -0.42
+      ],
+      "max": [
+        0.48,
+        0.14,
+        0.42
+      ],
+      "max_radius": 0.6466065264130885,
+      "atlas": "07",
+      "role": "DecorativePallet",
+      "sha256": "6344e8ef4c53372e31d97454f2275ec9a56687a779c9626125b7b71398510f6b"
+    }
+  ]
+}
