@@ -203,6 +203,38 @@ namespace M6IntegrationTests
             finally {wall.SetActive(false);Object.Destroy(wall);Physics.SyncTransforms();}
         }
 
+        [UnityTest] public IEnumerator SwitchingToThirdPersonAfterFpsWallRetractionRestoresRiflePose()
+        {
+            Equip();Mode(0);Call(Game,"LateUpdate");Call(Rig,"LateUpdate");Call(View,"LateUpdate");
+            GameObject rifle=(GameObject)Get(View,"rifle");
+            float freeLocalZ=rifle.transform.localPosition.z;
+            GameObject wall=GameObject.CreatePrimitive(PrimitiveType.Cube);
+            try
+            {
+                wall.name="V11_TEST_FPS_TO_TPS_CLEARANCE_HANDOFF";
+                wall.transform.SetPositionAndRotation(
+                    Camera.transform.position+Camera.transform.forward*1.20f,
+                    Quaternion.LookRotation(Camera.transform.forward));
+                wall.transform.localScale=new Vector3(3f,3f,.12f);
+                Physics.SyncTransforms();
+                for(int i=0;i<3;i++)
+                {
+                    yield return null;
+                    Call(Game,"LateUpdate");Call(Rig,"LateUpdate");Call(View,"LateUpdate");
+                }
+                Assert.Less(rifle.transform.localPosition.z,freeLocalZ-.20f,
+                    "FPS rifle must retract before perspective handoff.");
+            }
+            finally {wall.SetActive(false);Object.Destroy(wall);Physics.SyncTransforms();}
+            Mode(1);Pose(0,0);
+            Assert.IsTrue((bool)Get(View,"UsesThirdPersonPresentation"));
+            Assert.That(rifle.transform.localPosition.sqrMagnitude,Is.LessThan(.000001f),
+                "FPS clearance offset must not carry into third-person grips.");
+            Assert.That(Quaternion.Angle(rifle.transform.localRotation,Quaternion.identity),Is.LessThan(.01f),
+                "FPS recoil/ADS rotation must not carry into third-person grips.");
+            RequireGrips();
+        }
+
         [UnityTest] public IEnumerator EquippedSceneReloadsReleaseOldViewsAndDoNotDuplicateAnchors()
         {
             Equip();Mode(1);Pose(0,0);

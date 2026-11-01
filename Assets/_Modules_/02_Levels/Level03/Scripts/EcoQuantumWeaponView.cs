@@ -67,6 +67,10 @@ public sealed class EcoQuantumWeaponView : MonoBehaviour
         // Parent handoff is immediate; final position/rotation have one writer
         // below, after this frame's camera collision/orbit correction.
         if(transform.parent!=rig.transform)transform.SetParent(rig.transform,true);
+        // FPS wall clearance can leave the child rifle retracted/tilted.
+        // Restore its neutral pose before applying third-person grip scaling.
+        rifle.transform.localPosition=Vector3.zero;
+        rifle.transform.localRotation=Quaternion.identity;
         rifle.transform.localScale=Vector3.one*.65f;
         if(worker && worker.isActiveAndEnabled)worker.SetWeaponPresentation(this,true);
     }
