@@ -49,45 +49,28 @@ namespace SDGAdventure.Testing
         [UnityTest]
         public IEnumerator ReferenceFactoryBuildsThreeSortersWithoutChangingPuzzle()
         {
-            yield return SceneManager.LoadSceneAsync(C3Scene, LoadSceneMode.Single);
+            yield return SceneManager.LoadSceneAsync(C3Scene,LoadSceneMode.Single);
             yield return null;
-            Component visual = Find("C3TreasurePuzzle.C3ReferenceFactoryEnvironment");
-            Assert.IsNotNull(visual, "The reference recycling-plant art must attach to C_Main.");
-            Assert.IsNotNull(GameObject.Find("C3_ReferenceRecyclingFactory_Visuals"));
-            Assert.IsNotNull(GameObject.Find("C3_IndustrialSign_PaperHall"));
-            Assert.IsNotNull(GameObject.Find("C3_IndustrialSign_MetalHall"));
-            Assert.IsNotNull(GameObject.Find("C3_IndustrialSign_PlasticHall"));
-            Assert.IsNotNull(GameObject.Find("C3_IndustrialSign_Assembly"));
-            Assert.IsNotNull(GameObject.Find("Hidden_WeaponAssemblyBench_F"));
-            Assert.IsNotNull(GameObject.Find("Secondary_RecyclingInspectionWorkbench_F"));
-            Assert.IsNotNull(GameObject.Find("WasteSortingLine"));
-            Assert.IsNotNull(GameObject.Find("M4_PuzzleConsole"));
-            int rendered=(int)visual.GetType().GetProperty("DecorativeObjects").GetValue(visual);
-            int packages=(int)visual.GetType().GetProperty("ConveyorPackageCount").GetValue(visual);
-            Assert.Greater(rendered, 300);
-            Assert.AreEqual(18, packages);
+            Component visual=Find("C3TreasurePuzzle.C3ReferenceFactoryEnvironment");
+            Component geometry=Find("C3TreasurePuzzle.C3RecyclingLineGeometry");
+            Assert.IsNotNull(visual); Assert.IsNotNull(geometry);
+            Physics.SyncTransforms();
+            M6IntegrationTests.C3V11Phase2RecyclingLineTests.AssertEquipmentConnections(geometry);
+            foreach (string label in new[] {"PaperHall","MetalHall","PlasticHall","Assembly"})
+                Assert.IsNotNull(GameObject.Find("C3_IndustrialSign_"+label));
+            foreach (string name in new[] {"Hidden_WeaponAssemblyBench_F","Secondary_RecyclingInspectionWorkbench_F",
+                "WasteSortingLine","M4_PuzzleConsole","V11_BC_PVC_CURTAIN"}) Assert.IsNotNull(GameObject.Find(name));
+            Assert.AreEqual(0,(int)visual.GetType().GetProperty("ConveyorPackageCount").GetValue(visual),"Dormant has no pre-spawned fake products");
             Assert.IsTrue((bool)visual.GetType().GetProperty("ConveyorEndsInSorter").GetValue(visual));
-            Assert.IsNotNull(GameObject.Find("V3_LIVE_SINGLE_INFEED_RUBBER_SURFACE"));
-            GameObject machine = GameObject.Find("SORTER_MAIN_BODY_0");
-            Assert.IsNotNull(machine, "The actual feed machine must exist below the shared belt.");
-            Assert.IsNotNull(machine.GetComponent<BoxCollider>(), "The visible machine must be a physical obstacle.");
             for (int lane=0;lane<3;lane++)
             {
-                GameObject input=GameObject.Find("V3_CONNECTED_DIVERT_TO_HOPPER_"+lane);
-                GameObject output=GameObject.Find("CONNECTED_LOWER_OUTFEED_"+lane);
-                GameObject body=GameObject.Find("SORTER_MAIN_BODY_"+lane);
-                Assert.IsNotNull(input, "Each machine must connect to the upper belt by an inlet chute.");
-                Assert.IsNotNull(output, "Each machine must connect to a lower discharge belt.");
-                Assert.IsNotNull(body);
-                Assert.That(Mathf.Abs(input.transform.position.x-body.transform.position.x), Is.LessThan(.01f));
-                Assert.That(Mathf.Abs(output.transform.position.x-body.transform.position.x), Is.LessThan(.01f));
-                Assert.That(Mathf.Abs(output.transform.position.z-11.48f), Is.LessThan(.01f));
+                GameObject machine=GameObject.Find("SORTER_MAIN_BODY_"+lane);
+                Assert.IsNotNull(machine); Assert.IsTrue(machine.GetComponent<BoxCollider>().enabled);
             }
-            Assert.IsNotNull(GameObject.Find("V8_B_To_C_ContinuousRubber"));
             Assert.That(Vector3.Distance(GameObject.Find("Hidden_WeaponAssemblyBench_F").transform.position,
-                GameObject.Find("Secondary_RecyclingInspectionWorkbench_F").transform.position), Is.GreaterThan(6f));
-            Assert.That(GameObject.Find("WasteSortingLine").transform.position.x, Is.EqualTo(-13f).Within(.01f));
-            Assert.IsNull(Find("C3TreasurePuzzle.C3EnvironmentUpgrade"), "Old disconnected overlay must not be added.");
+                GameObject.Find("Secondary_RecyclingInspectionWorkbench_F").transform.position),Is.GreaterThan(6f));
+            Assert.That(GameObject.Find("WasteSortingLine").transform.position.x,Is.EqualTo(-13f).Within(.01f));
+            Assert.IsNull(Find("C3TreasurePuzzle.C3EnvironmentUpgrade"));
         }
 
         [UnityTest]

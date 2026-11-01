@@ -1,188 +1,108 @@
-using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace C3TreasurePuzzle
 {
     /// <summary>
-    /// V10 axis-corrected assembly (retains component name for scene/test compatibility).
-    /// Unity's OBJ importer mirrors OBJ X when converting handedness. The V3-V9 OBJ
-    /// source files incorrectly used Unity world X unconverted, so stair and B-feed
-    /// meshes rendered ACROSS the east wall instead of atop their C-hall colliders.
-    /// All C3V3Models OBJ vertices now pre-negate X; their faces and normals are
-    /// mirrored as well. This component checks the actual imported renderer.bounds
-    /// rather than accepting a nonzero size as evidence of correct placement.
-    /// The walkable deck,
-    /// stair treads, frames and yellow railings are imported *authored OBJ meshes*
-    /// (Resources/C3V3Models). Only invisible collision planes are constructed here.
-    /// The pedestrian bridge runs BEHIND the sorter and outside the horizontal
-    /// extent of the live high-level belt. Therefore it does not intersect the belt.
+    /// Scene-owned circulation, installed after the workshop and reference factory by
+    /// C3FactoryPresentation. Retains its original component/GUID; no parallel generator.
+    /// V11 uses Unity-space primitives for floors/treads and matching rail profiles,
+    /// rather than overlapping V3-V9 OBJ visuals with independently authored colliders.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class C3V3Circulation : MonoBehaviour
     {
+        public const float GroundSurface = .56f;
         public const float WalkSurface = 4.50f;
         public const float WestStairX = -23.20f;
         public const float EastStairX = -1.55f;
         public const float MainWalkZ = 19.20f;
-        public const float StairStartZ = 3.80f; // west entrance; east entrance is z=6.00
-        public const float StairTopZ = 13.70f; // west staircase; east top=10.10
+        public const float StairStartZ = 3.80f;
+        public const float StairTopZ = 13.70f;
+        public const float RouteWidth = 1.80f;
+        public const float RearSouthZ = 18.10f;
+        public const float RearNorthZ = 21.30f;
+        public const int StairSteps = 22;
+        public const float GuardHeight = 1.24f;
+        private const float DeckThickness = .18f;
+        private const string RootName = "C3_V3_VerifiedCirculation";
         private Transform buildRoot;
         private Material deckMat, frameMat, railMat, treadMat, mechanismMat;
-        private static readonly string[] Legacy =
-        {
-            "Stairs", "Floor2_Platforms", "Railings", "Supports"
-        };
+        private readonly List<Mesh> railMeshes = new List<Mesh>();
+        private readonly List<Material> signMaterials = new List<Material>();
 
         private void Awake()
         {
-            // Deactivate *both mesh and collider* of the old floating stairs,
-            // obstructing south safety rail and mezzanine collision proxies.
-            GameObject blockout = GameObject.Find("C_TwoFloor_Blockout");
-            if (blockout)
-            {
-                foreach (string name in Legacy)
-                {
-                    Transform t = blockout.transform.Find(name);
-                    if (t) t.gameObject.SetActive(false);
-                    else Debug.LogWarning("V3 expected old blockout child missing: " + name);
-                }
-            }
-            // Deactivate all old structural blockout collision, including nested old
-            // pillars outside the four legacy groups. Never touch gameplay triggers.
-            if (blockout)
-                foreach (Collider oldCollider in blockout.GetComponentsInChildren<Collider>(true))
-                    if (oldCollider && !oldCollider.isTrigger) oldCollider.enabled = false;
-            // The original 2F chip and observation controls still belong to gameplay;
-            // their small upper-deck cabinets must remain VISIBLE on the new bridge.
-            foreach (string liveStation in new[] { "UpperChipMaintenanceBench", "UpperDistributionBox" })
-            {
-                GameObject station = GameObject.Find(liveStation);
-                if (!station) continue;
-                foreach (Renderer renderer in station.GetComponentsInChildren<Renderer>(true))
-                    renderer.enabled = true;
-            }
-            if (GameObject.Find("C3_V3_VerifiedCirculation")) return;
-            buildRoot = new GameObject("C3_V3_VerifiedCirculation").transform;
-            buildRoot.SetParent(transform, false);
+            // Scoped idempotence: disabling/re-enabling this component does not rebuild.
+            if (transform.Find(RootName)) return;
+            RetireLegacyStructure();
+            buildRoot = new GameObject(RootName).transform;
+            buildRoot.SetParent(transform, true);
+            // All layout coordinates are world space, independent of the owner pose.
+            buildRoot.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
             Shader shader = Shader.Find("Standard");
             if (!shader) shader = Shader.Find("Diffuse");
-            deckMat = NewMaterial(shader, "V3 diamond-plate walking surface", new Color(.31f,.38f,.40f));
-            treadMat = NewMaterial(shader, "V3 high-contrast stair tread", new Color(.40f,.48f,.52f));
-            frameMat = NewMaterial(shader, "V3 galvanized structural steel", new Color(.57f,.63f,.66f));
-            railMat = NewMaterial(shader, "V3 safety yellow continuous rail", new Color(.98f,.61f,.065f));
-            mechanismMat = NewMaterial(shader, "V3 bounded conveyor frame", new Color(.21f,.26f,.29f));
+            deckMat = NewMaterial(shader, "V11 steel walking surface", new Color(.31f, .38f, .40f));
+            treadMat = NewMaterial(shader, "V11 stair treads", new Color(.40f, .48f, .52f));
+            frameMat = NewMaterial(shader, "V11 galvanized steel", new Color(.57f, .63f, .66f));
+            railMat = NewMaterial(shader, "V11 safety yellow", new Color(.98f, .61f, .065f));
+            mechanismMat = NewMaterial(shader, "V10 retained conveyor frame", new Color(.21f, .26f, .29f));
 
-            // V8 primary stair: visible from the C floor, safely offset from the sorting machines.
-            // V9 moves the sole primary entrance to the visible right-hand C hall aisle.
-            // Each piece has outward-facing OBJ normals and proper frame/rail geometry.
-            Visual("V9_RightVisibleStairTreads", treadMat);
-            Visual("V9_RightVisibleStairFrame", frameMat);
-            Visual("V9_RightVisibleStairGuardrails", railMat);
-            Visual("V9_StairGatewayArch", railMat);
-            Visual("V3_WalkwayDeck", deckMat);
-            Visual("V3_WalkwayUnderframe", frameMat);
-            Visual("V8_2F_RailNetwork", railMat);
-            Visual("V3_WalkwaySupportPosts", frameMat);
-            Visual("V7_EastWallSkywalkDeck", deckMat);
-            Visual("V7_EastWallSkywalkFrame", frameMat);
-            Visual("V9_EastGalleryRailingWithStairEntrance", railMat);
-            Visual("V7_EastGalleryRailWithConnectorGap", railMat);
-            Visual("V3_HopperShields", frameMat);
-            Visual("V3_InfeedCarrierFrame", mechanismMat);
-            Visual("V3_InfeedDrums", frameMat);
-            Visual("V3_OutfeedCarriers", mechanismMat);
-            // V8 B doorway -> C main sorter: a SINGLE visible, cleated, inclined feed.
-            // Its portal endpoint stops outside the B wall; B interior stays opaque.
-            Visual("V9_BDoorToSorterVisibleBelt", mechanismMat);
-            Visual("V9_BDoorToSorterSteelFrame", frameMat);
-            Visual("V9_BDoorToSorterYellowGuards", railMat);
-            Visual("V9_BDoorToSorterRollers", frameMat);
+            BuildStair(WestStairX, "A_WEST");
+            BuildStair(EastStairX, "B_EAST");
+            float routeLength = RearSouthZ - StairTopZ;
+            Deck("2F_WEST_SERVICE_ROUTE", WestStairX, (StairTopZ + RearSouthZ) * .5f, RouteWidth, routeLength);
+            Deck("2F_EAST_SERVICE_ROUTE", EastStairX, (StairTopZ + RearSouthZ) * .5f, RouteWidth, routeLength);
+            float west = WestStairX - RouteWidth * .5f;
+            float east = EastStairX + RouteWidth * .5f;
+            Deck("2F_CONNECTING_REAR_ROUTE", (west + east) * .5f,
+                (RearSouthZ + RearNorthZ) * .5f, east - west, RearNorthZ - RearSouthZ);
+            BuildUpperGuards(west, east);
+            BuildSupports(west, east);
+            GameObject floorSign = C3BakedSignFactory.AtWorld("SecondFloor",
+                new Vector3(-12.5f, 6.05f, 24.53f), Quaternion.Euler(0f, 180f, 0f), 3f, .6f, false);
+            OwnSign(floorSign, buildRoot);
 
-            // Continuous second-floor service circulation: all walkable tops at y=4.50.
-            WalkCollider("2F_WEST_SERVICE_ROUTE", WestStairX, 16.00f, 1.80f, 5.50f);
-            WalkCollider("2F_EAST_SERVICE_ROUTE", EastStairX, 16.00f, 1.74f, 5.50f);
-            WalkCollider("2F_CONNECTING_REAR_ROUTE", -13.925f, MainWalkZ, 20.29f, 2.16f);
-            // East-side overhead inspection branch joins the rear gallery;
-            // the old east ground-level stair is not a phantom physical blocker.
-            WalkCollider("2F_EAST_WALL_CONNECTING_ROUTE",EastStairX,13.65f,1.72f,7.30f);
-            WalkCollider("2F_EAST_REAR_TRANSFER_ROUTE",-3.09f,17.20f,3.12f,1.80f);
-            BuildV9VisibleRightStairCollision();
-            // Old, off-screen east stair was retired, including its invisible collision ramp.
-            // The east gallery is reachable via the rear connecting bridge.
-            BuildRailCollision();
-            BuildSupportCollision();
-            // Small entrance signs are fixed to the physical yellow stair arches.
-            C3BakedSignFactory.AtWorld("StairEntry",
-                new Vector3(-2.95f,3.06f,2.49f),Quaternion.identity,2.10f,.52f,false);
-            // SecondFloor image is bolted to rear wall rather than floating in space.
-            C3BakedSignFactory.AtWorld("SecondFloor", new Vector3(-12.5f, 6.05f, 24.53f),
-                Quaternion.Euler(0f,180f,0f), 3.0f, .60f, false);
-            Debug.Log("C3 V10: corrected Unity OBJ handedness for stair, catwalk and B receiving belt; auditing imported WORLD bounds in Start(). PlayMode walking unverified.");
+            // Phase 2 owns the complete replacement equipment; retain the old OBJ assets only.
         }
 
-        // Do not advertise "ACTIVE" merely because a mesh exists. The imported
-        // renderer must occupy its intended C-hall world-space X / Y / Z bounds.
-        private bool v10BoundsPassed;
-        private string v10Status = "V10 CHECKING MESH POSITIONS";
-        private void OnGUI()
+        private static void RetireLegacyStructure()
         {
-            GUI.Label(new Rect(Mathf.Max(0, Screen.width - 365), 10, 360, 30), v10Status);
+            // Exact leaf allowlist from C_Main V10. Do NOT disable the root, the
+            // Floor1_Additions/FutureGameplayMarkers groups, or arbitrary colliders.
+            GameObject blockout = GameObject.Find("C_TwoFloor_Blockout");
+            if (!blockout) return;
+            Transform root = blockout.transform;
+            foreach (string stair in new[] { "Stair_West_Up", "Stair_East_Down" })
+                for (int i = 1; i <= 22; i++)
+                {
+                    RetireLeaf(root, "Stairs/" + stair + "/Tread_" + i.ToString("D2"));
+                    foreach (string side in new[] { "Left", "Right" })
+                        RetireLeaf(root, "Railings/R_" + stair + "/Guard" + side + "_" + i.ToString("D2"));
+                }
+            foreach (string item in new[] { "F2_MainWalkway", "F2_ControlChipBay", "F2_ObservationDeck" })
+                RetireLeaf(root, "Floor2_Platforms/" + item);
+            foreach (string item in new[] { "R_WestEnd", "R_EastEnd", "R_MainSouth", "R_NorthWest",
+                "R_NorthBetweenBays", "R_ChipBayWest", "R_ChipBayEast", "R_ChipBayNorth",
+                "R_ObservationWest", "R_ObservationNorth" })
+                RetireLeaf(root, "Railings/" + item);
+            foreach (string x in new[] { "m21p5", "m17p5", "m10p0", "m5p5" })
+                foreach (string z in new[] { "14p5", "16p5" })
+                    RetireLeaf(root, "Supports/S_Main_" + x + "_" + z);
+            foreach (string x in new[] { "m13p5", "m11p5", "m8p5", "m5p5" })
+                RetireLeaf(root, "Supports/S_Bay_" + x);
         }
 
-        private bool CheckWorldBounds(string assetName, Vector3 min, Vector3 max, float tolerance)
+        private static void RetireLeaf(Transform root, string path)
         {
-            Transform item = buildRoot ? buildRoot.Find(assetName) : null;
-            Renderer renderer = item ? item.GetComponentInChildren<Renderer>(true) : null;
-            if (!renderer || !renderer.enabled)
-            {
-                Debug.LogError("V10 MISSING MESH/RENDERER: " + assetName);
-                return false;
-            }
-            Bounds actual = renderer.bounds;
-            bool ok =
-                Vector3.Distance(actual.min, min) < tolerance &&
-                Vector3.Distance(actual.max, max) < tolerance;
-            if (!ok)
-                Debug.LogError("V10 WORLD MESH BOUNDS WRONG: " + assetName +
-                    " actual min=" + actual.min.ToString("F2") +
-                    " max=" + actual.max.ToString("F2") +
-                    "; EXPECTED min=" + min.ToString("F2") +
-                    " max=" + max.ToString("F2") +
-                    ". Do not move colliders to the mirrored render mesh.");
-            else
-                Debug.Log("V10 WORLD MESH BOUNDS OK: " + assetName +
-                    " min=" + actual.min.ToString("F2") +
-                    " max=" + actual.max.ToString("F2"));
-            return ok;
-        }
-
-        private void AuditV10RuntimeAssets()
-        {
-            bool stair = CheckWorldBounds("V9_RightVisibleStairTreads",
-                new Vector3(-4.01f,.56f,2.42f), new Vector3(-1.11f,4.50f,11.74f),.24f);
-            bool feed = CheckWorldBounds("V9_BDoorToSorterVisibleBelt",
-                new Vector3(-7.49f,1.13f,11.26f), new Vector3(-.64f,6.71f,17.37f),.24f);
-            bool upper = CheckWorldBounds("V3_WalkwayDeck",
-                new Vector3(-24.10f,4.32f,13.25f), new Vector3(-3.75f,4.50f,20.28f),.24f);
-            bool branch = CheckWorldBounds("V7_EastWallSkywalkDeck",
-                new Vector3(-4.65f,4.32f,10.0f), new Vector3(-.69f,4.50f,18.10f),.24f);
-            v10BoundsPassed = stair && feed && upper && branch;
-            v10Status = v10BoundsPassed
-                ? "V10 MESH POSITIONS OK | WALK TEST PENDING"
-                : "V10 MESH MISPLACED - CHECK CONSOLE";
-        }
-
-        private void Start()
-        {
-            AuditV10RuntimeAssets();
-            // M4 real maintenance bench was hidden together with the old art pass.
-            // Re-enable this REAL upper workbench after all factory Awake calls.
-            foreach(string name in new[] {"UpperChipMaintenanceBench", "UpperDistributionBox"})
-            {
-                GameObject go=GameObject.Find(name);
-                if (!go) { Debug.LogWarning("V8 missing original second-floor target: "+name); continue; }
-                foreach(Renderer r in go.GetComponentsInChildren<Renderer>(true)) r.enabled=true;
-            }
+            Transform item = root.Find(path);
+            if (!item) return;
+            // Refuse to retire a leaf if future revisions add gameplay to it.
+            if (item.GetComponent<MonoBehaviour>() || item.childCount != 0) return;
+            foreach (Collider collider in item.GetComponents<Collider>())
+                if (collider.isTrigger) return;
+            foreach (Collider collider in item.GetComponents<Collider>()) collider.enabled = false;
+            foreach (Renderer renderer in item.GetComponents<Renderer>()) renderer.enabled = false;
         }
 
         private Material NewMaterial(Shader shader, string name, Color color)
@@ -192,132 +112,184 @@ namespace C3TreasurePuzzle
             if (mat.HasProperty("_Glossiness")) mat.SetFloat("_Glossiness", .38f);
             return mat;
         }
-        private void Visual(string filename, Material mat)
+
+        private Transform Group(string name)
         {
-            GameObject asset = Resources.Load<GameObject>("C3V3Models/" + filename);
-            if (!asset)
+            Transform item = new GameObject(name).transform;
+            item.SetParent(buildRoot, false);
+            return item;
+        }
+
+        private GameObject Box(Transform parent, string name, Vector3 center, Vector3 size,
+            Material material, bool solid = true, Quaternion? rotation = null)
+        {
+            GameObject item = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            item.name = name;
+            item.transform.SetParent(parent, false);
+            item.transform.SetPositionAndRotation(center, rotation ?? Quaternion.identity);
+            item.transform.localScale = size;
+            item.GetComponent<Renderer>().sharedMaterial = material;
+            // Cube collider and render mesh share the exact same transform and size.
+            if (!solid)
             {
-                Debug.LogError("V10 authored factory mesh is missing: " + filename);
-                return;
-            }
-            // The OBJ geometry deliberately stores world-space vertices. Unity
-            // originally focused an empty imported parent at (0,0,0), misleading
-            // users trying to locate the stair in Scene with F. Create an anchor
-            // at its actual rendered centre, while leaving its WORLD geometry fixed.
-            GameObject anchor = new GameObject(filename);
-            anchor.transform.SetParent(buildRoot, false);
-            GameObject piece = Instantiate(asset, Vector3.zero, Quaternion.identity, anchor.transform);
-            piece.name = filename + "_Geometry";
-            foreach (Renderer rend in piece.GetComponentsInChildren<Renderer>(true))
-                rend.sharedMaterial = mat;
-            foreach (Collider collider in piece.GetComponentsInChildren<Collider>(true))
+                Collider collider = item.GetComponent<Collider>();
                 collider.enabled = false;
-            Renderer first = piece.GetComponentInChildren<Renderer>(true);
-            if (first)
+                Destroy(collider);
+            }
+            return item;
+        }
+
+        private void Deck(string name, float x, float z, float width, float length)
+        {
+            Box(buildRoot, name, new Vector3(x, WalkSurface - DeckThickness * .5f, z),
+                new Vector3(width, DeckThickness, length), deckMat);
+        }
+
+        private void BuildStair(float x, string side)
+        {
+            Transform stair = Group("STAIR_" + side);
+            float rise = (WalkSurface - GroundSurface) / StairSteps; // .1791 < production stepOffset .30
+            float run = (StairTopZ - StairStartZ) / StairSteps;      // .45; pitch 21.7 < slopeLimit 45
+            Box(stair, "BOTTOM_LANDING", new Vector3(x, GroundSurface - .06f, StairStartZ - .60f),
+                new Vector3(RouteWidth, .12f, 1.20f), deckMat);
+            for (int i = 0; i < StairSteps; i++)
             {
-                Vector3 actualCentre = first.bounds.center;
-                // Use world-space centring and preserve world-space mesh bounds.
-                anchor.transform.position = actualCentre;
-                piece.transform.position = Vector3.zero;
+                float top = GroundSurface + rise * (i + 1);
+                float z = StairStartZ + run * (i + .5f);
+                // Physical tread plates, not a hidden ramp. Keep the space BELOW
+                // the upper flight open for the existing ground-level B/C doorway.
+                Box(stair, "TREAD_" + (i + 1).ToString("D2"),
+                    new Vector3(x, top - rise * .5f, z),
+                    new Vector3(RouteWidth, rise, run), treadMat);
+                Box(stair, "NOSING_" + (i + 1).ToString("D2"),
+                    new Vector3(x, top + .004f, z - run * .5f + .025f),
+                    new Vector3(RouteWidth, .008f, .05f), railMat, false);
+            }
+            for (int edge = -1; edge <= 1; edge += 2)
+            {
+                float railX = x + edge * RouteWidth * .5f;
+                Vector3 stringerStart = new Vector3(railX, GroundSurface - .15f, StairStartZ);
+                Vector3 stringerEnd = new Vector3(railX, WalkSurface - .15f, StairTopZ);
+                Vector3 stringer = stringerEnd - stringerStart;
+                Box(stair, "STRINGER_" + edge, (stringerStart + stringerEnd) * .5f,
+                    new Vector3(.10f, .18f, stringer.magnitude), frameMat,
+                    true, Quaternion.LookRotation(stringer));
+                Box(stair, "ENTRY_POST_" + edge,
+                    new Vector3(railX, GroundSurface + 1.25f, StairStartZ - 1.2f),
+                    new Vector3(.08f, 2.5f, .08f), frameMat);
+                Guard(stair, "GUARD_BOTTOM_" + edge,
+                    new Vector3(railX, GroundSurface, StairStartZ - 1.2f),
+                    new Vector3(railX, GroundSurface, StairStartZ));
+                Guard(stair, "GUARD_FLIGHT_" + edge,
+                    new Vector3(railX, GroundSurface, StairStartZ),
+                    new Vector3(railX, WalkSurface, StairTopZ));
+            }
+            Box(stair, "ENTRY_HEADER", new Vector3(x, GroundSurface + 2.5f, StairStartZ - 1.2f),
+                new Vector3(RouteWidth + .08f, .08f, .08f), railMat);
+            GameObject sign = C3BakedSignFactory.AtWorld("StairEntry",
+                new Vector3(x, GroundSurface + 2.5f, StairStartZ - 1.23f),
+                Quaternion.identity, 1.55f, .4f, true);
+            if (sign)
+            {
+                sign.name = "STAIR_" + side + "_ENTRY_SIGN";
+                OwnSign(sign, stair);
             }
         }
-        private GameObject ColliderObject(string name, Vector3 position, Vector3 size,
-            Quaternion rotation)
+
+        private void OwnSign(GameObject sign, Transform parent)
         {
-            GameObject holder = new GameObject(name);
-            holder.transform.SetParent(buildRoot, true);
-            holder.transform.SetPositionAndRotation(position, rotation);
-            BoxCollider c = holder.AddComponent<BoxCollider>();
-            c.size = size;
-            return holder;
+            if (!sign) return;
+            sign.transform.SetParent(parent, true);
+            // BakedSignFactory creates per-sign backing/ink material instances.
+            foreach (Renderer renderer in sign.GetComponentsInChildren<Renderer>())
+                foreach (Material material in renderer.sharedMaterials)
+                    if (material && !signMaterials.Contains(material)) signMaterials.Add(material);
         }
-        private void WalkCollider(string name, float x, float z, float width, float length)
+
+        private void BuildUpperGuards(float west, float east)
         {
-            // Models have top=4.50m, thickness=.18, centre=4.41m.
-            ColliderObject(name, new Vector3(x,4.41f,z),new Vector3(width,.18f,length),
-                Quaternion.identity);
+            Transform rails = Group("V11_UPPER_GUARDS");
+            Guard(rails, "GUARD_WEST_OUTER", new Vector3(west, WalkSurface, StairTopZ), new Vector3(west, WalkSurface, RearNorthZ));
+            Guard(rails, "GUARD_WEST_INNER", new Vector3(west + RouteWidth, WalkSurface, StairTopZ), new Vector3(west + RouteWidth, WalkSurface, RearSouthZ));
+            Guard(rails, "GUARD_REAR_NORTH", new Vector3(west, WalkSurface, RearNorthZ), new Vector3(east, WalkSurface, RearNorthZ));
+            Guard(rails, "GUARD_REAR_SOUTH", new Vector3(west + RouteWidth, WalkSurface, RearSouthZ), new Vector3(east - RouteWidth, WalkSurface, RearSouthZ));
+            Guard(rails, "GUARD_EAST_WALL_OUTER", new Vector3(east, WalkSurface, StairTopZ), new Vector3(east, WalkSurface, RearNorthZ));
+            Guard(rails, "GUARD_EAST_WALL_INNER_AFTER_STAIR", new Vector3(east - RouteWidth, WalkSurface, StairTopZ), new Vector3(east - RouteWidth, WalkSurface, RearSouthZ));
         }
-        private void BuildStairCollision(float x, string side)
+
+        private void Guard(Transform parent, string name, Vector3 a, Vector3 b)
         {
-            // Measured from the visible stair tread OBJ: ground y=.56 -> deck y=4.50.
-            // The WEST staircase starts near the entrance (z=3.8); the EAST
-            // staircase begins behind the live quantum workbench (z=6.0).
-            float start = x < -10f ? 3.80f : 2.70f;
-            float top = x < -10f ? 13.70f : 10.10f;
-            float rise = 3.94f;
-            float run = top - start;
-            float angle = Mathf.Atan2(rise, run) * Mathf.Rad2Deg;
-            float rampLength = Mathf.Sqrt(rise * rise + run * run);
-            ColliderObject("STAIR_"+side+"_CONTINUOUS_WALKING_RAMP",
-                new Vector3(x,2.48f,(start+top)*.5f),
-                new Vector3(1.74f,.12f,rampLength), Quaternion.Euler(-angle,0f,0f));
-            ColliderObject("STAIR_"+side+"_BOTTOM_LANDING",
-                new Vector3(x,.56f,start-.46f),
-                new Vector3(1.80f,.065f,.90f),Quaternion.identity);
+            Transform rail = new GameObject(name).transform;
+            rail.SetParent(parent, false);
+            Vector3 delta = b - a;
+            Vector3 across = Vector3.Cross(Vector3.up, delta).normalized * .04f;
+            // One closed convex safety profile spans toe to top, including for prone
+            // players. It follows the visible rail envelope, never a route entrance.
+            Vector3 up = Vector3.up * GuardHeight;
+            Mesh mesh = new Mesh { name = name + "_SafetyProfile" };
+            mesh.vertices = new[] { a - across, a + across, b + across, b - across,
+                a - across + up, a + across + up, b + across + up, b - across + up };
+            mesh.triangles = new[] { 0,1,2, 0,2,3, 4,6,5, 4,7,6,
+                0,5,1, 0,4,5, 1,6,2, 1,5,6, 2,7,3, 2,6,7, 3,4,0, 3,7,4 };
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            railMeshes.Add(mesh);
+            MeshCollider barrier = rail.gameObject.AddComponent<MeshCollider>();
+            barrier.sharedMesh = mesh;
+            barrier.convex = true;
+            foreach (float height in new[] { .12f, .60f, 1.20f })
+                Box(rail, height > 1f ? "TOP_RAIL" : height > .5f ? "MID_RAIL" : "TOE_RAIL",
+                    (a + b) * .5f + Vector3.up * height, new Vector3(.08f, .08f, delta.magnitude),
+                    railMat, false, Quaternion.LookRotation(delta));
+            int spans = Mathf.CeilToInt(delta.magnitude / 1.2f);
+            for (int i = 0; i <= spans; i++)
+                Box(rail, "POST_" + i, Vector3.Lerp(a, b, i / (float)spans) + up * .5f,
+                    new Vector3(.08f, GuardHeight, .08f), railMat, false);
         }
-        // V9 stairs: actual tread mesh and collider share start, top and x coordinate.
-        // Front-right entrance is in the sight line of the C-hall player.
-        private void BuildV9VisibleRightStairCollision()
+
+        private void BuildSupports(float west, float east)
         {
-            const float x=-2.95f, start=3.20f, top=10.30f, rise=3.94f;
-            float angle=Mathf.Atan2(rise,top-start)*Mathf.Rad2Deg;
-            float length=Mathf.Sqrt(rise*rise+(top-start)*(top-start));
-            ColliderObject("V9_RIGHT_STAIR_WALKABLE_RAMP",new Vector3(x,2.53f,(start+top)*.5f),
-                new Vector3(1.72f,.12f,length),Quaternion.Euler(-angle,0f,0f));
-            ColliderObject("V9_RIGHT_STAIR_START",new Vector3(x,.59f,2.80f),
-                new Vector3(2.05f,.07f,.76f),Quaternion.identity);
-            ColliderObject("V9_RIGHT_STAIR_TOP",new Vector3(x,4.41f,10.76f),
-                new Vector3(2.12f,.18f,1.32f),Quaternion.identity);
-            ColliderObject("V9_RIGHT_STAIR_EAST_GALLERY_JOIN",new Vector3(-2.15f,4.41f,10.92f),
-                new Vector3(2.08f,.18f,1.65f),Quaternion.identity);
-            for(int side=-1;side<=1;side+=2)
-                ColliderObject("V9_RIGHT_STAIR_GUARD_"+side,
-                    new Vector3(x+side*.92f,3.03f,(start+top)*.5f),
-                    new Vector3(.07f,1.10f,length),Quaternion.Euler(-angle,0f,0f));
+            Transform supports=Group("V11_EDGE_SUPPORTS");
+            // Consolidated outboard columns at deck joints, with visible
+            // cantilever brackets. Every member stays below the deck underside.
+            for (int side=0;side<2;side++)
+            {
+                float edge=side==0?west:east;
+                // Keep the east column clear of the wall at X=-.37 and end
+                // the post at the bracket bottom, rather than embedding the
+                // post through the bracket/deck. Walk/guard coordinates stay fixed.
+                float columnX=edge+(side==0?-.12f:.12f);
+                float innerX=edge+(side==0?.42f:-.42f);
+                float underside=WalkSurface-DeckThickness;
+                foreach (float z in new[] {13.75f,17.95f,21.2f})
+                {
+                    Box(supports,"COLUMN_BASE_PLATE",new Vector3(columnX,GroundSurface+.03f,z),
+                        new Vector3(.30f,.06f,.30f),frameMat);
+                    float bottom=GroundSurface+.06f,top=underside-.16f;
+                    Box(supports,"COLUMN_"+(side==0?"WEST_":"EAST_")+z,
+                        new Vector3(columnX,(bottom+top)*.5f,z),
+                        new Vector3(.16f,top-bottom,.16f),frameMat);
+                    Box(supports,"DECK_JOINT_BRACKET",new Vector3((columnX+innerX)*.5f,underside-.08f,z),
+                        new Vector3(Mathf.Abs(innerX-columnX)+.14f,.16f,.16f),frameMat);
+                    Vector3 low=new Vector3(columnX,underside-.90f,z);
+                    Vector3 high=new Vector3(innerX,underside-.16f,z);
+                    Box(supports,"KNEE_BRACE",(low+high)*.5f,new Vector3(.10f,.10f,Vector3.Distance(low,high)),
+                        frameMat,true,Quaternion.LookRotation(high-low));
+                }
+            }
         }
-        private void SafetyStrip(string name, float x, float y, float z,
-            float width, float depth)
-        {
-            ColliderObject("GUARD_"+name,new Vector3(x,y,z),
-                new Vector3(width,1.07f,depth),Quaternion.identity);
-        }
-        private void BuildRailCollision()
-        {
-            // Authored V8 yellow network has a deliberate WEST-gallery doorway at z=15.3.
-            // Collision follows the same opening, leaving x=-22.3 unobstructed.
-            SafetyStrip("WEST_OUTER",-24.07f,5.03f,15.70f,.09f,4.75f);
-            SafetyStrip("WEST_INNER",-22.30f,5.03f,15.66f,.09f,4.62f);
-            SafetyStrip("REAR_NORTH",-13.925f,5.03f,20.28f,20.25f,.09f);
-            SafetyStrip("REAR_SOUTH",-13.875f,5.03f,18.12f,16.65f,.09f);
-            SafetyStrip("REAR_WEST_END",-24.07f,5.03f,19.20f,.09f,2.16f);
-            SafetyStrip("REAR_EAST_END",-3.78f,5.03f,19.20f,.09f,2.16f);
-            SafetyStrip("EAST_WALL_OUTER",-.67f,5.03f,13.65f,.09f,7.20f);
-            // At z=10.0 to 11.8: no guard, the physical stair landing enters here.
-            SafetyStrip("EAST_WALL_INNER_AFTER_STAIR",-2.43f,5.03f,13.95f,.09f,4.30f);
-            // Leave a traversable transfer channel x=-4.6..-3.7 between the east
-            // skywalk connector and the back 2F maintenance gallery.
-            SafetyStrip("EAST_CONNECTOR_NORTH_INNER",-2.43f,5.03f,18.11f,.28f,.09f);
-            SafetyStrip("EAST_CONNECTOR_SOUTH_OUTER",-4.08f,5.03f,16.28f,1.05f,.09f);
-        }
-        private void BuildSupportCollision()
-        {
-            foreach (float x in new[] { WestStairX })
-                foreach (float z in new[] {14.55f,17.70f})
-                    ColliderObject("BRIDGE_GROUNDED_COLUMN_"+x+"_"+z,
-                        new Vector3(x + (x < -10f ? -.74f : .74f),2.40f,z),
-                        new Vector3(.17f,3.83f,.17f),
-                        Quaternion.identity);
-            foreach (float z in new[] {12.00f,15.60f})
-                ColliderObject("EAST_WALL_GALLERY_EDGE_SUPPORT_"+z,
-                    new Vector3(-.88f,2.40f,z),new Vector3(.15f,3.80f,.15f),Quaternion.identity);
-        }
+
         private void OnDestroy()
         {
-            if (deckMat) Destroy(deckMat);
-            if (frameMat) Destroy(frameMat);
-            if (railMat) Destroy(railMat);
-            if (treadMat) Destroy(treadMat);
-            if (mechanismMat) Destroy(mechanismMat);
+            if (buildRoot)
+            {
+                buildRoot.gameObject.SetActive(false);
+                Destroy(buildRoot.gameObject);
+            }
+            foreach (Mesh mesh in railMeshes) if (mesh) Destroy(mesh);
+            foreach (Material material in signMaterials) if (material) Destroy(material);
+            foreach (Material mat in new[] { deckMat, frameMat, railMat, treadMat, mechanismMat })
+                if (mat) Destroy(mat);
         }
     }
 }

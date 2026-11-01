@@ -38,6 +38,27 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
     public const int MaxStoredEnergy = 120;
     private int completedPlasticSorts;
     private int completedMetalSorts;
+    private int completedPaperSorts;
+    public const int RecyclingReceiptCapacity=4095;
+    private readonly HashSet<string> recyclingReceipts=new HashSet<string>(StringComparer.Ordinal);
+    private readonly HashSet<string> recyclingBatches=new HashSet<string>(StringComparer.Ordinal);
+    public int RecyclingReceiptCount => recyclingReceipts.Count;
+    public bool HasRecyclingReceipt(string materialId) => recyclingReceipts.Contains(materialId);
+    // One atomic processing receipt. SceneLoaded resets local unlock counters,
+    // but retains these IDs so a completed upstream item cannot be replayed.
+    public bool TryCommitRecyclingBatch(string batchId,EcoRecycleCargo.Kind materialType,string[] materialIds)
+    {
+        int kind=C3RecyclingLine.LegacyKind(materialType);
+        if (!factoryPowered || kind<0 || string.IsNullOrWhiteSpace(batchId) || batchId.Length>128 || recyclingBatches.Contains(batchId) ||
+            materialIds==null || materialIds.Length!=C3RecyclingLine.UnitsPerBale ||
+            recyclingReceipts.Count+materialIds.Length>RecyclingReceiptCapacity) return false;
+        HashSet<string> unique=new HashSet<string>(StringComparer.Ordinal);
+        foreach (string id in materialIds)
+            if (string.IsNullOrWhiteSpace(id) || id.Length>128 || !unique.Add(id) || recyclingReceipts.Contains(id)) return false;
+        recyclingBatches.Add(batchId);
+        foreach (string id in materialIds) { recyclingReceipts.Add(id); ReceiveSortedMaterial(kind); }
+        return true;
+    }
 
     // A weapon carried in inventory does not recharge unless it is held.
     public bool IsQuantumWeaponEquipped => WeaponEquipped();
@@ -101,6 +122,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             factoryPowered = false;
             completedPlasticSorts = 0;
             completedMetalSorts = 0;
+            completedPaperSorts = 0;
         }
         // Inventory and ammo survive scene changes, camera models do not.
         activeCamera = null;
@@ -192,12 +214,13 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         if (!factoryPowered) return;
         if (kind == 0) completedPlasticSorts++;
         else if (kind == 1) completedMetalSorts++;
+        else if (kind == 2) completedPaperSorts++;
     }
 
     public bool HasSortedMaterial(int kind)
     {
         return kind == 0 ? completedPlasticSorts > 0 :
-            kind == 1 && completedMetalSorts > 0;
+            kind == 1 ? completedMetalSorts > 0 : kind == 2 && completedPaperSorts > 0;
     }
 
     public bool RecoverSortedMaterial(int kind)
@@ -339,7 +362,13 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         if (keyboard.digit4Key.wasPressedThisFrame) selectedSlot = 3;
         if (keyboard.digit5Key.wasPressedThisFrame) selectedSlot = 4;
 
-        if (keyboard.fKey.wasPressedThisFrame)
+        // In C3 the existing action-service interactor dispatches quest OR
+        // workshop interaction. Retain raw-F fallback in other scenes or when
+        // that interactor is disabled; do not poll the same input twice.
+        C3PlayerInteractor c3Interactor = activeCamera != null
+            ? activeCamera.GetComponentInParent<C3PlayerInteractor>() : null;
+        if (keyboard.fKey.wasPressedThisFrame &&
+            (c3Interactor == null || !c3Interactor.HandlesInteractionInput))
             InteractWorkshop();
 
         if (WeaponEquipped())
@@ -381,7 +410,23 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         CharacterController character = activeCamera.GetComponentInParent<CharacterController>();
         if (character == null) return null;
         // Use the character position, not the orbiting third-person camera.
-        return EcoWorkshopInteractable.FindNearestMaterial(character.transform.position, 2.25f);
+        EcoWorkshopInteractable nearest = EcoWorkshopInteractable.FindNearestMaterial(character.transform.position, 2.25f);
+        PlayerPerspectiveRig rig = character.GetComponent<PlayerPerspectiveRig>();
+        C3PlayerInteractor interactor = character.GetComponent<C3PlayerInteractor>();
+        if (nearest != null && rig != null && rig.IsThirdPerson && interactor != null)
+        {
+            Collider volume = nearest.GetComponent<Collider>();
+            if (!volume || !interactor.CanReachPoint(volume, volume.ClosestPoint(interactor.ReachOrigin), 2.25f)) return null;
+        }
+        return nearest;
+    }
+
+    public void InteractWorkshopFromPlayer(C3PlayerInteractor interactor)
+    {
+        BindCamera();
+        if (!GameplayEnabled() || interactor == null || !interactor.HandlesInteractionInput ||
+            activeCamera == null || activeCamera.GetComponentInParent<C3PlayerInteractor>() != interactor) return;
+        InteractWorkshop();
     }
 
     private void InteractWorkshop()
@@ -394,6 +439,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             ~0, QueryTriggerInteraction.Collide);
         Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
         CharacterController player = activeCamera.GetComponentInParent<CharacterController>();
+        C3PlayerInteractor interactor = player != null ? player.GetComponent<C3PlayerInteractor>() : null;
         foreach (RaycastHit hit in hits)
         {
             if (player != null && hit.collider.transform.IsChildOf(player.transform)) continue;
@@ -403,6 +449,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
                 hit.collider.GetComponentInParent<EcoWorkshopInteractable>();
             if (target != null)
             {
+                if (third && interactor != null && !interactor.CanReachPoint(hit.collider, hit.point, 3.5f)) return;
                 target.Interact();
                 return;
             }
@@ -411,6 +458,10 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             if (hit.collider.GetComponentInParent<C3Interactable>() != null) return;
             break;
         }
+        // Third-person actions require the first camera hit AND body reach.
+        // Do not fall through a wall/missed aim to an off-ray nearby cache.
+        // Keep the accepted first-person proximity fallback below unchanged.
+        if (third) return;
         // Nearby materials can be picked up without requiring a tiny exact ray hit.
         // This respects the same material sorting/activation checks as normal F use.
         EcoWorkshopInteractable nearest = NearbyMaterialCache();
@@ -431,6 +482,12 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         {
             PlayerPerspectiveRig rig = activeCamera.GetComponentInParent<PlayerPerspectiveRig>();
             bool thirdPerson = rig != null && rig.IsThirdPerson;
+            EcoQuantumWeaponView visual = weaponModel.GetComponent<EcoQuantumWeaponView>();
+            if (visual != null)
+            {
+                visual.SetThirdPersonPresentation(rig, thirdPerson, aiming);
+                if (thirdPerson) return; // Final visual pose is owned by the view after the camera rig.
+            }
             Transform parent = thirdPerson ? rig.transform : activeCamera.transform;
             if (weaponModel.transform.parent != parent)
             {
@@ -479,7 +536,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         GameObject tracer = new GameObject("EcoQuantumTracer");
         LineRenderer line = tracer.AddComponent<LineRenderer>();
         Shader shader = Shader.Find("Sprites/Default");
-        if (shader != null) line.material = new Material(shader);
+        if (shader != null) C3OwnedVisualMaterial.Assign(line, new Material(shader));
         line.useWorldSpace = true;
         line.positionCount = 2;
         // Start the tracer slightly below/right of the reticle so it is visible
@@ -493,8 +550,8 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         line.SetPosition(1, destination);
         line.startWidth = 0.07f;
         line.endWidth = 0.006f;
-        line.startColor = new Color(0.1f, 1f, 0.8f);
-        line.endColor = Color.cyan;
+        line.startColor = new Color(0.2f, 1f, 0.25f);
+        line.endColor = new Color(0.1f, 0.65f, 0.18f);
         Destroy(tracer, 0.18f);
     }
 
@@ -536,18 +593,10 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
                 new Vector3(0.13f, 0.16f, 0.13f), color);
             return;
         }
-        AddGunPart(PrimitiveType.Cube, "RecycledHousing",
-            new Vector3(0, 0, 0), new Vector3(0.18f, 0.15f, 0.48f),
-            new Color(0.18f, 0.21f, 0.22f));
-        AddGunPart(PrimitiveType.Cylinder, "EnergyCoil",
-            new Vector3(0, 0.07f, 0.28f), new Vector3(0.10f, 0.29f, 0.10f),
-            new Color(0.04f, 0.85f, 0.78f), Quaternion.Euler(90, 0, 0), true);
-        AddGunPart(PrimitiveType.Cube, "InsulatedGrip",
-            new Vector3(0, -0.18f, -0.14f), new Vector3(0.10f, 0.26f, 0.11f),
-            new Color(0.12f, 0.14f, 0.15f));
-        AddGunPart(PrimitiveType.Cube, "RecycledMetalSight",
-            new Vector3(0, 0.105f, -0.12f), new Vector3(0.07f, 0.05f, 0.13f),
-            new Color(0.18f, 0.5f, 0.47f));
+        EcoQuantumWeaponView appearance = weaponModel.AddComponent<EcoQuantumWeaponView>();
+        appearance.AttachTo(activeCamera.transform);
+        appearance.SetVisible(true);
+        weaponModel.transform.localPosition = new Vector3(0.32f, -0.29f, 0.55f);
     }
 
     private void AddGunPart(PrimitiveType type, string name, Vector3 pos,
@@ -565,13 +614,14 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         Shader shader = Shader.Find("Standard");
         if (renderer != null && shader != null)
         {
-            renderer.material = new Material(shader);
-            renderer.material.color = color;
+            Material material = new Material(shader);
+            material.color = color;
             if (emissive)
             {
-                renderer.material.EnableKeyword("_EMISSION");
-                renderer.material.SetColor("_EmissionColor", color * 2f);
+                material.EnableKeyword("_EMISSION");
+                material.SetColor("_EmissionColor", color * 2f);
             }
+            C3OwnedVisualMaterial.Assign(renderer, material);
         }
     }
 

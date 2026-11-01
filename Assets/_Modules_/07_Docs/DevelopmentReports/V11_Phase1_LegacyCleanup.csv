@@ -1,0 +1,246 @@
+來源,物件或路徑,處理方式,原因
+scene,C_TwoFloor_Blockout/Stairs/Stair_West_Up/Tread_01,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardLeft_01,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardRight_01,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_West_Up/Tread_02,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardLeft_02,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardRight_02,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_West_Up/Tread_03,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardLeft_03,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardRight_03,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_West_Up/Tread_04,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardLeft_04,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardRight_04,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_West_Up/Tread_05,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardLeft_05,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardRight_05,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_West_Up/Tread_06,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardLeft_06,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardRight_06,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_West_Up/Tread_07,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardLeft_07,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardRight_07,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_West_Up/Tread_08,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardLeft_08,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardRight_08,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_West_Up/Tread_09,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardLeft_09,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardRight_09,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_West_Up/Tread_10,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardLeft_10,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardRight_10,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_West_Up/Tread_11,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardLeft_11,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardRight_11,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_West_Up/Tread_12,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardLeft_12,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardRight_12,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_West_Up/Tread_13,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardLeft_13,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardRight_13,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_West_Up/Tread_14,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardLeft_14,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardRight_14,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_West_Up/Tread_15,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardLeft_15,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardRight_15,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_West_Up/Tread_16,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardLeft_16,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardRight_16,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_West_Up/Tread_17,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardLeft_17,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardRight_17,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_West_Up/Tread_18,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardLeft_18,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardRight_18,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_West_Up/Tread_19,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardLeft_19,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardRight_19,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_West_Up/Tread_20,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardLeft_20,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardRight_20,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_West_Up/Tread_21,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardLeft_21,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardRight_21,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_West_Up/Tread_22,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardLeft_22,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_West_Up/GuardRight_22,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_East_Down/Tread_01,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardLeft_01,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardRight_01,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_East_Down/Tread_02,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardLeft_02,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardRight_02,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_East_Down/Tread_03,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardLeft_03,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardRight_03,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_East_Down/Tread_04,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardLeft_04,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardRight_04,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_East_Down/Tread_05,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardLeft_05,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardRight_05,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_East_Down/Tread_06,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardLeft_06,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardRight_06,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_East_Down/Tread_07,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardLeft_07,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardRight_07,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_East_Down/Tread_08,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardLeft_08,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardRight_08,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_East_Down/Tread_09,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardLeft_09,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardRight_09,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_East_Down/Tread_10,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardLeft_10,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardRight_10,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_East_Down/Tread_11,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardLeft_11,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardRight_11,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_East_Down/Tread_12,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardLeft_12,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardRight_12,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_East_Down/Tread_13,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardLeft_13,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardRight_13,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_East_Down/Tread_14,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardLeft_14,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardRight_14,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_East_Down/Tread_15,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardLeft_15,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardRight_15,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_East_Down/Tread_16,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardLeft_16,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardRight_16,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_East_Down/Tread_17,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardLeft_17,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardRight_17,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_East_Down/Tread_18,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardLeft_18,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardRight_18,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_East_Down/Tread_19,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardLeft_19,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardRight_19,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_East_Down/Tread_20,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardLeft_20,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardRight_20,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_East_Down/Tread_21,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardLeft_21,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardRight_21,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Stairs/Stair_East_Down/Tread_22,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊樓梯位於舊動線；由 V11 A/B 兩座實體踏階取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardLeft_22,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_Stair_East_Down/GuardRight_22,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Floor2_Platforms/F2_MainWalkway,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊平台在分類設備上方且與新平台不一致；由 V11 側廊與加寬後方平台取代。
+scene,C_TwoFloor_Blockout/Floor2_Platforms/F2_ControlChipBay,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊平台在分類設備上方且與新平台不一致；由 V11 側廊與加寬後方平台取代。
+scene,C_TwoFloor_Blockout/Floor2_Platforms/F2_ObservationDeck,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊平台在分類設備上方且與新平台不一致；由 V11 側廊與加寬後方平台取代。
+scene,C_TwoFloor_Blockout/Railings/R_WestEnd,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_EastEnd,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_MainSouth,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_NorthWest,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_NorthBetweenBays,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_ChipBayWest,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_ChipBayEast,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_ChipBayNorth,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_ObservationWest,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Railings/R_ObservationNorth,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,舊欄杆跟隨舊平台，會截斷新路線或形成錯位碰撞；由 V11 完整邊界護欄取代。
+scene,C_TwoFloor_Blockout/Supports/S_Main_m21p5_14p5,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,支撐舊平台的立柱；避免殘留無模型的碰撞，改用 V11 外緣支柱。
+scene,C_TwoFloor_Blockout/Supports/S_Main_m21p5_16p5,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,支撐舊平台的立柱；避免殘留無模型的碰撞，改用 V11 外緣支柱。
+scene,C_TwoFloor_Blockout/Supports/S_Main_m17p5_14p5,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,支撐舊平台的立柱；避免殘留無模型的碰撞，改用 V11 外緣支柱。
+scene,C_TwoFloor_Blockout/Supports/S_Main_m17p5_16p5,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,支撐舊平台的立柱；避免殘留無模型的碰撞，改用 V11 外緣支柱。
+scene,C_TwoFloor_Blockout/Supports/S_Main_m10p0_14p5,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,支撐舊平台的立柱；避免殘留無模型的碰撞，改用 V11 外緣支柱。
+scene,C_TwoFloor_Blockout/Supports/S_Main_m10p0_16p5,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,支撐舊平台的立柱；避免殘留無模型的碰撞，改用 V11 外緣支柱。
+scene,C_TwoFloor_Blockout/Supports/S_Main_m5p5_14p5,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,支撐舊平台的立柱；避免殘留無模型的碰撞，改用 V11 外緣支柱。
+scene,C_TwoFloor_Blockout/Supports/S_Main_m5p5_16p5,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,支撐舊平台的立柱；避免殘留無模型的碰撞，改用 V11 外緣支柱。
+scene,C_TwoFloor_Blockout/Supports/S_Bay_m13p5,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,支撐舊平台的立柱；避免殘留無模型的碰撞，改用 V11 外緣支柱。
+scene,C_TwoFloor_Blockout/Supports/S_Bay_m11p5,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,支撐舊平台的立柱；避免殘留無模型的碰撞，改用 V11 外緣支柱。
+scene,C_TwoFloor_Blockout/Supports/S_Bay_m8p5,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,支撐舊平台的立柱；避免殘留無模型的碰撞，改用 V11 外緣支柱。
+scene,C_TwoFloor_Blockout/Supports/S_Bay_m5p5,僅停用該葉節點 Renderer 與非 Trigger Collider；保留物件與 GUID,支撐舊平台的立柱；避免殘留無模型的碰撞，改用 V11 外緣支柱。
+scene,C_Factory_Art/Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceA_-10.0,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceA_-17.5,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceA_-21.5,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceA_-5.5,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceB_-10.0,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceB_-17.5,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceB_-21.5,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceB_-5.5,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Floor1_Industrial/EastToolCabinet,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Floor1_Industrial/WestPowerCabinet_A,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Floor1_Industrial/WestPowerCabinet_B,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/IndustrialMachines/FeedPump,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/IndustrialMachines/NortheastFilterArray,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/IndustrialMachines/PurificationReactor,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/IndustrialMachines/WasteSortingLine,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Lighting/Cyan_Console/IndicatorLens,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-10.0_14.8,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-10.0_16.0,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-15.0_14.8,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-15.0_16.0,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-20.0_14.8,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-20.0_16.0,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-6.0_14.8,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-6.0_16.0,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_MountsAndConnections/NorthWallHanger_-10.5,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_MountsAndConnections/NorthWallHanger_-16.0,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_MountsAndConnections/NorthWallHanger_-21.0,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_MountsAndConnections/NorthWallHanger_-5.0,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_MountsAndConnections/NorthWestJoin,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_MountsAndConnections/ReactorDeckHanger_14.4,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_MountsAndConnections/ReactorDeckHanger_17.0,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_MountsAndConnections/ReactorDeckHanger_19.5,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_MountsAndConnections/WestNorthElbow,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_MountsAndConnections/WestWallHanger_14.0,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_MountsAndConnections/WestWallHanger_18.6,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_MountsAndConnections/WestWallHanger_22.0,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_MountsAndConnections/WestWallHanger_4.0,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_MountsAndConnections/WestWallHanger_9.0,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_NorthFilterFeed/Collision_NorthFilterBranch,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_NorthFilterFeed/Collision_NorthFilterMain,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_ReactorReturn/Collision_ReactorOut,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_ReactorReturn/Collision_ReactorReturnJoin,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_ReactorReturn/Collision_ReactorReturnMain,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_UpperCableConduit/Collision_UpperConduitA,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_UpperCableConduit/Collision_UpperConduitB,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_WestServiceTrunk/Collision_MainWestTrunk,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_WestServiceTrunk/Collision_WestCabinetA,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Pipes/Pipe_WestServiceTrunk/Collision_WestCabinetB,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Props/Barrel_East,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Props/Barrel_North,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Props/Barrel_West,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Props/WasteContainer_A,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+scene,C_Factory_Art/Props/WasteContainer_B,維持 V10 退役狀態；以精確路徑停用該物件非 Trigger Collider,此舊美術由既有 ReferenceFactory 取代或隱藏；避免保留隱形障礙。非新增移除一樓設備；新設備與遊戲元件不在清單內。
+resource,Resources/C3V3Models/V9_RightVisibleStairTreads,保留資產與 meta；不再由 C3V3Circulation 實例化,避免 V3/V7/V8/V9 二樓結構疊加到 V11 共用尺寸的踏階、平台與護欄。
+resource,Resources/C3V3Models/V9_RightVisibleStairFrame,保留資產與 meta；不再由 C3V3Circulation 實例化,避免 V3/V7/V8/V9 二樓結構疊加到 V11 共用尺寸的踏階、平台與護欄。
+resource,Resources/C3V3Models/V9_RightVisibleStairGuardrails,保留資產與 meta；不再由 C3V3Circulation 實例化,避免 V3/V7/V8/V9 二樓結構疊加到 V11 共用尺寸的踏階、平台與護欄。
+resource,Resources/C3V3Models/V9_StairGatewayArch,保留資產與 meta；不再由 C3V3Circulation 實例化,避免 V3/V7/V8/V9 二樓結構疊加到 V11 共用尺寸的踏階、平台與護欄。
+resource,Resources/C3V3Models/V3_WalkwayDeck,保留資產與 meta；不再由 C3V3Circulation 實例化,避免 V3/V7/V8/V9 二樓結構疊加到 V11 共用尺寸的踏階、平台與護欄。
+resource,Resources/C3V3Models/V3_WalkwayUnderframe,保留資產與 meta；不再由 C3V3Circulation 實例化,避免 V3/V7/V8/V9 二樓結構疊加到 V11 共用尺寸的踏階、平台與護欄。
+resource,Resources/C3V3Models/V8_2F_RailNetwork,保留資產與 meta；不再由 C3V3Circulation 實例化,避免 V3/V7/V8/V9 二樓結構疊加到 V11 共用尺寸的踏階、平台與護欄。
+resource,Resources/C3V3Models/V3_WalkwaySupportPosts,保留資產與 meta；不再由 C3V3Circulation 實例化,避免 V3/V7/V8/V9 二樓結構疊加到 V11 共用尺寸的踏階、平台與護欄。
+resource,Resources/C3V3Models/V7_EastWallSkywalkDeck,保留資產與 meta；不再由 C3V3Circulation 實例化,避免 V3/V7/V8/V9 二樓結構疊加到 V11 共用尺寸的踏階、平台與護欄。
+resource,Resources/C3V3Models/V7_EastWallSkywalkFrame,保留資產與 meta；不再由 C3V3Circulation 實例化,避免 V3/V7/V8/V9 二樓結構疊加到 V11 共用尺寸的踏階、平台與護欄。
+resource,Resources/C3V3Models/V9_EastGalleryRailingWithStairEntrance,保留資產與 meta；不再由 C3V3Circulation 實例化,避免 V3/V7/V8/V9 二樓結構疊加到 V11 共用尺寸的踏階、平台與護欄。
+resource,Resources/C3V3Models/V7_EastGalleryRailWithConnectorGap,保留資產與 meta；不再由 C3V3Circulation 實例化,避免 V3/V7/V8/V9 二樓結構疊加到 V11 共用尺寸的踏階、平台與護欄。
+runtime V10,V9_RIGHT_STAIR_WALKABLE_RAMP,停止建立舊版碰撞物件,由兩側完整樓梯與無中斷後方平台取代；沒有以隱藏 Renderer 保留舊碰撞。
+runtime V10,V9_RIGHT_STAIR_START,停止建立舊版碰撞物件,由兩側完整樓梯與無中斷後方平台取代；沒有以隱藏 Renderer 保留舊碰撞。
+runtime V10,V9_RIGHT_STAIR_TOP,停止建立舊版碰撞物件,由兩側完整樓梯與無中斷後方平台取代；沒有以隱藏 Renderer 保留舊碰撞。
+runtime V10,V9_RIGHT_STAIR_EAST_GALLERY_JOIN,停止建立舊版碰撞物件,由兩側完整樓梯與無中斷後方平台取代；沒有以隱藏 Renderer 保留舊碰撞。
+runtime V10,V9_RIGHT_STAIR_GUARD_-1,停止建立舊版碰撞物件,由兩側完整樓梯與無中斷後方平台取代；沒有以隱藏 Renderer 保留舊碰撞。
+runtime V10,V9_RIGHT_STAIR_GUARD_1,停止建立舊版碰撞物件,由兩側完整樓梯與無中斷後方平台取代；沒有以隱藏 Renderer 保留舊碰撞。
+runtime V10,2F_EAST_WALL_CONNECTING_ROUTE,停止建立舊版碰撞物件,由兩側完整樓梯與無中斷後方平台取代；沒有以隱藏 Renderer 保留舊碰撞。
+runtime V10,2F_EAST_REAR_TRANSFER_ROUTE,停止建立舊版碰撞物件,由兩側完整樓梯與無中斷後方平台取代；沒有以隱藏 Renderer 保留舊碰撞。
+runtime V10,GUARD_REAR_WEST_END,停止建立舊版碰撞物件,由兩側完整樓梯與無中斷後方平台取代；沒有以隱藏 Renderer 保留舊碰撞。
+runtime V10,GUARD_REAR_EAST_END,停止建立舊版碰撞物件,由兩側完整樓梯與無中斷後方平台取代；沒有以隱藏 Renderer 保留舊碰撞。
+runtime V10,GUARD_EAST_CONNECTOR_NORTH_INNER,停止建立舊版碰撞物件,由兩側完整樓梯與無中斷後方平台取代；沒有以隱藏 Renderer 保留舊碰撞。
+runtime V10,GUARD_EAST_CONNECTOR_SOUTH_OUTER,停止建立舊版碰撞物件,由兩側完整樓梯與無中斷後方平台取代；沒有以隱藏 Renderer 保留舊碰撞。
+scene,M2_TestInteractable,恢復既有 MeshRenderer；保留非 Trigger Collider 與 C3TestInteractable,PR #2 回查發現 Renderer 已隱藏但實體碰撞及互動仍啟用；以原模型恢復可見性，未刪除互動。
+runtime V11,"C3_ReferenceRecyclingFactory_Visuals/WAREHOUSE structural column [east,z=1]",X 由 -0.75 移至 -0.45；原裝飾支柱模型不變,原支柱內緣 -0.90 侵入二樓走道；移動後內緣 -0.60 位於護欄外緣 -0.61 之外。此為裝飾網格位置修正，非已執行的物理通行證據。
+runtime V7,V7_OPAQUE_C_TO_B_RECEIVING_SHUTTER,停止生成整個不透明門板及其非 Trigger Collider；由無碰撞 PVC 條簾取代,CONFIRMED PLAYMODE FAILURE：原門板 X=-.44..-.28／Y=.545..6.315／Z=10.19..14.81 擋住 Z=10.7 通行；保留原門框地板及全部安全邊界。
+runtime V7,V7_B_SHUTTER_PRESSED_STEEL_SLAT,停止生成全部 21 條舊鋼質橫條,配合鐵捲門替換為半透明 PVC；避免關閉主碰撞後仍留下不透明門板裝飾。
+runtime V7,V7_C_SIDE_B_FEED_RECEIVING_HATCH,停止生成舊不透明接料門片,保留四個 V9 B 進料 OBJ 與七個 B_PORTAL_GENUINE_FEED_CARGO；PVC 無 Collider 供人員與物料穿越。
+runtime V11,"C3_ReferenceRecyclingFactory_Visuals/Sidewall weathered concrete inset [east,z=10.3]",僅將該裝飾板 Z 範圍 9.07..11.53 裁到 9.07..10.20；原牆體 Collider 不變,程式碼確認的視覺遮擋；原板沒有 Collider 但遮住 Z=10.7 人員通道。不是新增的實測物理失敗。
+runtime V11,"C3_ReferenceRecyclingFactory_Visuals/WAREHOUSE structural column [east,z=4.75]",X 由 -0.75 移至 -0.45；原裝飾支柱模型不變,原支柱內緣 -0.90 侵入二樓走道；移動後內緣 -0.60 位於護欄外緣 -0.61 之外。此為裝飾網格位置修正，非已執行的物理通行證據。
+runtime V11,"C3_ReferenceRecyclingFactory_Visuals/WAREHOUSE structural column [east,z=8.5]",X 由 -0.75 移至 -0.45；原裝飾支柱模型不變,原支柱內緣 -0.90 侵入二樓走道；移動後內緣 -0.60 位於護欄外緣 -0.61 之外。此為裝飾網格位置修正，非已執行的物理通行證據。
+runtime V11,"C3_ReferenceRecyclingFactory_Visuals/WAREHOUSE structural column [east,z=16]",X 由 -0.75 移至 -0.45；原裝飾支柱模型不變,原支柱內緣 -0.90 侵入二樓走道；移動後內緣 -0.60 位於護欄外緣 -0.61 之外。此為裝飾網格位置修正，非已執行的物理通行證據。
+runtime V11,"C3_ReferenceRecyclingFactory_Visuals/WAREHOUSE structural column [east,z=19.75]",X 由 -0.75 移至 -0.45；原裝飾支柱模型不變,原支柱內緣 -0.90 侵入二樓走道；移動後內緣 -0.60 位於護欄外緣 -0.61 之外。此為裝飾網格位置修正，非已執行的物理通行證據。
+runtime V11,"C3_ReferenceRecyclingFactory_Visuals/WAREHOUSE structural column [east,z=23.5]",X 由 -0.75 移至 -0.45；原裝飾支柱模型不變,原支柱內緣 -0.90 侵入二樓走道；移動後內緣 -0.60 位於護欄外緣 -0.61 之外。此為裝飾網格位置修正，非已執行的物理通行證據。

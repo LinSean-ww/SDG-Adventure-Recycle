@@ -81,6 +81,51 @@ namespace SDGAdventure.SharedPlayer
 
         public void SetEyeHeight(float height) => eyeHeight = height;
 
+        // Visual replacements must update the saved baseline as well as the live
+        // renderer, otherwise the next view toggle reapplies a stale snapshot.
+        // This never rebinds/moves the camera or changes player pose/preferences.
+        public void SetBodyRendererBaseline(Renderer renderer, bool enabledValue, ShadowCastingMode casting)
+        {
+            if (!renderer) return;
+            if (bodyRenderers != null)
+            {
+                int index = System.Array.IndexOf(bodyRenderers, renderer);
+                if (index < 0)
+                {
+                    index = bodyRenderers.Length;
+                    System.Array.Resize(ref bodyRenderers, index + 1);
+                    System.Array.Resize(ref originalEnabled, index + 1);
+                    System.Array.Resize(ref originalCast, index + 1);
+                    bodyRenderers[index] = renderer;
+                }
+                originalEnabled[index] = enabledValue;
+                originalCast[index] = casting;
+            }
+            renderer.enabled = enabledValue;
+            renderer.shadowCastingMode = view == null ? casting : IsThirdPerson
+                ? casting == ShadowCastingMode.ShadowsOnly ? ShadowCastingMode.On : casting
+                : ShadowCastingMode.ShadowsOnly;
+        }
+
+        // Drop only the outgoing visual subtree. Keep all surviving baselines;
+        // repeated add/remove cycles must not grow a cache of dead renderers.
+        public void RemoveBodyRenderers(Transform visualRoot)
+        {
+            if (!visualRoot || bodyRenderers == null) return;
+            int kept = 0;
+            for (int i = 0; i < bodyRenderers.Length; i++)
+            {
+                Renderer renderer = bodyRenderers[i];
+                if (!renderer || renderer.transform.IsChildOf(visualRoot)) continue;
+                bodyRenderers[kept] = renderer;
+                originalEnabled[kept] = originalEnabled[i];
+                originalCast[kept++] = originalCast[i];
+            }
+            System.Array.Resize(ref bodyRenderers, kept);
+            System.Array.Resize(ref originalEnabled, kept);
+            System.Array.Resize(ref originalCast, kept);
+        }
+
         public void Orbit(float yawDelta, float pitchDelta, float minPitch, float maxPitch)
         {
             if (!IsThirdPerson) return;

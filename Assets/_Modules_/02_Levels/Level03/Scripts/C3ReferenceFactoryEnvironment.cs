@@ -9,22 +9,21 @@ namespace C3TreasurePuzzle
     /// A single, spatially connected factory layout. The three output machines sit
     /// BELOW the shared infeed conveyor; a down-chute enters each roof hopper and
     /// each lower conveyor touches the corresponding output throat.
-    /// The legacy WasteSortingLine still owns puzzle timing and counts, but its
-    /// duplicate visible meshes are hidden and its transform is moved into the bank.
+    /// Phase 2 mechanical equipment and cargo are owned by the recycling line;
+    /// this component retains the warehouse, live workshop art, PVC and utilities.
     /// Coordinates are in C_Main's existing -25..0 / 0..25 hall.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class C3ReferenceFactoryEnvironment : MonoBehaviour
     {
-        public const float InputBeltY = 5.62f;
+        public const float InputBeltY = 5.8f;
         public const float InputBeltZ = 16.85f;
-        public const float SorterRoofY = 4.12f;
-        public const float SorterFrontZ = 12.95f;
-        public const float OutfeedTopY = 1.16f;
-        public const float OutputEndZ = 10.02f;
-        public const float OutputStartZ = 12.96f;
+        public const float SorterRoofY = 4.45f;
+        public const float SorterFrontZ = 12.75f;
+        public const float OutfeedTopY = 1.25f;
+        public const float OutputEndZ = 9.10f;
+        public const float OutputStartZ = 12.75f;
         public const int LaneCount = 3;
-        private static readonly float[] Centers = { -17.9f, -13.0f, -8.1f }; // paper, metal, plastic
 
         private Transform root;
         private C3DeviceState device;
@@ -32,19 +31,12 @@ namespace C3TreasurePuzzle
             paper, plastic, metalBale, green, tealGlow, purpleGlow, lightLens,
             darkGlass, wall, pipe, warmWhite;
         private readonly List<Material> owned = new List<Material>();
-        private readonly List<Transform> packages = new List<Transform>();
-        private readonly List<Transform> bFeedPackets = new List<Transform>();
-        private readonly List<Transform> rollers = new List<Transform>();
-        private readonly List<Renderer> machineIndicators = new List<Renderer>();
         private readonly List<Light> lamps = new List<Light>();
-        private bool running;
-        private float clock;
         public int DecorativeObjects { get; private set; }
-        public int ConveyorPackageCount => packages.Count;
-        public bool ConveyorMoving => running;
-        public bool ConveyorEndsInSorter =>
-            Mathf.Abs(InputBeltY - 5.62f) < .001f &&
-            Mathf.Abs(OutputStartZ - SorterFrontZ) < .05f && LaneCount == Centers.Length;
+        public int ConveyorPackageCount => GetComponentsInChildren<EcoRecycleCargo>(true).Length;
+        public bool ConveyorMoving => device && device.FactoryState >= C3FactoryState.Running && Time.timeScale>0f;
+        public bool ConveyorEndsInSorter => GetComponent<C3RecyclingLineGeometry>() &&
+            GetComponent<C3RecyclingLineGeometry>().ConnectionsMatch(.01f);
 
         private void Awake()
         {
@@ -57,9 +49,6 @@ namespace C3TreasurePuzzle
             ReplaceMismatchedLegacyArt(); // hide invisible legacy collision walls too
             BuildWarehouse();
             BuildFloorAndCirculation();
-            BuildUnifiedSorter();
-            BuildInfeedConveyorAndPhysicalDrops();
-            BuildOutfeedPallets();
             BuildInputWasteCages();
             BuildWorkStations();
             BuildPollutionSkid();
@@ -67,9 +56,10 @@ namespace C3TreasurePuzzle
             // BuildUpperWalkways() was an obstructing visual overlay; do not call it.
             BuildOverheadPiping();
             BuildPendantLights();
+            BuildIndustrialAgeing(); // visual-only wear; preserve all gameplay colliders
             RenderSettings.ambientMode = AmbientMode.Flat;
-            RenderSettings.ambientLight = new Color(.66f, .69f, .71f);
-            RenderSettings.ambientIntensity = 1.25f;
+            RenderSettings.ambientLight = new Color(.46f, .49f, .51f);
+            RenderSettings.ambientIntensity = 1.0f;
             RenderSettings.fog = false;
         }
 
@@ -83,74 +73,21 @@ namespace C3TreasurePuzzle
         private void OnDestroy() { foreach (Material m in owned) if (m) Destroy(m); }
         private void StartMachinery()
         {
-            running = true;
-            foreach (Renderer r in machineIndicators) if (r) r.sharedMaterial = tealGlow;
             foreach (Light l in lamps) if (l) l.intensity = 1.55f;
         }
-        private void Update()
-        {
-            if (!running) return;
-            clock += Time.deltaTime;
-            for (int i = 0; i < packages.Count; ++i)
-            {
-                Transform item = packages[i];
-                if (!item) continue;
-                int lane = i % LaneCount; // paper / metal / plastic correspond to the three machines
-                float phase = Mathf.Repeat(clock * .105f + i / (float)packages.Count, 1f);
-                item.gameObject.SetActive(phase < .76f || phase >= .87f);
-                if (phase < .58f)
-                {
-                    // The package stays on the SAME elevated conveyor until its own lane.
-                    item.localPosition = new Vector3(
-                        Mathf.Lerp(-6.32f, Centers[lane], phase / .58f),
-                        InputBeltY + .75f, InputBeltZ);
-                }
-                else if (phase < .76f)
-                {
-                    // It travels down the visible chute into the real machine roof.
-                    float t = (phase - .58f) / .18f;
-                    item.localPosition = new Vector3(Centers[lane],
-                        Mathf.Lerp(InputBeltY + .75f, 4.37f, t),
-                        Mathf.Lerp(InputBeltZ, 16.04f, t));
-                }
-                else if (phase >= .87f)
-                {
-                    // It is then shown again on the CONNECTED lower discharge belt.
-                    float t = (phase - .87f) / .13f;
-                    item.localPosition = new Vector3(Centers[lane], 1.40f,
-                        Mathf.Lerp(OutputStartZ, OutputEndZ, t));
-                }
-            }
-            // V9 feed is front-visible and terminates at the shared three-machine belt.
-            for (int i=0;i<bFeedPackets.Count;i++)
-            {
-                Transform packet=bFeedPackets[i];
-                if (!packet) continue;
-                float t=Mathf.Repeat(clock*.065f+i/(float)bFeedPackets.Count,1f);
-                Vector3 p0=new Vector3(-.67f,1.30f,12.50f);
-                Vector3 p1=new Vector3(-1.20f,1.30f,12.50f);
-                Vector3 p2=new Vector3(-6.90f,6.67f,11.85f);
-                Vector3 p3=new Vector3(-6.90f,6.67f,16.20f);
-                Vector3 p4=new Vector3(-6.20f,5.77f,16.85f);
-                if (t<.06f) packet.position=Vector3.Lerp(p0,p1,t/.06f);
-                else if(t<.55f) packet.position=Vector3.Lerp(p1,p2,(t-.06f)/.49f);
-                else if(t<.92f) packet.position=Vector3.Lerp(p2,p3,(t-.55f)/.37f);
-                else packet.position=Vector3.Lerp(p3,p4,(t-.92f)/.08f);
-            }
-            foreach (Transform r in rollers) if (r) r.Rotate(Vector3.up, 135f * Time.deltaTime, Space.Self);
-        }
-
         private void InitMaterials()
         {
-            floor = Mat("Concrete floor", new Color(.91f, .94f, .93f), .08f, .23f, "FactoryConcrete");
-            tile = Mat("Polished wet concrete", new Color(.92f, .92f, .89f), .22f, .51f, "FactoryConcrete");
-            wall = Mat("Factory light walls", new Color(.82f, .87f, .87f), .09f, .3f, "FactoryConcrete");
-            steel = Mat("Industrial painted steel", new Color(.70f, .77f, .79f), .63f, .4f, "FactorySteel");
-            stainless = Mat("Galvanized sorting plant", new Color(.92f, .96f, .98f), .76f, .56f, "FactorySteel");
-            graphite = Mat("Black structural steel", new Color(.23f, .29f, .32f), .55f, .37f, "FactorySteel");
-            belt = Mat("Dark conveyer rubber", new Color(.40f, .43f, .46f), .03f, .17f, "FactoryRubber");
-            yellow = Mat("Industrial railing yellow", new Color(.96f, .65f, .095f), .42f, .35f);
-            rust = Mat("Oxide equipment", new Color(.40f, .29f, .21f), .4f, .31f, "FactorySteel");
+            // Long-used but serviceable plant: faded paint and oxidized steel,
+            // without making active indicators, materials or safety lanes unreadable.
+            floor = Mat("Concrete floor", new Color(.49f, .50f, .47f), .05f, .13f, "FactoryConcrete");
+            tile = Mat("Polished wet concrete", new Color(.52f, .52f, .47f), .12f, .29f, "FactoryConcrete");
+            wall = Mat("Factory light walls", new Color(.52f, .53f, .48f), .04f, .17f, "FactoryConcrete");
+            steel = Mat("Industrial painted steel", new Color(.57f, .62f, .60f), .42f, .28f, "FactorySteel");
+            stainless = Mat("Galvanized sorting plant", new Color(.74f, .78f, .77f), .60f, .40f, "FactorySteel");
+            graphite = Mat("Black structural steel", new Color(.22f, .25f, .25f), .40f, .28f, "FactorySteel");
+            belt = Mat("Dark conveyer rubber", new Color(.36f, .38f, .37f), .02f, .14f, "FactoryRubber");
+            yellow = Mat("Industrial railing yellow", new Color(.82f, .62f, .19f), .24f, .22f);
+            rust = Mat("Oxide equipment", new Color(.36f, .23f, .15f), .20f, .20f, "FactorySteel");
             paper = Mat("Cardboard bale", new Color(.75f, .54f, .31f), .01f, .21f, "FactoryCardboard");
             plastic = Mat("Plastic pale blue", new Color(.36f, .73f, .80f), .06f, .42f);
             metalBale = Mat("Crushed aluminum", new Color(.47f, .59f, .72f), .65f, .55f, "FactorySteel");
@@ -205,8 +142,16 @@ namespace C3TreasurePuzzle
             Material mat,bool solid=false)
             => Shape(name,PrimitiveType.Cube,new Vector3(x,y,z),new Vector3(sx,sy,sz),mat,
                 null,solid);
-        private GameObject Cyl(string name,Vector3 pos,Vector3 scale,Material mat)
-            => Shape(name,PrimitiveType.Cylinder,pos,scale,mat);
+        private GameObject Cyl(string name,Vector3 pos,Vector3 scale,Material mat,bool solid=false)
+        {
+            // A primitive Cylinder starts with a CapsuleCollider. On a shallow
+            // flange its minimum diameter can exceed the visible height. Use a
+            // small local box proxy matching this cylinder mesh's unit bounds;
+            // never leave a hidden, tall capsule around the flat flange.
+            GameObject g=Shape(name,PrimitiveType.Cylinder,pos,scale,mat);
+            if (solid) g.AddComponent<BoxCollider>().size=new Vector3(1f,2f,1f);
+            return g;
+        }
         private void Beam(string name, Vector3 from,Vector3 to,float width,Material mat)
         {
             Vector3 delta=to-from;
@@ -222,23 +167,29 @@ namespace C3TreasurePuzzle
         private void ReplaceMismatchedLegacyArt()
         {
             // Hide the OLD machine renderers, not the entire objects: their state,
-            // interactables, and sorting cycle remain owned by C3FactoryPresentation.
+            // interactables remain live; Phase 2 owns material transport and accounting.
             GameObject art = GameObject.Find("C_Factory_Art");
             if (art)
             {
-                foreach (Renderer r in art.GetComponentsInChildren<Renderer>(true)) r.enabled=false;
+                // These are the original live upper stations, not obsolete factory art.
+                // Exclude their complete subtrees BEFORE hiding the old presentation,
+                // so collider state does not depend on another component's Start().
+                Transform bench = art.transform.Find("Floor2_Industrial/UpperChipMaintenanceBench");
+                Transform box = art.transform.Find("Floor2_Industrial/UpperDistributionBox");
+                foreach (Renderer r in art.GetComponentsInChildren<Renderer>(true))
+                    if (!IsUpperStation(r.transform, bench, box)) r.enabled=false;
                 // Invisible decorative stair/pipe meshes must not remain solid
                 // barriers that trap the player's CharacterController.
-                foreach (Collider c in art.GetComponentsInChildren<Collider>(true))
-                    if (c && !c.isTrigger) c.enabled=false;
+                foreach (string path in RetiredArtCollisionPaths)
+                {
+                    Transform item = art.transform.Find(path);
+                    if (!item) continue;
+                    foreach (Collider c in item.GetComponents<Collider>())
+                        if (!c.isTrigger) c.enabled = false;
+                }
             }
             GameObject oldSimulation = GameObject.Find("C3_SortingSimulation");
-            if (oldSimulation)
-            {
-                foreach (Renderer r in oldSimulation.GetComponentsInChildren<Renderer>(true)) r.enabled=false;
-                foreach (Collider c in oldSimulation.GetComponentsInChildren<Collider>(true))
-                    if (c && !c.isTrigger) c.enabled=false;
-            }
+            if (oldSimulation) { oldSimulation.SetActive(false); Destroy(oldSimulation); }
             foreach (string label in new[] { "Plastic", "Metal", "Paper" })
             {
                 GameObject old = GameObject.Find("C3_IndustrialSign_" + label);
@@ -247,12 +198,70 @@ namespace C3TreasurePuzzle
             // Move the one REAL sorting trigger/machine logic under the bank.
             GameObject line=GameObject.Find("WasteSortingLine");
             if (line) line.transform.position = new Vector3(-13f,.55f,14.55f);
-            // The source art machine volumes otherwise become invisible obstacles.
-            GameObject originalMachines = GameObject.Find("IndustrialMachines");
-            if(originalMachines)
-                foreach(Collider c in originalMachines.GetComponentsInChildren<Collider>(true))
-                    if (c && !c.isTrigger) c.enabled=false;
         }
+
+        // C_Main V10 inventory: only the collision volumes of replaced art.
+        // Never extend this to arbitrary descendants: live stations, new triggers
+        // and future equipment must retain their own physics and interaction.
+        private static readonly string[] RetiredArtCollisionPaths =
+        {
+            "Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceA_-10.0",
+            "Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceA_-17.5",
+            "Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceA_-21.5",
+            "Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceA_-5.5",
+            "Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceB_-10.0",
+            "Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceB_-17.5",
+            "Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceB_-21.5",
+            "Architecture_Additions/Steel_MainDeckCrossBraces/Collision_CrossBraceB_-5.5",
+            "Floor1_Industrial/EastToolCabinet",
+            "Floor1_Industrial/WestPowerCabinet_A",
+            "Floor1_Industrial/WestPowerCabinet_B",
+            "IndustrialMachines/FeedPump",
+            "IndustrialMachines/NortheastFilterArray",
+            "IndustrialMachines/PurificationReactor",
+            "IndustrialMachines/WasteSortingLine",
+            "Lighting/Cyan_Console/IndicatorLens",
+            "Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-10.0_14.8",
+            "Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-10.0_16.0",
+            "Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-15.0_14.8",
+            "Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-15.0_16.0",
+            "Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-20.0_14.8",
+            "Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-20.0_16.0",
+            "Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-6.0_14.8",
+            "Pipes/Pipe_MountsAndConnections/CeilingCableHanger_-6.0_16.0",
+            "Pipes/Pipe_MountsAndConnections/NorthWallHanger_-10.5",
+            "Pipes/Pipe_MountsAndConnections/NorthWallHanger_-16.0",
+            "Pipes/Pipe_MountsAndConnections/NorthWallHanger_-21.0",
+            "Pipes/Pipe_MountsAndConnections/NorthWallHanger_-5.0",
+            "Pipes/Pipe_MountsAndConnections/NorthWestJoin",
+            "Pipes/Pipe_MountsAndConnections/ReactorDeckHanger_14.4",
+            "Pipes/Pipe_MountsAndConnections/ReactorDeckHanger_17.0",
+            "Pipes/Pipe_MountsAndConnections/ReactorDeckHanger_19.5",
+            "Pipes/Pipe_MountsAndConnections/WestNorthElbow",
+            "Pipes/Pipe_MountsAndConnections/WestWallHanger_14.0",
+            "Pipes/Pipe_MountsAndConnections/WestWallHanger_18.6",
+            "Pipes/Pipe_MountsAndConnections/WestWallHanger_22.0",
+            "Pipes/Pipe_MountsAndConnections/WestWallHanger_4.0",
+            "Pipes/Pipe_MountsAndConnections/WestWallHanger_9.0",
+            "Pipes/Pipe_NorthFilterFeed/Collision_NorthFilterBranch",
+            "Pipes/Pipe_NorthFilterFeed/Collision_NorthFilterMain",
+            "Pipes/Pipe_ReactorReturn/Collision_ReactorOut",
+            "Pipes/Pipe_ReactorReturn/Collision_ReactorReturnJoin",
+            "Pipes/Pipe_ReactorReturn/Collision_ReactorReturnMain",
+            "Pipes/Pipe_UpperCableConduit/Collision_UpperConduitA",
+            "Pipes/Pipe_UpperCableConduit/Collision_UpperConduitB",
+            "Pipes/Pipe_WestServiceTrunk/Collision_MainWestTrunk",
+            "Pipes/Pipe_WestServiceTrunk/Collision_WestCabinetA",
+            "Pipes/Pipe_WestServiceTrunk/Collision_WestCabinetB",
+            "Props/Barrel_East",
+            "Props/Barrel_North",
+            "Props/Barrel_West",
+            "Props/WasteContainer_A",
+            "Props/WasteContainer_B",
+        };
+
+        private static bool IsUpperStation(Transform item, Transform bench, Transform box)
+            => (bench && item.IsChildOf(bench)) || (box && item.IsChildOf(box));
 
         private void BuildWarehouse()
         {
@@ -269,12 +278,13 @@ namespace C3TreasurePuzzle
                 {
                     // Do not block the actual B doorway with an ornamental pillar.
                     if (side==1 && Mathf.Abs(z-12.5f)<1f) continue;
-                    // West posts sit inside the wall, outside the stair rail envelope.
-                    float x=side==0?-24.53f:-.75f;
-                    Box("WAREHOUSE structural column",x,6.05f,z,.30f,10.95f,.32f,graphite);
-                    Box("Yellow column kickplate",x,.87f,z,.36f,.48f,.39f,yellow);
+                    // Full-height warehouse posts are embedded in the wall plane;
+                    // distinct below-deck columns carry the walkway cantilevers.
+                    float x=side==0?-24.70f:-.12f;
+                    Box("WAREHOUSE structural column",x,6.05f,z,.18f,10.95f,.22f,graphite);
+                    Box("Yellow column kickplate",x,.87f,z,.22f,.48f,.26f,yellow);
                 }
-                Box("WAREHOUSE top roof truss",-12.5f,11.45f,z,24.0f,.28f,.29f,steel);
+                Box("WAREHOUSE top roof truss",-12.41f,11.45f,z,24.58f,.28f,.29f,steel);
                 for(int t=0;t<6;t++)
                     Beam("Roof web bracing",new Vector3(-23f+t*4f,11.38f,z),
                         new Vector3(-21f+t*4f,10.75f,z),.045f,pipe);
@@ -291,7 +301,14 @@ namespace C3TreasurePuzzle
                 // its visual opening must remain open for the player and feed ramp.
                 if (Mathf.Abs(z - 12.5f) > 2.0f)
                 {
-                    Box("Sidewall weathered concrete inset",-.37f,4.2f,z,.10f,6.2f,2.46f,wall);
+                    // Clip the panel's full extent to the real doorway, not just
+                    // its center. The z=10.3 panel otherwise hides the pedestrian
+                    // opening at z=10.7 even after the shutter is removed.
+                    float nearZ=z-1.23f, farZ=z+1.23f;
+                    if (z<12.5f) farZ=Mathf.Min(farZ,10.2f);
+                    else nearZ=Mathf.Max(nearZ,14.8f);
+                    Box("Sidewall weathered concrete inset",-.37f,4.2f,(nearZ+farZ)*.5f,
+                        .10f,6.2f,farZ-nearZ,wall);
                     Box("RAISED_EAST_UPPER_WALL",-.37f,9.80f,z,.10f,5.00f,2.46f,wall);
                 }
             }
@@ -310,20 +327,53 @@ namespace C3TreasurePuzzle
                 float z=2.2f+i*4.05f;
                 Box("Industrial overhead cable rack",-12.5f,10.60f,z,21f,.12f,.28f,steel);
             }
-            // The B area is a different zone. C manufacturing must NOT expose
-            // its interior. A closed industrial material-receiving shutter sits
-            // immediately behind the C-side conveyor terminus, at the existing
-            // x=-0.3 zone boundary. D doorway remains open for level completion.
-            Box("V7_OPAQUE_C_TO_B_RECEIVING_SHUTTER",-.36f,3.43f,12.50f,
-                .16f,5.77f,4.62f,graphite,true);
-            for (int k=0;k<21;k++)
-                Box("V7_B_SHUTTER_PRESSED_STEEL_SLAT",-.461f,.76f+k*.265f,12.50f,
-                    .027f,.038f,4.48f,steel);
-            Box("V7_C_SIDE_B_FEED_RECEIVING_HATCH",-.48f,1.40f,12.50f,
-                .025f,.83f,1.25f,graphite);
+            // V11: the shared B/C doorway admits pedestrians in both directions.
+            // Retain the scene's jambs, lintel, floor and outer safety colliders;
+            // the separate B feed remains at z=12.5, north of the z=10.7 aisle.
+            BuildBCPvcCurtain();
             // Both transitions retain named, legible signs on their real doors.
             Sign("BZone",-.51f,4.36f,12.50f,2.55f,.54f,90f);
             Sign("DZone",-12.50f,4.38f,.44f,2.55f,.54f);
+        }
+        private void BuildBCPvcCurtain()
+        {
+            // Built-in render pipeline, as configured by this project. Standard's
+            // transparent mode needs blending and ZWrite settings as well as alpha.
+            Material pvc = Mat("V11 translucent blue PVC", new Color(.58f,.84f,.91f,.26f), 0f, .68f);
+            pvc.SetFloat("_Mode", 3f);
+            pvc.SetOverrideTag("RenderType", "Transparent");
+            pvc.SetInt("_SrcBlend", (int)BlendMode.One);
+            pvc.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
+            pvc.SetInt("_ZWrite", 0);
+            pvc.DisableKeyword("_ALPHATEST_ON");
+            pvc.DisableKeyword("_ALPHABLEND_ON");
+            pvc.EnableKeyword("_ALPHAPREMULTIPLY_ON");
+            pvc.renderQueue = (int)RenderQueue.Transparent;
+
+            Transform curtain = new GameObject("V11_BC_PVC_CURTAIN").transform;
+            curtain.SetParent(root, false);
+            // Existing wall opening: z=10.2..14.8, floor y=.55, lintel y=3.5.
+            // The header occupies the lintel; strips stop .07m above the floor.
+            GameObject header = Box("HEADER_RAIL",-.30f,3.54f,12.50f,.10f,.08f,4.60f,steel);
+            header.transform.SetParent(curtain, true);
+            const int stripCount = 20;
+            const float pitch = .23f;
+            for (int i=0;i<stripCount;i++)
+            {
+                // .25m strips at .23m pitch overlap .02m. Alternate their depth
+                // to avoid coplanar overlap. Thin cubes have faces towards BOTH
+                // zones, so no custom mesh, two-sided shader or material clone.
+                GameObject strip = Box("PVC_STRIP_"+i.ToString("D2"),
+                    -.30f+(i%2==0?-.008f:.008f),2.06f,10.315f+i*pitch,
+                    .012f,2.88f,.25f,pvc);
+                strip.transform.SetParent(curtain, true);
+                Renderer renderer = strip.GetComponent<Renderer>();
+                renderer.shadowCastingMode = ShadowCastingMode.Off;
+                renderer.receiveShadows = false;
+            }
+            // Box defaults to solid=false: primitive colliders are disabled
+            // immediately and destroyed by Shape, including on the header.
+            // Awake builds once; scene ownership and owned materials handle reload.
         }
         private void BuildFloorAndCirculation()
         {
@@ -361,243 +411,64 @@ namespace C3TreasurePuzzle
                         .08f,.010f,3.17f,side<0?yellow:tealGlow);
             }
         }
-        private void BuildUnifiedSorter()
-        {
-            string[] signs={"PaperHall","MetalHall","PlasticHall"};
-            Material[] plates={paper,metalBale,green};
-            for(int lane=0;lane<LaneCount;lane++)
-            {
-                float x=Centers[lane];
-                // Body faces the south aisle. Top, body, output throat and roof
-                // intake share EXACT axis x: no floating second sorter.
-                Box("SORTER_MAIN_BODY_"+lane,x,2.48f,14.87f,4.51f,2.91f,3.86f,stainless,true);
-                Box("SORTER_RECESSED_FRONT_PANEL_"+lane,x,2.67f,12.911f,4.13f,2.37f,.10f,steel);
-                Box("SORTER_LANE_COLOR_"+lane,x,3.43f,12.845f,3.86f,.82f,.065f,plates[lane]);
-                Box("SORTER_ROOF_CONTACT_"+lane,x,SorterRoofY,14.87f,4.66f,.15f,4.03f,pipe);
-                // Grounded support feet, so the main housings do not float.
-                for(int side=-1;side<=1;side+=2)
-                    for(int back=-1;back<=1;back+=2)
-                        Box("SORTER_MACHINE_GROUNDED_LEG_"+lane,
-                            x+side*1.89f,.79f,14.88f+back*1.43f,
-                            .27f,.49f,.35f,graphite);
-                Box("SORTER_DARK_THROAT_"+lane,x,1.65f,12.823f,2.55f,1.18f,.06f,graphite);
-                Box("SORTER_ACTIVE_OUTLET_"+lane,x,1.22f,12.784f,2.08f,.29f,.065f,belt);
-                for(int side=-1;side<=1;side+=2)
-                {
-                    Box("SORTER_YELLOW_GUARD_"+lane,x+side*2.14f,2.53f,12.76f,
-                        .13f,2.83f,.19f,yellow);
-                    Box("SORTER_GRATE_EDGE_"+lane,x+side*1.31f,1.24f,11.60f,
-                        .14f,.47f,2.75f,yellow);
-                }
-                // A machine indicator next to a machine, not floating over it.
-                Renderer indicator=Box("SORTER_INDICATOR_"+lane,x+1.66f,2.56f,12.737f,
-                    .13f,.13f,.065f,graphite).GetComponent<Renderer>();
-                machineIndicators.Add(indicator);
-                Sign(signs[lane],x,3.45f,12.725f,3.20f,.65f);
-                // Three lower conveyors start flush against the true throat.
-                Box("CONNECTED_LOWER_OUTFEED_"+lane,x,OutfeedTopY,11.48f,
-                    2.56f,.18f,2.95f,belt);
-                for(int k=0;k<9;k++)
-                {
-                    float z=OutputEndZ+k*(OutputStartZ-OutputEndZ)/8f;
-                    GameObject r=Cyl("Outfeed steel roller L"+lane,
-                        new Vector3(x,1.20f,z),new Vector3(.105f,1.26f,.105f),stainless);
-                    r.transform.rotation=Quaternion.Euler(0,0,90);
-                }
-                for(int k=0;k<3;k++)
-                {
-                    float z=10.30f+k*1.02f;
-                    Box("Conveyor underframe crossmember",x,.81f,z,2.5f,.12f,.22f,graphite);
-                }
-                // Draw actual tapered hood anchored at roof, fed by drop chutes.
-                Box("Sorter intake hopper mouth",x,4.27f,16.04f,2.05f,.32f,1.20f,graphite);
-            }
-            // Classification category plates are fixed directly to each machine face.
-        }
-        private void BuildInfeedConveyorAndPhysicalDrops()
-        {
-            // FIXED V3 GEOMETRY: the conveyor occupies only x [-20.35,-6.20]
-            // (NOT the pedestrian stair corridors at x=-22.25 and x=-4.65).
-            // All three actual sorting inlets are centered on this one continuous belt.
-            const float cx = -13.275f;
-            const float beltWidth = 14.15f;
-            Box("V3_LIVE_SINGLE_INFEED_RUBBER_SURFACE",cx,InputBeltY,InputBeltZ,
-                beltWidth,.18f,1.52f,belt);
-            for(int side=-1;side<=1;side+=2)
-            {
-                float z=InputBeltZ+side*.79f;
-                Box("V3_CONVEYOR_STEEL_SIDEWALL",cx,5.74f,z,
-                    beltWidth,.43f,.12f,steel);
-                // Guard plates stay low, avoiding fake pedestrian railing appearance.
-                Box("V3_BELT_RETENTION_LIP",cx,6.02f,z,
-                    beltWidth,.052f,.065f,yellow);
-            }
-            for(int k=0;k<15;k++)
-            {
-                float x=-20.10f+k*.98f;
-                GameObject r=Cyl("V3_MAIN_BELT_ROLLER",new Vector3(x,5.49f,InputBeltZ),
-                    new Vector3(.09f,.69f,.09f),stainless);
-                r.transform.rotation=Quaternion.Euler(90,0,0);
-                rollers.Add(r.transform);
-            }
-            // Support points terminate ON the machine roof structure, not on a walkway.
-            for(int i=0;i<6;i++)
-            {
-                float x=-19.8f+i*2.60f;
-                for(int side=-1;side<=1;side+=2)
-                {
-                    float z=InputBeltZ+side*.62f;
-                    Box("V3_INFEED_MACHINE_MOUNT",x,4.80f,z,
-                        .13f,1.35f,.14f,graphite);
-                }
-            }
-            for(int lane=0;lane<LaneCount;lane++)
-            {
-                float x=Centers[lane];
-                Vector3 top=new Vector3(x,5.60f,InputBeltZ);
-                Vector3 bottom=new Vector3(x,4.35f,16.04f);
-                Vector3 d=bottom-top;
-                Quaternion rotation=Quaternion.FromToRotation(Vector3.forward,d.normalized);
-                Shape("V3_CONNECTED_DIVERT_TO_HOPPER_"+lane,PrimitiveType.Cube,
-                    (top+bottom)*.5f,new Vector3(1.37f,.14f,d.magnitude+.14f),
-                    stainless,rotation);
-                // The authored V3_HopperShields mesh provides continuous sidewalls.
-                // A black inlet is visibly inset in the machine top.
-                Box("V3_SORTER_HOPPER_MOUTH_"+lane,x,4.30f,16.03f,
-                    1.35f,.12f,.54f,graphite);
-            }
-            // B side is a fully visible continuous authored OBJ system:
-            // visible floor-height belt from B door -> lift at x=-2.90,z=12.50
-            // -> stair-clearance crossover (7.05m descending to 5.87m) -> sorter main belt.
-            // C3V3Circulation loads the V4 meshes; do not overlay fake gray cubes.
-            for(int i=0;i<7;i++)
-            {
-                GameObject cargo=new GameObject("B_PORTAL_GENUINE_FEED_CARGO_"+i);
-                cargo.transform.SetParent(root,false);
-                cargo.transform.localPosition=Vector3.Lerp(
-                    new Vector3(-.67f,1.31f,12.50f),
-                    new Vector3(-2.35f,1.31f,12.50f),i/7f);
-                bFeedPackets.Add(cargo.transform);
-                Shape("B_portal_recycled_material",PrimitiveType.Cube,
-                    new Vector3(-.67f,1.31f,12.50f),new Vector3(.24f,.20f,.24f),
-                    i%3==0?paper:i%3==1?metalBale:plastic,
-                    parent:cargo.transform).transform.localPosition=Vector3.zero;
-            }
-            // Ground guide arrows point towards the live B input at the right wall.
-            for(int j=0;j<3;j++)
-                Box("B_ZONE_DIRECTION_FLOOR_STRIPE",-3.55f+j*.44f,.582f,11.3f,
-                    .28f,.012f,.07f,yellow);
-            // Infeed canisters: drawn on the physical black belt, NOT floating above it.
-            for(int i=0;i<18;i++)
-            {
-                GameObject carrier=new GameObject("BELT_MOTION_PACKAGE_"+i);
-                carrier.transform.SetParent(root,false);
-                carrier.transform.localPosition=new Vector3(-6.32f-i*.71f,
-                    InputBeltY+.75f,InputBeltZ);
-                packages.Add(carrier.transform);
-                Material m=i%3==0?plastic:i%3==1?metalBale:paper;
-                GameObject piece=Shape("Recycler product on real belt",i%3==1?
-                    PrimitiveType.Cylinder:PrimitiveType.Cube,
-                    carrier.transform.position,new Vector3(.40f,.48f,.42f),m,
-                    parent:carrier.transform);
-                piece.transform.localPosition=Vector3.zero;
-            }
-            Sign("WasteInput",-20.8f,7.25f,16.02f,3.32f,.65f);
-        }
-        private void BuildOutfeedPallets()
-        {
-            System.Random rng=new System.Random(20261029);
-            Material[] color={paper,metalBale,plastic};
-            string[] name={"PAPER","METAL","PLASTIC"};
-            for(int lane=0;lane<LaneCount;lane++)
-            {
-                float x=Centers[lane];
-                // Pallet at the END of the matching conveyor, not somewhere else.
-                Box("PALLET_AT_OUTPUT_"+name[lane],x,.66f,9.75f,2.94f,.21f,1.53f,graphite);
-                for(int q=0;q<3;q++)
-                for(int row=0;row<2;row++)
-                {
-                    float px=x-1.03f+q*1.03f;
-                    float pz=9.49f+row*.57f;
-                    Box(name[lane]+" BALED OUTPUT",px,1.10f,pz,
-                        .91f,.69f,.51f,color[lane]);
-                    for(int k=0;k<2;k++)
-                        Box("Bale binding straps",px+(k==0?-.22f:.22f),1.11f,pz,
-                            .035f,.75f,.55f,stainless);
-                    if(lane==1)
-                        for(int chip=0;chip<4;chip++)
-                            Cyl("Recycled aluminium glints",new Vector3(px-.27f+chip*.18f,1.46f,pz),
-                                new Vector3(.065f,.035f,.07f),stainless);
-                }
-            }
-            // V8: removed loose bales from the west stair lower access aisle.
-        }
         private void BuildInputWasteCages()
         {
-            Material[] stuff={paper,metalBale,plastic};
             System.Random rnd=new System.Random(31528);
             for(int c=0;c<3;c++)
             {
                 float x=-19.50f+c*2.55f;
                 float z=22.10f;
-                Box("SORTING BIN - input refuse floor",x,.78f,z,1.18f,.18f,2.16f,steel);
+                Box("SORTING BIN - input refuse floor",x,.78f,z,1.18f,.18f,2.16f,steel,true);
                 for(int side=-1;side<=1;side+=2)
                 for(int end=-1;end<=1;end+=2)
                     Box("Refuse cage metal upright",x+side*.57f,1.27f,z+end*1.01f,
-                        .07f,.98f,.06f,graphite);
+                        .07f,.98f,.06f,graphite,true);
                 for(int h=0;h<2;h++)
                 for(int side=-1;side<=1;side+=2)
                 {
                     Box("Bin lateral welded rail",x,1.00f+h*.56f,z+side*1.02f,
-                        1.20f,.065f,.06f,stainless);
+                        1.20f,.065f,.06f,stainless,true);
                     Box("Bin end welded rail",x+side*.60f,1.00f+h*.56f,z,
-                        .07f,.06f,2.08f,stainless);
+                        .07f,.06f,2.08f,stainless,true);
                 }
                 for(int k=0;k<18;k++)
                 {
                     float px=x-.38f+(k%4)*.25f;
                     float pz=z-.74f+(k/4)*.35f;
-                    Material mat=stuff[(k+c)%3];
-                    Shape("Caged recycled packaging",k%4==1?PrimitiveType.Cylinder:PrimitiveType.Cube,
-                        new Vector3(px,1.02f+((k%3)*.14f),pz),
-                        new Vector3(.20f,.17f,.23f),mat,
+                    string[] samples={"Paper_FoldedCarton","Metal_CrushedCan","Plastic_CrushedBottle"};
+                    string[] kinds={"Paper","Metal","Plastic"};
+                    int lane=(k+c)%3;
+                    Transform visual=new GameObject("Caged recycled packaging / DECOR_ONLY").transform;
+                    visual.SetParent(root,false);
+                    visual.SetPositionAndRotation(new Vector3(px,1.02f+((k%3)*.14f),pz),
                         Quaternion.Euler(0f,(float)rnd.NextDouble()*90f,0));
+                    visual.localScale=Vector3.one*1.7f;
+                    foreach(string suffix in new[]{"_Body","_Details"})
+                    {
+                        GameObject mesh=Resources.Load<GameObject>("RecyclingArt/Meshes/"+samples[lane]+suffix);
+                        if(!mesh){Debug.LogError("Missing decorative waste model: "+samples[lane]+suffix);continue;}
+                        GameObject detail=Instantiate(mesh,visual,false);
+                        foreach(Renderer renderer in detail.GetComponentsInChildren<Renderer>())
+                            renderer.sharedMaterial=Resources.Load<Material>("RecyclingArt/Materials/Raw_"+kinds[lane]);
+                    }
+                    ++DecorativeObjects;
                 }
             }
         }
         private void BuildWorkStations()
         {
-            // The LEFT station is the ORIGINAL interactable M4 puzzle console;
-            // no new fake console is placed elsewhere.
-            GameObject puzzle=GameObject.Find("M4_PuzzleConsole");
-            Vector3 p=puzzle? puzzle.transform.position : new Vector3(-20.9f,1.0f,.67f);
-            Box("REAL PUZZLE CONTROL CABINET shell",p.x,1.24f,p.z+.48f,2.65f,1.42f,1.40f,steel);
-            for(int k=0;k<3;k++)
-            {
-                float x=p.x-0.80f+k*.80f;
-                Box("Recycling control computer bezel",x,2.03f,p.z+.18f,
-                    .72f,.53f,.10f,graphite);
-                Box("Recycling control monitor",x,2.03f,p.z+.113f,
-                    .64f,.44f,.05f,tealGlow);
-                Box("Control keypad with buttons",x,1.57f,p.z-.18f,
-                    .62f,.055f,.41f,stainless);
-                for(int key=0;key<6;key++)
-                    Box("Control desk physical pushbutton",x-.22f+key*.09f,1.61f,p.z-.31f,
-                        .06f,.025f,.06f,key%2==0?yellow:graphite);
-            }
-            Sign("ControlCenter",p.x,2.80f,p.z-.26f,3.05f,.63f);
+            // The four original stations receive scene-owned 3D art in C3WorkstationVisualUpgrade.
             // The actual checking and crafting benches are positioned by
             // EcoFactoryWorkshop at ground level, in front of the machine bank.
             // EcoFactoryWorkshop already fixes small plates directly on the two real benches.
             // Do NOT add a second pair of giant suspended signs above them.
             // Give the real benches physical visual context; glowing status rails
             // are purely cosmetic and never duplicate the F interaction target.
-            Box("SENSOR_LAB monitor gantry",-12.35f,1.90f,4.77f,2.55f,.22f,.17f,graphite);
-            Box("MATERIAL_SCANNER active monitor",-12.35f,1.81f,4.67f,1.06f,.50f,.10f,tealGlow);
+            // Screenshot 03's freestanding black bar, cyan panel and two legs
+            // were cosmetic duplicates in front of D. The REAL inspection and
+            // weapon benches (including their interaction components) remain.
             for(int side=-1;side<=1;side+=2)
             {
-                Box("Scanner gantry leg",-12.35f+side*1.21f,1.18f,4.82f,
-                    .10f,1.38f,.09f,steel);
                 Box("Quantum coil support",-6.80f+side*.94f,1.24f,3.05f,
                     .09f,1.13f,.11f,stainless);
             }
@@ -619,35 +490,75 @@ namespace C3TreasurePuzzle
         private void BuildPollutionSkid()
         {
             Box("WASTEWATER treatment grated foundation",-2.64f,.71f,17.60f,
-                2.90f,.23f,5.46f,graphite);
+                2.90f,.23f,5.46f,graphite,true);
             for(int i=0;i<3;i++)
             {
                 float z=15.88f+i*1.56f;
                 Cyl("POLLUTION stainless purification vessel",
-                    new Vector3(-2.70f,1.82f,z),new Vector3(.54f,1.00f,.54f),stainless);
+                    new Vector3(-2.70f,1.82f,z),new Vector3(.54f,1.00f,.54f),stainless,true);
                 Cyl("Purifier flange lower",new Vector3(-2.70f,.88f,z),
-                    new Vector3(.61f,.09f,.61f),graphite);
+                    new Vector3(.61f,.09f,.61f),graphite,true);
                 Cyl("Purifier flange upper",new Vector3(-2.70f,2.78f,z),
-                    new Vector3(.62f,.08f,.62f),pipe);
-                Beam("Purifier connected exhaust riser",new Vector3(-2.70f,2.8f,z),
-                    new Vector3(-2.70f,6.72f,z),.105f,pipe);
+                    new Vector3(.62f,.08f,.62f),pipe,true);
+                BuildPurifierExhaust(z);
                 if(i>0)
                     Beam("POLLUTION connected pressurized manifold",
                         new Vector3(-2.70f,3.34f,z-1.56f),
                         new Vector3(-2.70f,3.34f,z),.08f,pipe);
                 Box("POLLUTION pressure controller",-1.63f,1.64f,z,
-                    .39f,.69f,.42f,steel);
+                    .39f,.69f,.42f,steel,true);
+                Box("POLLUTION controller mounting arm",-2.13f,1.64f,z,
+                    .61f,.08f,.10f,steel,true);
                 Box("Scrubber status screen",-1.84f,1.66f,z,
                     .04f,.26f,.27f,tealGlow);
             }
+            BuildPurifierExhaustHeader();
             Sign("PollutionControl",-1.92f,3.85f,15.8f,2.65f,.61f,90f);
+        }
+        private const float ExhaustWallX=-.50f,ExhaustOffsetY=3.60f,ExhaustHeaderY=7.80f;
+        private const float ExhaustDiameter=.105f;
+        private void BuildPurifierExhaust(float z)
+        {
+            // User identified the Z=19 riser: the old Y=2.8..6.72 pipe cut
+            // through the rear deck at Y=4.32..4.50. All three vessels now
+            // offset BELOW that deck, then rise OUTSIDE its east guard.
+            Vector3 source=new Vector3(-2.70f,2.80f,z);
+            Vector3 low=new Vector3(source.x,ExhaustOffsetY,z);
+            Vector3 wallLow=new Vector3(ExhaustWallX,ExhaustOffsetY,z);
+            Vector3 wallHigh=new Vector3(ExhaustWallX,ExhaustHeaderY,z);
+            Beam("Purifier connected exhaust riser",source,low,ExhaustDiameter,pipe);
+            Beam("Purifier under-deck exhaust offset",low,wallLow,ExhaustDiameter,pipe);
+            Beam("Purifier outboard exhaust riser",wallLow,wallHigh,ExhaustDiameter,pipe);
+            foreach (Vector3 joint in new[] {low,wallLow,wallHigh})
+                Shape("Purifier exhaust elbow coupling",PrimitiveType.Sphere,joint,Vector3.one*.12f,pipe);
+            // Pipe/fittings stay east of the rail's X=-.61 outer face and
+            // west of the wall's X=-.42 inner face. Only this small support
+            // backplate intentionally seats into the wall, above the rail.
+            Box("Purifier exhaust wall clamp",-.455f,6.60f,z,.11f,.12f,.15f,steel);
+        }
+        private void BuildPurifierExhaustHeader()
+        {
+            Vector3 first=new Vector3(ExhaustWallX,ExhaustHeaderY,15.88f);
+            Vector3 turn=new Vector3(ExhaustWallX,ExhaustHeaderY,20.30f);
+            Vector3 roof=new Vector3(ExhaustWallX,10.45f,20.30f);
+            Vector3 outlet=new Vector3(-.70f,10.45f,20.30f);
+            Beam("Purifier exhaust common header",first,turn,ExhaustDiameter,pipe);
+            Beam("Purifier exhaust roof riser",turn,roof,ExhaustDiameter,pipe);
+            Beam("Purifier exhaust roof connection",roof,outlet,ExhaustDiameter,pipe);
+            foreach (Vector3 joint in new[] {turn,roof})
+                Shape("Purifier exhaust roof elbow",PrimitiveType.Sphere,joint,Vector3.one*.12f,pipe);
+            // Join the existing Cross-hall ceiling ventilation at Z=20.30,
+            // Y=10.45, X=-.70; this is a connected exhaust, not a blind stub.
+            Beam("Purifier exhaust roof sleeve",outlet-Vector3.right*.06f,outlet+Vector3.right*.06f,.14f,pipe);
         }
         private void BuildOverheadPiping()
         {
             for(int p=0;p<5;p++)
             {
-                float x=-23.7f+p*5.58f;
-                float y=6.63f+(p%2)*.36f;
+                float x=p==0?-24.55f:p==4?-.15f:-23.7f+p*5.58f;
+                // Outer risers move over the wall; lowest hangers are now 8.09m,
+                // above the 6.30m standing head and the elevated material bridge.
+                float y=8.80f+(p%2)*.36f;
                 Beam("Industrial wall-longitudinal supply",new Vector3(x,y,1.1f),
                     new Vector3(x,y,24.0f),.13f,p%2==0?pipe:stainless);
                 for(int i=0;i<5;i++)
@@ -659,10 +570,10 @@ namespace C3TreasurePuzzle
                 }
             }
             // The reference's large duct elbow above the right side of the sorting line.
-            Beam("Central machine extraction duct",new Vector3(-6.00f,4.28f,15.94f),
-                new Vector3(-5.70f,5.60f,16.52f),.41f,stainless);
-            Beam("Machine extraction roof return",new Vector3(-5.70f,5.60f,16.52f),
-                new Vector3(-3.9f,5.98f,17.10f),.38f,pipe);
+            Beam("Central machine extraction duct",new Vector3(-5.80f,4.28f,15.94f),
+                new Vector3(-5.80f,8.65f,15.94f),.41f,stainless);
+            Beam("Machine extraction roof return",new Vector3(-5.80f,8.65f,15.94f),
+                new Vector3(-3.9f,9.20f,17.10f),.38f,pipe);
             for(int i=0;i<5;i++)
             {
                 float z=3.1f+i*4.30f;
@@ -670,6 +581,101 @@ namespace C3TreasurePuzzle
                     new Vector3(-.7f,10.45f,z),.11f,stainless);
             }
         }
+        // Every weathering mark is built through Shape(solid:false), which
+        // disables its collider immediately. These are thin surface marks, not
+        // a second factory layout, and never sit across the B/C or D doorway.
+        private void AgeMark(string name, Vector3 position, Vector3 dimensions, Material material,
+            float yaw = 0f)
+        {
+            GameObject mark = Shape("V11_AGE_" + name, PrimitiveType.Cube,
+                position, dimensions, material, Quaternion.Euler(0f, yaw, 0f));
+            Renderer renderer = mark.GetComponent<Renderer>();
+            if (renderer)
+            {
+                renderer.shadowCastingMode = ShadowCastingMode.Off;
+                renderer.receiveShadows = false;
+            }
+        }
+
+        private void BuildIndustrialAgeing()
+        {
+            Material oxidation = Mat("V11 aged oxide streak", new Color(.29f, .17f, .105f), .06f, .11f);
+            Material soot = Mat("V11 aged wall soot", new Color(.29f, .30f, .27f), .01f, .07f);
+            Material oilFilm = Mat("V11 aged oil film", new Color(.19f, .22f, .21f), .05f, .13f);
+            Material paintChip = Mat("V11 aged chipped enamel", new Color(.40f, .43f, .38f), .11f, .17f);
+            System.Random random = new System.Random(150922); // stable screenshots and layout
+
+            // Inside west wall, rust drips from the aged cladding seams.
+            // Its visible face is x=-24.58; marks are 1-2cm inside the hall.
+            for (int i = 0; i < 19; i++)
+            {
+                float z = 1.9f + i * 1.18f;
+                float y = 1.35f + (i % 5) * .91f;
+                AgeMark("WALL_W_" + i, new Vector3(-24.566f, y, z),
+                    new Vector3(.012f, .31f + (i % 4) * .14f, .13f + (i % 3) * .085f),
+                    i % 3 == 0 ? soot : oxidation);
+            }
+            // East wall has a real B/C passage at z=10.2..14.8: leave it open.
+            for (int i = 0; i < 12; i++)
+            {
+                float z = 2.1f + i * 1.95f;
+                if (z > 9.9f && z < 15.1f) continue;
+                AgeMark("WALL_E_" + i,
+                    new Vector3(-.433f, 1.55f + (i % 4) * 1.1f, z),
+                    new Vector3(.010f, .37f + (i % 3) * .19f, .16f + (i % 2) * .12f),
+                    i % 4 == 0 ? soot : oxidation);
+            }
+            // North end wall: uneven water runs on the concrete, not a solid panel.
+            for (int i = 0; i < 12; i++)
+            {
+                float x = -22.6f + i * 1.79f;
+                AgeMark("WALL_N_" + i,
+                    new Vector3(x, 2.25f + (i % 4) * .85f, 24.585f),
+                    new Vector3(.17f + (i % 3) * .09f, .35f + (i % 4) * .15f, .009f),
+                    i % 3 == 0 ? oxidation : soot);
+            }
+
+            // Low-profile deposits lie above the finished-floor render plane.
+            // All are decorative: no solid puddle, debris mesh or physics blocker.
+            for (int i = 0; i < 34; i++)
+            {
+                float x = -22.8f + (float)random.NextDouble() * 20.1f;
+                float z = 1.6f + (float)random.NextDouble() * 21.4f;
+                float sx = .20f + (float)random.NextDouble() * .58f;
+                float sz = .13f + (float)random.NextDouble() * .40f;
+                AgeMark("FLOOR_OIL_" + i,
+                    new Vector3(x, .5825f, z), new Vector3(sx, .003f, sz),
+                    i % 4 == 0 ? oxidation : oilFilm, (i * 47) % 180);
+            }
+            // Visible scuffed areas at the service bays, away from pickup rays.
+            for (int i = 0; i < 12; i++)
+            {
+                float x = -21.9f + i * 1.69f;
+                AgeMark("FLOOR_SCUFF_" + i,
+                    new Vector3(x, .5828f, i % 2 == 0 ? 6.60f : 19.55f),
+                    new Vector3(.38f, .003f, .085f), paintChip, (i % 3 - 1) * 11f);
+            }
+            // Aged collars on the high wall pipe supports. All remain above
+            // the elevated walkway and never obstruct stairs or the camera.
+            for (int i = 0; i < 10; i++)
+            {
+                float z = 3.1f + (i % 5) * 4.28f;
+                float x = i < 5 ? -24.55f : -.15f;
+                float y = 8.80f;
+                AgeMark("PIPE_" + i, new Vector3(x, y - .13f, z),
+                    new Vector3(.21f, .065f, .20f), oxidation);
+            }
+            // Worn kick-plates embedded against wall-side structural columns.
+            for (int i = 0; i < 12; i++)
+            {
+                float z = 1.0f + (i % 6) * 3.75f;
+                float x = i < 6 ? -24.578f : -.250f;
+                if (i >= 6 && Mathf.Abs(z - 12.5f) < 1f) continue;
+                AgeMark("COLUMN_" + i, new Vector3(x, .91f, z),
+                    new Vector3(.012f, .36f, .13f), i % 3 == 0 ? paintChip : oxidation);
+            }
+        }
+
         private void BuildPendantLights()
         {
             for(int i=0;i<12;i++)

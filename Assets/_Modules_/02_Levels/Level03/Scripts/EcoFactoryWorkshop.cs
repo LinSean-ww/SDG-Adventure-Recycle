@@ -12,7 +12,6 @@ namespace C3TreasurePuzzle
         private Transform workshopRoot;
         private Transform coreRotor;
         private Light coreLight;
-        private int observedCycles;
         private bool powerEstablished;
 
         public bool Powered => device != null &&
@@ -61,15 +60,8 @@ namespace C3TreasurePuzzle
                 if (coreRotor != null)
                     coreRotor.Rotate(Vector3.up, Powered ? 75f * Time.deltaTime : 0f);
             }
-            if (!Powered || presentation == null ||
-                EcoAdventureRuntime.Instance == null) return;
-            // CompletedCycles increments only when a physically visible item reaches its bin.
-            while (observedCycles < presentation.CompletedCycles)
-            {
-                int completedKind = observedCycles % 3; // plastic, metal, paper
-                EcoAdventureRuntime.Instance.ReceiveSortedMaterial(completedKind);
-                observedCycles++;
-            }
+            // Material credits are committed by the authoritative Phase 2 batch
+            // transaction. Never infer a material type from a cycle counter.
         }
 
         private void BuildWorkshop()
@@ -316,6 +308,9 @@ namespace C3TreasurePuzzle
             clue.range = 2.2f;
             clue.intensity = 0.75f;
             clue.shadows = LightShadows.None;
+            Color hint = kind == EcoWorkshopInteractable.StationKind.CircuitMaterial ? new Color(.2f,.8f,1f) :
+                kind == EcoWorkshopInteractable.StationKind.MetalMaterial ? new Color(1f,.65f,.2f) : new Color(.2f,1f,.4f);
+            prop.AddComponent<C3ProximityHint>().Configure(hint, clue);
         }
 
         private static void BuildEnergyPickup(Transform parent, EcoEnergyPickup.SalvageKind kind,
@@ -333,30 +328,7 @@ namespace C3TreasurePuzzle
             EcoEnergyPickup pickup = prop.AddComponent<EcoEnergyPickup>();
             pickup.Configure(kind);
 
-            if (kind == EcoEnergyPickup.SalvageKind.PlasticBottle)
-            {
-                PickupShape(PrimitiveType.Cylinder, "CrushedRecycledBottle", prop.transform,
-                    new Vector3(0f, 0.20f, 0f), new Vector3(0.15f, 0.19f, 0.15f), plastic);
-                PickupShape(PrimitiveType.Cylinder, "BottleNeck", prop.transform,
-                    new Vector3(0f, 0.42f, 0f), new Vector3(0.075f, 0.045f, 0.075f), steel);
-            }
-            else if (kind == EcoEnergyPickup.SalvageKind.MetalCan)
-            {
-                PickupShape(PrimitiveType.Cylinder, "AluminiumCan", prop.transform,
-                    new Vector3(0f, 0.20f, 0f), new Vector3(0.16f, 0.18f, 0.16f), steel);
-                PickupShape(PrimitiveType.Cylinder, "CanLid", prop.transform,
-                    new Vector3(0f, 0.39f, 0f), new Vector3(0.165f, 0.02f, 0.165f), rust);
-            }
-            else
-            {
-                for (int layer = 0; layer < 4; layer++)
-                    PickupShape(PrimitiveType.Cube, "RecoveredCardboardSheet", prop.transform,
-                        new Vector3(0f, 0.075f + layer * 0.035f, 0f),
-                        new Vector3(0.34f, 0.028f, 0.26f), rust);
-            }
-            // Small local glow strip is attached to the prop, not floating world text.
-            PickupShape(PrimitiveType.Cube, "PickupEnergyHint", prop.transform,
-                new Vector3(0f, 0.016f, 0f), new Vector3(0.33f, 0.020f, 0.33f), energy);
+            prop.AddComponent<C3SalvageAppearance>();
         }
 
         private static void PickupShape(PrimitiveType kind, string name, Transform parent,

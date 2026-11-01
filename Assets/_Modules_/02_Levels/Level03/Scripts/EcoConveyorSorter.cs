@@ -1,37 +1,25 @@
+using System.Linq;
 using UnityEngine;
+using C3TreasurePuzzle;
 
-// Optional trigger-based sorter. The existing C3 paper/metal/plastic sorting
-// animation is owned by C3FactoryPresentation and remains unchanged.
+// In C_Main this trigger only transfers an upstream object into the line. It
+// cannot award an independent sorting credit or destroy a line-owned item.
 public class EcoConveyorSorter : MonoBehaviour
 {
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other) => TrySort(other.GetComponentInParent<EcoRecycleCargo>());
+    public bool TrySort(EcoRecycleCargo cargo)
     {
-        EcoAdventureRuntime game = EcoAdventureRuntime.Instance;
-        if (game == null || !game.factoryPowered) return;
-
-        EcoRecycleCargo cargo = other.GetComponentInParent<EcoRecycleCargo>();
-        if (cargo == null || cargo.processed) return;
-
-        // EcoAdventureRuntime.ReceiveSortedMaterial uses 0=plastic, 1=metal,
-        // 2=paper; EcoRecycleCargo.Kind instead uses Metal,Plastic,Electronics.
-        // Map by enum names to avoid incorrectly treating metal as plastic.
-        switch (cargo.materialType)
-        {
-            case EcoRecycleCargo.Kind.Metal:
-                game.ReceiveSortedMaterial(1);
-                break;
-            case EcoRecycleCargo.Kind.Plastic:
-                game.ReceiveSortedMaterial(0);
-                break;
-            case EcoRecycleCargo.Kind.Electronics:
-                // Electronic scrap is now recovered from the separate factory cache.
-                // Sorting it must not auto-grant the crafting item.
-                break;
-            default:
-                return;
-        }
-
-        cargo.processed = true;
+        if (!cargo || cargo.processed || cargo.lineOwned) return false;
+        C3RecyclingLine line=Object.FindObjectsByType<C3RecyclingLine>(FindObjectsSortMode.None)
+            .FirstOrDefault(l=>l.gameObject.scene==gameObject.scene);
+        if (line) return line.TryAcceptCargo(cargo);
+        // Compatibility for levels without the authoritative C3 line.
+        EcoAdventureRuntime game=EcoAdventureRuntime.Instance;
+        int kind=C3RecyclingLine.LegacyKind(cargo.materialType);
+        if (!game || !game.factoryPowered || kind<0) return false;
+        game.ReceiveSortedMaterial(kind);
+        cargo.processed=true;
         Destroy(cargo.gameObject);
+        return true;
     }
 }
