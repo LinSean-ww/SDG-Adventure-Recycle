@@ -40,8 +40,20 @@ public sealed class C3TextLifecycleTests
         yield return null;
         GameObject canvas = GameObject.Find("C3UiCanvas");
         Assert.IsNotNull(canvas);
-        Assert.IsNotNull(canvas.transform.Find("PuzzlePanel/Viewport/Content/Choice0/Label").GetComponent<Text>().font);
-        Assert.AreEqual("廢棄物分類", canvas.transform.Find("PuzzlePanel/Viewport/Content/Choice0/Label").GetComponent<Text>().text);
+        Transform content = canvas.transform.Find("PuzzlePanel/Viewport/Content");
+        Assert.IsNotNull(content);
+        string[] expectedSteps = { "廢棄物分類", "資源回收", "污染處理" };
+        Button[] optionButtons = new Button[3];
+        string[] optionLabels = new string[3];
+        for (int i = 0; i < optionButtons.Length; i++)
+        {
+            optionButtons[i] = content.Find("Choice" + i).GetComponent<Button>();
+            Text label = optionButtons[i].transform.Find("Label").GetComponent<Text>();
+            Assert.IsNotNull(label.font);
+            optionLabels[i] = label.text;
+        }
+        CollectionAssert.AreEquivalent(expectedSteps, optionLabels,
+            "The three processing choices must each appear exactly once, regardless of shuffle order.");
         for (int frame = 0; frame < 10; frame++)
         {
             EditorWindow.GetWindow(Type.GetType("UnityEditor.GameView,UnityEditor")).Repaint();
@@ -53,9 +65,12 @@ public sealed class C3TextLifecycleTests
             EditorWindow.GetWindow(Type.GetType("UnityEditor.GameView,UnityEditor")).Repaint();
             yield return null;
         }
-        Click(canvas.transform.Find("PuzzlePanel/Viewport/Content/Choice0").GetComponent<Button>());
-        Click(canvas.transform.Find("PuzzlePanel/Viewport/Content/Choice1").GetComponent<Button>());
-        Click(canvas.transform.Find("PuzzlePanel/Viewport/Content/Choice2").GetComponent<Button>());
+        foreach (string expectedStep in expectedSteps)
+        {
+            int slot = Array.IndexOf(optionLabels, expectedStep);
+            Assert.GreaterOrEqual(slot, 0);
+            Click(optionButtons[slot]);
+        }
         Click(canvas.transform.Find("PuzzlePanel/Viewport/Content/Confirm").GetComponent<Button>());
         Call(console, "ClosePanel");
         yield return null;

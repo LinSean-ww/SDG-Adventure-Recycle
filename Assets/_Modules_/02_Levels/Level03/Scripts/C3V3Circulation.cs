@@ -19,6 +19,9 @@ namespace C3TreasurePuzzle
         public const float MainWalkZ = 19.20f;
         public const float StairStartZ = 3.80f;
         public const float StairTopZ = 13.70f;
+        // B rises before the doorway, then runs level above it (reference 04).
+        // A retains the original flight and entry coordinates.
+        public const float EastFlightTopZ = 10.10f;
         public const float RouteWidth = 1.80f;
         public const float RearSouthZ = 18.10f;
         public const float RearNorthZ = 21.30f;
@@ -49,7 +52,14 @@ namespace C3TreasurePuzzle
             mechanismMat = NewMaterial(shader, "V10 retained conveyor frame", new Color(.21f, .26f, .29f));
 
             BuildStair(WestStairX, "A_WEST");
-            BuildStair(EastStairX, "B_EAST");
+            BuildStair(EastStairX, "B_EAST", EastFlightTopZ);
+            Deck("B_EAST_LEVEL_LANDING", EastStairX, (EastFlightTopZ + StairTopZ) * .5f,
+                RouteWidth, StairTopZ - EastFlightTopZ);
+            Transform landingGuards = Group("B_EAST_LEVEL_GUARDS");
+            for (int edge = -1; edge <= 1; edge += 2)
+                Guard(landingGuards, "GUARD_LEVEL_" + edge,
+                    new Vector3(EastStairX + edge * RouteWidth * .5f, WalkSurface, EastFlightTopZ),
+                    new Vector3(EastStairX + edge * RouteWidth * .5f, WalkSurface, StairTopZ));
             float routeLength = RearSouthZ - StairTopZ;
             Deck("2F_WEST_SERVICE_ROUTE", WestStairX, (StairTopZ + RearSouthZ) * .5f, RouteWidth, routeLength);
             Deck("2F_EAST_SERVICE_ROUTE", EastStairX, (StairTopZ + RearSouthZ) * .5f, RouteWidth, routeLength);
@@ -145,11 +155,11 @@ namespace C3TreasurePuzzle
                 new Vector3(width, DeckThickness, length), deckMat);
         }
 
-        private void BuildStair(float x, string side)
+        private void BuildStair(float x, string side, float topZ = StairTopZ)
         {
             Transform stair = Group("STAIR_" + side);
             float rise = (WalkSurface - GroundSurface) / StairSteps; // .1791 < production stepOffset .30
-            float run = (StairTopZ - StairStartZ) / StairSteps;      // .45; pitch 21.7 < slopeLimit 45
+            float run = (topZ - StairStartZ) / StairSteps; // B: .286m run, 32 degrees < slopeLimit 45
             Box(stair, "BOTTOM_LANDING", new Vector3(x, GroundSurface - .06f, StairStartZ - .60f),
                 new Vector3(RouteWidth, .12f, 1.20f), deckMat);
             for (int i = 0; i < StairSteps; i++)
@@ -169,7 +179,7 @@ namespace C3TreasurePuzzle
             {
                 float railX = x + edge * RouteWidth * .5f;
                 Vector3 stringerStart = new Vector3(railX, GroundSurface - .15f, StairStartZ);
-                Vector3 stringerEnd = new Vector3(railX, WalkSurface - .15f, StairTopZ);
+                Vector3 stringerEnd = new Vector3(railX, WalkSurface - .15f, topZ);
                 Vector3 stringer = stringerEnd - stringerStart;
                 Box(stair, "STRINGER_" + edge, (stringerStart + stringerEnd) * .5f,
                     new Vector3(.10f, .18f, stringer.magnitude), frameMat,
@@ -182,7 +192,7 @@ namespace C3TreasurePuzzle
                     new Vector3(railX, GroundSurface, StairStartZ));
                 Guard(stair, "GUARD_FLIGHT_" + edge,
                     new Vector3(railX, GroundSurface, StairStartZ),
-                    new Vector3(railX, WalkSurface, StairTopZ));
+                    new Vector3(railX, WalkSurface, topZ));
             }
             Box(stair, "ENTRY_HEADER", new Vector3(x, GroundSurface + 2.5f, StairStartZ - 1.2f),
                 new Vector3(RouteWidth + .08f, .08f, .08f), railMat);
@@ -261,7 +271,10 @@ namespace C3TreasurePuzzle
                 float columnX=edge+(side==0?-.12f:.12f);
                 float innerX=edge+(side==0?.42f:-.42f);
                 float underside=WalkSurface-DeckThickness;
-                foreach (float z in new[] {13.75f,17.95f,21.2f})
+                // A bracket at the B flight/level-deck joint carries the new span.
+                float[] joints=side==0 ? new[] {13.75f,17.95f,21.2f}
+                    : new[] {EastFlightTopZ,13.75f,17.95f,21.2f};
+                foreach (float z in joints)
                 {
                     Box(supports,"COLUMN_BASE_PLATE",new Vector3(columnX,GroundSurface+.03f,z),
                         new Vector3(.30f,.06f,.30f),frameMat);

@@ -69,11 +69,33 @@ namespace C3TreasurePuzzle
             art.Part(hips,"Neck",new Vector3(0,.50f,0),new Vector3(.09f,.035f,.09f),"skin",PrimitiveType.Cylinder);
             head=art.Group(hips,"WorkerHead",new Vector3(0,.62f,0));
             art.Part(head,"Face",Vector3.zero,new Vector3(.205f,.25f,.21f),"skin",PrimitiveType.Capsule);
-            art.Part(head,"Nose",new Vector3(0,-.01f,.112f),new Vector3(.037f,.048f,.038f),"skin");
-            art.Part(head,"SafetyGlasses",new Vector3(0,.035f,.110f),new Vector3(.19f,.043f,.023f),"dark");
-            art.Part(head,"Beard",new Vector3(0,-.075f,.085f),new Vector3(.15f,.065f,.055f),"rust");
-            art.Part(head,"YellowHardHat",new Vector3(0,.12f,0),new Vector3(.255f,.13f,.25f),"yellow",PrimitiveType.Sphere);
-            art.Part(head,"HardHatBrim",new Vector3(0,.10f,.015f),new Vector3(.29f,.015f,.30f),"yellow",PrimitiveType.Cylinder);
+            // Keep the accepted head/neck pose and face proportions. Shallow rounded features
+            // replace the stacked cubes; the beard uses untextured hair shading,
+            // rather than the metallic rust palette used by equipment and boots.
+            art.Part(head,"Nose",new Vector3(0,-.012f,.109f),new Vector3(.031f,.040f,.033f),"skin",PrimitiveType.Sphere);
+            art.Part(head,"Beard",new Vector3(0,-.078f,.084f),new Vector3(.135f,.054f,.050f),"dark",PrimitiveType.Sphere);
+            // Open safety frames, with visible eyes behind them. A single opaque
+            // .19m dark slab used to hide the entire eye region.
+            Transform glasses=art.Group(head,"SafetyGlasses",Vector3.zero);
+            for(int side=-1;side<=1;side+=2)
+            {
+                string eye=side<0?"Left":"Right";
+                float x=side*.049f;
+                // Seat the eyes in the curved face instead of floating on a flat plane.
+                Vector3 eyeCentre=new Vector3(x,.035f,.090f),eyeEuler=new Vector3(0,side*28f,0);
+                Vector3 eyeForward=Quaternion.Euler(eyeEuler)*Vector3.forward;
+                art.Part(head,"EyeWhite_"+eye,eyeCentre,new Vector3(.022f,.014f,.012f),"white",PrimitiveType.Sphere,eyeEuler);
+                art.Part(head,"EyePupil_"+eye,eyeCentre+eyeForward*.007f,new Vector3(.006f,.008f,.002f),"dark",PrimitiveType.Sphere,eyeEuler);
+                foreach(int edge in new[]{-1,1})
+                {
+                    art.Part(glasses,"RimHorizontal_"+eye+"_"+edge,new Vector3(x,.035f+edge*.022f,.113f),new Vector3(.068f,.004f,.006f),"dark");
+                    art.Part(glasses,"RimVertical_"+eye+"_"+edge,new Vector3(x+edge*.034f,.035f,.113f),new Vector3(.004f,.044f,.006f),"dark");
+                }
+                art.Rod(glasses,"Temple_"+eye,new Vector3(side*.085f,.035f,.113f),new Vector3(side*.099f,.035f,.02f),.005f,"dark");
+            }
+            art.Part(glasses,"Bridge",new Vector3(0,.052f,.113f),new Vector3(.030f,.004f,.006f),"dark");
+            art.Part(head,"YellowHardHat",new Vector3(0,.13f,0),new Vector3(.255f,.13f,.25f),"yellow",PrimitiveType.Sphere);
+            art.Part(head,"HardHatBrim",new Vector3(0,.11f,.008f),new Vector3(.275f,.006f,.27f),"yellow",PrimitiveType.Cylinder);
             art.Recycle(head,new Vector3(0,.137f,.126f),.037f);
             leftArm=Arm(chest,-1);rightArm=Arm(chest,1);
             weaponAnchor=art.Group(body,"V11_ThirdPersonWeaponAnchor",Vector3.zero);

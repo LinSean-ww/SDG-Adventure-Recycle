@@ -521,6 +521,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         nextShotTime = Time.time + 0.18f;
         Ray ray = new Ray(activeCamera.transform.position, activeCamera.transform.forward);
         Vector3 destination = ray.GetPoint(85f);
+        bool surfaceHit = false;
         RaycastHit[] hits = Physics.RaycastAll(ray, 85f, ~0, QueryTriggerInteraction.Ignore);
         Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
         CharacterController player = activeCamera.GetComponentInParent<CharacterController>();
@@ -528,31 +529,16 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         {
             if (player != null && hit.collider.transform.IsChildOf(player.transform)) continue;
             destination = hit.point;
+            surfaceHit = true;
             // Enemy damage uses the aim ray; the player's third-person body is excluded.
             hit.collider.SendMessageUpwards("TakeDamage", 15f,
                 SendMessageOptions.DontRequireReceiver);
             break;
         }
-        GameObject tracer = new GameObject("EcoQuantumTracer");
-        LineRenderer line = tracer.AddComponent<LineRenderer>();
-        Shader shader = Shader.Find("Sprites/Default");
-        if (shader != null) C3OwnedVisualMaterial.Assign(line, new Material(shader));
-        line.useWorldSpace = true;
-        line.positionCount = 2;
-        // Start the tracer slightly below/right of the reticle so it is visible
-        // even when the player is stationary; aim/damage still use the camera ray.
-        PlayerPerspectiveRig cameraRig = activeCamera.GetComponentInParent<PlayerPerspectiveRig>();
-        Vector3 muzzle = cameraRig != null && cameraRig.IsThirdPerson && weaponModel != null
-            ? weaponModel.transform.TransformPoint(new Vector3(0f, 0.07f, 0.45f))
-            : ray.GetPoint(0.55f) + activeCamera.transform.right * 0.12f -
-              activeCamera.transform.up * 0.09f;
-        line.SetPosition(0, muzzle);
-        line.SetPosition(1, destination);
-        line.startWidth = 0.07f;
-        line.endWidth = 0.006f;
-        line.startColor = new Color(0.2f, 1f, 0.25f);
-        line.endColor = new Color(0.1f, 0.65f, 0.18f);
-        Destroy(tracer, 0.18f);
+        // One presentation path, driven by the unchanged hitscan result above.
+        EcoQuantumWeaponView presentation = weaponModel != null
+            ? weaponModel.GetComponent<EcoQuantumWeaponView>() : null;
+        if (presentation != null) presentation.OnShot(destination, surfaceHit);
     }
 
     private IEnumerator Reload()
