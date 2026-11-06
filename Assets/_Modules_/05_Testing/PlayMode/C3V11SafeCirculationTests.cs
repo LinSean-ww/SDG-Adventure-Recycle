@@ -375,7 +375,8 @@ namespace M6IntegrationTests
                 new Vector3(-1.55f,4.5f,16f), new Vector3(-1.55f,4.5f,16f),
                 new Vector3(-23.2f,4.5f,20.5f), new Vector3(-1.55f,4.5f,20.5f),
                 new Vector3(-23.2f,2.53f,8.525f), new Vector3(-23.2f,2.53f,8.525f),
-                new Vector3(-1.55f,2.53f,8.525f), new Vector3(-1.55f,2.53f,8.525f),
+                // V12 B flight midpoint; the A samples retain their original pose.
+                new Vector3(-1.55f,2.53f,6.95f), new Vector3(-1.55f,2.53f,6.95f),
                 new Vector3(-23.2f,.56f,3.1f), new Vector3(-23.2f,.56f,3.1f),
                 new Vector3(-1.55f,.56f,3.1f), new Vector3(-1.55f,.56f,3.1f) };
             Vector3[] directions = { Vector3.left, Vector3.right, Vector3.forward, Vector3.back,
@@ -437,7 +438,7 @@ namespace M6IntegrationTests
             }
             MeshCollider[] guards = root.GetComponentsInChildren<MeshCollider>()
                 .Where(c => c.name.StartsWith("GUARD_")).ToArray();
-            Assert.AreEqual(14, guards.Length); // six upper edges + two sides x two sections x two stairs
+            Assert.AreEqual(16, guards.Length); // original 14 plus both sides of the V12 B level landing
             foreach (MeshCollider guard in guards)
             {
                 Assert.IsTrue(guard.enabled && guard.convex && !guard.isTrigger);
@@ -459,7 +460,44 @@ namespace M6IntegrationTests
                 GameObject station = GameObject.Find(name);
                 Assert.IsNotNull(station);
                 Assert.IsTrue(station.GetComponent<Collider>().enabled);
-                Assert.IsTrue(station.GetComponentsInChildren<Renderer>().All(r => r.enabled));
+                Renderer[] disabled = station.GetComponentsInChildren<Renderer>()
+    .Where(r => !r.enabled).ToArray();
+
+if (name == "UpperChipMaintenanceBench")
+{
+    string[] retiredVisuals =
+    {
+        "Steel_UpperWorkbench",
+        "Rust_UpperWorkSurface",
+        "Paper_MaintenanceLog"
+    };
+
+    foreach (Renderer r in disabled)
+    {
+        Assert.Contains(r.gameObject.name, retiredVisuals,
+            "Unexpected disabled Renderer: " + r.name);
+
+        Collider c = r.GetComponent<Collider>();
+
+        Assert.IsTrue(c == null || !c.enabled || c.isTrigger,
+            "Hidden solid object: " + r.name);
+    }
+
+    Transform replacement = station.transform.Find(
+        "V11_StationArt_UpperChipMaintenanceBench");
+
+    Assert.IsNotNull(replacement, "Replacement workstation missing");
+
+    Assert.IsTrue(
+        replacement.GetComponentsInChildren<Renderer>()
+            .Any(r => r.enabled && r.gameObject.activeInHierarchy),
+        "Replacement workstation has no visible Renderer");
+}
+else
+{
+    Assert.IsEmpty(disabled,
+        name + " has unexpected disabled Renderers");
+}
             }
             // The former low OBJ feed is retired. Query actual Phase 2 surface
             // meshes/colliders and all real junctions instead of its old bounds.
@@ -567,11 +605,11 @@ namespace M6IntegrationTests
                 Assert.IsTrue(visuals.Any(r => r.enabled && r.gameObject.activeInHierarchy),
                     "Solid collider with only hidden visuals: " + collider.name);
             }
-            GameObject originalTest = GameObject.Find("M2_TestInteractable");
-            Assert.IsNotNull(originalTest);
-            Assert.IsTrue(originalTest.GetComponent<Renderer>().enabled);
-            Component interactable = originalTest.GetComponent(RuntimeType("C3TreasurePuzzle.C3TestInteractable"));
-            Assert.IsNotNull(interactable, "Do not remove the original test interaction to remove its obstacle");
+            // Final V12 deliberately removes the obsolete demo instance from
+            // production. Keep the class for dedicated tests, never a hidden solid.
+            Assert.IsNull(GameObject.Find("M2_TestInteractable"));
+            Assert.IsEmpty(Object.FindObjectsOfType(RuntimeType("C3TreasurePuzzle.C3TestInteractable"), true),
+                "C_Main must not retain a demo interaction, even inactive");
         }
 
         [UnityTest]
@@ -632,10 +670,22 @@ namespace M6IntegrationTests
             string[] slots = (string[])Field(runtime, "quickSlots");
             Assert.Contains("eco_quantum_projector", slots);
             Assert.IsTrue((bool)Property(runtime, "IsQuantumWeaponEquipped"));
-            int ammo = (int)Field(runtime, "ammoInMagazine");
+
+// 測試專用 Runtime 停用了 Update，須手動建立真正的武器模型。
+Call(runtime, "BuildHeldModel");
+
+int ammo = (int)Field(runtime, "ammoInMagazine");
             Call(runtime, "Shoot");
             Assert.AreEqual(ammo - 1, Field(runtime, "ammoInMagazine"));
-            Assert.IsNotNull(GameObject.Find("EcoQuantumTracer"));
+           GameObject weapon = Field(runtime, "weaponModel") as GameObject;
+Assert.IsNotNull(weapon, "Equipped quantum weapon model missing");
+
+Type vfxType = RuntimeType("EcoQuantumShotVfx");
+Component vfx = weapon.GetComponent(vfxType);
+Assert.IsNotNull(vfx, "V12 quantum shot VFX component missing");
+
+Assert.Greater((int)Property(vfx, "ActiveCount"), 0,
+    "Shooting did not activate a V12 quantum tracer effect");
             // Persistent inventory and equipment survive an actual scene reload.
             yield return SceneManager.LoadSceneAsync(ScenePath, LoadSceneMode.Single);
             yield return null;

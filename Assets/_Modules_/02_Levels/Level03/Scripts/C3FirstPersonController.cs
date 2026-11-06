@@ -46,6 +46,9 @@ namespace C3TreasurePuzzle
         private readonly Collider[] clearanceHits = new Collider[32];
         private PlayerInputService sharedInput;
         private bool jumpQueued;
+        private const float ProneJumpBufferSeconds = .65f;
+        private float proneJumpRemaining;
+        private bool risingFromProne;
         private PlayerPerspectiveRig perspective;
 
         // One authoritative Q/E value for both the camera and the third-person visual.
@@ -95,6 +98,10 @@ namespace C3TreasurePuzzle
             if (perspective == null) perspective = gameObject.AddComponent<PlayerPerspectiveRig>();
             C3WorkerAppearance.Install(gameObject);
             perspective.Bind(viewTransform);
+            // C3-only near-plane protection after lean/orbit, before weapon posing.
+            // Movement dimensions and the shared third-person solver stay unchanged.
+            if (!GetComponent<C3FactoryCameraClearance>())
+                gameObject.AddComponent<C3FactoryCameraClearance>();
         }
 
         private void Start()
@@ -111,10 +118,11 @@ namespace C3TreasurePuzzle
                 if (sharedInput.Context != PlayerInputContext.Gameplay ||
                     C3PuzzleConsole.BlocksGameplayInputThisFrame || C3CompletionScreen.BlocksGameplayInputThisFrame)
                 {
-                    jumpQueued = false;
+                    ClearJumpRequest();
                     return;
                 }
                 bool acceptsSharedInput = Cursor.lockState == CursorLockMode.Locked && viewTransform != null;
+                if (!acceptsSharedInput) ClearJumpRequest();
                 if (acceptsSharedInput) ReadProneKey();
                 if (acceptsSharedInput)
                     ApplyLook(sharedInput.Look * (0.08f * sharedInput.Keybindings.Settings.mouseSensitivity));
@@ -127,6 +135,7 @@ namespace C3TreasurePuzzle
             }
             if (C3PuzzleConsole.BlocksGameplayInputThisFrame || C3CompletionScreen.BlocksGameplayInputThisFrame)
             {
+                ClearJumpRequest();
                 TickMovement(Vector2.zero, false, false, false, Time.deltaTime);
                 return;
             }
@@ -143,6 +152,7 @@ namespace C3TreasurePuzzle
 
             // 解鎖滑鼠時停用水平與視角輸入，但重力仍持續作用。
             bool acceptsInput = Cursor.lockState == CursorLockMode.Locked && viewTransform != null;
+            if (!acceptsInput) ClearJumpRequest();
             if (acceptsInput) ReadProneKey();
             if (acceptsInput)
                 ApplyLook(new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")));
@@ -194,6 +204,33 @@ namespace C3TreasurePuzzle
         // PlayMode tests to exercise the real controller without synthetic OS key events.
         private void TickMovement(Vector2 input, bool sprintHeld, bool crouchHeld, bool jumpPressed, float deltaTime)
         {
+            proneJumpRemaining = Mathf.Max(0f, proneJumpRemaining - Mathf.Max(0f, deltaTime));
+            if (isProne || crouchHeld || !allowJump || !characterController.isGrounded)
+                proneJumpRemaining = 0f;
+            if (risingFromProne)
+            {
+                // A ceiling may enter the path after Space was pressed. Return
+                // to a safe low pose rather than expanding into it mid-transition.
+                if (!CanStand())
+                {
+                    isProne = true;
+                    proneJumpRemaining = 0f;
+                }
+                if (isProne || crouchHeld) risingFromProne = false;
+            }
+            if (jumpPressed && isProne)
+            {
+                if (CanStand())
+                {
+                    isProne = false;
+                    risingFromProne = !crouchHeld;
+                    // Ctrl retains crouch priority. Airborne recovery can stand,
+                    // but must not turn into a delayed landing/double jump.
+                    if (allowJump && characterController.isGrounded && !crouchHeld)
+                        proneJumpRemaining = ProneJumpBufferSeconds;
+                }
+                jumpPressed = false; // never launch using the prone capsule
+            }
             bool blockedFromStanding = !isProne && !crouchHeld &&
                 characterController.height < standingHeight - 0.01f && !CanStand();
             float targetHeight = isProne
@@ -203,10 +240,14 @@ namespace C3TreasurePuzzle
             characterController.height = height;
             characterController.center = Vector3.up * (height * 0.5f);
             isCrouching = crouchHeld || height < standingHeight - 0.01f;
+            if (height >= standingHeight - .001f) risingFromProne = false;
             if (viewTransform != null)
             {
-                float eye = isProne ? proneEyeHeight : Mathf.Lerp(crouchEyeHeight, standingEyeHeight,
-                    Mathf.InverseLerp(crouchHeight, standingHeight, height));
+                float eye = isProne ? proneEyeHeight : height < crouchHeight
+                    ? Mathf.Lerp(proneEyeHeight, crouchEyeHeight, Mathf.InverseLerp(
+                        Mathf.Clamp(proneHeight, characterController.radius * 2f, crouchHeight), crouchHeight, height))
+                    : Mathf.Lerp(crouchEyeHeight, standingEyeHeight,
+                        Mathf.InverseLerp(crouchHeight, standingHeight, height));
                 Vector3 position = viewTransform.localPosition;
                 if (perspective != null) perspective.SetEyeHeight(eye);
                 if (perspective == null || !perspective.IsThirdPerson)
@@ -226,8 +267,12 @@ namespace C3TreasurePuzzle
 
             // Keep gravity active even when the cursor is unlocked.
             if (characterController.isGrounded && verticalSpeed < 0f) verticalSpeed = -2f;
-            if (jumpPressed && allowJump && !isCrouching && characterController.isGrounded)
+            bool bufferedJump = proneJumpRemaining > 0f && height >= standingHeight - .001f;
+            if ((jumpPressed || bufferedJump) && allowJump && !isCrouching && characterController.isGrounded)
+            {
+                proneJumpRemaining = 0f; // one request, at most one takeoff
                 verticalSpeed = Mathf.Sqrt(2f * gravity * jumpHeight);
+            }
             verticalSpeed -= gravity * deltaTime;
 
             CollisionFlags collision = characterController.Move((horizontal + Vector3.up * verticalSpeed) * deltaTime);
@@ -239,6 +284,8 @@ namespace C3TreasurePuzzle
         {
             Keyboard keyboard = Keyboard.current;
             if (keyboard == null || !keyboard.zKey.wasPressedThisFrame) return;
+            proneJumpRemaining = 0f;
+            risingFromProne = false;
             if (isProne)
             {
                 if (CanStand()) isProne = false;
@@ -306,10 +353,16 @@ namespace C3TreasurePuzzle
             return true;
         }
 
+        private void ClearJumpRequest()
+        {
+            jumpQueued = false;
+            proneJumpRemaining = 0f;
+        }
+
         private void OnDisable()
         {
             if (sharedInput != null) sharedInput.JumpPressed -= QueueJump;
-            jumpQueued = false;
+            ClearJumpRequest();
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }

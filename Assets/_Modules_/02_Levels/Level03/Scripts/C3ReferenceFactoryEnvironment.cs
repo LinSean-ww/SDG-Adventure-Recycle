@@ -332,7 +332,11 @@ namespace C3TreasurePuzzle
             // the separate B feed remains at z=12.5, north of the z=10.7 aisle.
             BuildBCPvcCurtain();
             // Both transitions retain named, legible signs on their real doors.
-            Sign("BZone",-.51f,4.36f,12.50f,2.55f,.54f,90f);
+            // V12's real level deck clears the doorway. Seat its nameplate
+            // below the deck underside (4.32), above the PVC header (3.58).
+            // Offset 0.2m along the opening so the Z=13.75 support column
+            // also clears the full right edge of the nameplate.
+            Sign("BZone",-.51f,3.85f,12.30f,2.55f,.54f,90f);
             Sign("DZone",-12.50f,4.38f,.44f,2.55f,.54f);
         }
         private void BuildBCPvcCurtain()

@@ -232,9 +232,23 @@ namespace C3TreasurePuzzle
                 art.Part(r,"ToolHandle",new Vector3(-.50f+i*.22f,1.07f,.25f),new Vector3(.055f,.14f,.04f),i<3?"silver":"yellow");
                 if(i<3)art.Part(r,"SpannerJaw",new Vector3(-.50f+i*.22f,1.41f,.25f),new Vector3(.09f,.06f,.04f),"silver");
             }
-            art.Part(r,"PliersLeft",new Vector3(.40f,1.23f,.25f),new Vector3(.025f,.27f,.025f),"red",PrimitiveType.Cube,new Vector3(0,0,18));
-            art.Part(r,"PliersRight",new Vector3(.46f,1.23f,.25f),new Vector3(.025f,.27f,.025f),"red",PrimitiveType.Cube,new Vector3(0,0,-18));
-            art.CircuitBoard(r,new Vector3(-.17f,.87f,-.06f),.55f);
+            // One hanging pair of pliers in its own right-hand bay, clear of
+            // the screwdriver at X=.38. Only the two handles meet at the pivot.
+            Transform pliers=art.Group(r,"MaintenancePliers",new Vector3(.55f,1.37f,.25f));
+            art.Rod(pliers,"PliersLeft",Vector3.zero,new Vector3(-.055f,-.23f,0),.025f,"red");
+            art.Rod(pliers,"PliersRight",Vector3.zero,new Vector3(.055f,-.23f,0),.025f,"red");
+            art.Part(pliers,"PliersPivot",Vector3.zero,new Vector3(.045f,.045f,.028f),"silver",PrimitiveType.Sphere);
+            for(int side=-1;side<=1;side+=2)
+                art.Rod(pliers,"PliersJaw_"+side,Vector3.zero,new Vector3(side*.028f,.07f,0),.018f,"silver");
+            art.Rod(r,"PliersPeg",new Vector3(.55f,1.39f,.31f),new Vector3(.55f,1.39f,.25f),.014f,"silver");
+            // Decorative PCB only: keep the original quest chip/Collider in place.
+            // PCB base rests on the .85m worktop instead of floating above it.
+            Transform board=art.Group(r,"MaintenanceCircuitBoard",new Vector3(-.43f,.855f,-.20f));
+            board.localRotation=Quaternion.Euler(0,28f,0);
+            art.CircuitBoard(board,Vector3.zero,.55f);
+            // The existing chip's visual underside is .8672m above this root,
+            // while the tabletop is .85m. Support it without moving gameplay.
+            art.Part(r,"ChipESDSupport",new Vector3(0,.8585f,-.03f),new Vector3(.28f,.017f,.20f),"dark");
             art.Part(r,"MaintenanceToolbox",new Vector3(.39f,.98f,.02f),new Vector3(.35f,.25f,.27f),"green");
             art.Part(r,"ToolboxHandle",new Vector3(.39f,1.13f,.02f),new Vector3(.17f,.035f,.06f),"silver");
             art.Rod(r,"WorkLampArm",new Vector3(-.6f,.87f,.19f),new Vector3(-.6f,1.65f,.19f),.025f,"silver");

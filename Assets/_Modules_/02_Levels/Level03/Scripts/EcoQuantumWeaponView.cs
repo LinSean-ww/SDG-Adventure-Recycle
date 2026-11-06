@@ -13,7 +13,7 @@ public sealed class EcoQuantumWeaponView : MonoBehaviour
     private GameObject rifle;
     private Transform muzzle;
     private readonly List<Material> ownedMaterials = new List<Material>();
-    private Material beamMaterial;
+    private EcoQuantumShotVfx shotVfx;
     private C3TreasurePuzzle.C3VisualBuilder visualArt;
     private bool visible, aiming;
     private float recoil, shotFlash, reloadGlow;
@@ -77,6 +77,8 @@ public sealed class EcoQuantumWeaponView : MonoBehaviour
 
     private void LateUpdate()
     {
+        shotFlash=Mathf.MoveTowards(shotFlash,0f,Time.deltaTime*12f);
+        if(muzzleLight)muzzleLight.intensity=shotFlash*5f;
         // In the accepted FPS runtime UpdateViewmodel was never invoked.
         // Own the visual offset here after the runtime moves the camera mount;
         // third-person presentation keeps the existing arm/aim solver below.
@@ -141,17 +143,16 @@ public sealed class EcoQuantumWeaponView : MonoBehaviour
         thirdPerson=false;thirdPersonRig=null;adsBlend=0f;obstructionBlend=0f;
     }
 
-    private void OnDisable() => ReleaseGripPose();
+    private void OnDisable()
+    {
+        ReleaseGripPose();
+        if(shotVfx)shotVfx.Clear();
+        if(muzzleLight)muzzleLight.intensity=0f;
+    }
     private void BuildRifle()
     {
         visualArt=new C3TreasurePuzzle.C3VisualBuilder();
-        Shader lineShader=Shader.Find("Sprites/Default");
-        if(lineShader)
-        {
-            beamMaterial=new Material(lineShader);
-            beamMaterial.name="Reusable quantum ray";
-            ownedMaterials.Add(beamMaterial);
-        }
+        shotVfx=gameObject.AddComponent<EcoQuantumShotVfx>();
         rifle=new GameObject("Eco Quantum Projector / modular receiver");
         rifle.transform.SetParent(transform,false);
         Transform root=rifle.transform;
@@ -167,7 +168,7 @@ public sealed class EcoQuantumWeaponView : MonoBehaviour
         light.transform.SetParent(muzzle,false);
         muzzleLight=light.AddComponent<Light>();
         muzzleLight.type=LightType.Point; muzzleLight.range=3f;
-        muzzleLight.intensity=0f; muzzleLight.color=new Color(.2f,1f,.25f);
+        muzzleLight.intensity=0f; muzzleLight.color=new Color(.15f,.85f,1f);
         muzzleLight.shadows=LightShadows.None;
         fireAudio=rifle.AddComponent<AudioSource>();
         fireAudio.playOnAwake=false;
@@ -189,8 +190,6 @@ public sealed class EcoQuantumWeaponView : MonoBehaviour
     {
         if (!rifle || !cameraMount || !visible) return;
         recoil=Mathf.MoveTowards(recoil,0f,Time.deltaTime*4f);
-        shotFlash=Mathf.MoveTowards(shotFlash,0f,Time.deltaTime*9f);
-        if(muzzleLight) muzzleLight.intensity=shotFlash*2.8f;
         // EcoAdventureRuntime already owns the FPS hip/ADS camera offset.
         // An additional +.59m here would push the 1.02m barrel through walls.
         Vector3 target=new Vector3(0f,0f,-recoil*.14f);
@@ -245,27 +244,16 @@ public sealed class EcoQuantumWeaponView : MonoBehaviour
         }
         return closest;
     }
-    public void OnShot(Vector3 hitPosition)
+    public void OnShot(Vector3 hitPosition) => OnShot(hitPosition,true);
+    public void OnShot(Vector3 hitPosition,bool surfaceHit)
     {
-        if(!visible || !cameraMount) return;
+        if(!visible || !cameraMount || !shotVfx) return;
         recoil=Mathf.Min(1f,recoil+.53f);
         shotFlash=1f;
         if(fireAudio && fireClip)fireAudio.PlayOneShot(fireClip);
         Vector3 origin=muzzle ? muzzle.position : cameraMount.position+cameraMount.forward*.4f;
-        GameObject tracer=new GameObject("Quantum beam (short-lived)");
-        LineRenderer line=tracer.AddComponent<LineRenderer>();
-        if(beamMaterial) line.sharedMaterial=beamMaterial;
-        line.positionCount=2;line.useWorldSpace=true;
-        line.SetPosition(0,origin);line.SetPosition(1,hitPosition);
-        line.startWidth=.035f;line.endWidth=.004f;
-        line.startColor=new Color(.2f,1f,.25f);line.endColor=new Color(.1f,.65f,.18f);
-        Destroy(tracer,.13f);
-        GameObject hit=new GameObject("Quantum impact flash");
-        hit.transform.position=hitPosition;
-        Light point=hit.AddComponent<Light>();point.type=LightType.Point;
-        point.range=1.7f;point.intensity=.65f;point.color=new Color(.2f,1f,.25f);
-        point.shadows=LightShadows.None;
-        Destroy(hit,.075f);
+        CharacterController owner=cameraMount.GetComponentInParent<CharacterController>();
+        shotVfx.Fire(cameraMount.position,origin,hitPosition,owner?owner.transform:cameraMount.root,surfaceHit);
     }
     public void OnReload()
     {
@@ -274,6 +262,7 @@ public sealed class EcoQuantumWeaponView : MonoBehaviour
     private void OnDestroy()
     {
         ReleaseGripPose();
+        if(shotVfx)Destroy(shotVfx);
         if(rifle)
         {
             rifle.SetActive(false);
