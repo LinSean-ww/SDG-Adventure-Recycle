@@ -107,7 +107,7 @@ namespace C3TreasurePuzzle
         private void Start()
         {
             // 遊戲開始先鎖定滑鼠；ESC 放開，點擊遊戲畫面可重新鎖定。
-            Cursor.lockState = CursorLockMode.Locked;
+            PlayerCursor.LockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
 
@@ -121,7 +121,7 @@ namespace C3TreasurePuzzle
                     ClearJumpRequest();
                     return;
                 }
-                bool acceptsSharedInput = Cursor.lockState == CursorLockMode.Locked && viewTransform != null;
+                bool acceptsSharedInput = PlayerCursor.LockState == CursorLockMode.Locked && viewTransform != null;
                 if (!acceptsSharedInput) ClearJumpRequest();
                 if (acceptsSharedInput)
                     ApplyLook(sharedInput.Look * (0.08f * sharedInput.Keybindings.Settings.mouseSensitivity));
@@ -140,17 +140,17 @@ namespace C3TreasurePuzzle
             }
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                Cursor.lockState = CursorLockMode.None;
+                PlayerCursor.LockState = CursorLockMode.None;
                 Cursor.visible = true;
             }
-            else if (Cursor.lockState != CursorLockMode.Locked && Input.GetMouseButtonDown(0))
+            else if (PlayerCursor.LockState != CursorLockMode.Locked && Input.GetMouseButtonDown(0))
             {
-                Cursor.lockState = CursorLockMode.Locked;
+                PlayerCursor.LockState = CursorLockMode.Locked;
                 Cursor.visible = false;
             }
 
             // 解鎖滑鼠時停用水平與視角輸入，但重力仍持續作用。
-            bool acceptsInput = Cursor.lockState == CursorLockMode.Locked && viewTransform != null;
+            bool acceptsInput = PlayerCursor.LockState == CursorLockMode.Locked && viewTransform != null;
             if (!acceptsInput) ClearJumpRequest();
             if (acceptsInput) ReadProneKey();
             if (acceptsInput)
@@ -288,7 +288,7 @@ namespace C3TreasurePuzzle
 
         private void OnPronePressed()
         {
-            if (Cursor.lockState != CursorLockMode.Locked || viewTransform == null ||
+            if (PlayerCursor.LockState != CursorLockMode.Locked || viewTransform == null ||
                 C3PuzzleConsole.BlocksGameplayInputThisFrame || C3CompletionScreen.BlocksGameplayInputThisFrame) return;
             ToggleProne();
         }
@@ -314,7 +314,7 @@ namespace C3TreasurePuzzle
             bool thirdPerson = perspective != null && perspective.IsThirdPerson;
             Keyboard keyboard = Keyboard.current;
             bool enabledInput = keyboard != null &&
-                Cursor.lockState == CursorLockMode.Locked &&
+                PlayerCursor.LockState == CursorLockMode.Locked &&
                 (sharedInput == null || sharedInput.Context == PlayerInputContext.Gameplay) &&
                 !C3PuzzleConsole.BlocksGameplayInputThisFrame &&
                 !C3CompletionScreen.BlocksGameplayInputThisFrame;
@@ -374,7 +374,7 @@ namespace C3TreasurePuzzle
         {
             if (sharedInput != null) { sharedInput.JumpPressed -= QueueJump; sharedInput.PronePressed -= OnPronePressed; }
             ClearJumpRequest();
-            Cursor.lockState = CursorLockMode.None;
+            PlayerCursor.LockState = CursorLockMode.None;
             Cursor.visible = true;
         }
     }

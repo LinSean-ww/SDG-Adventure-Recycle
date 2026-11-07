@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="10" result="Failed(Child)" total="10" passed="9" failed="1" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-07 12:44:32Z" end-time="2026-11-07 12:44:37Z" duration="5.1208555">
+  <test-suite type="TestSuite" id="1000" name="My project" fullname="My project" runstate="Runnable" testcasecount="217" result="Failed" site="Child" start-time="2026-11-07 12:44:32Z" end-time="2026-11-07 12:44:37Z" duration="5.120856" total="10" passed="9" failed="1" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1222" name="M6Integration.PlayModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/M6Integration.PlayModeTests.dll" runstate="Runnable" testcasecount="187" result="Failed" site="Child" start-time="2026-11-07 12:44:32Z" end-time="2026-11-07 12:44:37Z" duration="5.109694" total="10" passed="9" failed="1" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="52484" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1223" name="M6IntegrationTests" fullname="M6IntegrationTests" runstate="Runnable" testcasecount="174" result="Failed" site="Child" start-time="2026-11-07 12:44:32Z" end-time="2026-11-07 12:44:37Z" duration="5.104968" total="10" passed="9" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestFixture" id="1149" name="C3V13BakedFactoryTests" fullname="M6IntegrationTests.C3V13BakedFactoryTests" classname="M6IntegrationTests.C3V13BakedFactoryTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 12:44:32Z" end-time="2026-11-07 12:44:33Z" duration="1.167933" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-case id="1150" name="SavedGeometryRebindsAndReloadsWithoutDuplicateEquipment" fullname="M6IntegrationTests.C3V13BakedFactoryTests.SavedGeometryRebindsAndReloadsWithoutDuplicateEquipment" methodname="SavedGeometryRebindsAndReloadsWithoutDuplicateEquipment" classname="M6IntegrationTests.C3V13BakedFactoryTests" runstate="Runnable" seed="2130259897" result="Passed" start-time="2026-11-07 12:44:32Z" end-time="2026-11-07 12:44:33Z" duration="1.154648" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="TestFixture" id="1154" name="C3V3CirculationTests" fullname="M6IntegrationTests.C3V3CirculationTests" classname="M6IntegrationTests.C3V3CirculationTests" runstate="Runnable" testcasecount="4" result="Failed" site="Child" start-time="2026-11-07 12:44:33Z" end-time="2026-11-07 12:44:34Z" duration="1.166517" total="4" passed="3" failed="1" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-case id="1155" name="AllFivePedestrianSectionsHavePhysicalFloor" fullname="M6IntegrationTests.C3V3CirculationTests.AllFivePedestrianSectionsHavePhysicalFloor" methodname="AllFivePedestrianSectionsHavePhysicalFloor" classname="M6IntegrationTests.C3V3CirculationTests" runstate="Runnable" seed="1827913534" result="Passed" start-time="2026-11-07 12:44:33Z" end-time="2026-11-07 12:44:33Z" duration="0.273461" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1157" name="ConveyorHasOneFeedAndThreePhysicalIntakeOutputPairs" fullname="M6IntegrationTests.C3V3CirculationTests.ConveyorHasOneFeedAndThreePhysicalIntakeOutputPairs" methodname="ConveyorHasOneFeedAndThreePhysicalIntakeOutputPairs" classname="M6IntegrationTests.C3V3CirculationTests" runstate="Runnable" seed="811426307" result="Passed" start-time="2026-11-07 12:44:33Z" end-time="2026-11-07 12:44:33Z" duration="0.273601" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1158" name="OriginalGameplayObjectsAndPlayerRemain" fullname="M6IntegrationTests.C3V3CirculationTests.OriginalGameplayObjectsAndPlayerRemain" methodname="OriginalGameplayObjectsAndPlayerRemain" classname="M6IntegrationTests.C3V3CirculationTests" runstate="Runnable" seed="1356522060" result="Passed" start-time="2026-11-07 12:44:33Z" end-time="2026-11-07 12:44:34Z" duration="0.274871" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1156" name="StairRampsReachTheirDecksWithoutBarrierAcrossExit" fullname="M6IntegrationTests.C3V3CirculationTests.StairRampsReachTheirDecksWithoutBarrierAcrossExit" methodname="StairRampsReachTheirDecksWithoutBarrierAcrossExit" classname="M6IntegrationTests.C3V3CirculationTests" runstate="Runnable" seed="1166687588" result="Failed" start-time="2026-11-07 12:44:34Z" end-time="2026-11-07 12:44:34Z" duration="0.340302" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: 13.6999989f +/- 0.00999999978f
+  But was:  10.1000004f
+]]></message>
+              <stack-trace><![CDATA[at M6IntegrationTests.C3V3CirculationTests+<StairRampsReachTheirDecksWithoutBarrierAcrossExit>d__3.MoveNext () [0x0021a] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V3CirculationTests.cs:68
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@1.3.9\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+            </failure>
+          </test-case>
+        </test-suite>
+        <test-suite type="TestFixture" id="1179" name="C3V9VisibleIndustrialRouteTests" fullname="M6IntegrationTests.C3V9VisibleIndustrialRouteTests" classname="M6IntegrationTests.C3V9VisibleIndustrialRouteTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-07 12:44:34Z" end-time="2026-11-07 12:44:37Z" duration="2.756697" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-case id="1181" name="BReceivingBeltActuallyExistsOnCFrontFaceAndMeetsMainHighBelt" fullname="M6IntegrationTests.C3V9VisibleIndustrialRouteTests.BReceivingBeltActuallyExistsOnCFrontFaceAndMeetsMainHighBelt" methodname="BReceivingBeltActuallyExistsOnCFrontFaceAndMeetsMainHighBelt" classname="M6IntegrationTests.C3V9VisibleIndustrialRouteTests" runstate="Runnable" seed="517479013" result="Passed" start-time="2026-11-07 12:44:34Z" end-time="2026-11-07 12:44:35Z" duration="0.746928" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1183" name="PlayerCanClimbRightStairAndReachRearMaintenanceBridge" fullname="M6IntegrationTests.C3V9VisibleIndustrialRouteTests.PlayerCanClimbRightStairAndReachRearMaintenanceBridge" methodname="PlayerCanClimbRightStairAndReachRearMaintenanceBridge" classname="M6IntegrationTests.C3V9VisibleIndustrialRouteTests" runstate="Runnable" seed="2038642726" result="Passed" start-time="2026-11-07 12:44:35Z" end-time="2026-11-07 12:44:36Z" duration="0.903603" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <output><![CDATA[C3 movement blocked by: M3_Treasure/C3_V3_VerifiedCirculation/STAIR_B_EAST/TREAD_01 | world=(-1.55, 0.74, 3.80) | player=(-1.55, 0.64, 3.50)
+C3 movement blocked by: M3_Treasure/C3_V3_VerifiedCirculation/STAIR_B_EAST/TREAD_02 | world=(-1.55, 0.92, 4.09) | player=(-1.55, 0.82, 3.78)
+C3 movement blocked by: M3_Treasure/C3_V3_VerifiedCirculation/STAIR_B_EAST/TREAD_03 | world=(-1.55, 1.10, 4.37) | player=(-1.55, 1.00, 4.06)
+C3 movement blocked by: M3_Treasure/C3_V3_VerifiedCirculation/STAIR_B_EAST/TREAD_06 | world=(-1.55, 1.63, 5.23) | player=(-1.55, 1.54, 4.94)
+C3 movement blocked by: M3_Treasure/C3_V3_VerifiedCirculation/STAIR_B_EAST/TREAD_07 | world=(-1.55, 1.81, 5.52) | player=(-1.55, 1.71, 5.22)
+C3 movement blocked by: M3_Treasure/C3_V3_VerifiedCirculation/STAIR_B_EAST/TREAD_08 | world=(-1.55, 1.99, 5.80) | player=(-1.55, 1.89, 5.50)
+C3 movement blocked by: M3_Treasure/C3_V3_VerifiedCirculation/STAIR_B_EAST/TREAD_09 | world=(-1.55, 2.17, 6.09) | player=(-1.55, 2.07, 5.78)
+C3 movement blocked by: M3_Treasure/C3_V3_VerifiedCirculation/STAIR_B_EAST/TREAD_13 | world=(-1.55, 2.89, 7.24) | player=(-1.55, 2.79, 6.94)
+C3 movement blocked by: M3_Treasure/C3_V3_VerifiedCirculation/STAIR_B_EAST/TREAD_14 | world=(-1.55, 3.07, 7.52) | player=(-1.55, 2.97, 7.22)
+C3 movement blocked by: M3_Treasure/C3_V3_VerifiedCirculation/STAIR_B_EAST/TREAD_15 | world=(-1.55, 3.25, 7.81) | player=(-1.55, 3.15, 7.50)
+C3 movement blocked by: M3_Treasure/C3_V3_VerifiedCirculation/STAIR_B_EAST/TREAD_19 | world=(-1.55, 3.96, 8.95) | player=(-1.55, 3.86, 8.66)
+C3 movement blocked by: M3_Treasure/C3_V3_VerifiedCirculation/STAIR_B_EAST/TREAD_20 | world=(-1.55, 4.14, 9.24) | player=(-1.55, 4.04, 8.94)
+C3 movement blocked by: M3_Treasure/C3_V3_VerifiedCirculation/STAIR_B_EAST/TREAD_21 | world=(-1.55, 4.32, 9.53) | player=(-1.55, 4.22, 9.22)
+C3 movement blocked by: M3_Treasure/C3_V3_VerifiedCirculation/STAIR_B_EAST/TREAD_22 | world=(-1.55, 4.50, 9.81) | player=(-1.55, 4.40, 9.50)
+C3 movement blocked by: M3_Treasure/C3_P2_RecyclingLine/P2_INFEED_1/STEEL_UNDERFRAME | world=(-1.55, 6.67, 12.02) | player=(-1.55, 4.58, 11.82)
+]]></output>
+          </test-case>
+          <test-case id="1184" name="PriorFloorStripeIsPassable" fullname="M6IntegrationTests.C3V9VisibleIndustrialRouteTests.PriorFloorStripeIsPassable" methodname="PriorFloorStripeIsPassable" classname="M6IntegrationTests.C3V9VisibleIndustrialRouteTests" runstate="Runnable" seed="890884710" result="Passed" start-time="2026-11-07 12:44:36Z" end-time="2026-11-07 12:44:36Z" duration="0.443371" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1182" name="ReplacementDeckWorldBoundsMatchBothStairExitsAndRearBay" fullname="M6IntegrationTests.C3V9VisibleIndustrialRouteTests.ReplacementDeckWorldBoundsMatchBothStairExitsAndRearBay" methodname="ReplacementDeckWorldBoundsMatchBothStairExitsAndRearBay" classname="M6IntegrationTests.C3V9VisibleIndustrialRouteTests" runstate="Runnable" seed="759085483" result="Passed" start-time="2026-11-07 12:44:36Z" end-time="2026-11-07 12:44:36Z" duration="0.331618" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1180" name="ReplacementStairsHaveMatchingPhysicalTreadsOnBothSides" fullname="M6IntegrationTests.C3V9VisibleIndustrialRouteTests.ReplacementStairsHaveMatchingPhysicalTreadsOnBothSides" methodname="ReplacementStairsHaveMatchingPhysicalTreadsOnBothSides" classname="M6IntegrationTests.C3V9VisibleIndustrialRouteTests" runstate="Runnable" seed="1424638842" result="Passed" start-time="2026-11-07 12:44:36Z" end-time="2026-11-07 12:44:37Z" duration="0.327488" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

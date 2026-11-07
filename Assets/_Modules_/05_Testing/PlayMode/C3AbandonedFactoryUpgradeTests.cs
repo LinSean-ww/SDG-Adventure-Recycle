@@ -28,13 +28,22 @@ namespace SDGAdventure.Testing
             Assert.IsNotNull(layout, "The new connected factory must be installed");
             Assert.Greater((int)Get(layout, "DecorativeObjects"), 300);
             Assert.IsTrue((bool)Get(layout, "ConveyorEndsInSorter"));
-            GameObject conveyor = GameObject.Find("B區進料帶面");
-            GameObject endpoint = GameObject.Find("B區入口_輸送帶連接端");
+            GameObject conveyor = GameObject.Find("P2_INFEED_0");
+            GameObject endpoint = GameObject.Find("P2_B_HIGH_INFEED_INTERFACE");
             Assert.IsNotNull(conveyor);
             Assert.IsNotNull(endpoint);
-            Assert.That(endpoint.transform.position.x, Is.EqualTo(-0.7f).Within(.1f));
+            Assert.That(endpoint.transform.position.x, Is.EqualTo(1.2f).Within(.1f));
             Assert.That(endpoint.transform.position.z, Is.EqualTo(12.5f).Within(.1f));
-            Assert.IsNotNull(GameObject.Find("V8_B_To_C_ContinuousRubber"));
+            Transform surface=conveyor.transform.Find("BELT_SURFACE");
+            Assert.IsNotNull(surface);
+            Assert.IsTrue(surface.GetComponent<Renderer>().enabled);
+            Assert.IsTrue(surface.GetComponent<Collider>().enabled);
+            Assert.Less(Vector3.Distance(endpoint.transform.position,conveyor.transform.Find("START").position),.01f);
+            Assert.IsNotNull(GameObject.Find("P2_MAIN_BELT"));
+            Component geometry=Find("C3TreasurePuzzle.C3RecyclingLineGeometry");
+            Assert.IsNotNull(geometry);
+            Assert.IsTrue((bool)Call(geometry,"ConnectionsMatch",.01f),
+                "The current B infeed and sorter paths must remain physically connected.");
             Assert.IsNull(Find("C3TreasurePuzzle.C3FactoryDecay"),
                 "Obsolete visual rubble overlay would obstruct the new production floor");
         }

@@ -138,7 +138,7 @@ namespace SDGAdventure.SharedPlayer
             view?.Hide();
             Time.timeScale = previousTimeScale;
             input?.SetContext(PlayerInputContext.Gameplay);
-            Cursor.lockState = CursorLockMode.Locked;
+            PlayerCursor.LockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
 
@@ -266,7 +266,7 @@ namespace SDGAdventure.SharedPlayer
             State = state;
             Time.timeScale = 0f;
             input.SetContext(PlayerInputContext.UI);
-            Cursor.lockState = CursorLockMode.None;
+            PlayerCursor.LockState = CursorLockMode.None;
             Cursor.visible = true;
         }
 
@@ -316,7 +316,7 @@ namespace SDGAdventure.SharedPlayer
             if (UsesExternalTaskView) closeTaskView();
             if (State != PlayerMenuState.Playing) Time.timeScale = previousTimeScale;
             view?.Hide();
-            Cursor.lockState = CursorLockMode.None;
+            PlayerCursor.LockState = CursorLockMode.None;
             Cursor.visible = true;
         }
     }

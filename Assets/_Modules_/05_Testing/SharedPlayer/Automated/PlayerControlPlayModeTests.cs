@@ -293,13 +293,28 @@ namespace SDGAdventure.PlayerControlTests
         [UnityTest]
         public IEnumerator PauseBlocksGameplayAndRestoresCursorAndTime()
         {
-            GameObject floor = Floor(new Vector3(140f, 0f, 140f));
-            GameObject playerObject = Player(new Vector3(140f, 0f, 140f));
+            // A previous test can leave a Level03 player in the loaded scene.
+            // Temporarily detach its menu subscription, then restore its state.
+            var priorMenus = UnityEngine.Object.FindObjectsByType<PlayerPauseMenu>(FindObjectsSortMode.None)
+                .Where(m => m.isActiveAndEnabled).ToArray();
+            var originalInput = PlayerInputService.Instance;
+            var originalContext = originalInput.Context;
+            var originalLock = Cursor.lockState;
+            bool originalVisible = Cursor.visible;
+            float originalTimeScale = Time.timeScale;
+            GameObject floor = null;
+            GameObject playerObject = null;
+            GameObject returnPoint = null;
+            try
+            {
+            foreach (var prior in priorMenus) prior.enabled = false;
+            floor = Floor(new Vector3(140f, 0f, 140f));
+            playerObject = Player(new Vector3(140f, 0f, 140f));
             yield return null;
             var menu = playerObject.GetComponent<PlayerPauseMenu>();
             var input = PlayerInputService.Instance;
             Assert.AreEqual(1, UnityEngine.Object.FindObjectsByType<PlayerPauseMenu>(
-                FindObjectsSortMode.None).Length, "The input test requires one active player menu.");
+                FindObjectsSortMode.None).Count(m => m.isActiveAndEnabled), "The input test requires one active player menu.");
             Assert.AreEqual(PlayerInputContext.Gameplay, input.Context);
             menu.Pause();
             Assert.AreEqual(PlayerMenuState.Paused, menu.State);
@@ -321,7 +336,7 @@ namespace SDGAdventure.PlayerControlTests
             Assert.AreEqual(1f, Time.timeScale);
             Assert.AreEqual(PlayerInputContext.Gameplay, input.Context);
             Assert.AreEqual(PlayerMenuState.Playing, menu.State);
-            GameObject returnPoint = new GameObject("TestReturnPoint");
+            returnPoint = new GameObject("TestReturnPoint");
             returnPoint.transform.position = new Vector3(140f, 0f, 140f);
             menu.SetTestReturnPoint(returnPoint.transform);
             playerObject.GetComponent<SharedFirstPersonController>()
@@ -330,9 +345,18 @@ namespace SDGAdventure.PlayerControlTests
             menu.ReturnToTestStart();
             Assert.AreEqual(returnPoint.transform.position, playerObject.transform.position);
             Assert.AreEqual(PlayerMenuState.Playing, menu.State);
-            UnityEngine.Object.Destroy(playerObject);
-            UnityEngine.Object.Destroy(floor);
-            UnityEngine.Object.Destroy(returnPoint);
+            }
+            finally
+            {
+                if (playerObject) { playerObject.SetActive(false); UnityEngine.Object.Destroy(playerObject); }
+                if (floor) UnityEngine.Object.Destroy(floor);
+                if (returnPoint) UnityEngine.Object.Destroy(returnPoint);
+                foreach (var prior in priorMenus) if (prior) prior.enabled = true;
+                if (originalInput) originalInput.SetContext(originalContext);
+                PlayerCursor.LockState = originalLock;
+                Cursor.visible = originalVisible;
+                Time.timeScale = originalTimeScale;
+            }
             yield return null;
         }
 
@@ -345,6 +369,10 @@ namespace SDGAdventure.PlayerControlTests
             var menu = playerObject.GetComponent<PlayerPauseMenu>();
             var input = PlayerInputService.Instance;
             menu.Journal.SetTasks(new[] { new PlayerTaskItem("demo", "示範", "進度測試") });
+            Canvas[] initialCanvases = UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None);
+            var ownedCanvases = playerObject.GetComponentsInChildren<Canvas>(true);
+            Assert.AreEqual(1, ownedCanvases.Count(c => c.name == "PlayerMenuCanvas"));
+            Assert.AreEqual(1, ownedCanvases.Count(c => c.name == "PlayerHudCanvas"));
             for (int cycle = 0; cycle < 5; cycle++)
             {
                 menu.Pause();
@@ -381,8 +409,8 @@ namespace SDGAdventure.PlayerControlTests
                 menu.CloseTasks();
                 Assert.AreEqual(PlayerMenuState.Playing, menu.State);
                 Assert.AreEqual(1f, Time.timeScale);
-                Assert.AreEqual(2, UnityEngine.Object.FindObjectsByType<Canvas>(
-                    FindObjectsSortMode.None).Length);
+                CollectionAssert.AreEquivalent(initialCanvases, UnityEngine.Object.FindObjectsByType<Canvas>(
+                    FindObjectsSortMode.None), "Pause cycles must not create or lose canvases.");
                 Assert.AreEqual(1, UnityEngine.Object.FindObjectsByType<EventSystem>(
                     FindObjectsSortMode.None).Length);
                 yield return null;

@@ -76,11 +76,11 @@ namespace C3TreasurePuzzle
             Mode=device.IsActivated?ConsoleMode.ProductionControl:puzzle.PuzzleSolved?ConsoleMode.Activation:ConsoleMode.Puzzle;
             feedback = Mode==ConsoleMode.ProductionControl?ProductionStatus:
                 puzzle.PuzzleSolved ? "解謎已完成；設備尚未啟動。請確認啟動。" : "請依線索選擇三個處理步驟。";
-            previousLock = Cursor.lockState;
+            previousLock = PlayerCursor.LockState;
             previousVisible = Cursor.visible;
             activePanel = this;
             panelOpen = true;
-            Cursor.lockState = CursorLockMode.None;
+            PlayerCursor.LockState = CursorLockMode.None;
             Cursor.visible = true;
             return true;
         }
@@ -92,12 +92,12 @@ namespace C3TreasurePuzzle
             if (activePanel == this) activePanel = null;
             closedFrame = Time.frameCount;
             if (C3CompletionScreen.BlocksGameplayInputThisFrame || (device && device.LevelCompleted))
-            { Cursor.lockState=CursorLockMode.None; Cursor.visible=true; }
+            { PlayerCursor.LockState=CursorLockMode.None; Cursor.visible=true; }
             else
             {
                 PlayerInputService input=PlayerInputService.Instance;
                 if (input==null || input.Context==PlayerInputContext.Gameplay)
-                { Cursor.lockState=previousLock; Cursor.visible=previousVisible; }
+                { PlayerCursor.LockState=previousLock; Cursor.visible=previousVisible; }
             }
         }
 

@@ -1,5 +1,43 @@
 # Validation
 
+## Phase 2
+
+All runs below used Unity 2023.1.22f1 on Windows. The PlayMode runs use `-batchmode -nographics`; the EditMode run uses graphics. `RunIsolatedTests.ps1` exports the two existing project PlayerPrefs registry keys, runs one Unity process at a time, and restores and verifies their values afterward. This protects the captured values but is not an isolated OS account; another process writing the same keys concurrently would interfere. Backups and editor logs remain in the user's temporary directory, not the repository.
+
+| Run | Total | Pass | Fail | Skip | Evidence |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Final targeted groups; seed 71, one repeat | 14 | 14 | 0 | 0 | [XML](Phase2_Final_Targeted_Retry.xml) |
+| Input and pause groups | 27 | 27 | 0 | 0 | [XML](Phase2_Input_Targeted.xml) |
+| Cursor, interaction and factory groups | 64 | 63 | 1 | 0 | [XML](Phase2_InteractionGroups.xml) |
+| Weapon, V3 and reload; seed 17, two repeats | 13 | 13 | 0 | 0 | [XML](Phase2_FactoryWeapon_Repeat.xml) |
+| UI safety; seed 71, two repeats | 2 | 2 | 0 | 0 | [XML](Phase2_Safety_Targeted.xml) |
+| Order-leak tests; seed 71, two repeats | 2 | 2 | 0 | 0 | [XML](Phase2_OrderLeak_Targeted.xml) |
+| Full EditMode, final | 14 | 14 | 0 | 0 | [XML](Phase2_Final_EditMode.xml) |
+| Full PlayMode before final factory/transition changes | 217 | 201 | 13 | 3 | [XML](Phase2_PlayMode.xml) |
+| Full PlayMode, seed 71 and one repeat before final factory/transition changes | 217 | 201 | 13 | 3 | [XML](Phase2_Final_PlayMode_Seed71.xml) |
+| Full PlayMode, final, seed 71 and one repeat | 217 | 205 | 9 | 3 | [XML](Phase2_Final_PlayMode.xml) |
+| Lighting comparison, graphics enabled | 1 | 0 | 1 | 0 | [XML](Phase2_Lighting_Graphics.xml) |
+
+The 64-test group retains the display-versus-held rifle geometry failure. An intermediate seed 71 run exposed two order-sensitive failures; the targeted order-leak test and the later full seeded run passed both. The recorded `repeatIteration` property reports completed repetitions; these are not separate test-case counts in the XML.
+
+The final nine failures are:
+
+1. `C3FactoryFullArtTests.StageA_UpperDeckChipRemainsCollectibleAndHudHintIsCurrent`: saved chip position differs from the old coordinate; the subsequent ray and collection assertions were not reached.
+2. `C3M2BlockoutPlayModeTests.PlayerCapsuleCanUseBothStairsAndMainWalkway`: the old route starts at obsolete coordinates; the newer `C3V6AccessRegressionTests.BothStairsCanCarryACharacterControllerOntoTheSecondFloor` passed using the saved stair entrances and real controller.
+3. `C3SceneBugFixTests.OriginalControllerMovesJumpsAndPhysicalSupportsBlock`: the spawn movement ended at x = -1.05499983 versus required x < -1.06665528. Identify actual capsule contacts and retest before proposing a minimal fix; a scene defect has not been established.
+4. `C3V11VisualUpgradeTests.SharedRifleGeometryUsesViewmodelOffAndAssemblyDisplayOnShadows`: the baked display has 45 renderers and the live V14 sight model 48. This is an actual presentation mismatch, not a hard-coded count in the assertion.
+5. `C3V5SpatialIntegrityTests.BDoorHasVisibleFloorHeightConveyorAndOverheadConnection`: obsolete V8 belt name/layout; confirm current interface and clearance requirements before replacing its spatial assertions.
+6. `C3V6AccessRegressionTests.ConveyorIsInsideTheMainHallAndConnectsToSorter`: obsolete V8 belt reference; the current P2 connection checks pass, but this historical hall-boundary condition still needs review.
+7. `C3V7CZoneBoundaryAndAisleTests.CToBIsClosedAndTheReceivingBeltStopsAtThreshold`: the old shutter is absent; verify the current B/C boundary design before changing this check.
+8. `C3V7CZoneBoundaryAndAisleTests.FormerObstructingStairRampHasMovedAwayFromReportedPosition`: the old ramp and route names are absent; map the aisle and side-stair constraints to current colliders.
+9. `M6VisualRuntimeTests.DirectVersusSelectionSceneLighting`: all 360,000 pixels differ from an old reference in both nographics and graphics-enabled runs. The cause and whether the historical reference remains applicable are unverified; a visual comparison of the current accepted scene is required.
+
+No skips were added. The three skips still describe V8 geometry replaced by V9. No new manual gameplay or visual acceptance was performed.
+
+The first Phase 2 input run attempted to restore PlayerPrefs through a read-only registry handle. Those writes failed and its pre-run in-memory snapshot was lost. That run may have changed existing project preferences; the earlier value cannot be recovered. Subsequent runs used persistent exports and writable handles and reported verified restoration. A separate compilation-failed run was stopped after its wrapper stalled; its saved registry exports were re-imported and both keys verified identical to those backups. No game window or manual re-acceptance was performed.
+
+## Phase 1
+
 Unity 2023.1.22f1 (c1416845ad01), Windows Editor. Commands use `-batchmode -runTests -testPlatform <platform> -projectPath <project> -testResults <xml> -logFile <log>`. PlayMode comparisons additionally use `-nographics`; the graphics EditMode run omits it. Commands did not use `-quit`.
 
 | Run | Total | Passed | Failed | Skipped | Evidence |

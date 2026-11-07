@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using SDGAdventure.SharedPlayer;
 using Object = UnityEngine.Object;
 
 namespace M6IntegrationTests
@@ -42,7 +43,7 @@ namespace M6IntegrationTests
             Type type=Type.GetType("SDGAdventure.SharedPlayer.PlayerInputService, SDGAdventure.SharedPlayer",true);
             object service=type.GetProperty("Instance").GetValue(null);Assert.IsNotNull(service);
             Call(service,"SetContext",Enum.Parse(Get(service,"Context").GetType(),"Gameplay"));
-            Cursor.lockState=CursorLockMode.Locked;Cursor.visible=false;
+            PlayerCursor.LockState=CursorLockMode.Locked;Cursor.visible=false;
         }
         private static Component InputService => Type.GetType("SDGAdventure.SharedPlayer.PlayerInputService, SDGAdventure.SharedPlayer",true)
             .GetProperty("Instance").GetValue(null) as Component;
@@ -120,7 +121,8 @@ namespace M6IntegrationTests
         [UnitySetUp] public IEnumerator Open()
         {
             temporary.Clear();
-            scope=new C3V11Phase2RecyclingLineTests();yield return scope.Open();yield return null;
+            scope=new C3V11Phase2RecyclingLineTests();yield return scope.Open();
+            PlayerCursor.BeginSimulation(CursorLockMode.None);yield return null;
         }
         [UnityTearDown] public IEnumerator Close()
         {
@@ -130,6 +132,7 @@ namespace M6IntegrationTests
             yield return null;
             foreach(Object item in temporary)if(item && !(item is GameObject))Object.Destroy(item);
             temporary.Clear();yield return null;
+            PlayerCursor.EndSimulation();
             if(scope!=null)yield return scope.Close();
         }
 

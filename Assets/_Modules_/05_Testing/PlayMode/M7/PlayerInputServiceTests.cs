@@ -15,6 +15,21 @@ namespace M7SharedPlayerTests
         private const string Selection = "Assets/_Modules_/05_Testing/Scenes/M6_DevelopmentSelection.unity";
         private const string C3 = "Assets/_Modules_/02_Levels/Level03/Scenes/C_Main.unity";
 
+        [SetUp] public void BeginCursorSimulation() => PlayerCursor.BeginSimulation(CursorLockMode.None);
+        [TearDown] public void EndCursorSimulation() => PlayerCursor.EndSimulation();
+
+        [Test]
+        public void SimulatedCursorSeparatesRequestedAndOsState()
+        {
+            CursorLockMode actual = Cursor.lockState;
+            PlayerCursor.LockState = CursorLockMode.Locked;
+            Assert.AreEqual(CursorLockMode.Locked, PlayerCursor.RequestedLockState);
+            Assert.AreEqual(CursorLockMode.Locked, PlayerCursor.LockState);
+            Assert.AreEqual(actual, Cursor.lockState, "Simulation must not change the OS cursor.");
+            PlayerCursor.EndSimulation();
+            Assert.AreEqual(Cursor.lockState, PlayerCursor.LockState, "Normal gameplay must read the OS state.");
+        }
+
         [Test]
         public void EscapeHasOneEnabledActionInEachContext()
         {
@@ -85,6 +100,10 @@ namespace M7SharedPlayerTests
             Assert.AreEqual(PlayerInputContext.Gameplay, input.Context);
             var progressType = System.Type.GetType("C3TreasurePuzzle.C3TreasureProgress, Assembly-CSharp", true);
             var progress = UnityEngine.Object.FindFirstObjectByType(progressType);
+            var gameType = System.Type.GetType("EcoAdventureRuntime, Assembly-CSharp", true);
+            var game = gameType.GetProperty("Instance").GetValue(null);
+            var gameplayEnabled = gameType.GetMethod("GameplayEnabled", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            Assert.IsTrue((bool)gameplayEnabled.Invoke(game, null));
             Assert.IsTrue((bool)progress.GetType().GetMethod("TryCollect")
                 .Invoke(progress, new object[] { "fuse", "Fuse" }));
             Assert.AreEqual(1, menu.Journal.CompletedCount);
@@ -94,7 +113,12 @@ namespace M7SharedPlayerTests
             Assert.IsTrue(menu.View.IsVisible);
             Assert.AreEqual(0f, Time.timeScale);
             Assert.AreEqual(PlayerInputContext.UI, input.Context);
-            Assert.AreEqual(CursorLockMode.None, Cursor.lockState);
+            Assert.AreEqual(CursorLockMode.None, PlayerCursor.RequestedLockState);
+            Assert.AreEqual(CursorLockMode.None, PlayerCursor.LockState);
+            PlayerCursor.LockState = CursorLockMode.Locked;
+            Assert.IsFalse((bool)gameplayEnabled.Invoke(game, null),
+                "A locked cursor must not bypass the UI context or enable firing while paused.");
+            PlayerCursor.LockState = CursorLockMode.None;
             CollectionAssert.AreEqual(new[] { "繼續遊戲", "操作設定", "任務清單", "重新開始本關", "返回選關" },
                 menu.View.Panel.Find("ScrollViewport/ScrollContent").GetComponentsInChildren<Button>()
                     .Select(button => button.GetComponentInChildren<Text>().text).ToArray());
@@ -117,17 +141,21 @@ namespace M7SharedPlayerTests
             menu.Resume();
             Assert.AreEqual(1f, Time.timeScale);
             Assert.AreEqual(PlayerInputContext.Gameplay, input.Context);
-            Assert.AreEqual(CursorLockMode.Locked, Cursor.lockState);
+            Assert.AreEqual(CursorLockMode.Locked, PlayerCursor.RequestedLockState);
+            Assert.AreEqual(CursorLockMode.Locked, PlayerCursor.LockState);
+            Assert.IsTrue((bool)gameplayEnabled.Invoke(game, null));
 
             menu.OpenTasks();
             Assert.AreEqual(PlayerMenuState.Tasks, menu.State);
             Assert.IsTrue((bool)sheetOpen.GetValue(hud));
             Assert.IsFalse(menu.View.IsVisible);
             Assert.AreEqual(PlayerInputContext.UI, input.Context);
-            Assert.AreEqual(CursorLockMode.None, Cursor.lockState);
+            Assert.AreEqual(CursorLockMode.None, PlayerCursor.RequestedLockState);
+            Assert.AreEqual(CursorLockMode.None, PlayerCursor.LockState);
             menu.CloseTasks();
             Assert.IsFalse((bool)sheetOpen.GetValue(hud));
-            Assert.AreEqual(CursorLockMode.Locked, Cursor.lockState);
+            Assert.AreEqual(CursorLockMode.Locked, PlayerCursor.RequestedLockState);
+            Assert.AreEqual(CursorLockMode.Locked, PlayerCursor.LockState);
             menu.Pause();
             menu.RestartLevel();
             yield return null;
@@ -145,6 +173,7 @@ namespace M7SharedPlayerTests
             Assert.AreEqual(Selection, SceneManager.GetActiveScene().path);
             Assert.AreEqual(1f, Time.timeScale);
             Assert.AreEqual(PlayerInputContext.Inactive, input.Context);
+            Assert.AreEqual(CursorLockMode.None, PlayerCursor.RequestedLockState);
             Assert.AreEqual(1, Object.FindObjectsByType<PlayerInputService>(FindObjectsSortMode.None).Length);
         }
     }

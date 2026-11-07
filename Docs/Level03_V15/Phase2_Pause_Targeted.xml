@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="6" result="Passed" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-07 12:41:59Z" end-time="2026-11-07 12:42:02Z" duration="2.7003642">
+  <test-suite type="TestSuite" id="1000" name="My project" fullname="My project" runstate="Runnable" testcasecount="217" result="Passed" start-time="2026-11-07 12:41:59Z" end-time="2026-11-07 12:42:02Z" duration="2.700364" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1222" name="M6Integration.PlayModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/M6Integration.PlayModeTests.dll" runstate="Runnable" testcasecount="187" result="Passed" start-time="2026-11-07 12:41:59Z" end-time="2026-11-07 12:42:01Z" duration="1.409623" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="38396" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <test-suite type="TestSuite" id="1223" name="M6IntegrationTests" fullname="M6IntegrationTests" runstate="Runnable" testcasecount="174" result="Passed" start-time="2026-11-07 12:41:59Z" end-time="2026-11-07 12:42:01Z" duration="1.405645" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <test-suite type="TestFixture" id="1048" name="C3V11RecyclingPresentationTests" fullname="M6IntegrationTests.C3V11RecyclingPresentationTests" classname="M6IntegrationTests.C3V11RecyclingPresentationTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-11-07 12:41:59Z" end-time="2026-11-07 12:42:01Z" duration="1.392590" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-case id="1050" name="ProductionUguiReceivesARealClickWithoutReactivationOrPuzzleSubmission" fullname="M6IntegrationTests.C3V11RecyclingPresentationTests.ProductionUguiReceivesARealClickWithoutReactivationOrPuzzleSubmission" methodname="ProductionUguiReceivesARealClickWithoutReactivationOrPuzzleSubmission" classname="M6IntegrationTests.C3V11RecyclingPresentationTests" runstate="Runnable" seed="339412153" result="Passed" start-time="2026-11-07 12:41:59Z" end-time="2026-11-07 12:42:01Z" duration="1.375678" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <output><![CDATA[R3 synthetic pointer event chain completed; hardware mouse/InputSystem processing still requires manual acceptance.
+Input context=Gameplay
+OpenPanel immediate frame=3736 point=(320.00, 240.00) contentHeight=0 normalized=0 direct=0 event=0 targetReady=False raycasterRegistered=True
+  Viewport#-3342 type=UnityEngine.UI.Image active=False raycastTarget=True depth=-1 cull=False color.a=0 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=False rectContains=True Graphic.Raycast=False facingDot=1.000000
+  PuzzlePanel#-3332 type=UnityEngine.UI.Image active=False raycastTarget=True depth=-1 cull=False color.a=0.95 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=False rectContains=True Graphic.Raycast=False facingDot=1.000000
+  Presentation#-3578 type=UnityEngine.UI.Image active=False raycastTarget=True depth=-1 cull=False color.a=1 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=False rectContains=False Graphic.Raycast=False facingDot=1.000000
+OpenPanel next frame before rebuild frame=3737 point=(320.00, 240.00) contentHeight=0 normalized=0 direct=0 event=0 targetReady=False raycasterRegistered=True
+  Viewport#-3342 type=UnityEngine.UI.Image active=True raycastTarget=True depth=-1 cull=False color.a=0 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  PuzzlePanel#-3332 type=UnityEngine.UI.Image active=True raycastTarget=True depth=-1 cull=False color.a=0.95 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  Presentation#-3578 type=UnityEngine.UI.Image active=True raycastTarget=True depth=-1 cull=False color.a=1 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=False Graphic.Raycast=True facingDot=1.000000
+normal viewport before Force frame=3737 point=(320.00, 240.00) contentHeight=0 normalized=0 direct=0 event=0 targetReady=False raycasterRegistered=True
+  Viewport#-3342 type=UnityEngine.UI.Image active=True raycastTarget=True depth=-1 cull=False color.a=0 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  PuzzlePanel#-3332 type=UnityEngine.UI.Image active=True raycastTarget=True depth=-1 cull=False color.a=0.95 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  Presentation#-3578 type=UnityEngine.UI.Image active=True raycastTarget=True depth=-1 cull=False color.a=1 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=False Graphic.Raycast=True facingDot=1.000000
+normal viewport after Force frame=3737 point=(320.00, 240.00) contentHeight=432 normalized=1 direct=0 event=0 targetReady=False raycasterRegistered=True
+  Viewport#-3342 type=UnityEngine.UI.Image active=True raycastTarget=True depth=-1 cull=False color.a=0 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  PuzzlePanel#-3332 type=UnityEngine.UI.Image active=True raycastTarget=True depth=-1 cull=False color.a=0.95 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  Presentation#-3578 type=UnityEngine.UI.Image active=True raycastTarget=True depth=-1 cull=False color.a=1 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=False Graphic.Raycast=True facingDot=1.000000
+normal viewport next frame 1 frame=3738 point=(320.00, 240.00) contentHeight=432 normalized=1 direct=3 event=3 targetReady=True raycasterRegistered=True
+  Viewport#-3342 type=UnityEngine.UI.Image active=True raycastTarget=True depth=4 cull=False color.a=0 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  PuzzlePanel#-3332 type=UnityEngine.UI.Image active=True raycastTarget=True depth=3 cull=False color.a=0.95 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  Presentation#-3578 type=UnityEngine.UI.Image active=True raycastTarget=True depth=9 cull=False color.a=1 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=False Graphic.Raycast=True facingDot=1.000000
+Formal panel-background control point=(21.00, 240.00) direct=2 event=2
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=3 distance=0.000000 screen=(21.00, 240.00)
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzleBackdrop module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=2 distance=0.000000 screen=(21.00, 240.00)
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=3 distance=0.000000 screen=(21.00, 240.00)
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzleBackdrop module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=2 distance=0.000000 screen=(21.00, 240.00)
+Formal visible Button control=c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel/Viewport/Content/Close point=(320.00, 75.50) direct=4 event=4 directButton=True eventButton=True
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel/Viewport/Content/Close module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=11 distance=0.000000 screen=(320.00, 75.50)
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel/Viewport module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=4 distance=0.000000 screen=(320.00, 75.50)
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=3 distance=0.000000 screen=(320.00, 75.50)
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzleBackdrop module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=2 distance=0.000000 screen=(320.00, 75.50)
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel/Viewport/Content/Close module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=11 distance=0.000000 screen=(320.00, 75.50)
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel/Viewport module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=4 distance=0.000000 screen=(320.00, 75.50)
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=3 distance=0.000000 screen=(320.00, 75.50)
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzleBackdrop module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=2 distance=0.000000 screen=(320.00, 75.50)
+short viewport before Force frame=3738 point=(320.00, 360.00) contentHeight=432 normalized=1 direct=3 event=3 targetReady=True raycasterRegistered=True
+  Viewport#-3342 type=UnityEngine.UI.Image active=True raycastTarget=True depth=4 cull=False color.a=0 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  PuzzlePanel#-3332 type=UnityEngine.UI.Image active=True raycastTarget=True depth=3 cull=False color.a=0.95 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  Presentation#-3578 type=UnityEngine.UI.Image active=True raycastTarget=True depth=9 cull=True color.a=1 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=False Graphic.Raycast=True facingDot=1.000000
+short viewport after Force frame=3738 point=(320.00, 360.00) contentHeight=432 normalized=1 direct=3 event=3 targetReady=True raycasterRegistered=True
+  Viewport#-3342 type=UnityEngine.UI.Image active=True raycastTarget=True depth=4 cull=False color.a=0 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  PuzzlePanel#-3332 type=UnityEngine.UI.Image active=True raycastTarget=True depth=3 cull=False color.a=0.95 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  Presentation#-3578 type=UnityEngine.UI.Image active=True raycastTarget=True depth=9 cull=True color.a=1 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=False Graphic.Raycast=True facingDot=1.000000
+Clipped button control: maskRejects=True direct=2 event=2 Presentation receiver absent, ActivePresentation null
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=3 distance=0.000000 screen=(320.00, 129.00)
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzleBackdrop module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=2 distance=0.000000 screen=(320.00, 129.00)
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=3 distance=0.000000 screen=(320.00, 129.00)
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzleBackdrop module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=2 distance=0.000000 screen=(320.00, 129.00)
+short viewport wheel pixels=231 contentBefore=(0.00, 0.00) contentAfter=(0.00, 231.00) normalizedBefore=1 normalizedAfter=0.08333334
+short viewport visible button before Force frame=3739 point=(320.00, 360.00) contentHeight=432 normalized=0.08333334 direct=4 event=4 targetReady=True raycasterRegistered=True
+  Viewport#-3342 type=UnityEngine.UI.Image active=True raycastTarget=True depth=4 cull=False color.a=0 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  PuzzlePanel#-3332 type=UnityEngine.UI.Image active=True raycastTarget=True depth=3 cull=False color.a=0.95 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  Presentation#-3578 type=UnityEngine.UI.Image active=True raycastTarget=True depth=9 cull=False color.a=1 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+short viewport visible button after Force frame=3739 point=(320.00, 360.00) contentHeight=432 normalized=0.08333334 direct=4 event=4 targetReady=True raycasterRegistered=True
+  Viewport#-3342 type=UnityEngine.UI.Image active=True raycastTarget=True depth=4 cull=False color.a=0 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  PuzzlePanel#-3332 type=UnityEngine.UI.Image active=True raycastTarget=True depth=3 cull=False color.a=0.95 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  Presentation#-3578 type=UnityEngine.UI.Image active=True raycastTarget=True depth=9 cull=False color.a=1 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+restored normal viewport before Force frame=3740 point=(320.00, 240.00) contentHeight=432 normalized=1 direct=3 event=3 targetReady=True raycasterRegistered=True
+  Viewport#-3342 type=UnityEngine.UI.Image active=True raycastTarget=True depth=4 cull=False color.a=0 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  PuzzlePanel#-3332 type=UnityEngine.UI.Image active=True raycastTarget=True depth=3 cull=False color.a=0.95 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  Presentation#-3578 type=UnityEngine.UI.Image active=True raycastTarget=True depth=9 cull=False color.a=1 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=False Graphic.Raycast=True facingDot=1.000000
+restored normal viewport after Force frame=3740 point=(320.00, 240.00) contentHeight=432 normalized=1 direct=3 event=3 targetReady=True raycasterRegistered=True
+  Viewport#-3342 type=UnityEngine.UI.Image active=True raycastTarget=True depth=4 cull=False color.a=0 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  PuzzlePanel#-3332 type=UnityEngine.UI.Image active=True raycastTarget=True depth=3 cull=False color.a=0.95 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  Presentation#-3578 type=UnityEngine.UI.Image active=True raycastTarget=True depth=9 cull=False color.a=1 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=False Graphic.Raycast=True facingDot=1.000000
+normal viewport visible button before Force frame=3741 point=(320.00, 129.00) contentHeight=432 normalized=1 direct=4 event=4 targetReady=True raycasterRegistered=True
+  Viewport#-3342 type=UnityEngine.UI.Image active=True raycastTarget=True depth=4 cull=False color.a=0 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  PuzzlePanel#-3332 type=UnityEngine.UI.Image active=True raycastTarget=True depth=3 cull=False color.a=0.95 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  Presentation#-3578 type=UnityEngine.UI.Image active=True raycastTarget=True depth=9 cull=False color.a=1 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+normal viewport visible button after Force frame=3741 point=(320.00, 129.00) contentHeight=432 normalized=1 direct=4 event=4 targetReady=True raycasterRegistered=True
+  Viewport#-3342 type=UnityEngine.UI.Image active=True raycastTarget=True depth=4 cull=False color.a=0 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  PuzzlePanel#-3332 type=UnityEngine.UI.Image active=True raycastTarget=True depth=3 cull=False color.a=0.95 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  Presentation#-3578 type=UnityEngine.UI.Image active=True raycastTarget=True depth=9 cull=False color.a=1 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+busy reopened viewport before Force frame=3744 point=(320.00, 240.00) contentHeight=432 normalized=1 direct=0 event=0 targetReady=False raycasterRegistered=True
+  Viewport#-3342 type=UnityEngine.UI.Image active=True raycastTarget=True depth=-1 cull=False color.a=0 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  PuzzlePanel#-3332 type=UnityEngine.UI.Image active=True raycastTarget=True depth=-1 cull=False color.a=0.95 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  Presentation#-3578 type=UnityEngine.UI.Image active=True raycastTarget=True depth=-1 cull=False color.a=1 rendererAlpha=0.989331 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=False Graphic.Raycast=True facingDot=1.000000
+busy reopened viewport after Force frame=3744 point=(320.00, 240.00) contentHeight=432 normalized=1 direct=0 event=0 targetReady=False raycasterRegistered=True
+  Viewport#-3342 type=UnityEngine.UI.Image active=True raycastTarget=True depth=-1 cull=False color.a=0 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  PuzzlePanel#-3332 type=UnityEngine.UI.Image active=True raycastTarget=True depth=-1 cull=False color.a=0.95 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  Presentation#-3578 type=UnityEngine.UI.Image active=True raycastTarget=True depth=-1 cull=False color.a=1 rendererAlpha=0.989331 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=False Graphic.Raycast=True facingDot=1.000000
+busy reopened viewport next frame 1 frame=3745 point=(320.00, 240.00) contentHeight=432 normalized=1 direct=3 event=3 targetReady=True raycasterRegistered=True
+  Viewport#-3342 type=UnityEngine.UI.Image active=True raycastTarget=True depth=4 cull=False color.a=0 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  PuzzlePanel#-3332 type=UnityEngine.UI.Image active=True raycastTarget=True depth=3 cull=False color.a=0.95 rendererAlpha=1 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  Presentation#-3578 type=UnityEngine.UI.Image active=True raycastTarget=True depth=9 cull=False color.a=1 rendererAlpha=0.9744984 canvas=C3UiCanvas#-3012 registered=True raycastRegistered=True rectContains=False Graphic.Raycast=True facingDot=1.000000
+
+R3 ROOT CAUSE: NOT YET CONFIRMED
+Unity=2023.1.22f1 batch=True graphicsDevice=Null frame=3745 UGUI=UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+R3 screen=640x480 canvas=c3_treasure_puzzle Adapter/C3UiCanvas renderMode=ScreenSpaceOverlay sortingOrder=600 active=True scaleFactor=1 Canvas.enabled=True Canvas.isActiveAndEnabled=True CanvasScaler.scaleFactor=1 GraphicRaycaster.enabled=True
+EventSystem=M2_Player/PlayerMenuEventSystem enabled=True inputModule=UnityEngine.InputSystem.UI.InputSystemUIInputModule inputModuleEnabled=True panelActive=True
+viewportWorld=(30.000, 30.000, 0.000);(30.000, 450.000, 0.000);(610.000, 450.000, 0.000);(610.000, 30.000, 0.000) viewportScreen=(x:30.00, y:30.00, width:580.00, height:420.00) contentHeight=432 contentPosition=(0.00, 0.00) normalized=1 scrollEnabled=True
+button=c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel/Viewport/Content/Presentation active=True interactable=False image.raycastTarget=True graphicCulled=False buttonWorld=(30.000, 105.000, 0.000);(30.000, 153.000, 0.000);(610.000, 153.000, 0.000);(610.000, 105.000, 0.000) buttonScreen=(x:30.00, y:105.00, width:580.00, height:48.00) point=(320.00, 129.00) overlapsViewport=True maskEnabled=True maskAcceptsPoint=True
+rootCanvas=c3_treasure_puzzle Adapter/C3UiCanvas targetDisplay=0 pixelRect=(x:0.00, y:0.00, width:640.00, height:480.00) canvasRect=(x:-320.00, y:-240.00, width:640.00, height:480.00) canvasPosition=(320.000, 240.000, 0.000) rotation=(0.000, 0.000, 0.000, 1.000) lossyScale=(1.000, 1.000, 1.000) canvasForward=(0.000, 0.000, 1.000) Display.RelativeMouseAt=(0.00, 0.00, 0.00) displayCount=1
+Direct count=4
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel/Viewport/Content/Presentation module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=9 distance=0.000000 screen=(320.00, 129.00)
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel/Viewport module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=4 distance=0.000000 screen=(320.00, 129.00)
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=3 distance=0.000000 screen=(320.00, 129.00)
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzleBackdrop module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=2 distance=0.000000 screen=(320.00, 129.00)
+EventSystem count=4
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel/Viewport/Content/Presentation module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=9 distance=0.000000 screen=(320.00, 129.00)
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel/Viewport module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=4 distance=0.000000 screen=(320.00, 129.00)
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=3 distance=0.000000 screen=(320.00, 129.00)
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzleBackdrop module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=2 distance=0.000000 screen=(320.00, 129.00)
+queryErrors=
+Direct nonempty and all objects also in EventSystem=True
+c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel/Viewport type=UnityEngine.UI.Image active=True raycastTarget=True depth=4 cull=False color.a=0 rendererAlpha=1 canvas=c3_treasure_puzzle Adapter/C3UiCanvas registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  rect=(x:-290.00, y:-210.00, width:580.00, height:420.00) screenRect=(x:30.00, y:30.00, width:580.00, height:420.00) worldCorners=(30.000, 30.000, 0.000);(30.000, 450.000, 0.000);(610.000, 450.000, 0.000);(610.000, 30.000, 0.000) position=(320.000, 240.000, 0.000) rotation=(0.000, 0.000, 0.000, 1.000) lossyScale=(1.000, 1.000, 1.000) forward=(0.000, 0.000, 1.000)
+  rawFilter=c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel/Viewport:UnityEngine.UI.Image active=True accepts=True
+  rawFilter=c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel/Viewport:UnityEngine.UI.RectMask2D active=True accepts=True
+  rawFilter=c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel:UnityEngine.UI.Image active=True accepts=True
+  canvasAncestor=c3_treasure_puzzle Adapter/C3UiCanvas overrideSorting=False
+  Raw filter entries are not combined; Graphic.Raycast above applies ignoreParentGroups/overrideSorting.
+
+c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel type=UnityEngine.UI.Image active=True raycastTarget=True depth=3 cull=False color.a=0.95 rendererAlpha=1 canvas=c3_treasure_puzzle Adapter/C3UiCanvas registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  rect=(x:-308.00, y:-228.00, width:616.00, height:456.00) screenRect=(x:12.00, y:12.00, width:616.00, height:456.00) worldCorners=(12.000, 12.000, 0.000);(12.000, 468.000, 0.000);(628.000, 468.000, 0.000);(628.000, 12.000, 0.000) position=(320.000, 240.000, 0.000) rotation=(0.000, 0.000, 0.000, 1.000) lossyScale=(1.000, 1.000, 1.000) forward=(0.000, 0.000, 1.000)
+  rawFilter=c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel:UnityEngine.UI.Image active=True accepts=True
+  canvasAncestor=c3_treasure_puzzle Adapter/C3UiCanvas overrideSorting=False
+  Raw filter entries are not combined; Graphic.Raycast above applies ignoreParentGroups/overrideSorting.
+
+c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel/Viewport/Content/Presentation type=UnityEngine.UI.Image active=True raycastTarget=True depth=9 cull=False color.a=1 rendererAlpha=0.9744984 canvas=c3_treasure_puzzle Adapter/C3UiCanvas registered=True raycastRegistered=True rectContains=True Graphic.Raycast=True facingDot=1.000000
+  rect=(x:-290.00, y:-24.00, width:580.00, height:48.00) screenRect=(x:30.00, y:105.00, width:580.00, height:48.00) worldCorners=(30.000, 105.000, 0.000);(30.000, 153.000, 0.000);(610.000, 153.000, 0.000);(610.000, 105.000, 0.000) position=(320.000, 129.000, 0.000) rotation=(0.000, 0.000, 0.000, 1.000) lossyScale=(1.000, 1.000, 1.000) forward=(0.000, 0.000, 1.000)
+  rawFilter=c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel/Viewport/Content/Presentation:UnityEngine.UI.Image active=True accepts=True
+  rawFilter=c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel/Viewport:UnityEngine.UI.Image active=True accepts=True
+  rawFilter=c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel/Viewport:UnityEngine.UI.RectMask2D active=True accepts=True
+  rawFilter=c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel:UnityEngine.UI.Image active=True accepts=True
+  canvasAncestor=c3_treasure_puzzle Adapter/C3UiCanvas overrideSorting=False
+  Raw filter entries are not combined; Graphic.Raycast above applies ignoreParentGroups/overrideSorting.
+
+GraphicRegistry all=14 raycastRegistry=5 API=public GetRaycastableGraphicsForCanvas; returnType=UnityEngine.UI.Collections.IndexedSet`1[[UnityEngine.UI.Graphic, UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]; indexed count=5 candidatesBeforeRectAndFilters=5 descendants=60
+Raycaster registry: read-only reflection; internal RaycasterManager; returnType=System.Collections.Generic.List`1[[UnityEngine.EventSystems.BaseRaycaster, UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]; indexed count=2 entries=2
+Raycaster=c3_treasure_puzzle Adapter/C3UiCanvas:UnityEngine.UI.GraphicRaycaster active=True IsActive=True registered=True camera=MISSING rootRaycaster=c3_treasure_puzzle Adapter/C3UiCanvas ignoreReversed=True blockingObjects=None blockingMask=-1 rootCanvas=c3_treasure_puzzle Adapter/C3UiCanvas targetDisplay=0
+  otherCanvas direct=4 allGraphics=14
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel/Viewport/Content/Presentation module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=9 distance=0.000000 screen=(320.00, 129.00)
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel/Viewport module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=4 distance=0.000000 screen=(320.00, 129.00)
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzlePanel module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=3 distance=0.000000 screen=(320.00, 129.00)
+  c3_treasure_puzzle Adapter/C3UiCanvas/PuzzleBackdrop module=UnityEngine.UI.GraphicRaycaster@c3_treasure_puzzle Adapter/C3UiCanvas order=600 depth=2 distance=0.000000 screen=(320.00, 129.00)
+
+Raycaster=M2_Player/PlayerMenuCanvas:UnityEngine.UI.GraphicRaycaster active=True IsActive=True registered=True camera=MISSING rootRaycaster=M2_Player/PlayerMenuCanvas ignoreReversed=True blockingObjects=None blockingMask=-1 rootCanvas=M2_Player/PlayerMenuCanvas targetDisplay=0
+  otherCanvas direct=0 allGraphics=0
+
+
+EventSystems=M2_Player/PlayerMenuEventSystem active=True current=True
+Active canvases=c3_treasure_puzzle Adapter/C3UiCanvas order=600 mode=ScreenSpaceOverlay;M2_Player/PlayerMenuCanvas order=500 mode=ScreenSpaceOverlay
+
+]]></output>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1243" name="M7SharedPlayer.PlayModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/M7SharedPlayer.PlayModeTests.dll" runstate="Runnable" testcasecount="14" result="Passed" start-time="2026-11-07 12:42:01Z" end-time="2026-11-07 12:42:02Z" duration="1.098684" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="38396" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <test-suite type="TestSuite" id="1244" name="M7SharedPlayerTests" fullname="M7SharedPlayerTests" runstate="Runnable" testcasecount="14" result="Passed" start-time="2026-11-07 12:42:01Z" end-time="2026-11-07 12:42:02Z" duration="1.097669" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <test-suite type="TestFixture" id="1226" name="PlayerInputServiceTests" fullname="M7SharedPlayerTests.PlayerInputServiceTests" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-11-07 12:42:01Z" end-time="2026-11-07 12:42:02Z" duration="1.096372" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-case id="1228" name="EscapeHasOneEnabledActionInEachContext" fullname="M7SharedPlayerTests.PlayerInputServiceTests.EscapeHasOneEnabledActionInEachContext" methodname="EscapeHasOneEnabledActionInEachContext" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" seed="1916528577" result="Passed" start-time="2026-11-07 12:42:01Z" end-time="2026-11-07 12:42:01Z" duration="0.003018" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1230" name="Level03MenuPausesResumesAndUsesExistingTransitions" fullname="M7SharedPlayerTests.PlayerInputServiceTests.Level03MenuPausesResumesAndUsesExistingTransitions" methodname="Level03MenuPausesResumesAndUsesExistingTransitions" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" seed="1764322853" result="Passed" start-time="2026-11-07 12:42:01Z" end-time="2026-11-07 12:42:01Z" duration="0.566575" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1229" name="OneServiceSurvivesM6C3SceneChanges" fullname="M7SharedPlayerTests.PlayerInputServiceTests.OneServiceSurvivesM6C3SceneChanges" methodname="OneServiceSurvivesM6C3SceneChanges" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" seed="1900910252" result="Passed" start-time="2026-11-07 12:42:01Z" end-time="2026-11-07 12:42:02Z" duration="0.523981" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1227" name="SimulatedCursorSeparatesRequestedAndOsState" fullname="M7SharedPlayerTests.PlayerInputServiceTests.SimulatedCursorSeparatesRequestedAndOsState" methodname="SimulatedCursorSeparatesRequestedAndOsState" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" seed="776859195" result="Passed" start-time="2026-11-07 12:42:02Z" end-time="2026-11-07 12:42:02Z" duration="0.000335" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1264" name="PlayerControl.PlayModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/PlayerControl.PlayModeTests.dll" runstate="Runnable" testcasecount="16" result="Passed" start-time="2026-11-07 12:42:02Z" end-time="2026-11-07 12:42:02Z" duration="0.175712" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="38396" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <test-suite type="TestSuite" id="1265" name="SDGAdventure" fullname="SDGAdventure" runstate="Runnable" testcasecount="16" result="Passed" start-time="2026-11-07 12:42:02Z" end-time="2026-11-07 12:42:02Z" duration="0.166092" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <test-suite type="TestSuite" id="1266" name="PlayerControlTests" fullname="SDGAdventure.PlayerControlTests" runstate="Runnable" testcasecount="16" result="Passed" start-time="2026-11-07 12:42:02Z" end-time="2026-11-07 12:42:02Z" duration="0.164488" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-suite type="TestFixture" id="1249" name="PlayerControlPlayModeTests" fullname="SDGAdventure.PlayerControlTests.PlayerControlPlayModeTests" classname="SDGAdventure.PlayerControlTests.PlayerControlPlayModeTests" runstate="Runnable" testcasecount="12" result="Passed" start-time="2026-11-07 12:42:02Z" end-time="2026-11-07 12:42:02Z" duration="0.163309" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+            </properties>
+            <test-case id="1258" name="RepeatedPauseSettingsCyclesRestoreGameplayState" fullname="SDGAdventure.PlayerControlTests.PlayerControlPlayModeTests.RepeatedPauseSettingsCyclesRestoreGameplayState" methodname="RepeatedPauseSettingsCyclesRestoreGameplayState" classname="SDGAdventure.PlayerControlTests.PlayerControlPlayModeTests" runstate="Runnable" seed="126151326" result="Passed" start-time="2026-11-07 12:42:02Z" end-time="2026-11-07 12:42:02Z" duration="0.160416" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="platform" value="PlayMode" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

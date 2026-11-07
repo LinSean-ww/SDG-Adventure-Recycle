@@ -171,7 +171,12 @@ namespace M6IntegrationTests
                     Quaternion.LookRotation(Model.transform.forward));
                 obstruction.transform.localScale=new Vector3(1f,1.1f,.14f);
                 Physics.SyncTransforms();
-                for(int i=0;i<6;i++){yield return null;Pose(0,0);}
+                // The production tuck moves at a rate per second, not per frame.
+                // Bound the wait in real time so a paused or stalled pose fails.
+                float deadline=Time.realtimeSinceStartup+1f,elapsed=0f;
+                do { yield return null; Pose(0,0); elapsed+=Time.deltaTime; }
+                while (elapsed<.2f && Time.realtimeSinceStartup<deadline);
+                Assert.GreaterOrEqual(elapsed,.2f,"The high-ready pose must advance within one second.");
                 Assert.That((float)Get(View,"obstructionBlend"),Is.GreaterThan(.4f),
                     "A solid obstacle in front of the muzzle must trigger high-ready pose.");
                 Transform right=(Transform)Get(Worker,"rightHand");

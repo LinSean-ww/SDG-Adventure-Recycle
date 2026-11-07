@@ -11,6 +11,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
+using SDGAdventure.SharedPlayer;
 using Object=UnityEngine.Object;
 using static M6IntegrationTests.C3V11Phase2RecyclingLineTests;
 
@@ -24,13 +25,14 @@ namespace M6IntegrationTests
         [UnitySetUp] public IEnumerator Open()
         {
             scope=new C3V11Phase2RecyclingLineTests(); yield return scope.Open();
+            PlayerCursor.BeginSimulation(CursorLockMode.None);
             line=Find("C3TreasurePuzzle.C3RecyclingLine"); device=Find("C3TreasurePuzzle.C3DeviceState");
             console=Find("C3TreasurePuzzle.C3PuzzleConsole"); runtime=Find("EcoAdventureRuntime"); library=Find("C3TreasurePuzzle.C3RecyclingVisuals");
             Type inputType=Type.GetType("SDGAdventure.SharedPlayer.PlayerInputService, SDGAdventure.SharedPlayer",true);
             input=inputType.GetProperty("Instance").GetValue(null) as Component;
             if (input) Call(input,"SetContext",Enum.Parse(Member(input,"Context").GetType(),"Gameplay"));
         }
-        [UnityTearDown] public IEnumerator Close() { if (scope!=null) yield return scope.Close(); }
+        [UnityTearDown] public IEnumerator Close() { PlayerCursor.EndSimulation(); if (scope!=null) yield return scope.Close(); }
         private IEnumerator FirstProduction()
         {
             foreach (string kind in new[] {"Plastic","Metal","Paper"}) C3Phase21TestDriver.Supply(line,kind);
@@ -499,7 +501,7 @@ namespace M6IntegrationTests
             Assert.IsTrue((bool)Call(device,"TryCompleteAtExit"));
             Call(console,"Update"); Assert.IsFalse((bool)Member(console,"PanelOpen"));
             Assert.IsFalse((bool)Call(console,"OpenPanel")); Assert.IsFalse((bool)Member(line,"CanStartPresentation"));
-            Assert.AreEqual(CursorLockMode.None,Cursor.lockState); Assert.IsTrue(Cursor.visible);
+            Assert.AreEqual(CursorLockMode.None,PlayerCursor.LockState); Assert.IsTrue(Cursor.visible);
             yield return null;
         }
         [UnityTest] public IEnumerator ProductionUguiReceivesARealClickWithoutReactivationOrPuzzleSubmission()
@@ -513,7 +515,7 @@ namespace M6IntegrationTests
                 yield return FirstProduction();
                 string formalBefore=ProtectedState();
                 int attempts=(int)Member(Find("C3TreasurePuzzle.C3PuzzleState"),"SubmissionCount");
-                Cursor.lockState=CursorLockMode.Locked; Cursor.visible=false;
+                PlayerCursor.LockState=CursorLockMode.Locked; Cursor.visible=false;
                 Assert.IsTrue((bool)Call(console,"OpenPanel"));
                 Transform content=GameObject.Find("C3UiCanvas").transform.Find("PuzzlePanel/Viewport/Content");
                 Button button=content.Find("Presentation").GetComponent<Button>();
@@ -586,7 +588,7 @@ namespace M6IntegrationTests
                     Assert.IsTrue(ExecuteEvents.Execute(press,pointer,ExecuteEvents.pointerUpHandler));
                     Assert.IsTrue(ExecuteEvents.Execute(press,pointer,ExecuteEvents.pointerClickHandler));
                     object session=Member(line,"ActivePresentation"); Assert.IsNotNull(session); Assert.IsTrue((bool)Member(session,"IsPresentation"));
-                    Assert.IsFalse((bool)Member(console,"PanelOpen")); Assert.AreEqual(CursorLockMode.Locked,Cursor.lockState); Assert.IsFalse(Cursor.visible);
+                    Assert.IsFalse((bool)Member(console,"PanelOpen")); Assert.AreEqual(CursorLockMode.Locked,PlayerCursor.LockState); Assert.IsFalse(Cursor.visible);
                     Assert.AreEqual(formalBefore,ProtectedState(),"UI presentation start changed formal records/rewards/inventory");
                     Assert.IsFalse((bool)Call(console,"StartPresentation"));
                     yield return null; // closedFrame deliberately blocks gameplay only for the click frame
@@ -808,7 +810,7 @@ namespace M6IntegrationTests
             Assert.IsNull(Member(line,"ActivePresentation")); Assert.IsTrue((bool)Member(device,"LevelCompleted"));
             Assert.IsTrue((bool)Member(Find("C3TreasurePuzzle.C3CompletionScreen"),"Visible"));
             Assert.IsFalse((bool)Member(console,"PanelOpen")); Assert.IsFalse((bool)Call(console,"OpenPanel"));
-            Assert.AreEqual(CursorLockMode.None,Cursor.lockState); Assert.IsTrue(Cursor.visible); yield return null;
+            Assert.AreEqual(CursorLockMode.None,PlayerCursor.LockState); Assert.IsTrue(Cursor.visible); yield return null;
         }
         [UnityTest] public IEnumerator SceneReloadDropsAllReplayStateAndKeepsSharedAssetsBounded()
         {

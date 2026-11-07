@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="9" result="Passed" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-07 12:43:02Z" end-time="2026-11-07 12:43:08Z" duration="5.935969">
+  <test-suite type="TestSuite" id="1000" name="My project" fullname="My project" runstate="Runnable" testcasecount="217" result="Passed" start-time="2026-11-07 12:43:02Z" end-time="2026-11-07 12:43:08Z" duration="5.935969" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1222" name="M6Integration.PlayModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/M6Integration.PlayModeTests.dll" runstate="Runnable" testcasecount="187" result="Passed" start-time="2026-11-07 12:43:02Z" end-time="2026-11-07 12:43:08Z" duration="5.926133" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="34356" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <test-suite type="TestSuite" id="1223" name="M6IntegrationTests" fullname="M6IntegrationTests" runstate="Runnable" testcasecount="174" result="Passed" start-time="2026-11-07 12:43:02Z" end-time="2026-11-07 12:43:08Z" duration="5.920950" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <test-suite type="TestFixture" id="1078" name="C3V11ThirdPersonWeaponTests" fullname="M6IntegrationTests.C3V11ThirdPersonWeaponTests" classname="M6IntegrationTests.C3V11ThirdPersonWeaponTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-11-07 12:43:02Z" end-time="2026-11-07 12:43:06Z" duration="3.618201" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-case id="1082" name="CloseWallRaisesHeldRifleAndKeepsBothHandsOnGrips" fullname="M6IntegrationTests.C3V11ThirdPersonWeaponTests.CloseWallRaisesHeldRifleAndKeepsBothHandsOnGrips" methodname="CloseWallRaisesHeldRifleAndKeepsBothHandsOnGrips" classname="M6IntegrationTests.C3V11ThirdPersonWeaponTests" runstate="Runnable" seed="1552661792" result="Passed" start-time="2026-11-07 12:43:02Z" end-time="2026-11-07 12:43:03Z" duration="1.037087" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1085" name="EquippedSceneReloadsReleaseOldViewsAndDoNotDuplicateAnchors" fullname="M6IntegrationTests.C3V11ThirdPersonWeaponTests.EquippedSceneReloadsReleaseOldViewsAndDoNotDuplicateAnchors" methodname="EquippedSceneReloadsReleaseOldViewsAndDoNotDuplicateAnchors" classname="M6IntegrationTests.C3V11ThirdPersonWeaponTests" runstate="Runnable" seed="1723341811" result="Passed" start-time="2026-11-07 12:43:03Z" end-time="2026-11-07 12:43:04Z" duration="0.884747" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1080" name="EquippedWeaponAndBothHandsFollowPitchOrbitAndViewSwitches" fullname="M6IntegrationTests.C3V11ThirdPersonWeaponTests.EquippedWeaponAndBothHandsFollowPitchOrbitAndViewSwitches" methodname="EquippedWeaponAndBothHandsFollowPitchOrbitAndViewSwitches" classname="M6IntegrationTests.C3V11ThirdPersonWeaponTests" runstate="Runnable" seed="910209281" result="Passed" start-time="2026-11-07 12:43:04Z" end-time="2026-11-07 12:43:04Z" duration="0.333586" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1083" name="FirstPersonBarrelRetractsBeforeSolidWallWithoutChangingRig" fullname="M6IntegrationTests.C3V11ThirdPersonWeaponTests.FirstPersonBarrelRetractsBeforeSolidWallWithoutChangingRig" methodname="FirstPersonBarrelRetractsBeforeSolidWallWithoutChangingRig" classname="M6IntegrationTests.C3V11ThirdPersonWeaponTests" runstate="Runnable" seed="2114095452" result="Passed" start-time="2026-11-07 12:43:04Z" end-time="2026-11-07 12:43:05Z" duration="0.313128" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1079" name="SightHasOpenCenterOnCameraAimAxis" fullname="M6IntegrationTests.C3V11ThirdPersonWeaponTests.SightHasOpenCenterOnCameraAimAxis" methodname="SightHasOpenCenterOnCameraAimAxis" classname="M6IntegrationTests.C3V11ThirdPersonWeaponTests" runstate="Runnable" seed="1435019973" result="Passed" start-time="2026-11-07 12:43:05Z" end-time="2026-11-07 12:43:05Z" duration="0.302743" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1084" name="SwitchingToThirdPersonAfterFpsWallRetractionRestoresRiflePose" fullname="M6IntegrationTests.C3V11ThirdPersonWeaponTests.SwitchingToThirdPersonAfterFpsWallRetractionRestoresRiflePose" methodname="SwitchingToThirdPersonAfterFpsWallRetractionRestoresRiflePose" classname="M6IntegrationTests.C3V11ThirdPersonWeaponTests" runstate="Runnable" seed="2113354080" result="Passed" start-time="2026-11-07 12:43:05Z" end-time="2026-11-07 12:43:05Z" duration="0.338774" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1081" name="WalkingLeanProneAndAdsKeepGripsWithoutChangingMovementState" fullname="M6IntegrationTests.C3V11ThirdPersonWeaponTests.WalkingLeanProneAndAdsKeepGripsWithoutChangingMovementState" methodname="WalkingLeanProneAndAdsKeepGripsWithoutChangingMovementState" classname="M6IntegrationTests.C3V11ThirdPersonWeaponTests" runstate="Runnable" seed="1643690023" result="Passed" start-time="2026-11-07 12:43:05Z" end-time="2026-11-07 12:43:06Z" duration="0.393756" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="TestFixture" id="1151" name="C3V141ReloadTests" fullname="M6IntegrationTests.C3V141ReloadTests" classname="M6IntegrationTests.C3V141ReloadTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-07 12:43:06Z" end-time="2026-11-07 12:43:08Z" duration="2.295621" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-case id="1152" name="ReloadBlocksShotsAndTransfersAmmoOnce" fullname="M6IntegrationTests.C3V141ReloadTests.ReloadBlocksShotsAndTransfersAmmoOnce" methodname="ReloadBlocksShotsAndTransfersAmmoOnce" classname="M6IntegrationTests.C3V141ReloadTests" runstate="Runnable" seed="1520723345" result="Passed" start-time="2026-11-07 12:43:06Z" end-time="2026-11-07 12:43:08Z" duration="1.959906" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1153" name="SwitchingWeaponCancelsWithoutTransferringAmmo" fullname="M6IntegrationTests.C3V141ReloadTests.SwitchingWeaponCancelsWithoutTransferringAmmo" methodname="SwitchingWeaponCancelsWithoutTransferringAmmo" classname="M6IntegrationTests.C3V141ReloadTests" runstate="Runnable" seed="459427531" result="Passed" start-time="2026-11-07 12:43:08Z" end-time="2026-11-07 12:43:08Z" duration="0.334444" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

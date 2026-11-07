@@ -174,7 +174,7 @@ namespace C3TreasurePuzzle
             compactPanel.GetComponent<Image>().color = hud.CollectionFeedbackActive ? new Color(0.10f, 0.32f, 0.20f, 0.86f) : new Color(0.035f, 0.065f, 0.09f, 0.72f);
             var input = PlayerInputService.Instance;
             bool gameplay = input == null || input.Context == PlayerInputContext.Gameplay;
-            bool showAim = gameplay && !showPuzzle && !showCompletion && !showTask && Cursor.lockState == CursorLockMode.Locked;
+            bool showAim = gameplay && !showPuzzle && !showCompletion && !showTask && PlayerCursor.LockState == CursorLockMode.Locked;
             crosshair.SetActive(showAim);
             compactPanel.SetActive(gameplay && !showPuzzle && !showCompletion && !showTask);
             notice.text = showPuzzle || showCompletion ? "" : console.NoticeText;

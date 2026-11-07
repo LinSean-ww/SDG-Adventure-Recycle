@@ -6,6 +6,7 @@ using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using SDGAdventure.SharedPlayer;
 using Object=UnityEngine.Object;
 
 namespace M6IntegrationTests
@@ -17,6 +18,7 @@ namespace M6IntegrationTests
     {
         private C3V11Phase2RecyclingLineTests scope;
         private object keyboard,previousKeyboard;
+        private object inputSettings,previousBackground,previousEditorInput;
         private readonly List<GameObject> temporary=new List<GameObject>();
         private const BindingFlags Any=BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Instance;
         private static readonly Vector3 Parking=new Vector3(128,128,128);
@@ -38,7 +40,7 @@ namespace M6IntegrationTests
         private static void Context(string name)
         {
             Call(Service,"SetContext",Enum.Parse(Get(Service,"Context").GetType(),name));
-            Cursor.lockState=CursorLockMode.Locked;Cursor.visible=false;
+            PlayerCursor.LockState=CursorLockMode.Locked;Cursor.visible=false;
         }
         private static void Mode(int value)
         {
@@ -80,6 +82,13 @@ namespace M6IntegrationTests
         {
             keyboard=previousKeyboard=null;
             temporary.Clear();scope=new C3V11Phase2RecyclingLineTests();yield return scope.Open();
+            PlayerCursor.BeginSimulation(CursorLockMode.None);
+            inputSettings=InputType("InputSystem").GetProperty("settings").GetValue(null);
+            PropertyInfo background=inputSettings.GetType().GetProperty("backgroundBehavior");
+            PropertyInfo editorInput=inputSettings.GetType().GetProperty("editorInputBehaviorInPlayMode");
+            previousBackground=background.GetValue(inputSettings);previousEditorInput=editorInput.GetValue(inputSettings);
+            background.SetValue(inputSettings,Enum.Parse(background.PropertyType,"IgnoreFocus"));
+            editorInput.SetValue(inputSettings,Enum.Parse(editorInput.PropertyType,"AllDeviceInputAlwaysGoesToGameView"));
             ((Behaviour)Rig).enabled=false; // fixture owns the camera pose in these selection tests
             Assert.IsNotNull(Service);Call(Interactor,"UseSharedInput",Service);((Behaviour)Interactor).enabled=true;Context("Gameplay");
             previousKeyboard=InputType("Keyboard").GetProperty("current").GetValue(null);
@@ -110,6 +119,11 @@ namespace M6IntegrationTests
                     previousKeyboard.GetType().GetMethod("MakeCurrent",Type.EmptyTypes).Invoke(previousKeyboard,null);
             },ref failure);
             previousKeyboard=null;
+            TryCleanup(()=>{if(inputSettings!=null){
+                inputSettings.GetType().GetProperty("editorInputBehaviorInPlayMode").SetValue(inputSettings,previousEditorInput);
+                inputSettings.GetType().GetProperty("backgroundBehavior").SetValue(inputSettings,previousBackground);
+            }},ref failure);
+            TryCleanup(()=>PlayerCursor.EndSimulation(),ref failure);
             foreach(GameObject item in temporary)
                 TryCleanup(()=>{if(item){item.SetActive(false);Object.Destroy(item);}},ref failure);
             temporary.Clear();yield return null;

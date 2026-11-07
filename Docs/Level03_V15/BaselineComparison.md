@@ -1,5 +1,7 @@
 # Baseline comparison
 
+Phase 2 added one explicit cursor-state separation test. Before the final V4 test updates, both the ordinary full run and the fixed-seed 71 run with one repeat reported 217 tests, 201 passed, 13 failed and 3 skipped; their per-test outcomes matched. After the final V4 and transition changes, the final fixed-seed run with one repeat reported 217 tests, 205 passed, 9 failed and 3 skipped. Of the 46 historical failures, 37 passed in that final run. See [Validation.md](Validation.md) for the runs and their exact scope.
+
 | Version and run | Commit | Tests | Pass | Fail | Skip | Evidence |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
 | Historical V14.1 PlayMode | Before final input-state change | 214 | 165 | 46 | 3 | [XML](Historical_V141_PlayMode.xml) |

@@ -5,6 +5,59 @@ using UnityEngine.SceneManagement;
 
 namespace SDGAdventure.SharedPlayer
 {
+    // Production reads the OS state, so losing focus still blocks gameplay.
+    // The requested state is recorded separately for UI and automated checks.
+    public static class PlayerCursor
+    {
+        public static CursorLockMode RequestedLockState { get; private set; }
+#if UNITY_EDITOR
+        private static bool simulated;
+        private static CursorLockMode simulatedState;
+        private static CursorLockMode previousRequestedState;
+        public static void BeginSimulation(CursorLockMode initialState)
+        {
+            if (simulated) throw new InvalidOperationException("Cursor simulation is already active.");
+            previousRequestedState = RequestedLockState;
+            simulated = true;
+            simulatedState = initialState;
+            RequestedLockState = initialState;
+        }
+        public static void EndSimulation()
+        {
+            if (!simulated) return;
+            simulated = false;
+            RequestedLockState = previousRequestedState;
+        }
+#endif
+        public static CursorLockMode LockState
+        {
+            get
+            {
+#if UNITY_EDITOR
+                if (simulated) return simulatedState;
+#endif
+                return Cursor.lockState;
+            }
+            set
+            {
+                RequestedLockState = value;
+#if UNITY_EDITOR
+                if (simulated) { simulatedState = value; return; }
+#endif
+                Cursor.lockState = value;
+            }
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void Reset()
+        {
+#if UNITY_EDITOR
+            simulated = false;
+#endif
+            RequestedLockState = CursorLockMode.None;
+        }
+    }
+
     public enum PlayerInputContext { Inactive, Gameplay, UI }
 
     // Only the action service survives scene changes. Players and cameras remain scene-owned.

@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="14" result="Failed(Child)" total="14" passed="13" failed="1" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-07 13:11:28Z" end-time="2026-11-07 13:11:37Z" duration="9.1523616">
+  <test-suite type="TestSuite" id="1269" name="My project" fullname="My project" runstate="Runnable" testcasecount="217" result="Failed" site="Child" start-time="2026-11-07 13:11:28Z" end-time="2026-11-07 13:11:37Z" duration="9.152362" total="14" passed="13" failed="1" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="suiteIsReordered" value="True" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1296" name="M6Integration.PlayModeTests.dll" fullname="M6Integration.PlayModeTests.dll" runstate="Runnable" testcasecount="14" result="Passed" start-time="2026-11-07 13:11:28Z" end-time="2026-11-07 13:11:29Z" duration="1.061501" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="21224" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="suiteIsReordered" value="True" />
+        <property name="childIndex" value="3" />
+      </properties>
+      <test-suite type="TestSuite" id="1297" name="M6IntegrationTests" fullname="M6IntegrationTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-11-07 13:11:28Z" end-time="2026-11-07 13:11:29Z" duration="1.053386" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+          <property name="suiteIsReordered" value="True" />
+        </properties>
+        <test-suite type="TestFixture" id="1299" name="C3V3CirculationTests" fullname="M6IntegrationTests.C3V3CirculationTests" classname="M6IntegrationTests.C3V3CirculationTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 13:11:28Z" end-time="2026-11-07 13:11:29Z" duration="1.051449" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+            <property name="suiteIsReordered" value="True" />
+          </properties>
+          <test-case id="1157" name="ConveyorHasOneFeedAndThreePhysicalIntakeOutputPairs" fullname="M6IntegrationTests.C3V3CirculationTests.ConveyorHasOneFeedAndThreePhysicalIntakeOutputPairs" methodname="ConveyorHasOneFeedAndThreePhysicalIntakeOutputPairs" classname="M6IntegrationTests.C3V3CirculationTests" runstate="Runnable" seed="1920745929" result="Passed" start-time="2026-11-07 13:11:29Z" end-time="2026-11-07 13:11:29Z" duration="0.298287" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="suiteIsReordered" value="True" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="1" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1329" name="PlayerControl.PlayModeTests.dll" fullname="PlayerControl.PlayModeTests.dll" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-07 13:11:29Z" end-time="2026-11-07 13:11:29Z" duration="0.121161" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="21224" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="suiteIsReordered" value="True" />
+        <property name="childIndex" value="3" />
+      </properties>
+      <test-suite type="TestSuite" id="1330" name="SDGAdventure" fullname="SDGAdventure" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-07 13:11:29Z" end-time="2026-11-07 13:11:29Z" duration="0.118552" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+          <property name="suiteIsReordered" value="True" />
+        </properties>
+        <test-suite type="TestSuite" id="1331" name="PlayerControlTests" fullname="PlayerControlTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-07 13:11:29Z" end-time="2026-11-07 13:11:29Z" duration="0.117193" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+            <property name="suiteIsReordered" value="True" />
+          </properties>
+          <test-suite type="TestFixture" id="1332" name="PlayerControlPlayModeTests" fullname="SDGAdventure.PlayerControlTests.PlayerControlPlayModeTests" classname="SDGAdventure.PlayerControlTests.PlayerControlPlayModeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-07 13:11:29Z" end-time="2026-11-07 13:11:29Z" duration="0.115981" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="suiteIsReordered" value="True" />
+            </properties>
+            <test-case id="1257" name="PauseBlocksGameplayAndRestoresCursorAndTime" fullname="SDGAdventure.PlayerControlTests.PlayerControlPlayModeTests.PauseBlocksGameplayAndRestoresCursorAndTime" methodname="PauseBlocksGameplayAndRestoresCursorAndTime" classname="SDGAdventure.PlayerControlTests.PlayerControlPlayModeTests" runstate="Runnable" seed="238666028" result="Passed" start-time="2026-11-07 13:11:29Z" end-time="2026-11-07 13:11:29Z" duration="0.032037" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="platform" value="PlayMode" />
+                <property name="suiteIsReordered" value="True" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="1" />
+              </properties>
+              <output><![CDATA[There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1336" name="M7SharedPlayer.PlayModeTests.dll" fullname="M7SharedPlayer.PlayModeTests.dll" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 13:11:29Z" end-time="2026-11-07 13:11:29Z" duration="0.011207" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="21224" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="suiteIsReordered" value="True" />
+        <property name="childIndex" value="3" />
+      </properties>
+      <test-suite type="TestSuite" id="1337" name="M7SharedPlayerTests" fullname="M7SharedPlayerTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 13:11:29Z" end-time="2026-11-07 13:11:29Z" duration="0.009692" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+          <property name="suiteIsReordered" value="True" />
+        </properties>
+        <test-suite type="TestFixture" id="1338" name="PlayerInputServiceTests" fullname="M7SharedPlayerTests.PlayerInputServiceTests" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 13:11:29Z" end-time="2026-11-07 13:11:29Z" duration="0.005549" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+            <property name="suiteIsReordered" value="True" />
+          </properties>
+          <test-case id="1228" name="EscapeHasOneEnabledActionInEachContext" fullname="M7SharedPlayerTests.PlayerInputServiceTests.EscapeHasOneEnabledActionInEachContext" methodname="EscapeHasOneEnabledActionInEachContext" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" seed="690510344" result="Passed" start-time="2026-11-07 13:11:29Z" end-time="2026-11-07 13:11:29Z" duration="0.000242" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="suiteIsReordered" value="True" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="1" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1389" name="M6Integration.PlayModeTests.dll" fullname="M6Integration.PlayModeTests.dll" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-11-07 13:11:29Z" end-time="2026-11-07 13:11:31Z" duration="1.312542" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="21224" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="suiteIsReordered" value="True" />
+        <property name="childIndex" value="12" />
+      </properties>
+      <test-suite type="TestSuite" id="1390" name="M6IntegrationTests" fullname="M6IntegrationTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-11-07 13:11:29Z" end-time="2026-11-07 13:11:31Z" duration="1.310616" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+          <property name="suiteIsReordered" value="True" />
+        </properties>
+        <test-suite type="TestFixture" id="1395" name="C3V4BFeedAndAccessTests" fullname="M6IntegrationTests.C3V4BFeedAndAccessTests" classname="M6IntegrationTests.C3V4BFeedAndAccessTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 13:11:29Z" end-time="2026-11-07 13:11:30Z" duration="0.701453" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+            <property name="suiteIsReordered" value="True" />
+          </properties>
+          <test-case id="1160" name="BZoneHasVisibleInputBeltRollersAndConveyorLift" fullname="M6IntegrationTests.C3V4BFeedAndAccessTests.BZoneHasVisibleInputBeltRollersAndConveyorLift" methodname="BZoneHasVisibleInputBeltRollersAndConveyorLift" classname="M6IntegrationTests.C3V4BFeedAndAccessTests" runstate="Runnable" seed="1404795049" result="Passed" start-time="2026-11-07 13:11:30Z" end-time="2026-11-07 13:11:30Z" duration="0.358670" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="suiteIsReordered" value="True" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="1" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="TestFixture" id="1397" name="C3V4BFeedAndAccessTests" fullname="M6IntegrationTests.C3V4BFeedAndAccessTests" classname="M6IntegrationTests.C3V4BFeedAndAccessTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 13:11:30Z" end-time="2026-11-07 13:11:31Z" duration="0.606240" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+            <property name="suiteIsReordered" value="True" />
+            <property name="childIndex" value="2" />
+          </properties>
+          <test-case id="1161" name="RaisedCeilingAndRealAccessibleStairEndpointsExist" fullname="M6IntegrationTests.C3V4BFeedAndAccessTests.RaisedCeilingAndRealAccessibleStairEndpointsExist" methodname="RaisedCeilingAndRealAccessibleStairEndpointsExist" classname="M6IntegrationTests.C3V4BFeedAndAccessTests" runstate="Runnable" seed="1932997088" result="Passed" start-time="2026-11-07 13:11:30Z" end-time="2026-11-07 13:11:31Z" duration="0.306729" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="suiteIsReordered" value="True" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="1" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1430" name="M7SharedPlayer.PlayModeTests.dll" fullname="M7SharedPlayer.PlayModeTests.dll" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 13:11:31Z" end-time="2026-11-07 13:11:31Z" duration="0.005199" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="21224" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="suiteIsReordered" value="True" />
+        <property name="childIndex" value="7" />
+      </properties>
+      <test-suite type="TestSuite" id="1431" name="M7SharedPlayerTests" fullname="M7SharedPlayerTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 13:11:31Z" end-time="2026-11-07 13:11:31Z" duration="0.003158" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+          <property name="suiteIsReordered" value="True" />
+        </properties>
+        <test-suite type="TestFixture" id="1432" name="PlayerInputServiceTests" fullname="M7SharedPlayerTests.PlayerInputServiceTests" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 13:11:31Z" end-time="2026-11-07 13:11:31Z" duration="0.001931" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+            <property name="suiteIsReordered" value="True" />
+          </properties>
+          <test-case id="1227" name="SimulatedCursorSeparatesRequestedAndOsState" fullname="M7SharedPlayerTests.PlayerInputServiceTests.SimulatedCursorSeparatesRequestedAndOsState" methodname="SimulatedCursorSeparatesRequestedAndOsState" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" seed="675160538" result="Passed" start-time="2026-11-07 13:11:31Z" end-time="2026-11-07 13:11:31Z" duration="0.000096" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="suiteIsReordered" value="True" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="1" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1450" name="M7SharedPlayer.PlayModeTests.dll" fullname="M7SharedPlayer.PlayModeTests.dll" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 13:11:31Z" end-time="2026-11-07 13:11:32Z" duration="1.384838" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="21224" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="suiteIsReordered" value="True" />
+        <property name="childIndex" value="8" />
+      </properties>
+      <test-suite type="TestSuite" id="1451" name="M7SharedPlayerTests" fullname="M7SharedPlayerTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 13:11:31Z" end-time="2026-11-07 13:11:32Z" duration="1.383612" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+          <property name="suiteIsReordered" value="True" />
+        </properties>
+        <test-suite type="TestFixture" id="1452" name="PlayerInputServiceTests" fullname="M7SharedPlayerTests.PlayerInputServiceTests" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 13:11:31Z" end-time="2026-11-07 13:11:32Z" duration="1.382633" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+            <property name="suiteIsReordered" value="True" />
+          </properties>
+          <test-case id="1230" name="Level03MenuPausesResumesAndUsesExistingTransitions" fullname="M7SharedPlayerTests.PlayerInputServiceTests.Level03MenuPausesResumesAndUsesExistingTransitions" methodname="Level03MenuPausesResumesAndUsesExistingTransitions" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" seed="960814274" result="Passed" start-time="2026-11-07 13:11:31Z" end-time="2026-11-07 13:11:32Z" duration="0.765538" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="suiteIsReordered" value="True" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="1" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1470" name="M7SharedPlayer.PlayModeTests.dll" fullname="M7SharedPlayer.PlayModeTests.dll" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 13:11:32Z" end-time="2026-11-07 13:11:33Z" duration="0.921703" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="21224" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="suiteIsReordered" value="True" />
+        <property name="childIndex" value="10" />
+      </properties>
+      <test-suite type="TestSuite" id="1471" name="M7SharedPlayerTests" fullname="M7SharedPlayerTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 13:11:32Z" end-time="2026-11-07 13:11:33Z" duration="0.920686" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+          <property name="suiteIsReordered" value="True" />
+        </properties>
+        <test-suite type="TestFixture" id="1472" name="PlayerInputServiceTests" fullname="M7SharedPlayerTests.PlayerInputServiceTests" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 13:11:32Z" end-time="2026-11-07 13:11:33Z" duration="0.920038" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+            <property name="suiteIsReordered" value="True" />
+          </properties>
+          <test-case id="1229" name="OneServiceSurvivesM6C3SceneChanges" fullname="M7SharedPlayerTests.PlayerInputServiceTests.OneServiceSurvivesM6C3SceneChanges" methodname="OneServiceSurvivesM6C3SceneChanges" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" seed="256402686" result="Passed" start-time="2026-11-07 13:11:32Z" end-time="2026-11-07 13:11:33Z" duration="0.440673" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="suiteIsReordered" value="True" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="1" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1473" name="M6Integration.PlayModeTests.dll" fullname="M6Integration.PlayModeTests.dll" runstate="Runnable" testcasecount="29" result="Passed" start-time="2026-11-07 13:11:33Z" end-time="2026-11-07 13:11:34Z" duration="1.376795" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="21224" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="suiteIsReordered" value="True" />
+        <property name="childIndex" value="20" />
+      </properties>
+      <test-suite type="TestSuite" id="1474" name="M6IntegrationTests" fullname="M6IntegrationTests" runstate="Runnable" testcasecount="16" result="Passed" start-time="2026-11-07 13:11:33Z" end-time="2026-11-07 13:11:34Z" duration="0.748949" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+          <property name="suiteIsReordered" value="True" />
+        </properties>
+        <test-suite type="TestFixture" id="1483" name="C3V3CirculationTests" fullname="M6IntegrationTests.C3V3CirculationTests" classname="M6IntegrationTests.C3V3CirculationTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 13:11:33Z" end-time="2026-11-07 13:11:34Z" duration="0.742610" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+            <property name="suiteIsReordered" value="True" />
+          </properties>
+          <test-case id="1158" name="OriginalGameplayObjectsAndPlayerRemain" fullname="M6IntegrationTests.C3V3CirculationTests.OriginalGameplayObjectsAndPlayerRemain" methodname="OriginalGameplayObjectsAndPlayerRemain" classname="M6IntegrationTests.C3V3CirculationTests" runstate="Runnable" seed="472118656" result="Passed" start-time="2026-11-07 13:11:33Z" end-time="2026-11-07 13:11:34Z" duration="0.296616" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="suiteIsReordered" value="True" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="1" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+      <test-suite type="TestSuite" id="1494" name="M6IntegrationTests" fullname="M6IntegrationTests" runstate="Runnable" testcasecount="12" result="Passed" start-time="2026-11-07 13:11:34Z" end-time="2026-11-07 13:11:34Z" duration="0.613413" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+          <property name="suiteIsReordered" value="True" />
+          <property name="childIndex" value="2" />
+        </properties>
+        <test-suite type="TestFixture" id="1502" name="C3V3CirculationTests" fullname="M6IntegrationTests.C3V3CirculationTests" classname="M6IntegrationTests.C3V3CirculationTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 13:11:34Z" end-time="2026-11-07 13:11:34Z" duration="0.606137" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+            <property name="suiteIsReordered" value="True" />
+          </properties>
+          <test-case id="1156" name="StairRampsReachTheirDecksWithoutBarrierAcrossExit" fullname="M6IntegrationTests.C3V3CirculationTests.StairRampsReachTheirDecksWithoutBarrierAcrossExit" methodname="StairRampsReachTheirDecksWithoutBarrierAcrossExit" classname="M6IntegrationTests.C3V3CirculationTests" runstate="Runnable" seed="956631868" result="Passed" start-time="2026-11-07 13:11:34Z" end-time="2026-11-07 13:11:34Z" duration="0.285698" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="suiteIsReordered" value="True" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="1" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1511" name="M6Integration.PlayModeTests.dll" fullname="M6Integration.PlayModeTests.dll" runstate="Runnable" testcasecount="9" result="Failed" site="Child" start-time="2026-11-07 13:11:34Z" end-time="2026-11-07 13:11:35Z" duration="0.296336" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="21224" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="suiteIsReordered" value="True" />
+        <property name="childIndex" value="21" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1517" name="SDGAdventure" fullname="SDGAdventure" runstate="Runnable" testcasecount="2" result="Failed" site="Child" start-time="2026-11-07 13:11:34Z" end-time="2026-11-07 13:11:35Z" duration="0.293342" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+          <property name="suiteIsReordered" value="True" />
+        </properties>
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1518" name="Testing" fullname="Testing" runstate="Runnable" testcasecount="2" result="Failed" site="Child" start-time="2026-11-07 13:11:34Z" end-time="2026-11-07 13:11:35Z" duration="0.292093" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+            <property name="suiteIsReordered" value="True" />
+          </properties>
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestFixture" id="1519" name="C3AbandonedFactoryUpgradeTests" fullname="SDGAdventure.Testing.C3AbandonedFactoryUpgradeTests" classname="SDGAdventure.Testing.C3AbandonedFactoryUpgradeTests" runstate="Runnable" testcasecount="2" result="Failed" site="Child" start-time="2026-11-07 13:11:34Z" end-time="2026-11-07 13:11:35Z" duration="0.290771" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="suiteIsReordered" value="True" />
+            </properties>
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-case id="1206" name="RuntimeArtHasBFeedAndNonBlockingDecay" fullname="SDGAdventure.Testing.C3AbandonedFactoryUpgradeTests.RuntimeArtHasBFeedAndNonBlockingDecay" methodname="RuntimeArtHasBFeedAndNonBlockingDecay" classname="SDGAdventure.Testing.C3AbandonedFactoryUpgradeTests" runstate="Runnable" seed="1407705506" result="Failed" start-time="2026-11-07 13:11:34Z" end-time="2026-11-07 13:11:35Z" duration="0.286365" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="platform" value="PlayMode" />
+                <property name="suiteIsReordered" value="True" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <failure>
+                <message><![CDATA[  Expected: not null
+  But was:  null
+]]></message>
+                <stack-trace><![CDATA[at SDGAdventure.Testing.C3AbandonedFactoryUpgradeTests+<RuntimeArtHasBFeedAndNonBlockingDecay>d__5.MoveNext () [0x000b7] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3AbandonedFactoryUpgradeTests.cs:33
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@1.3.9\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+              </failure>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1552" name="M6Integration.PlayModeTests.dll" fullname="M6Integration.PlayModeTests.dll" runstate="Runnable" testcasecount="11" result="Passed" start-time="2026-11-07 13:11:35Z" end-time="2026-11-07 13:11:36Z" duration="1.126313" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="21224" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="suiteIsReordered" value="True" />
+        <property name="childIndex" value="24" />
+      </properties>
+      <test-suite type="TestSuite" id="1553" name="M6IntegrationTests" fullname="M6IntegrationTests" runstate="Runnable" testcasecount="11" result="Passed" start-time="2026-11-07 13:11:35Z" end-time="2026-11-07 13:11:36Z" duration="1.123820" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+          <property name="suiteIsReordered" value="True" />
+        </properties>
+        <test-suite type="TestFixture" id="1560" name="C3V4BFeedAndAccessTests" fullname="M6IntegrationTests.C3V4BFeedAndAccessTests" classname="M6IntegrationTests.C3V4BFeedAndAccessTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 13:11:35Z" end-time="2026-11-07 13:11:36Z" duration="1.120185" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+            <property name="suiteIsReordered" value="True" />
+          </properties>
+          <test-case id="1162" name="WestStairRampCanCarryARealCharacterController" fullname="M6IntegrationTests.C3V4BFeedAndAccessTests.WestStairRampCanCarryARealCharacterController" methodname="WestStairRampCanCarryARealCharacterController" classname="M6IntegrationTests.C3V4BFeedAndAccessTests" runstate="Runnable" seed="1303587181" result="Passed" start-time="2026-11-07 13:11:35Z" end-time="2026-11-07 13:11:36Z" duration="0.542336" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="suiteIsReordered" value="True" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="1" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1570" name="M6Integration.PlayModeTests.dll" fullname="M6Integration.PlayModeTests.dll" runstate="Runnable" testcasecount="20" result="Passed" start-time="2026-11-07 13:11:36Z" end-time="2026-11-07 13:11:36Z" duration="0.783769" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="21224" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="suiteIsReordered" value="True" />
+        <property name="childIndex" value="25" />
+      </properties>
+      <test-suite type="TestSuite" id="1571" name="M6IntegrationTests" fullname="M6IntegrationTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 13:11:36Z" end-time="2026-11-07 13:11:36Z" duration="0.779729" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+          <property name="suiteIsReordered" value="True" />
+        </properties>
+        <test-suite type="TestFixture" id="1572" name="M6FlowTests" fullname="M6IntegrationTests.M6FlowTests" classname="M6IntegrationTests.M6FlowTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 13:11:36Z" end-time="2026-11-07 13:11:36Z" duration="0.778580" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+            <property name="suiteIsReordered" value="True" />
+          </properties>
+          <test-case id="1194" name="FactoryStateExitAndEventsRequireTheRealPlayer" fullname="M6IntegrationTests.M6FlowTests.FactoryStateExitAndEventsRequireTheRealPlayer" methodname="FactoryStateExitAndEventsRequireTheRealPlayer" classname="M6IntegrationTests.M6FlowTests" runstate="Runnable" seed="823249369" result="Passed" start-time="2026-11-07 13:11:36Z" end-time="2026-11-07 13:11:36Z" duration="0.470454" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="suiteIsReordered" value="True" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="1" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1618" name="M6Integration.PlayModeTests.dll" fullname="M6Integration.PlayModeTests.dll" runstate="Runnable" testcasecount="10" result="Passed" start-time="2026-11-07 13:11:36Z" end-time="2026-11-07 13:11:37Z" duration="0.682186" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="21224" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="suiteIsReordered" value="True" />
+        <property name="childIndex" value="27" />
+      </properties>
+      <test-suite type="TestSuite" id="1622" name="M6IntegrationTests" fullname="M6IntegrationTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-11-07 13:11:36Z" end-time="2026-11-07 13:11:37Z" duration="0.678963" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+          <property name="suiteIsReordered" value="True" />
+        </properties>
+        <test-suite type="TestFixture" id="1625" name="C3V3CirculationTests" fullname="M6IntegrationTests.C3V3CirculationTests" classname="M6IntegrationTests.C3V3CirculationTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 13:11:37Z" end-time="2026-11-07 13:11:37Z" duration="0.674619" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+            <property name="suiteIsReordered" value="True" />
+          </properties>
+          <test-case id="1155" name="AllFivePedestrianSectionsHavePhysicalFloor" fullname="M6IntegrationTests.C3V3CirculationTests.AllFivePedestrianSectionsHavePhysicalFloor" methodname="AllFivePedestrianSectionsHavePhysicalFloor" classname="M6IntegrationTests.C3V3CirculationTests" runstate="Runnable" seed="249372044" result="Passed" start-time="2026-11-07 13:11:37Z" end-time="2026-11-07 13:11:37Z" duration="0.330577" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="suiteIsReordered" value="True" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="1" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

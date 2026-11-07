@@ -1,3 +1,67 @@
+# Phase 2: historical failures
+
+The final seeded run repeated each passing test once; 37 of the 46 historical failures passed and nine failed. Results below link to the raw XML. A pass does not independently prove a shared root cause. The Phase 1 ledger that follows is retained as historical analysis; its retest column describes Phase 1, not the final state.
+
+| Historical failed test | Phase 2 |
+| --- | --- |
+| `M6IntegrationTests.C3FactoryFullArtTests.StageA_UpperDeckChipRemainsCollectibleAndHudHintIsCurrent` | Failed |
+| `M6IntegrationTests.C3M2BlockoutPlayModeTests.PlayerCapsuleCanUseBothStairsAndMainWalkway` | Failed |
+| `M6IntegrationTests.C3SceneBugFixTests.OriginalControllerMovesJumpsAndPhysicalSupportsBlock` | Failed |
+| `M6IntegrationTests.C3V11RecyclingPresentationTests.ProductionUguiReceivesARealClickWithoutReactivationOrPuzzleSubmission` | Passed |
+| `M6IntegrationTests.C3V11ThirdPersonInteractionTests.FirstPersonKeepsItsTwoMetreRayAndOnceOnlyFCollection` | Passed |
+| `M6IntegrationTests.C3V11ThirdPersonInteractionTests.ThirdPersonMaterialsKeepActivationSortingAndOnceOnlyRecovery` | Passed |
+| `M6IntegrationTests.C3V11ThirdPersonInteractionTests.ThirdPersonRejectsCameraWallsBodyWallsAndFloors` | Passed |
+| `M6IntegrationTests.C3V11ThirdPersonInteractionTests.ThirdPersonUsesBodyDistanceForAllThreeRealQuestParts` | Passed |
+| `M6IntegrationTests.C3V11ThirdPersonInteractionTests.UiContextAndBothUpdateOrdersNeverDispatchTwoInteractions` | Passed |
+| `M6IntegrationTests.C3V11VisualUpgradeTests.AssemblyNativeRayRequiresMaterialsConsumesExactlyOneAndCannotRepeat` | Passed |
+| `M6IntegrationTests.C3V11VisualUpgradeTests.CollectibleDisableReenableAndPickupClearTheCueWithoutRepeatingRewards` | Passed |
+| `M6IntegrationTests.C3V11VisualUpgradeTests.ConsoleNativeRayOpensTheOriginalPuzzleAndActivationFlow` | Passed |
+| `M6IntegrationTests.C3V11VisualUpgradeTests.InspectionNativeRayShowsTheOriginalReportWithoutGrantingMaterials` | Passed |
+| `M6IntegrationTests.C3V11VisualUpgradeTests.MaintenanceKeepsItsExistingBenchAndNearbyChipWithoutInventingAnFTask` | Passed |
+| `M6IntegrationTests.C3V11VisualUpgradeTests.SharedRifleGeometryUsesViewmodelOffAndAssemblyDisplayOnShadows` | Failed |
+| `M6IntegrationTests.C3V12FactoryRepairTests.ScenePlacedPartsCanBeCollectedWithFOnceInFirstPerson` | Passed |
+| `M6IntegrationTests.C3V12FactoryRepairTests.ScenePlacedPartsCanBeCollectedWithFOnceInThirdPerson` | Passed |
+| `M6IntegrationTests.C3V12FinalFollowupTests.AirborneSpaceCannotQueueALandingOrDoubleJump` | Passed |
+| `M6IntegrationTests.C3V12FinalFollowupTests.FirstPersonZThenSpaceStandsBeforeOneGroundedJump` | Passed |
+| `M6IntegrationTests.C3V12FinalFollowupTests.HeldCtrlUnpronesToCrouchWithoutADelayedJump` | Passed |
+| `M6IntegrationTests.C3V12FinalFollowupTests.JumpDisabledStillAllowsSafeStandingButNoImpulse` | Passed |
+| `M6IntegrationTests.C3V12FinalFollowupTests.LowCeilingRejectsSpaceInBothViewsAndZStillRecoversAfterLeaving` | Passed |
+| `M6IntegrationTests.C3V12FinalFollowupTests.MaintenanceChipStillAcceptsRealFOnceInFirstPerson` | Passed |
+| `M6IntegrationTests.C3V12FinalFollowupTests.MaintenanceChipStillAcceptsRealFOnceInThirdPerson` | Passed |
+| `M6IntegrationTests.C3V12FinalFollowupTests.NewCeilingDuringRecoveryCancelsJumpAndReturnsToProne` | Passed |
+| `M6IntegrationTests.C3V12FinalFollowupTests.SlowStandExpiresTheRequestInsteadOfJumpingMuchLater` | Passed |
+| `M6IntegrationTests.C3V12FinalFollowupTests.ThirdPersonZThenSpaceStandsBeforeOneGroundedJump` | Passed |
+| `M6IntegrationTests.C3V12FinalFollowupTests.UiAndUnlockedCursorCancelAnExistingBufferedJump` | Passed |
+| `M6IntegrationTests.C3V12FinalFollowupTests.UiSpaceDoesNotUnproneOrJumpInEitherView` | Passed |
+| `M6IntegrationTests.C3V12FinalFollowupTests.ViewSwitchDuringRecoveryKeepsExactlyOneJumpSubscriptionAndTakeoff` | Passed |
+| `M6IntegrationTests.C3V12FinalFollowupTests.ZCancelsAPendingProneJump` | Passed |
+| `M6IntegrationTests.C3V3CirculationTests.AllFivePedestrianSectionsHavePhysicalFloor` | Passed |
+| `M6IntegrationTests.C3V3CirculationTests.ConveyorHasOneFeedAndThreePhysicalIntakeOutputPairs` | Passed |
+| `M6IntegrationTests.C3V3CirculationTests.StairRampsReachTheirDecksWithoutBarrierAcrossExit` | Passed |
+| `M6IntegrationTests.C3V4BFeedAndAccessTests.BZoneHasVisibleInputBeltRollersAndConveyorLift` | Passed |
+| `M6IntegrationTests.C3V4BFeedAndAccessTests.RaisedCeilingAndRealAccessibleStairEndpointsExist` | Passed |
+| `M6IntegrationTests.C3V4BFeedAndAccessTests.WestStairRampCanCarryARealCharacterController` | Passed |
+| `M6IntegrationTests.C3V5SpatialIntegrityTests.BDoorHasVisibleFloorHeightConveyorAndOverheadConnection` | Failed |
+| `M6IntegrationTests.C3V6AccessRegressionTests.ConveyorIsInsideTheMainHallAndConnectsToSorter` | Failed |
+| `M6IntegrationTests.C3V7CZoneBoundaryAndAisleTests.CToBIsClosedAndTheReceivingBeltStopsAtThreshold` | Failed |
+| `M6IntegrationTests.C3V7CZoneBoundaryAndAisleTests.FormerObstructingStairRampHasMovedAwayFromReportedPosition` | Failed |
+| `M6IntegrationTests.M6VisualRuntimeTests.DirectVersusSelectionSceneLighting` | Failed |
+| `SDGAdventure.Testing.C3AbandonedFactoryUpgradeTests.RuntimeArtHasBFeedAndNonBlockingDecay` | Passed |
+| `M7SharedPlayerTests.PlayerInputServiceTests.Level03MenuPausesResumesAndUsesExistingTransitions` | Passed |
+| `M7SharedPlayerTests.PlayerSettingsTests.ProneActionRespondsOnlyToCurrentKey` | Passed |
+| `SDGAdventure.PlayerControlTests.PlayerControlPlayModeTests.RepeatedPauseSettingsCyclesRestoreGameplayState` | Passed |
+
+Evidence: [historical XML](Historical_V141_PlayMode.xml), [final Phase 2 XML](Phase2_Final_PlayMode.xml), and [targeted verification](Phase2_Final_Targeted_Retry.xml).
+
+## Phase 2 interpretation and remaining work
+
+- F, Z and pause: the OS returned an unlocked cursor in batch mode. Tests now use an Editor-only simulated cursor backend and real Input System events with focus settings restored in teardown. Production still reads the OS cursor; UI context still blocks gameplay. The relevant groups passed; the focus settings were changed together, so their individual contributions are not isolated.
+- V3/V4 factory tests: former V8 names and old west/east coordinates conflict with the serialized V13 design. Updated tests verify two sets of 22 solid treads, the east landing, connected current P2 infeed surfaces and rollers, a physical west-stair walk and the existing three sorter paths. No scene geometry was edited.
+- Close-wall rifle: the prior six-frame wait was frame-rate dependent because the production pose advances with deltaTime. The test now allows 0.2 seconds of game time within a one-second real-time limit and retains the original grip and 0.025 clearance assertions. The final seeded repeated run passed; this does not prove clearance at every intermediate frame.
+- Menu and coordinator ordering: prior scene-owned menus are temporarily disabled and restored; the module test compares its previous result and always unsubscribes. These targeted tests and the seeded full run passed.
+- Remaining nine failures are listed in Validation.md. The old M2 west-stair route uses retired coordinates; a newer actual-character test crosses both current stairs and the rear walkway successfully. The original-controller spawn movement still needs a collider/contact trace before deciding whether it is a real defect or an obsolete displacement assumption. Do not move equipment or rebake the scene on this evidence alone.
+- Rifle mismatch: the baked scene contains the old `Sight` while the live generator makes two `SightSide` and two `SightRim` renderers. The display and held models are genuinely different; the original structural equality test remains failing. A separately reviewed display update would be needed to make them match, subject to the scene/geometry constraints.
+
 # Failure triage — incomplete
 
 This ledger covers all 46 failures in the historical V14.1 XML plus the additional failure in the new V14.1 HEAD baseline and the new unstable final-run failure. Original messages for historical failures come from Historical_V141_PlayMode.xml. The V14 result below is from the sequential run; PlayerPrefs were shared across runs. Unresolved means the root cause or correction has not been demonstrated.

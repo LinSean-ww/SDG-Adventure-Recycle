@@ -310,7 +310,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
     private bool GameplayEnabled()
     {
         PlayerInputService service = PlayerInputService.Instance;
-        return !inventoryOpen && Cursor.lockState == CursorLockMode.Locked &&
+        return !inventoryOpen && PlayerCursor.LockState == CursorLockMode.Locked &&
             (service == null || service.Context == PlayerInputContext.Gameplay) &&
             !C3PuzzleConsole.BlocksGameplayInputThisFrame &&
             !C3CompletionScreen.BlocksGameplayInputThisFrame;
@@ -342,10 +342,10 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             input != null && input.Context == PlayerInputContext.Gameplay &&
             !C3PuzzleConsole.BlocksGameplayInputThisFrame &&
             !C3CompletionScreen.BlocksGameplayInputThisFrame &&
-            Cursor.lockState != CursorLockMode.Locked &&
+            PlayerCursor.LockState != CursorLockMode.Locked &&
             mouse != null && mouse.leftButton.wasPressedThisFrame)
         {
-            Cursor.lockState = CursorLockMode.Locked;
+            PlayerCursor.LockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
 
@@ -398,7 +398,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         PlayerInputService service = PlayerInputService.Instance;
         if (service != null)
             service.SetContext(inventoryOpen ? PlayerInputContext.UI : PlayerInputContext.Gameplay);
-        Cursor.lockState = inventoryOpen ? CursorLockMode.None : CursorLockMode.Locked;
+        PlayerCursor.LockState = inventoryOpen ? CursorLockMode.None : CursorLockMode.Locked;
         Cursor.visible = inventoryOpen;
         if (!inventoryOpen) presentedId = null;
     }
