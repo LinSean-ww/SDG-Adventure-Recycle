@@ -12,6 +12,10 @@ public sealed class EcoQuantumWeaponView : MonoBehaviour
     private Transform cameraMount;
     private GameObject rifle;
     private Transform muzzle;
+    private Transform magazine;
+    private Vector3 magazineHome;
+    private bool reloadActive;
+    private float reloadProgress;
     private readonly List<Material> ownedMaterials = new List<Material>();
     private EcoQuantumShotVfx shotVfx;
     private C3TreasurePuzzle.C3VisualBuilder visualArt;
@@ -131,9 +135,10 @@ public sealed class EcoQuantumWeaponView : MonoBehaviour
         obstructionBlend=Mathf.MoveTowards(obstructionBlend,blocked,Time.deltaTime*12f);
         Quaternion highReady=Quaternion.LookRotation(thirdPersonRig.CameraFlatForward,Vector3.up)*
             Quaternion.Euler(-80f,0f,-lean*12f);
+        float pose = ReloadPose();
         transform.SetPositionAndRotation(
-            position-thirdPersonRig.CameraFlatForward*(.20f*obstructionBlend),
-            Quaternion.Slerp(aimed,highReady,obstructionBlend));
+            position-thirdPersonRig.CameraFlatForward*(.20f*obstructionBlend) - Vector3.up * (.16f * pose),
+            Quaternion.Slerp(aimed,highReady,obstructionBlend) * Quaternion.Euler(18f * pose, 0f, 25f * pose));
         if(worker)worker.ApplyWeaponHands(this,primaryGrip,supportGrip);
     }
 
@@ -145,6 +150,7 @@ public sealed class EcoQuantumWeaponView : MonoBehaviour
 
     private void OnDisable()
     {
+        EndReload();
         ReleaseGripPose();
         if(shotVfx)shotVfx.Clear();
         if(muzzleLight)muzzleLight.intensity=0f;
@@ -157,6 +163,8 @@ public sealed class EcoQuantumWeaponView : MonoBehaviour
         rifle.transform.SetParent(transform,false);
         Transform root=rifle.transform;
         visualArt.QuantumRifle(root,1f,ShadowCastingMode.Off);
+        magazine = root.Find("ReclaimedQuantumRifle_Visual/Magazine");
+        if (magazine) magazineHome = magazine.localPosition;
         primaryGrip=new GameObject("V11_PrimaryGrip_Visual").transform;
         primaryGrip.SetParent(root,false);primaryGrip.localPosition=new Vector3(.02f,-.18f,-.13f);
         supportGrip=new GameObject("V11_SupportGrip_Visual").transform;
@@ -192,7 +200,8 @@ public sealed class EcoQuantumWeaponView : MonoBehaviour
         recoil=Mathf.MoveTowards(recoil,0f,Time.deltaTime*4f);
         // EcoAdventureRuntime already owns the FPS hip/ADS camera offset.
         // An additional +.59m here would push the 1.02m barrel through walls.
-        Vector3 target=new Vector3(0f,0f,-recoil*.14f);
+        float pose = ReloadPose();
+        Vector3 target=new Vector3(-.08f * pose,-.18f * pose,-recoil*.14f);
         float clear=FirstPersonForwardClearance();
         firstPersonClearance=clear;
         // The muzzle is 1.02m ahead of the rifle pivot. Account for the
@@ -206,7 +215,7 @@ public sealed class EcoQuantumWeaponView : MonoBehaviour
         smooth.z=Mathf.Min(smooth.z,target.z);
         rifle.transform.localPosition=smooth;
         rifle.transform.localRotation=Quaternion.Slerp(rifle.transform.localRotation,
-            Quaternion.Euler(-recoil*7f,aiming?0f:-7f,aiming?0f:-2.5f),Time.deltaTime*13f);
+            Quaternion.Euler(-recoil*7f + 18f * pose, aiming?0f:-7f, (aiming?0f:-2.5f) + 28f * pose),Time.deltaTime*13f);
     }
 
     private float FirstPersonForwardClearance()
@@ -254,6 +263,28 @@ public sealed class EcoQuantumWeaponView : MonoBehaviour
         Vector3 origin=muzzle ? muzzle.position : cameraMount.position+cameraMount.forward*.4f;
         CharacterController owner=cameraMount.GetComponentInParent<CharacterController>();
         shotVfx.Fire(cameraMount.position,origin,hitPosition,owner?owner.transform:cameraMount.root,surfaceHit);
+    }
+    private float ReloadPose()
+    {
+        if (!reloadActive) return 0f;
+        return Mathf.SmoothStep(0f, 1f, Mathf.Min(reloadProgress / .18f, (1f - reloadProgress) / .2f));
+    }
+    public void BeginReload() { reloadActive = true; SetReloadProgress(0f); }
+    public void SetReloadProgress(float progress)
+    {
+        reloadProgress = Mathf.Clamp01(progress);
+        if (!magazine) return;
+        // The same model represents the spent cell leaving and a fresh cell entering.
+        float displacement = reloadProgress < .48f
+            ? Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(.18f, .45f, reloadProgress))
+            : 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(.55f, .82f, reloadProgress));
+        magazine.gameObject.SetActive(reloadProgress < .45f || reloadProgress >= .55f);
+        magazine.localPosition = magazineHome + new Vector3(-.10f, -.32f, 0f) * displacement;
+    }
+    public void EndReload()
+    {
+        reloadActive = false; reloadProgress = 0f;
+        if (magazine) { magazine.gameObject.SetActive(true); magazine.localPosition = magazineHome; }
     }
     public void OnReload()
     {
