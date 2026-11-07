@@ -25,14 +25,14 @@ namespace C3TreasurePuzzle
         public const float OutputStartZ = 12.75f;
         public const int LaneCount = 3;
 
-        private Transform root;
+        [SerializeField] private Transform root;
         private C3DeviceState device;
         private Material floor, tile, steel, stainless, graphite, belt, yellow, rust,
             paper, plastic, metalBale, green, tealGlow, purpleGlow, lightLens,
             darkGlass, wall, pipe, warmWhite;
         private readonly List<Material> owned = new List<Material>();
-        private readonly List<Light> lamps = new List<Light>();
-        public int DecorativeObjects { get; private set; }
+        [SerializeField] private List<Light> lamps = new List<Light>();
+        [field: SerializeField] public int DecorativeObjects { get; private set; }
         public int ConveyorPackageCount => GetComponentsInChildren<EcoRecycleCargo>(true).Length;
         public bool ConveyorMoving => device && device.FactoryState >= C3FactoryState.Running && Time.timeScale>0f;
         public bool ConveyorEndsInSorter => GetComponent<C3RecyclingLineGeometry>() &&
@@ -41,7 +41,14 @@ namespace C3TreasurePuzzle
         private void Awake()
         {
             device = GetComponent<C3DeviceState>();
-            if (GameObject.Find("C3_ReferenceRecyclingFactory_Visuals")) return;
+            EnsureLayout();
+        }
+
+        public void EnsureLayout()
+        {
+            if (root) return;
+            if (transform.Find("C3_ReferenceRecyclingFactory_Visuals"))
+                throw new InvalidOperationException("Factory visuals exist without serialized ownership. Validate the bake.");
             root = new GameObject("C3_ReferenceRecyclingFactory_Visuals").transform;
             root.SetParent(transform, false);
             root.localPosition = Vector3.zero;
@@ -70,7 +77,7 @@ namespace C3TreasurePuzzle
             if (device && device.FactoryState >= C3FactoryState.Running) StartMachinery();
         }
         private void OnDisable() { if (device) device.Running -= StartMachinery; }
-        private void OnDestroy() { foreach (Material m in owned) if (m) Destroy(m); }
+        private void OnDestroy() { foreach (Material m in owned) C3FactoryLayoutUtility.ReleaseTransient(m); }
         private void StartMachinery()
         {
             foreach (Light l in lamps) if (l) l.intensity = 1.55f;
@@ -132,7 +139,7 @@ namespace C3TreasurePuzzle
             g.transform.rotation = rotation ?? Quaternion.identity;
             g.transform.localScale = size;
             Collider c = g.GetComponent<Collider>();
-            if (c && !solid) { c.enabled = false; Destroy(c); }
+            if (c && !solid) { c.enabled = false; C3FactoryLayoutUtility.Remove(c); }
             Renderer r = g.GetComponent<Renderer>();
             if (r) { r.sharedMaterial = mat; r.shadowCastingMode = ShadowCastingMode.On; }
             ++DecorativeObjects;
@@ -189,7 +196,7 @@ namespace C3TreasurePuzzle
                 }
             }
             GameObject oldSimulation = GameObject.Find("C3_SortingSimulation");
-            if (oldSimulation) { oldSimulation.SetActive(false); Destroy(oldSimulation); }
+            if (oldSimulation && Application.isPlaying) { oldSimulation.SetActive(false); Destroy(oldSimulation); }
             foreach (string label in new[] { "Plastic", "Metal", "Paper" })
             {
                 GameObject old = GameObject.Find("C3_IndustrialSign_" + label);

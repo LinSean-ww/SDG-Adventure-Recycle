@@ -8,6 +8,7 @@ namespace C3TreasurePuzzle
     {
         public const string RootName="C3_P2_RecyclingLine";
         public const float RawRadius=.12f;
+        [System.Serializable]
         public sealed class Machine
         {
             public int Index;
@@ -15,27 +16,35 @@ namespace C3TreasurePuzzle
             public Renderer Indicator;
             public BoxCollider ProcessBed;
             public C3ConveyorSection Chute,HopperDrop,IntakeRamp,ReceivingBed,DischargeBed,InternalOutput,Outfeed,CollectionBed;
-            public readonly List<C3ConveyorSection> InputSections=new List<C3ConveyorSection>();
-            public readonly List<C3ConveyorSection> OutputSections=new List<C3ConveyorSection>();
+            public List<C3ConveyorSection> InputSections=new List<C3ConveyorSection>();
+            public List<C3ConveyorSection> OutputSections=new List<C3ConveyorSection>();
         }
-        public Transform BuildRoot { get; private set; }
-        public Transform BMaterialInterface { get; private set; }
-        public Transform MainEntry { get; private set; }
-        public C3ConveyorSection MainBelt { get; private set; }
-        public C3RecyclingVisuals Visuals { get; private set; }
-        public readonly List<C3ConveyorSection> CommonSections=new List<C3ConveyorSection>();
-        public readonly List<C3ConveyorSection> Sections=new List<C3ConveyorSection>();
-        public readonly List<Machine> Machines=new List<Machine>();
+        [field: SerializeField] public Transform BuildRoot { get; private set; }
+        [field: SerializeField] public Transform BMaterialInterface { get; private set; }
+        [field: SerializeField] public Transform MainEntry { get; private set; }
+        [field: SerializeField] public C3ConveyorSection MainBelt { get; private set; }
+        [field: SerializeField] public C3RecyclingVisuals Visuals { get; private set; }
+        public List<C3ConveyorSection> CommonSections=new List<C3ConveyorSection>();
+        public List<C3ConveyorSection> Sections=new List<C3ConveyorSection>();
+        public List<Machine> Machines=new List<Machine>();
         private readonly List<Material> materials=new List<Material>();
-        private readonly List<Transform> rollers=new List<Transform>();
-        private Material steel,rubber,yellow,glass;
-        private Material[] types;
+        [SerializeField] private List<Transform> rollers=new List<Transform>();
+        [SerializeField] private Material steel;
+        private Material rubber,yellow,glass;
+        [SerializeField] private Material[] types;
         private MaterialPropertyBlock indicatorBlock;
         private static readonly float[] MachineCenters={-17.9f,-13f,-8.1f};
 
-        private void Awake()
+        private void Awake() => EnsureLayout();
+
+        public void EnsureLayout()
         {
-            if (transform.Find(RootName)) return;
+            // Recreate the session-only property block even when all layout references
+            // came from disk. The line can initialize before this component's Awake.
+            if (indicatorBlock == null) indicatorBlock = new MaterialPropertyBlock();
+            if (BuildRoot) return;
+            if (transform.Find(RootName))
+                throw new System.InvalidOperationException("Recycling line exists without serialized bindings. Validate the bake.");
             BuildRoot=new GameObject(RootName).transform;
             BuildRoot.SetParent(transform,true);
             BuildRoot.SetPositionAndRotation(Vector3.zero,Quaternion.identity);
@@ -77,7 +86,7 @@ namespace C3TreasurePuzzle
             g.name=name; g.transform.SetParent(parent?parent:BuildRoot,false);
             g.transform.SetPositionAndRotation(position,rotation??Quaternion.identity);
             g.transform.localScale=size; g.GetComponent<Renderer>().sharedMaterial=mat;
-            if (!solid) { Collider c=g.GetComponent<Collider>(); c.enabled=false; Destroy(c); }
+            if (!solid) { Collider c=g.GetComponent<Collider>(); c.enabled=false; C3FactoryLayoutUtility.Remove(c); }
             return g;
         }
         private C3ConveyorSection Section(string name,Vector3 a,Vector3 b,float width,Transform parent=null,bool withGuards=true)
@@ -112,7 +121,7 @@ namespace C3TreasurePuzzle
                     rotation*Quaternion.Euler(0f,0f,90f));
                 roller.transform.localScale=new Vector3(.14f,width*.46f,.14f);
                 roller.GetComponent<Renderer>().sharedMaterial=steel;
-                Collider c=roller.GetComponent<Collider>(); c.enabled=false; Destroy(c);
+                Collider c=roller.GetComponent<Collider>(); c.enabled=false; C3FactoryLayoutUtility.Remove(c);
                 rollers.Add(roller.transform);
             }
             Sections.Add(section); return section;
@@ -359,8 +368,9 @@ namespace C3TreasurePuzzle
         }
         private void OnDestroy()
         {
+            if (!Application.isPlaying) return;
             if (BuildRoot) { BuildRoot.gameObject.SetActive(false); Destroy(BuildRoot.gameObject); }
-            foreach (Material material in materials) if (material) Destroy(material);
+            foreach (Material material in materials) C3FactoryLayoutUtility.ReleaseTransient(material);
         }
     }
 }
