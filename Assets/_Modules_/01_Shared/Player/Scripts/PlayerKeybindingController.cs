@@ -57,6 +57,15 @@ namespace SDGAdventure.SharedPlayer
                 return false;
             }
 
+            // Q/E are used by the existing lean controls outside the action maps.
+            if (mapName == "Gameplay" && actionName == "Prone" &&
+                (string.Equals(normalized, "<Keyboard>/q", StringComparison.OrdinalIgnoreCase) ||
+                 string.Equals(normalized, "<Keyboard>/e", StringComparison.OrdinalIgnoreCase)))
+            {
+                error = "Already bound to lean.";
+                return false;
+            }
+
             foreach (InputActionMap map in actions.actionMaps)
             {
                 if (!CanCoexist(action.actionMap.name, map.name)) continue;

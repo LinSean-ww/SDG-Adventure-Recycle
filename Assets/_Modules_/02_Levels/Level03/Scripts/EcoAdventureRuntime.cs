@@ -496,7 +496,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
                     ? new Vector3(0.23f, 1.03f, 0.23f) : new Vector3(0.32f, -0.29f, 0.55f);
             }
             Vector3 localTarget = thirdPerson ? new Vector3(0.23f, 1.03f, 0.23f) :
-                aiming ? new Vector3(0f, -0.19f, 0.52f) :
+                aiming ? new Vector3(0f, -0.20f, 0.52f) :
                          new Vector3(0.32f, -0.29f, 0.55f);
             weaponModel.transform.localPosition = Vector3.Lerp(
                 weaponModel.transform.localPosition, localTarget, Time.deltaTime * 10f);

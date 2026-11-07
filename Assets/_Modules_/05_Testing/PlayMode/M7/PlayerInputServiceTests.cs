@@ -109,6 +109,10 @@ namespace M7SharedPlayerTests
             Assert.AreEqual(0f, Time.timeScale);
             menu.OpenSettings();
             Assert.AreEqual(PlayerMenuState.Settings, menu.State);
+            var proneRow = menu.View.Panel.Find("ScrollViewport/ScrollContent/Binding_Prone_0");
+            Assert.IsNotNull(proneRow);
+            Assert.IsTrue(proneRow.GetComponentsInChildren<Text>().Any(t => t.text == "趴下"));
+            Assert.AreEqual(input.Keybindings.BindingDisplay("Gameplay", "Prone", 0), proneRow.GetComponentInChildren<Button>().GetComponentInChildren<Text>().text);
             menu.BackToPause();
             menu.Resume();
             Assert.AreEqual(1f, Time.timeScale);

@@ -151,7 +151,11 @@ namespace C3TreasurePuzzle
                 Part(r,"EmitterRing",new Vector3(0,0,.68f+i*.075f),new Vector3(.20f,.016f,.20f),i%2==0?"silver":"glow",PrimitiveType.Cylinder,new Vector3(90,0,0));
             Part(r,"EnergyMuzzle",new Vector3(0,0,.97f),new Vector3(.12f,.014f,.12f),"glow",PrimitiveType.Cylinder,new Vector3(90,0,0));
             Part(r,"OpticMount",new Vector3(0,.14f,.01f),new Vector3(.09f,.06f,.26f),"dark");
-            Rod(r,"Sight",new Vector3(0,.20f,-.11f),new Vector3(0,.20f,.14f),.075f,"rust");
+            // Open sight frame replaces the solid cylinder that blocked ADS.
+            foreach (float x in new[] { -.075f, .075f })
+                Part(r,"SightSide",new Vector3(x,.20f,.015f),new Vector3(.018f,.17f,.25f),"rust");
+            foreach (float y in new[] { .12f, .28f })
+                Part(r,"SightRim",new Vector3(0,y,.015f),new Vector3(.15f,.018f,.25f),"rust");
             foreach(Renderer renderer in r.GetComponentsInChildren<Renderer>(true))
                 renderer.shadowCastingMode=shadows;
         }

@@ -39,6 +39,7 @@ namespace SDGAdventure.SharedPlayer
         private PlayerPerspectiveRig perspective;
 
         public bool IsCrouching { get; private set; }
+        public bool IsProne => prone;
         public float CurrentSpeed { get; private set; }
         public float CurrentHeight => motor == null ? 0f : motor.height;
         public float StandingHeight => standingHeight;
@@ -75,12 +76,12 @@ namespace SDGAdventure.SharedPlayer
         private void OnEnable()
         {
             input = PlayerInputService.Instance;
-            if (input != null) input.JumpPressed += QueueJump;
+            if (input != null) { input.JumpPressed += QueueJump; input.PronePressed += ToggleProne; }
         }
 
         private void OnDisable()
         {
-            if (input != null) input.JumpPressed -= QueueJump;
+            if (input != null) { input.JumpPressed -= QueueJump; input.PronePressed -= ToggleProne; }
             jumpQueued = false;
         }
 
@@ -111,7 +112,6 @@ namespace SDGAdventure.SharedPlayer
             }
 
             bool acceptsInput = Cursor.lockState == CursorLockMode.Locked;
-            if (acceptsInput) ReadProne();
             Vector2 movement = acceptsInput ? input.Move : Vector2.zero;
             TickMotor(movement, acceptsInput && input.SprintActive, acceptsInput && input.CrouchActive,
                 acceptsInput && jumpQueued, Time.deltaTime);
@@ -126,7 +126,8 @@ namespace SDGAdventure.SharedPlayer
             bool blockedFromStanding = !prone && !crouch &&
                 motor.height < standingHeight - 0.01f && !CanStand();
             float target = prone ? Mathf.Clamp(proneHeight, motor.radius * 2f, crouchingHeight) :
-                crouch || blockedFromStanding ? crouchingHeight : standingHeight;
+                blockedFromStanding ? Mathf.Min(motor.height, crouchingHeight) :
+                crouch ? crouchingHeight : standingHeight;
             float height = Mathf.MoveTowards(motor.height, target, stanceSpeed * deltaTime);
             if (Mathf.Abs(height - motor.height) > 0.0001f)
             {
@@ -143,8 +144,9 @@ namespace SDGAdventure.SharedPlayer
             {
                 float fraction = Mathf.InverseLerp(crouchingHeight, standingHeight, height);
                 Vector3 eye = viewTransform.localPosition;
-                eye.y = prone ? proneEyeHeight :
-                    Mathf.Lerp(crouchingEyeHeight, standingEyeHeight, fraction);
+                eye.y = height < crouchingHeight
+                    ? Mathf.Lerp(proneEyeHeight, crouchingEyeHeight, Mathf.InverseLerp(Mathf.Clamp(proneHeight, motor.radius * 2f, crouchingHeight), crouchingHeight, height))
+                    : Mathf.Lerp(crouchingEyeHeight, standingEyeHeight, fraction);
                 if (perspective != null) perspective.SetEyeHeight(eye.y);
                 if (perspective == null || !perspective.IsThirdPerson)
                     viewTransform.localPosition = eye;
@@ -167,10 +169,9 @@ namespace SDGAdventure.SharedPlayer
             if ((collision & CollisionFlags.Below) != 0 && verticalSpeed < 0f) verticalSpeed = -2f;
         }
 
-        private void ReadProne()
+        private void ToggleProne()
         {
-            Keyboard keyboard = Keyboard.current;
-            if (keyboard == null || !keyboard.zKey.wasPressedThisFrame) return;
+            if (Cursor.lockState != CursorLockMode.Locked) return;
             if (!prone) prone = true;
             else if (CanStand()) prone = false;
         }

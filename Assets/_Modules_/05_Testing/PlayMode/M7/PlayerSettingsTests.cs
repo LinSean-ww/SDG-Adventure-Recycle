@@ -4,6 +4,7 @@ using NUnit.Framework;
 using SDGAdventure.SharedPlayer;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.TestTools;
 
 namespace M7SharedPlayerTests
@@ -89,6 +90,48 @@ namespace M7SharedPlayerTests
                 Assert.AreEqual("<Keyboard>/G", reloaded.FindActionMap("Gameplay").FindAction("Interact").bindings[0].effectivePath);
                 Assert.AreEqual(ButtonMode.Toggle, loaded.Settings.sprintMode);
                 Assert.AreEqual(ButtonMode.Toggle, loaded.Settings.crouchMode);
+            }
+            finally { UnityEngine.Object.DestroyImmediate(reloaded); }
+        }
+
+        [Test]
+        public void ProneActionRespondsOnlyToCurrentKey()
+        {
+            var keyboard = InputSystem.AddDevice<Keyboard>();
+            var prone = actions.FindAction("Gameplay/Prone", true);
+            int presses = 0;
+            prone.performed += _ => presses++;
+            try
+            {
+                prone.Enable(); InputSystem.Update();
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.Z)); InputSystem.Update();
+                Assert.AreEqual(1, presses);
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState()); InputSystem.Update();
+                Assert.IsTrue(bindings.TryApply("Gameplay", "Prone", 0, "<Keyboard>/v", out string error), error);
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.Z)); InputSystem.Update();
+                Assert.AreEqual(1, presses);
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState()); InputSystem.Update();
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.V)); InputSystem.Update();
+                Assert.AreEqual(2, presses);
+            }
+            finally { prone.Disable(); InputSystem.RemoveDevice(keyboard); }
+        }
+
+        [Test]
+        public void ProneBindingCanRebindRejectConflictReloadAndReset()
+        {
+            var prone = actions.FindAction("Gameplay/Prone", true);
+            Assert.AreEqual("<Keyboard>/z", prone.bindings[0].effectivePath);
+            Assert.IsFalse(bindings.TryApply("Gameplay", "Prone", 0, "<Keyboard>/space", out string error));
+            StringAssert.Contains("Jump", error);
+            Assert.IsTrue(bindings.TryApply("Gameplay", "Prone", 0, "<Keyboard>/v", out error), error);
+            var reloaded = UnityEngine.Object.Instantiate(Resources.Load<InputActionAsset>("SDGPlayerControls"));
+            try
+            {
+                var loaded = new PlayerKeybindingController(reloaded, store);
+                Assert.AreEqual("<Keyboard>/V", reloaded.FindAction("Gameplay/Prone", true).bindings[0].effectivePath);
+                loaded.RestoreDefaults();
+                Assert.AreEqual("<Keyboard>/z", reloaded.FindAction("Gameplay/Prone", true).bindings[0].effectivePath);
             }
             finally { UnityEngine.Object.DestroyImmediate(reloaded); }
         }

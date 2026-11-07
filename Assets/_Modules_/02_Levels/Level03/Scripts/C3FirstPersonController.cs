@@ -58,14 +58,14 @@ namespace C3TreasurePuzzle
         public void SetViewTransform(Transform value) => viewTransform = value;
         public void UseSharedInput(PlayerInputService service)
         {
-            if (sharedInput != null) sharedInput.JumpPressed -= QueueJump;
+            if (sharedInput != null) { sharedInput.JumpPressed -= QueueJump; sharedInput.PronePressed -= OnPronePressed; }
             sharedInput = service;
-            if (isActiveAndEnabled && sharedInput != null) sharedInput.JumpPressed += QueueJump;
+            if (isActiveAndEnabled && sharedInput != null) { sharedInput.JumpPressed += QueueJump; sharedInput.PronePressed += OnPronePressed; }
         }
 
         private void OnEnable()
         {
-            if (sharedInput != null) sharedInput.JumpPressed += QueueJump;
+            if (sharedInput != null) { sharedInput.JumpPressed += QueueJump; sharedInput.PronePressed += OnPronePressed; }
         }
 
         private void QueueJump() => jumpQueued = true;
@@ -123,7 +123,6 @@ namespace C3TreasurePuzzle
                 }
                 bool acceptsSharedInput = Cursor.lockState == CursorLockMode.Locked && viewTransform != null;
                 if (!acceptsSharedInput) ClearJumpRequest();
-                if (acceptsSharedInput) ReadProneKey();
                 if (acceptsSharedInput)
                     ApplyLook(sharedInput.Look * (0.08f * sharedInput.Keybindings.Settings.mouseSensitivity));
                 TickMovement(acceptsSharedInput ? sharedInput.Move : Vector2.zero,
@@ -284,11 +283,23 @@ namespace C3TreasurePuzzle
         {
             Keyboard keyboard = Keyboard.current;
             if (keyboard == null || !keyboard.zKey.wasPressedThisFrame) return;
+            ToggleProne();
+        }
+
+        private void OnPronePressed()
+        {
+            if (Cursor.lockState != CursorLockMode.Locked || viewTransform == null ||
+                C3PuzzleConsole.BlocksGameplayInputThisFrame || C3CompletionScreen.BlocksGameplayInputThisFrame) return;
+            ToggleProne();
+        }
+
+        private void ToggleProne()
+        {
             proneJumpRemaining = 0f;
             risingFromProne = false;
             if (isProne)
             {
-                if (CanStand()) isProne = false;
+                if (CanStand()) { isProne = false; risingFromProne = true; }
                 // Remain prone if the standing clearance capsule is blocked.
             }
             else
@@ -361,7 +372,7 @@ namespace C3TreasurePuzzle
 
         private void OnDisable()
         {
-            if (sharedInput != null) sharedInput.JumpPressed -= QueueJump;
+            if (sharedInput != null) { sharedInput.JumpPressed -= QueueJump; sharedInput.PronePressed -= OnPronePressed; }
             ClearJumpRequest();
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;

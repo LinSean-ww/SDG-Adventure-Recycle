@@ -52,6 +52,12 @@
           "type": "Button",
           "id": "a8a698c1-3833-4f48-a4d7-015a5ea0242f",
           "expectedControlType": "Button"
+        },
+        {
+          "name": "Prone",
+          "type": "Button",
+          "id": "b75c2675-2bf8-4b0e-9dcc-d1b285d17fb5",
+          "expectedControlType": "Button"
         }
       ],
       "bindings": [
@@ -131,6 +137,12 @@
           "id": "08394316-ce23-499d-8811-3c6057073630",
           "path": "<Mouse>/leftButton",
           "action": "Fire"
+        },
+        {
+          "name": "",
+          "id": "8c8f16bb-ebaa-4d30-9b34-1ef933fa9fe1",
+          "path": "<Keyboard>/z",
+          "action": "Prone"
         }
       ]
     },

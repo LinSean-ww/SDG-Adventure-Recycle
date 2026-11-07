@@ -75,6 +75,25 @@ namespace M6IntegrationTests
         }
         [UnityTearDown] public IEnumerator Close(){if(scope!=null)yield return scope.Close();}
 
+        [UnityTest] public IEnumerator SightHasOpenCenterOnCameraAimAxis()
+        {
+            Equip(); Mode(0); yield return null;
+            Transform sight = Model.GetComponentsInChildren<Transform>(true).SingleOrDefault(t => t.name == "ReclaimedQuantumRifle_Visual");
+            Assert.IsNotNull(sight);
+            Assert.IsNull(sight.Find("Sight"), "The old solid cylinder obscures ADS.");
+            Assert.AreEqual(2, sight.Cast<Transform>().Count(t => t.name == "SightSide"));
+            Assert.AreEqual(2, sight.Cast<Transform>().Count(t => t.name == "SightRim"));
+            foreach (Transform part in sight)
+                if (part.name == "SightSide" || part.name == "SightRim")
+                {
+                    Bounds b = part.GetComponent<Renderer>().localBounds;
+                    Vector3 center = part.localPosition;
+                    Vector3 extent = Vector3.Scale(b.extents, part.localScale);
+                    Assert.IsFalse(Mathf.Abs(center.x) < extent.x && Mathf.Abs(center.y - .20f) < extent.y,
+                        "Sight frame covers the optical axis.");
+                }
+        }
+
         [UnityTest] public IEnumerator EquippedWeaponAndBothHandsFollowPitchOrbitAndViewSwitches()
         {
             Equip();Mode(1);GameObject weapon=Model;

@@ -22,6 +22,7 @@ namespace SDGAdventure.SharedPlayer
             (Keybindings.Settings.crouchMode == ButtonMode.Hold ? crouch.IsPressed() : crouchToggled);
 
         public event Action JumpPressed;
+        public event Action PronePressed;
         public event Action InteractPressed;
         public event Action TaskListPressed;
         public event Action UiTaskListPressed;
@@ -38,6 +39,7 @@ namespace SDGAdventure.SharedPlayer
         private InputAction jump;
         private InputAction sprint;
         private InputAction crouch;
+        private InputAction prone;
         private InputAction interact;
         private InputAction taskList;
         private InputAction pause;
@@ -81,6 +83,7 @@ namespace SDGAdventure.SharedPlayer
             jump = gameplay.FindAction("Jump", true);
             sprint = gameplay.FindAction("Sprint", true);
             crouch = gameplay.FindAction("Crouch", true);
+            prone = gameplay.FindAction("Prone", true);
             interact = gameplay.FindAction("Interact", true);
             taskList = gameplay.FindAction("TaskList", true);
             pause = global.FindAction("Pause", true);
@@ -100,6 +103,7 @@ namespace SDGAdventure.SharedPlayer
             jump.performed += OnJump;
             sprint.performed += OnSprint;
             crouch.performed += OnCrouch;
+            prone.performed += OnProne;
             interact.performed += OnInteract;
             taskList.performed += OnTaskList;
             pause.performed += OnPause;
@@ -152,6 +156,7 @@ namespace SDGAdventure.SharedPlayer
 
         private void OnSceneUnloaded(Scene _) => SetContext(PlayerInputContext.Inactive);
         private void OnJump(InputAction.CallbackContext _) => JumpPressed?.Invoke();
+        private void OnProne(InputAction.CallbackContext _) => PronePressed?.Invoke();
         private void OnSprint(InputAction.CallbackContext _) { if (Keybindings.Settings.sprintMode == ButtonMode.Toggle) sprintToggled = !sprintToggled; }
         private void OnCrouch(InputAction.CallbackContext _) { if (Keybindings.Settings.crouchMode == ButtonMode.Toggle) crouchToggled = !crouchToggled; }
         private void OnInteract(InputAction.CallbackContext _) => InteractPressed?.Invoke();
@@ -171,6 +176,7 @@ namespace SDGAdventure.SharedPlayer
                 jump.performed -= OnJump;
                 sprint.performed -= OnSprint;
                 crouch.performed -= OnCrouch;
+                prone.performed -= OnProne;
                 interact.performed -= OnInteract;
                 taskList.performed -= OnTaskList;
                 pause.performed -= OnPause;
