@@ -97,6 +97,10 @@ namespace M7SharedPlayerTests
         [Test]
         public void ProneActionRespondsOnlyToCurrentKey()
         {
+            var previousBackground = InputSystem.settings.backgroundBehavior;
+            var previousEditorInput = InputSystem.settings.editorInputBehaviorInPlayMode;
+            InputSystem.settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
+            InputSystem.settings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
             var keyboard = InputSystem.AddDevice<Keyboard>();
             var prone = actions.FindAction("Gameplay/Prone", true);
             int presses = 0;
@@ -114,7 +118,12 @@ namespace M7SharedPlayerTests
                 InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.V)); InputSystem.Update();
                 Assert.AreEqual(2, presses);
             }
-            finally { prone.Disable(); InputSystem.RemoveDevice(keyboard); }
+            finally
+            {
+                prone.Disable(); InputSystem.RemoveDevice(keyboard);
+                InputSystem.settings.editorInputBehaviorInPlayMode = previousEditorInput;
+                InputSystem.settings.backgroundBehavior = previousBackground;
+            }
         }
 
         [Test]

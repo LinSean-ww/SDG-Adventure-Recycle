@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="14" result="Failed(Child)" total="14" passed="13" failed="1" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-07 10:47:32Z" end-time="2026-11-07 10:47:32Z" duration="0.2575526">
+  <test-suite type="TestSuite" id="1000" name="My project" fullname="My project" runstate="Runnable" testcasecount="14" result="Failed" site="Child" start-time="2026-11-07 10:47:32Z" end-time="2026-11-07 10:47:32Z" duration="0.257553" total="14" passed="13" failed="1" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1013" name="C3TextLifecycle.EditModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/C3TextLifecycle.EditModeTests.dll" runstate="Runnable" testcasecount="9" result="Failed" site="Child" start-time="2026-11-07 10:47:32Z" end-time="2026-11-07 10:47:32Z" duration="0.028554" total="9" passed="8" failed="1" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="48788" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestFixture" id="1001" name="C3TextLifecycleTests" fullname="C3TextLifecycleTests" classname="C3TextLifecycleTests" runstate="Runnable" testcasecount="3" result="Failed" site="Child" start-time="2026-11-07 10:47:32Z" end-time="2026-11-07 10:47:32Z" duration="0.009120" total="3" passed="2" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="EditMode" />
+        </properties>
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1002" name="PlayModeCycleOne" fullname="C3TextLifecycleTests.PlayModeCycleOne" methodname="PlayModeCycleOne" classname="C3TextLifecycleTests" runstate="Runnable" seed="1693728748" result="Failed" start-time="2026-11-07 10:47:04Z" end-time="2026-11-07 10:47:07Z" duration="3.581356" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="platform" value="EditMode" />
+          </properties>
+          <failure>
+            <message><![CDATA[Unhandled log message: '[Error] No graphic device is available to initialize the view.'. Use UnityEngine.TestTools.LogAssert.Expect]]></message>
+            <stack-trace><![CDATA[UnityEditor.EditorWindow:GetWindow (System.Type)
+C3TextLifecycleTests/<Exercise>d__8:MoveNext () (at Assets/_Modules_/05_Testing/Editor/C3TextLifecycle/C3TextLifecycleTests.cs:59)
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()
+
+]]></stack-trace>
+          </failure>
+          <output><![CDATA[No graphic device is available to initialize the view.
+No graphic device is available to show the window.
+No graphic device is available to initialize the view.
+GfxDevice renderer is null. Unity cannot update the Ambient Probe and Reflection Probes that the SkyManager generates. Run the Editor without the -nographics argument or generate lighting for your scene.
+]]></output>
+        </test-case>
+        <test-case id="1004" name="PlayModeCycleThree" fullname="C3TextLifecycleTests.PlayModeCycleThree" methodname="PlayModeCycleThree" classname="C3TextLifecycleTests" runstate="Runnable" seed="334391765" result="Passed" start-time="2026-11-07 10:47:07Z" end-time="2026-11-07 10:47:11Z" duration="3.535749" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="platform" value="EditMode" />
+          </properties>
+          <output><![CDATA[GfxDevice renderer is null. Unity cannot update the Ambient Probe and Reflection Probes that the SkyManager generates. Run the Editor without the -nographics argument or generate lighting for your scene.
+]]></output>
+        </test-case>
+        <test-case id="1003" name="PlayModeCycleTwo" fullname="C3TextLifecycleTests.PlayModeCycleTwo" methodname="PlayModeCycleTwo" classname="C3TextLifecycleTests" runstate="Runnable" seed="2079015361" result="Passed" start-time="2026-11-07 10:47:11Z" end-time="2026-11-07 10:47:14Z" duration="3.468904" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="platform" value="EditMode" />
+          </properties>
+          <output><![CDATA[GfxDevice renderer is null. Unity cannot update the Ambient Probe and Reflection Probes that the SkyManager generates. Run the Editor without the -nographics argument or generate lighting for your scene.
+]]></output>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1005" name="C3V12PreviewTests" fullname="C3V12PreviewTests" classname="C3V12PreviewTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 10:47:32Z" end-time="2026-11-07 10:47:32Z" duration="0.001204" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="EditMode" />
+        </properties>
+        <test-case id="1006" name="RepeatedEditCaptureDoesNotBakeObjectsDirtyTheSceneOrLeaveACamera" fullname="C3V12PreviewTests.RepeatedEditCaptureDoesNotBakeObjectsDirtyTheSceneOrLeaveACamera" methodname="RepeatedEditCaptureDoesNotBakeObjectsDirtyTheSceneOrLeaveACamera" classname="C3V12PreviewTests" runstate="Runnable" seed="1410504211" result="Passed" start-time="2026-11-07 10:47:14Z" end-time="2026-11-07 10:47:15Z" duration="0.851912" asserts="0">
+          <properties>
+            <property name="platform" value="EditMode" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1007" name="C3V13FactoryBakeTests" fullname="C3V13FactoryBakeTests" classname="C3V13FactoryBakeTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-07 10:47:32Z" end-time="2026-11-07 10:47:32Z" duration="0.001438" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="EditMode" />
+        </properties>
+        <test-case id="1010" name="DamagedBakeRefusesToRebuildOrOverwriteUserObjects" fullname="C3V13FactoryBakeTests.DamagedBakeRefusesToRebuildOrOverwriteUserObjects" methodname="DamagedBakeRefusesToRebuildOrOverwriteUserObjects" classname="C3V13FactoryBakeTests" runstate="Runnable" seed="173280429" result="Passed" start-time="2026-11-07 10:47:15Z" end-time="2026-11-07 10:47:16Z" duration="0.716045" asserts="0">
+          <properties>
+            <property name="platform" value="EditMode" />
+          </properties>
+        </test-case>
+        <test-case id="1011" name="FreshBakeUndoRedoRestoresHierarchyCollidersAndBindings" fullname="C3V13FactoryBakeTests.FreshBakeUndoRedoRestoresHierarchyCollidersAndBindings" methodname="FreshBakeUndoRedoRestoresHierarchyCollidersAndBindings" classname="C3V13FactoryBakeTests" runstate="Runnable" seed="1495215771" result="Passed" start-time="2026-11-07 10:47:16Z" end-time="2026-11-07 10:47:19Z" duration="2.754377" asserts="0">
+          <properties>
+            <property name="platform" value="EditMode" />
+          </properties>
+        </test-case>
+        <test-case id="1012" name="PlayStopPreservesAuthoredFactoryAndDiskScene" fullname="C3V13FactoryBakeTests.PlayStopPreservesAuthoredFactoryAndDiskScene" methodname="PlayStopPreservesAuthoredFactoryAndDiskScene" classname="C3V13FactoryBakeTests" runstate="Runnable" seed="837443277" result="Passed" start-time="2026-11-07 10:47:19Z" end-time="2026-11-07 10:47:23Z" duration="3.964938" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="platform" value="EditMode" />
+          </properties>
+          <output><![CDATA[GfxDevice renderer is null. Unity cannot update the Ambient Probe and Reflection Probes that the SkyManager generates. Run the Editor without the -nographics argument or generate lighting for your scene.
+GfxDevice renderer is null. Unity cannot update the Ambient Probe and Reflection Probes that the SkyManager generates. Run the Editor without the -nographics argument or generate lighting for your scene.
+GfxDevice renderer is null. Unity cannot update the Ambient Probe and Reflection Probes that the SkyManager generates. Run the Editor without the -nographics argument or generate lighting for your scene.
+GfxDevice renderer is null. Unity cannot update the Ambient Probe and Reflection Probes that the SkyManager generates. Run the Editor without the -nographics argument or generate lighting for your scene.
+]]></output>
+        </test-case>
+        <test-case id="1009" name="RepeatedBakePreservesManualEditsAndReferencesAfterSaveReload" fullname="C3V13FactoryBakeTests.RepeatedBakePreservesManualEditsAndReferencesAfterSaveReload" methodname="RepeatedBakePreservesManualEditsAndReferencesAfterSaveReload" classname="C3V13FactoryBakeTests" runstate="Runnable" seed="637857384" result="Passed" start-time="2026-11-07 10:47:23Z" end-time="2026-11-07 10:47:29Z" duration="5.889947" asserts="0">
+          <properties>
+            <property name="platform" value="EditMode" />
+          </properties>
+        </test-case>
+        <test-case id="1008" name="SavedFactoryHasPersistentMeshesMaterialsAndConnectedBindings" fullname="C3V13FactoryBakeTests.SavedFactoryHasPersistentMeshesMaterialsAndConnectedBindings" methodname="SavedFactoryHasPersistentMeshesMaterialsAndConnectedBindings" classname="C3V13FactoryBakeTests" runstate="Runnable" seed="1371218543" result="Passed" start-time="2026-11-07 10:47:29Z" end-time="2026-11-07 10:47:29Z" duration="0.505860" asserts="0">
+          <properties>
+            <property name="platform" value="EditMode" />
+          </properties>
+        </test-case>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1020" name="PlayerControl.EditModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/PlayerControl.EditModeTests.dll" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-07 10:47:32Z" end-time="2026-11-07 10:47:32Z" duration="0.156813" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="48788" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+      </properties>
+      <test-suite type="TestSuite" id="1021" name="SDGAdventure" fullname="SDGAdventure" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-07 10:47:32Z" end-time="2026-11-07 10:47:32Z" duration="0.152391" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="EditMode" />
+        </properties>
+        <test-suite type="TestSuite" id="1022" name="PlayerControlTests" fullname="SDGAdventure.PlayerControlTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-07 10:47:32Z" end-time="2026-11-07 10:47:32Z" duration="0.144621" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="EditMode" />
+          </properties>
+          <test-suite type="TestFixture" id="1014" name="PlayerControlAssetTests" fullname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests" classname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-07 10:47:32Z" end-time="2026-11-07 10:47:32Z" duration="0.138810" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties>
+              <property name="platform" value="EditMode" />
+            </properties>
+            <test-case id="1015" name="SharedCanvasFontLoadsWithoutChangingGuiSkin" fullname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests.SharedCanvasFontLoadsWithoutChangingGuiSkin" methodname="SharedCanvasFontLoadsWithoutChangingGuiSkin" classname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests" runstate="Runnable" seed="938668773" result="Passed" start-time="2026-11-07 10:47:29Z" end-time="2026-11-07 10:47:29Z" duration="0.007846" asserts="0">
+              <properties>
+                <property name="platform" value="EditMode" />
+              </properties>
+            </test-case>
+            <test-case id="1017" name="SharedPlayerPrefabHasOneMotorCameraAndMenu" fullname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests.SharedPlayerPrefabHasOneMotorCameraAndMenu" methodname="SharedPlayerPrefabHasOneMotorCameraAndMenu" classname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests" runstate="Runnable" seed="1945874483" result="Passed" start-time="2026-11-07 10:47:29Z" end-time="2026-11-07 10:47:29Z" duration="0.003407" asserts="0">
+              <properties>
+                <property name="platform" value="EditMode" />
+              </properties>
+            </test-case>
+            <test-case id="1019" name="StandaloneSceneEntersPlayModeWithoutBuildSettings" fullname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests.StandaloneSceneEntersPlayModeWithoutBuildSettings" methodname="StandaloneSceneEntersPlayModeWithoutBuildSettings" classname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests" runstate="Runnable" seed="769024934" result="Passed" start-time="2026-11-07 10:47:29Z" end-time="2026-11-07 10:47:32Z" duration="2.939728" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="platform" value="EditMode" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[GfxDevice renderer is null. Unity cannot update the Ambient Probe and Reflection Probes that the SkyManager generates. Run the Editor without the -nographics argument or generate lighting for your scene.
+]]></output>
+            </test-case>
+            <test-case id="1018" name="StandaloneSceneReferencesPrefabAndTestObjects" fullname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests.StandaloneSceneReferencesPrefabAndTestObjects" methodname="StandaloneSceneReferencesPrefabAndTestObjects" classname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests" runstate="Runnable" seed="630562174" result="Passed" start-time="2026-11-07 10:47:32Z" end-time="2026-11-07 10:47:32Z" duration="0.032755" asserts="0">
+              <properties>
+                <property name="platform" value="EditMode" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1016" name="TaskListActionIsBoundToPInSharedInputAsset" fullname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests.TaskListActionIsBoundToPInSharedInputAsset" methodname="TaskListActionIsBoundToPInSharedInputAsset" classname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests" runstate="Runnable" seed="2108799861" result="Passed" start-time="2026-11-07 10:47:32Z" end-time="2026-11-07 10:47:32Z" duration="0.001528" asserts="0">
+              <properties>
+                <property name="platform" value="EditMode" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Docs\Level03_V15\Baseline_V141_EditMode.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

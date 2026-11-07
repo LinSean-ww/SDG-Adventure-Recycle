@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="1" result="Passed" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-07 11:09:31Z" end-time="2026-11-07 11:09:32Z" duration="0.7808326">
+  <test-suite type="TestSuite" id="1000" name="My project" fullname="My project" runstate="Runnable" testcasecount="216" result="Passed" start-time="2026-11-07 11:09:31Z" end-time="2026-11-07 11:09:32Z" duration="0.780833" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1222" name="M6Integration.PlayModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/M6Integration.PlayModeTests.dll" runstate="Runnable" testcasecount="187" result="Passed" start-time="2026-11-07 11:09:31Z" end-time="2026-11-07 11:09:32Z" duration="0.770575" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="5268" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <test-suite type="TestSuite" id="1223" name="M6IntegrationTests" fullname="M6IntegrationTests" runstate="Runnable" testcasecount="174" result="Passed" start-time="2026-11-07 11:09:31Z" end-time="2026-11-07 11:09:32Z" duration="0.767967" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <test-suite type="TestFixture" id="1078" name="C3V11ThirdPersonWeaponTests" fullname="M6IntegrationTests.C3V11ThirdPersonWeaponTests" classname="M6IntegrationTests.C3V11ThirdPersonWeaponTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-11-07 11:09:31Z" end-time="2026-11-07 11:09:32Z" duration="0.762403" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-case id="1082" name="CloseWallRaisesHeldRifleAndKeepsBothHandsOnGrips" fullname="M6IntegrationTests.C3V11ThirdPersonWeaponTests.CloseWallRaisesHeldRifleAndKeepsBothHandsOnGrips" methodname="CloseWallRaisesHeldRifleAndKeepsBothHandsOnGrips" classname="M6IntegrationTests.C3V11ThirdPersonWeaponTests" runstate="Runnable" seed="505645156" result="Passed" start-time="2026-11-07 11:09:31Z" end-time="2026-11-07 11:09:32Z" duration="0.750056" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>
