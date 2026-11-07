@@ -1,5 +1,7 @@
 # Validation
 
+The latest acceptance run and its remaining blockers are recorded in [PreIntegrationAcceptance.md](PreIntegrationAcceptance.md). The Phase 2 table below is retained for comparison with the earlier 205-pass state.
+
 ## Phase 2
 
 All runs below used Unity 2023.1.22f1 on Windows. The PlayMode runs use `-batchmode -nographics`; the EditMode run uses graphics. `RunIsolatedTests.ps1` exports the two existing project PlayerPrefs registry keys, runs one Unity process at a time, and restores and verifies their values afterward. This protects the captured values but is not an isolated OS account; another process writing the same keys concurrently would interfere. Backups and editor logs remain in the user's temporary directory, not the repository.

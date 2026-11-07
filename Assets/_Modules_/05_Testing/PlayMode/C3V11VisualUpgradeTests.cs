@@ -714,7 +714,11 @@ namespace M6IntegrationTests
         {
             Transform bench=GameObject.Find("Hidden_WeaponAssemblyBench_F").transform;
             Transform display=bench.GetComponentsInChildren<Transform>(true).Single(t=>t.name=="ReclaimedQuantumRifle_Visual");
-            Renderer[] tableRenderers=display.GetComponentsInChildren<Renderer>(true);
+            Transform legacySight=display.Find("Sight");
+            Assert.IsNotNull(legacySight,"The baked manifest must retain its authored optic object.");
+            Assert.IsFalse(legacySight.gameObject.activeSelf,"The obsolete solid sight must not remain visible.");
+            Renderer[] tableRenderers=display.GetComponentsInChildren<Renderer>(true)
+                .Where(r=>r.enabled && r.gameObject.activeInHierarchy).ToArray();
             Assert.IsNotEmpty(tableRenderers);Assert.IsTrue(tableRenderers.All(r=>r.shadowCastingMode==ShadowCastingMode.On));
             // Test the actual equipped-weapon creation path, not a standalone
             // visual component that production might never install.

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -19,33 +20,41 @@ namespace M6IntegrationTests
         public IEnumerator CToBIsClosedAndTheReceivingBeltStopsAtThreshold()
         {
             yield return Load();
-            GameObject shutter=GameObject.Find("V7_OPAQUE_C_TO_B_RECEIVING_SHUTTER");
-            Assert.IsNotNull(shutter,"The B room must be hidden from the C factory");
-            Collider door=shutter.GetComponent<Collider>();
-            Assert.IsNotNull(door);
-            Assert.IsTrue(door.enabled);
-            Assert.LessOrEqual(door.bounds.max.x,-.27f);
-            var belt=GameObject.Find("V8_B_To_C_ContinuousRubber");
-            Assert.IsNotNull(belt);
-            var r=belt.GetComponentInChildren<Renderer>();
-            Assert.IsNotNull(r);
-            Assert.Less(r.bounds.max.x,-.48f,"Conveyor must not enter B zone");
-            Assert.Greater(r.bounds.max.x,-.90f,"Conveyor should visibly meet the doorway");
+            // V11 intentionally replaces the opaque V7 shutter with a PVC opening
+            // and an overhead material interface; preserve its actual safety checks.
+            Assert.IsNull(GameObject.Find("V7_OPAQUE_C_TO_B_RECEIVING_SHUTTER"));
+            GameObject curtain=GameObject.Find("V11_BC_PVC_CURTAIN");
+            Assert.IsNotNull(curtain);
+            Assert.IsEmpty(curtain.GetComponentsInChildren<Collider>(true));
+            Assert.Greater(curtain.GetComponentsInChildren<Renderer>().Length,0);
+            foreach(string name in new[]{"C_Wall_4_Near","C_Wall_4_Far","C_Wall_4_Lintel","B_Door_Floor","B_Safety_End","B_Safety_Near","B_Safety_Far"})
+            {
+                var collider=GameObject.Find(name).GetComponent<Collider>();
+                Assert.IsTrue(collider.enabled && !collider.isTrigger,name);
+            }
+            var geometry=C3V11Phase2RecyclingLineTests.Find("C3TreasurePuzzle.C3RecyclingLineGeometry");
+            Assert.IsNotNull(geometry);
+            Transform entry=(Transform)C3V11Phase2RecyclingLineTests.Member(geometry,"BMaterialInterface");
+            Assert.Greater(entry.position.y,6.8f);
+            C3V11Phase2RecyclingLineTests.AssertEquipmentConnections(geometry);
         }
         [UnityTest]
         public IEnumerator FormerObstructingStairRampHasMovedAwayFromReportedPosition()
         {
             yield return Load();
-            var ramp=GameObject.Find("V8_MAIN_STAIR_CONTINUOUS_RAMP");
-            Assert.IsNotNull(ramp);
-            Collider c=ramp.GetComponent<Collider>();
-            Assert.IsNotNull(c);
-            Assert.IsTrue(c.enabled);
-            Assert.Less(c.bounds.max.x,-20.8f,"Primary staircase must stay outside central aisle");
+            var root=GameObject.Find("C3_V3_VerifiedCirculation").transform;
+            Transform west=root.Find("STAIR_A_WEST"),east=root.Find("STAIR_B_EAST");
+            Assert.IsNotNull(west);Assert.IsNotNull(east);
+            Assert.AreEqual(22,west.GetComponentsInChildren<Collider>().Count(c=>c.enabled && c.name.StartsWith("TREAD_")));
+            Assert.AreEqual(22,east.GetComponentsInChildren<Collider>().Count(c=>c.enabled && c.name.StartsWith("TREAD_")));
+            foreach(Collider tread in west.GetComponentsInChildren<Collider>())
+                if(tread.enabled && tread.name.StartsWith("TREAD_"))
+                    Assert.Less(tread.bounds.max.x,-20.8f,"West stairs must stay outside central aisle");
+            Assert.IsNotNull(root.Find("2F_WEST_SERVICE_ROUTE").GetComponent<Collider>());
+            Assert.IsNotNull(root.Find("2F_EAST_SERVICE_ROUTE").GetComponent<Collider>());
+            Assert.IsNotNull(root.Find("2F_CONNECTING_REAR_ROUTE").GetComponent<Collider>());
             Assert.IsNull(GameObject.Find("STAIR_EAST_CONTINUOUS_WALKING_RAMP"),
                 "Retired east stair must not have invisible collision");
-            Assert.IsNotNull(GameObject.Find("2F_EAST_WALL_CONNECTING_ROUTE"));
-            Assert.IsNotNull(GameObject.Find("2F_EAST_REAR_TRANSFER_ROUTE"));
         }
         [UnityTest]
         public IEnumerator RealCapsuleCanCrossPreviouslyBlockedFloorStripeTowardsDExit()

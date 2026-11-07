@@ -8,9 +8,11 @@ param(
     [switch]$Graphics
 )
 $ErrorActionPreference = 'Stop'
-if (Get-Process -Name Unity -ErrorAction SilentlyContinue) { throw 'A Unity Editor is already running; do not touch shared PlayerPrefs.' }
-$root = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $editor = 'C:\Program Files\Unity\Hub\Editor\2023.1.22f1\Editor\Unity.exe'
+if (Get-Process -Name Unity -ErrorAction SilentlyContinue | Where-Object { -not $_.Path -or $_.Path -notlike '*\Unity Hub\resources\unity.exe' }) {
+    throw 'A Unity Editor is already running; do not touch shared PlayerPrefs.'
+}
+$root = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $subkeys = @('Software\Unity\UnityEditor\DefaultCompany\My project','Software\DefaultCompany\My project')
 $backupDir = Join-Path $env:TEMP ('SDG_V15_Prefs_' + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $backupDir | Out-Null

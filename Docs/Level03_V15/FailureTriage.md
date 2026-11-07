@@ -1,3 +1,7 @@
+# Latest pre-integration status
+
+The latest full graphics-enabled run passed six of the nine Phase 2 failures and retained three failures: the obsolete M2 stair route, the spawn movement/contact assertion, and the unstable V15 lighting reference. See [PreIntegrationAcceptance.md](PreIntegrationAcceptance.md) and [final XML](PreIntegration_Final_PlayMode.xml) for the latest evidence and blocker assessment. The phase-specific tables below preserve earlier results and should not be read as the final status.
+
 # Phase 2: historical failures
 
 The final seeded run repeated each passing test once; 37 of the 46 historical failures passed and nine failed. Results below link to the raw XML. A pass does not independently prove a shared root cause. The Phase 1 ledger that follows is retained as historical analysis; its retest column describes Phase 1, not the final state.

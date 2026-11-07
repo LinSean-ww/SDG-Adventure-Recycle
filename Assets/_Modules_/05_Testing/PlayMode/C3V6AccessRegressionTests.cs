@@ -24,15 +24,15 @@ namespace M6IntegrationTests
         public IEnumerator ConveyorIsInsideTheMainHallAndConnectsToSorter()
         {
             yield return Load();
-            GameObject conveyor=GameObject.Find("V8_B_To_C_ContinuousRubber");
-            Assert.IsNotNull(conveyor);
-            Renderer r=conveyor.GetComponentInChildren<Renderer>();
-            Assert.IsNotNull(r);
-            Assert.LessOrEqual(r.bounds.max.x,-.55f,"Conveyor entered B room");
-            Assert.LessOrEqual(r.bounds.min.x,-6.1f,"Conveyor does not reach sorter main line");
-            Assert.GreaterOrEqual(r.bounds.max.z,16.8f,"Conveyor has no feed to the sorter");
-            Assert.GreaterOrEqual(r.bounds.max.y,5.6f,"Conveyor cannot reach high intake");
-            Assert.LessOrEqual(r.bounds.max.y,5.72f,"Conveyor crossover is above its clearance envelope");
+            Component geometry=C3V11Phase2RecyclingLineTests.Find("C3TreasurePuzzle.C3RecyclingLineGeometry");
+            Assert.IsNotNull(geometry);
+            C3V11Phase2RecyclingLineTests.AssertEquipmentConnections(geometry);
+            Collider main=(Collider)C3V11Phase2RecyclingLineTests.Member(
+                C3V11Phase2RecyclingLineTests.Member(geometry,"MainBelt"),"Surface");
+            Assert.IsTrue(main.enabled && !main.isTrigger);
+            Assert.LessOrEqual(main.bounds.max.x,-6.1f,"Main belt must remain in the C hall");
+            Assert.GreaterOrEqual(main.bounds.max.z,16.8f,"Main belt must reach the sorter row");
+            Assert.That(main.bounds.max.y,Is.EqualTo(5.8f).Within(.02f));
             Assert.IsNull(GameObject.Find("V5_BPortalContinuousBelt"),
                 "Old B-inside model should not be present simultaneously");
         }

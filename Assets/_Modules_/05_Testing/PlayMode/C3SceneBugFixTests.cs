@@ -105,8 +105,15 @@ namespace M6IntegrationTests
             Assert.IsNotNull(tick);
             capsule.Move(Vector3.down * 0.1f);
             float startX = player.transform.position.x;
+            var contactEvidence=player.AddComponent<C3V11CollisionRecorder>();
+            contactEvidence.CaptureDetails=true;
+            Vector3 beforeMove=player.transform.position;
             tick.Invoke(controller, new object[] { new Vector2(0f, 1f), false, false, false, 0.1f });
-            Assert.Less(player.transform.position.x, startX - 0.25f, "C3 player must walk into the factory from the new spawn.");
+            string evidence="Start="+beforeMove+" end="+player.transform.position+
+                " forward="+player.transform.forward+" speed="+controller.GetType().GetField("currentMoveSpeed",BindingFlags.NonPublic|BindingFlags.Instance).GetValue(controller)+
+                " contacts="+string.Join(", ",contactEvidence.DetailedContacts.Select(c=>c.Collider.name+" normal="+c.Normal));
+            UnityEngine.Object.Destroy(contactEvidence);
+            Assert.Less(player.transform.position.x, startX - 0.25f, "C3 player must walk into the factory from the new spawn. "+evidence);
             capsule.Move(Vector3.down * 0.1f);
             float beforeJump = player.transform.position.y;
             tick.Invoke(controller, new object[] { Vector2.zero, false, false, true, 0.02f });
