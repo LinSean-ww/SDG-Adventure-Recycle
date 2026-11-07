@@ -15,7 +15,7 @@ namespace SDGAdventure.SharedPlayer
             ("前進", "Gameplay", "Move", 1), ("後退", "Gameplay", "Move", 2),
             ("左移", "Gameplay", "Move", 3), ("右移", "Gameplay", "Move", 4),
             ("跳躍", "Gameplay", "Jump", 0), ("奔跑", "Gameplay", "Sprint", 0),
-            ("蹲下", "Gameplay", "Crouch", 0), ("互動", "Gameplay", "Interact", 0),
+            ("蹲下", "Gameplay", "Crouch", 0), ("趴下", "Gameplay", "Prone", 0), ("互動", "Gameplay", "Interact", 0),
             ("任務清單", "Gameplay", "TaskList", 0), ("暫停", "Global", "Pause", 0)
         };
 

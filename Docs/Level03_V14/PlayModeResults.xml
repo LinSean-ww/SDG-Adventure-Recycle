@@ -1,0 +1,532 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="39" result="Failed(Child)" total="39" passed="23" failed="16" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-07 10:01:40Z" end-time="2026-11-07 10:01:50Z" duration="10.014005">
+  <test-suite type="TestSuite" id="1000" name="My project" fullname="My project" runstate="Runnable" testcasecount="214" result="Failed" site="Child" start-time="2026-11-07 10:01:40Z" end-time="2026-11-07 10:01:50Z" duration="10.014005" total="39" passed="23" failed="16" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1219" name="M6Integration.PlayModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/M6Integration.PlayModeTests.dll" runstate="Runnable" testcasecount="185" result="Failed" site="Child" start-time="2026-11-07 10:01:40Z" end-time="2026-11-07 10:01:49Z" duration="9.255096" total="26" passed="12" failed="14" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="49308" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1220" name="M6IntegrationTests" fullname="M6IntegrationTests" runstate="Runnable" testcasecount="172" result="Failed" site="Child" start-time="2026-11-07 10:01:40Z" end-time="2026-11-07 10:01:49Z" duration="9.249648" total="26" passed="12" failed="14" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestFixture" id="1078" name="C3V11ThirdPersonWeaponTests" fullname="M6IntegrationTests.C3V11ThirdPersonWeaponTests" classname="M6IntegrationTests.C3V11ThirdPersonWeaponTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-11-07 10:01:40Z" end-time="2026-11-07 10:01:43Z" duration="3.173224" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-case id="1082" name="CloseWallRaisesHeldRifleAndKeepsBothHandsOnGrips" fullname="M6IntegrationTests.C3V11ThirdPersonWeaponTests.CloseWallRaisesHeldRifleAndKeepsBothHandsOnGrips" methodname="CloseWallRaisesHeldRifleAndKeepsBothHandsOnGrips" classname="M6IntegrationTests.C3V11ThirdPersonWeaponTests" runstate="Runnable" seed="36643076" result="Passed" start-time="2026-11-07 10:01:40Z" end-time="2026-11-07 10:01:41Z" duration="0.784830" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1085" name="EquippedSceneReloadsReleaseOldViewsAndDoNotDuplicateAnchors" fullname="M6IntegrationTests.C3V11ThirdPersonWeaponTests.EquippedSceneReloadsReleaseOldViewsAndDoNotDuplicateAnchors" methodname="EquippedSceneReloadsReleaseOldViewsAndDoNotDuplicateAnchors" classname="M6IntegrationTests.C3V11ThirdPersonWeaponTests" runstate="Runnable" seed="539986759" result="Passed" start-time="2026-11-07 10:01:41Z" end-time="2026-11-07 10:01:42Z" duration="0.864322" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1080" name="EquippedWeaponAndBothHandsFollowPitchOrbitAndViewSwitches" fullname="M6IntegrationTests.C3V11ThirdPersonWeaponTests.EquippedWeaponAndBothHandsFollowPitchOrbitAndViewSwitches" methodname="EquippedWeaponAndBothHandsFollowPitchOrbitAndViewSwitches" classname="M6IntegrationTests.C3V11ThirdPersonWeaponTests" runstate="Runnable" seed="2107125247" result="Passed" start-time="2026-11-07 10:01:42Z" end-time="2026-11-07 10:01:42Z" duration="0.281304" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1083" name="FirstPersonBarrelRetractsBeforeSolidWallWithoutChangingRig" fullname="M6IntegrationTests.C3V11ThirdPersonWeaponTests.FirstPersonBarrelRetractsBeforeSolidWallWithoutChangingRig" methodname="FirstPersonBarrelRetractsBeforeSolidWallWithoutChangingRig" classname="M6IntegrationTests.C3V11ThirdPersonWeaponTests" runstate="Runnable" seed="1770370512" result="Passed" start-time="2026-11-07 10:01:42Z" end-time="2026-11-07 10:01:42Z" duration="0.273609" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1079" name="SightHasOpenCenterOnCameraAimAxis" fullname="M6IntegrationTests.C3V11ThirdPersonWeaponTests.SightHasOpenCenterOnCameraAimAxis" methodname="SightHasOpenCenterOnCameraAimAxis" classname="M6IntegrationTests.C3V11ThirdPersonWeaponTests" runstate="Runnable" seed="523903722" result="Passed" start-time="2026-11-07 10:01:42Z" end-time="2026-11-07 10:01:42Z" duration="0.298808" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1084" name="SwitchingToThirdPersonAfterFpsWallRetractionRestoresRiflePose" fullname="M6IntegrationTests.C3V11ThirdPersonWeaponTests.SwitchingToThirdPersonAfterFpsWallRetractionRestoresRiflePose" methodname="SwitchingToThirdPersonAfterFpsWallRetractionRestoresRiflePose" classname="M6IntegrationTests.C3V11ThirdPersonWeaponTests" runstate="Runnable" seed="277331419" result="Passed" start-time="2026-11-07 10:01:42Z" end-time="2026-11-07 10:01:43Z" duration="0.314459" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1081" name="WalkingLeanProneAndAdsKeepGripsWithoutChangingMovementState" fullname="M6IntegrationTests.C3V11ThirdPersonWeaponTests.WalkingLeanProneAndAdsKeepGripsWithoutChangingMovementState" methodname="WalkingLeanProneAndAdsKeepGripsWithoutChangingMovementState" classname="M6IntegrationTests.C3V11ThirdPersonWeaponTests" runstate="Runnable" seed="1293324418" result="Passed" start-time="2026-11-07 10:01:43Z" end-time="2026-11-07 10:01:43Z" duration="0.341402" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="TestFixture" id="1125" name="C3V12FinalFollowupTests" fullname="M6IntegrationTests.C3V12FinalFollowupTests" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" testcasecount="18" result="Failed" site="Child" start-time="2026-11-07 10:01:43Z" end-time="2026-11-07 10:01:49Z" duration="5.512316" total="18" passed="4" failed="14" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-case id="1130" name="AirborneSpaceCannotQueueALandingOrDoubleJump" fullname="M6IntegrationTests.C3V12FinalFollowupTests.AirborneSpaceCannotQueueALandingOrDoubleJump" methodname="AirborneSpaceCannotQueueALandingOrDoubleJump" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="526191773" result="Failed" start-time="2026-11-07 10:01:43Z" end-time="2026-11-07 10:01:43Z" duration="0.349407" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+              <stack-trace><![CDATA[at M6IntegrationTests.C3V12FinalFollowupTests.Prone (System.Int32 mode) [0x00012] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:80
+at M6IntegrationTests.C3V12FinalFollowupTests+<AirborneSpaceCannotQueueALandingOrDoubleJump>d__43.MoveNext () [0x00021] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:147
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@1.3.9\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+            </failure>
+          </test-case>
+          <test-case id="1143" name="DedicatedTestsCanStillInstantiateTheDemoWithoutQuestRewards" fullname="M6IntegrationTests.C3V12FinalFollowupTests.DedicatedTestsCanStillInstantiateTheDemoWithoutQuestRewards" methodname="DedicatedTestsCanStillInstantiateTheDemoWithoutQuestRewards" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="1761695584" result="Passed" start-time="2026-11-07 10:01:43Z" end-time="2026-11-07 10:01:44Z" duration="0.258893" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <output><![CDATA[M2 測試互動：測試互動物件，次數 1
+]]></output>
+          </test-case>
+          <test-case id="1126" name="FirstPersonZThenSpaceStandsBeforeOneGroundedJump" fullname="M6IntegrationTests.C3V12FinalFollowupTests.FirstPersonZThenSpaceStandsBeforeOneGroundedJump" methodname="FirstPersonZThenSpaceStandsBeforeOneGroundedJump" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="1701378390" result="Failed" start-time="2026-11-07 10:01:44Z" end-time="2026-11-07 10:01:44Z" duration="0.268065" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+              <stack-trace><![CDATA[at M6IntegrationTests.C3V12FinalFollowupTests.Prone (System.Int32 mode) [0x00012] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:80
+at M6IntegrationTests.C3V12FinalFollowupTests+<StandJump>d__40.MoveNext () [0x00021] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:104
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@1.3.9\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+            </failure>
+          </test-case>
+          <test-case id="1133" name="HeldCtrlUnpronesToCrouchWithoutADelayedJump" fullname="M6IntegrationTests.C3V12FinalFollowupTests.HeldCtrlUnpronesToCrouchWithoutADelayedJump" methodname="HeldCtrlUnpronesToCrouchWithoutADelayedJump" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="523546762" result="Failed" start-time="2026-11-07 10:01:44Z" end-time="2026-11-07 10:01:44Z" duration="0.247463" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+              <stack-trace><![CDATA[at M6IntegrationTests.C3V12FinalFollowupTests.Prone (System.Int32 mode) [0x00012] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:80
+at M6IntegrationTests.C3V12FinalFollowupTests+<HeldCtrlUnpronesToCrouchWithoutADelayedJump>d__46.MoveNext () [0x00021] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:177
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@1.3.9\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+            </failure>
+          </test-case>
+          <test-case id="1136" name="JumpDisabledStillAllowsSafeStandingButNoImpulse" fullname="M6IntegrationTests.C3V12FinalFollowupTests.JumpDisabledStillAllowsSafeStandingButNoImpulse" methodname="JumpDisabledStillAllowsSafeStandingButNoImpulse" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="112550071" result="Failed" start-time="2026-11-07 10:01:44Z" end-time="2026-11-07 10:01:44Z" duration="0.268072" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+              <stack-trace><![CDATA[at M6IntegrationTests.C3V12FinalFollowupTests.Prone (System.Int32 mode) [0x00012] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:80
+at M6IntegrationTests.C3V12FinalFollowupTests+<JumpDisabledStillAllowsSafeStandingButNoImpulse>d__49.MoveNext () [0x00021] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:202
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@1.3.9\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+            </failure>
+          </test-case>
+          <test-case id="1128" name="LowCeilingRejectsSpaceInBothViewsAndZStillRecoversAfterLeaving" fullname="M6IntegrationTests.C3V12FinalFollowupTests.LowCeilingRejectsSpaceInBothViewsAndZStillRecoversAfterLeaving" methodname="LowCeilingRejectsSpaceInBothViewsAndZStillRecoversAfterLeaving" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="1446537281" result="Failed" start-time="2026-11-07 10:01:44Z" end-time="2026-11-07 10:01:45Z" duration="0.286361" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+              <stack-trace><![CDATA[at M6IntegrationTests.C3V12FinalFollowupTests.Prone (System.Int32 mode) [0x00012] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:80
+at M6IntegrationTests.C3V12FinalFollowupTests+<LowCeilingRejectsSpaceInBothViewsAndZStillRecoversAfterLeaving>d__41.MoveNext () [0x00021] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:124
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@1.3.9\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+            </failure>
+          </test-case>
+          <test-case id="1138" name="MaintenanceBoardRestsOnTableAndStaysSeparateFromTheUnmovedQuestChip" fullname="M6IntegrationTests.C3V12FinalFollowupTests.MaintenanceBoardRestsOnTableAndStaysSeparateFromTheUnmovedQuestChip" methodname="MaintenanceBoardRestsOnTableAndStaysSeparateFromTheUnmovedQuestChip" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="1494829601" result="Passed" start-time="2026-11-07 10:01:45Z" end-time="2026-11-07 10:01:45Z" duration="0.352741" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1140" name="MaintenanceChipStillAcceptsRealFOnceInFirstPerson" fullname="M6IntegrationTests.C3V12FinalFollowupTests.MaintenanceChipStillAcceptsRealFOnceInFirstPerson" methodname="MaintenanceChipStillAcceptsRealFOnceInFirstPerson" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="1891087575" result="Failed" start-time="2026-11-07 10:01:45Z" end-time="2026-11-07 10:01:45Z" duration="0.251151" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: False
+  But was:  True
+]]></message>
+              <stack-trace><![CDATA[at M6IntegrationTests.C3V12FinalFollowupTests+<CollectChip>d__55.MoveNext () [0x000f2] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:280
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@1.3.9\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+            </failure>
+          </test-case>
+          <test-case id="1141" name="MaintenanceChipStillAcceptsRealFOnceInThirdPerson" fullname="M6IntegrationTests.C3V12FinalFollowupTests.MaintenanceChipStillAcceptsRealFOnceInThirdPerson" methodname="MaintenanceChipStillAcceptsRealFOnceInThirdPerson" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="1234119150" result="Failed" start-time="2026-11-07 10:01:45Z" end-time="2026-11-07 10:01:46Z" duration="0.269329" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: False
+  But was:  True
+]]></message>
+              <stack-trace><![CDATA[at M6IntegrationTests.C3V12FinalFollowupTests+<CollectChip>d__55.MoveNext () [0x000f2] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:280
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@1.3.9\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+            </failure>
+          </test-case>
+          <test-case id="1129" name="NewCeilingDuringRecoveryCancelsJumpAndReturnsToProne" fullname="M6IntegrationTests.C3V12FinalFollowupTests.NewCeilingDuringRecoveryCancelsJumpAndReturnsToProne" methodname="NewCeilingDuringRecoveryCancelsJumpAndReturnsToProne" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="467990281" result="Failed" start-time="2026-11-07 10:01:46Z" end-time="2026-11-07 10:01:46Z" duration="0.301905" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+              <stack-trace><![CDATA[at M6IntegrationTests.C3V12FinalFollowupTests.Prone (System.Int32 mode) [0x00012] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:80
+at M6IntegrationTests.C3V12FinalFollowupTests+<NewCeilingDuringRecoveryCancelsJumpAndReturnsToProne>d__42.MoveNext () [0x00021] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:140
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@1.3.9\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+            </failure>
+          </test-case>
+          <test-case id="1142" name="NormalFactoryHasNoDemoInteractionOrTerminalAcrossThreeLoads" fullname="M6IntegrationTests.C3V12FinalFollowupTests.NormalFactoryHasNoDemoInteractionOrTerminalAcrossThreeLoads" methodname="NormalFactoryHasNoDemoInteractionOrTerminalAcrossThreeLoads" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="91512306" result="Passed" start-time="2026-11-07 10:01:46Z" end-time="2026-11-07 10:01:47Z" duration="0.781797" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1139" name="PliersHaveOnePivotClearTipsAndARealPegWithoutTouchingOtherTools" fullname="M6IntegrationTests.C3V12FinalFollowupTests.PliersHaveOnePivotClearTipsAndARealPegWithoutTouchingOtherTools" methodname="PliersHaveOnePivotClearTipsAndARealPegWithoutTouchingOtherTools" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="142526913" result="Passed" start-time="2026-11-07 10:01:47Z" end-time="2026-11-07 10:01:47Z" duration="0.272555" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1135" name="SlowStandExpiresTheRequestInsteadOfJumpingMuchLater" fullname="M6IntegrationTests.C3V12FinalFollowupTests.SlowStandExpiresTheRequestInsteadOfJumpingMuchLater" methodname="SlowStandExpiresTheRequestInsteadOfJumpingMuchLater" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="1385404071" result="Failed" start-time="2026-11-07 10:01:47Z" end-time="2026-11-07 10:01:47Z" duration="0.255046" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+              <stack-trace><![CDATA[at M6IntegrationTests.C3V12FinalFollowupTests.Prone (System.Int32 mode) [0x00012] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:80
+at M6IntegrationTests.C3V12FinalFollowupTests+<SlowStandExpiresTheRequestInsteadOfJumpingMuchLater>d__48.MoveNext () [0x00021] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:194
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@1.3.9\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+            </failure>
+          </test-case>
+          <test-case id="1127" name="ThirdPersonZThenSpaceStandsBeforeOneGroundedJump" fullname="M6IntegrationTests.C3V12FinalFollowupTests.ThirdPersonZThenSpaceStandsBeforeOneGroundedJump" methodname="ThirdPersonZThenSpaceStandsBeforeOneGroundedJump" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="1564969474" result="Failed" start-time="2026-11-07 10:01:47Z" end-time="2026-11-07 10:01:48Z" duration="0.258867" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+              <stack-trace><![CDATA[at M6IntegrationTests.C3V12FinalFollowupTests.Prone (System.Int32 mode) [0x00012] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:80
+at M6IntegrationTests.C3V12FinalFollowupTests+<StandJump>d__40.MoveNext () [0x00021] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:104
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@1.3.9\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+            </failure>
+          </test-case>
+          <test-case id="1132" name="UiAndUnlockedCursorCancelAnExistingBufferedJump" fullname="M6IntegrationTests.C3V12FinalFollowupTests.UiAndUnlockedCursorCancelAnExistingBufferedJump" methodname="UiAndUnlockedCursorCancelAnExistingBufferedJump" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="1106773959" result="Failed" start-time="2026-11-07 10:01:48Z" end-time="2026-11-07 10:01:48Z" duration="0.271422" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+              <stack-trace><![CDATA[at M6IntegrationTests.C3V12FinalFollowupTests.Prone (System.Int32 mode) [0x00012] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:80
+at M6IntegrationTests.C3V12FinalFollowupTests+<UiAndUnlockedCursorCancelAnExistingBufferedJump>d__45.MoveNext () [0x00021] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:166
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@1.3.9\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+            </failure>
+          </test-case>
+          <test-case id="1131" name="UiSpaceDoesNotUnproneOrJumpInEitherView" fullname="M6IntegrationTests.C3V12FinalFollowupTests.UiSpaceDoesNotUnproneOrJumpInEitherView" methodname="UiSpaceDoesNotUnproneOrJumpInEitherView" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="1891774040" result="Failed" start-time="2026-11-07 10:01:48Z" end-time="2026-11-07 10:01:48Z" duration="0.302273" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+              <stack-trace><![CDATA[at M6IntegrationTests.C3V12FinalFollowupTests.Prone (System.Int32 mode) [0x00012] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:80
+at M6IntegrationTests.C3V12FinalFollowupTests+<UiSpaceDoesNotUnproneOrJumpInEitherView>d__44.MoveNext () [0x00021] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:155
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@1.3.9\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+            </failure>
+          </test-case>
+          <test-case id="1137" name="ViewSwitchDuringRecoveryKeepsExactlyOneJumpSubscriptionAndTakeoff" fullname="M6IntegrationTests.C3V12FinalFollowupTests.ViewSwitchDuringRecoveryKeepsExactlyOneJumpSubscriptionAndTakeoff" methodname="ViewSwitchDuringRecoveryKeepsExactlyOneJumpSubscriptionAndTakeoff" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="223882274" result="Failed" start-time="2026-11-07 10:01:48Z" end-time="2026-11-07 10:01:48Z" duration="0.248431" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+              <stack-trace><![CDATA[at M6IntegrationTests.C3V12FinalFollowupTests.Prone (System.Int32 mode) [0x00012] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:80
+at M6IntegrationTests.C3V12FinalFollowupTests+<ViewSwitchDuringRecoveryKeepsExactlyOneJumpSubscriptionAndTakeoff>d__50.MoveNext () [0x00021] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:210
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@1.3.9\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+            </failure>
+          </test-case>
+          <test-case id="1134" name="ZCancelsAPendingProneJump" fullname="M6IntegrationTests.C3V12FinalFollowupTests.ZCancelsAPendingProneJump" methodname="ZCancelsAPendingProneJump" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="1927754818" result="Failed" start-time="2026-11-07 10:01:48Z" end-time="2026-11-07 10:01:49Z" duration="0.261768" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+              <stack-trace><![CDATA[at M6IntegrationTests.C3V12FinalFollowupTests.Prone (System.Int32 mode) [0x00012] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:80
+at M6IntegrationTests.C3V12FinalFollowupTests+<ZCancelsAPendingProneJump>d__47.MoveNext () [0x00021] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\C3V12FinalFollowupTests.cs:187
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@1.3.9\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+            </failure>
+          </test-case>
+        </test-suite>
+        <test-suite type="TestFixture" id="1149" name="C3V13BakedFactoryTests" fullname="M6IntegrationTests.C3V13BakedFactoryTests" classname="M6IntegrationTests.C3V13BakedFactoryTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 10:01:49Z" end-time="2026-11-07 10:01:49Z" duration="0.551096" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-case id="1150" name="SavedGeometryRebindsAndReloadsWithoutDuplicateEquipment" fullname="M6IntegrationTests.C3V13BakedFactoryTests.SavedGeometryRebindsAndReloadsWithoutDuplicateEquipment" methodname="SavedGeometryRebindsAndReloadsWithoutDuplicateEquipment" classname="M6IntegrationTests.C3V13BakedFactoryTests" runstate="Runnable" seed="221227443" result="Passed" start-time="2026-11-07 10:01:49Z" end-time="2026-11-07 10:01:49Z" duration="0.550152" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1239" name="M7SharedPlayer.PlayModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/M7SharedPlayer.PlayModeTests.dll" runstate="Runnable" testcasecount="13" result="Failed" site="Child" start-time="2026-11-07 10:01:49Z" end-time="2026-11-07 10:01:50Z" duration="0.747183" total="13" passed="11" failed="2" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="49308" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1240" name="M7SharedPlayerTests" fullname="M7SharedPlayerTests" runstate="Runnable" testcasecount="13" result="Failed" site="Child" start-time="2026-11-07 10:01:49Z" end-time="2026-11-07 10:01:50Z" duration="0.746563" total="13" passed="11" failed="2" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestFixture" id="1223" name="PlayerInputServiceTests" fullname="M7SharedPlayerTests.PlayerInputServiceTests" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" testcasecount="3" result="Failed" site="Child" start-time="2026-11-07 10:01:49Z" end-time="2026-11-07 10:01:50Z" duration="0.697479" total="3" passed="2" failed="1" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-case id="1224" name="EscapeHasOneEnabledActionInEachContext" fullname="M7SharedPlayerTests.PlayerInputServiceTests.EscapeHasOneEnabledActionInEachContext" methodname="EscapeHasOneEnabledActionInEachContext" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" seed="1006177756" result="Passed" start-time="2026-11-07 10:01:49Z" end-time="2026-11-07 10:01:49Z" duration="0.001686" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1226" name="Level03MenuPausesResumesAndUsesExistingTransitions" fullname="M7SharedPlayerTests.PlayerInputServiceTests.Level03MenuPausesResumesAndUsesExistingTransitions" methodname="Level03MenuPausesResumesAndUsesExistingTransitions" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" seed="1104174999" result="Failed" start-time="2026-11-07 10:01:49Z" end-time="2026-11-07 10:01:49Z" duration="0.282871" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: Locked
+  But was:  None
+]]></message>
+              <stack-trace><![CDATA[at M7SharedPlayerTests.PlayerInputServiceTests+<Level03MenuPausesResumesAndUsesExistingTransitions>d__4.MoveNext () [0x003bb] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\M7\PlayerInputServiceTests.cs:120
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@1.3.9\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+            </failure>
+          </test-case>
+          <test-case id="1225" name="OneServiceSurvivesM6C3SceneChanges" fullname="M7SharedPlayerTests.PlayerInputServiceTests.OneServiceSurvivesM6C3SceneChanges" methodname="OneServiceSurvivesM6C3SceneChanges" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" seed="2083812321" result="Passed" start-time="2026-11-07 10:01:49Z" end-time="2026-11-07 10:01:50Z" duration="0.411818" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="TestFixture" id="1227" name="PlayerPerspectivePlayModeTests" fullname="M7SharedPlayerTests.PlayerPerspectivePlayModeTests" classname="M7SharedPlayerTests.PlayerPerspectivePlayModeTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-11-07 10:01:50Z" end-time="2026-11-07 10:01:50Z" duration="0.018744" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-case id="1228" name="DefaultIsFirstPersonAndDiagonalTravelIsNormalized" fullname="M7SharedPlayerTests.PlayerPerspectivePlayModeTests.DefaultIsFirstPersonAndDiagonalTravelIsNormalized" methodname="DefaultIsFirstPersonAndDiagonalTravelIsNormalized" classname="M7SharedPlayerTests.PlayerPerspectivePlayModeTests" runstate="Runnable" seed="1908834130" result="Passed" start-time="2026-11-07 10:01:50Z" end-time="2026-11-07 10:01:50Z" duration="0.004116" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1229" name="FreeLookDoesNotTurnPlayerAndReturnKeepsPlayerPosition" fullname="M7SharedPlayerTests.PlayerPerspectivePlayModeTests.FreeLookDoesNotTurnPlayerAndReturnKeepsPlayerPosition" methodname="FreeLookDoesNotTurnPlayerAndReturnKeepsPlayerPosition" classname="M7SharedPlayerTests.PlayerPerspectivePlayModeTests" runstate="Runnable" seed="335020894" result="Passed" start-time="2026-11-07 10:01:50Z" end-time="2026-11-07 10:01:50Z" duration="0.003314" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1230" name="ThirdPersonCameraStopsBeforeWall" fullname="M7SharedPlayerTests.PlayerPerspectivePlayModeTests.ThirdPersonCameraStopsBeforeWall" methodname="ThirdPersonCameraStopsBeforeWall" classname="M7SharedPlayerTests.PlayerPerspectivePlayModeTests" runstate="Runnable" seed="532821402" result="Passed" start-time="2026-11-07 10:01:50Z" end-time="2026-11-07 10:01:50Z" duration="0.002552" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="TestFixture" id="1231" name="PlayerSettingsTests" fullname="M7SharedPlayerTests.PlayerSettingsTests" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" testcasecount="7" result="Failed" site="Child" start-time="2026-11-07 10:01:50Z" end-time="2026-11-07 10:01:50Z" duration="0.029700" total="7" passed="6" failed="1" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-case id="1238" name="CorruptSettingsRecoverToDefaults" fullname="M7SharedPlayerTests.PlayerSettingsTests.CorruptSettingsRecoverToDefaults" methodname="CorruptSettingsRecoverToDefaults" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="269038620" result="Passed" start-time="2026-11-07 10:01:50Z" end-time="2026-11-07 10:01:50Z" duration="0.005217" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <output><![CDATA[Player settings were invalid and were reset to defaults: JSON parse error: Missing a name for object member.
+]]></output>
+          </test-case>
+          <test-case id="1232" name="DefaultsMatchUnifiedControls" fullname="M7SharedPlayerTests.PlayerSettingsTests.DefaultsMatchUnifiedControls" methodname="DefaultsMatchUnifiedControls" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="515894073" result="Passed" start-time="2026-11-07 10:01:50Z" end-time="2026-11-07 10:01:50Z" duration="0.001519" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1236" name="ProneActionRespondsOnlyToCurrentKey" fullname="M7SharedPlayerTests.PlayerSettingsTests.ProneActionRespondsOnlyToCurrentKey" methodname="ProneActionRespondsOnlyToCurrentKey" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="1052393589" result="Failed" start-time="2026-11-07 10:01:50Z" end-time="2026-11-07 10:01:50Z" duration="0.007236" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: 1
+  But was:  0
+]]></message>
+              <stack-trace><![CDATA[at M7SharedPlayerTests.PlayerSettingsTests.ProneActionRespondsOnlyToCurrentKey () [0x00067] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\M7\PlayerSettingsTests.cs:108
+]]></stack-trace>
+            </failure>
+          </test-case>
+          <test-case id="1237" name="ProneBindingCanRebindRejectConflictReloadAndReset" fullname="M7SharedPlayerTests.PlayerSettingsTests.ProneBindingCanRebindRejectConflictReloadAndReset" methodname="ProneBindingCanRebindRejectConflictReloadAndReset" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="606849506" result="Passed" start-time="2026-11-07 10:01:50Z" end-time="2026-11-07 10:01:50Z" duration="0.008883" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1233" name="RebindRejectsConflictWithoutChangingOldBinding" fullname="M7SharedPlayerTests.PlayerSettingsTests.RebindRejectsConflictWithoutChangingOldBinding" methodname="RebindRejectsConflictWithoutChangingOldBinding" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="803079008" result="Passed" start-time="2026-11-07 10:01:50Z" end-time="2026-11-07 10:01:50Z" duration="0.001411" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1234" name="RestoreDefaultsClearsOverridesAndModes" fullname="M7SharedPlayerTests.PlayerSettingsTests.RestoreDefaultsClearsOverridesAndModes" methodname="RestoreDefaultsClearsOverridesAndModes" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="1844316711" result="Passed" start-time="2026-11-07 10:01:50Z" end-time="2026-11-07 10:01:50Z" duration="0.002459" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1235" name="SavedOverridesAndModesReload" fullname="M7SharedPlayerTests.PlayerSettingsTests.SavedOverridesAndModesReload" methodname="SavedOverridesAndModesReload" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="950623885" result="Passed" start-time="2026-11-07 10:01:50Z" end-time="2026-11-07 10:01:50Z" duration="0.001570" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>
