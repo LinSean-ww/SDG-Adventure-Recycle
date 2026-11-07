@@ -9,9 +9,9 @@ namespace C3TreasurePuzzle
     {
         [SerializeField] private C3DeviceState device;
         [SerializeField] private C3FactoryPresentation presentation;
-        private Transform workshopRoot;
-        private Transform coreRotor;
-        private Light coreLight;
+        [SerializeField] private Transform workshopRoot;
+        [SerializeField] private Transform coreRotor;
+        [SerializeField] private Light coreLight;
         private bool powerEstablished;
 
         public bool Powered => device != null &&
@@ -22,14 +22,14 @@ namespace C3TreasurePuzzle
         {
             if (!device) device = GetComponent<C3DeviceState>();
             if (!presentation) presentation = GetComponent<C3FactoryPresentation>();
-            BuildWorkshop();
+            EnsureLayout();
         }
 
         // If the sorter wasn't yet discoverable when the component was added in Awake,
         // retry after all scene objects have completed Awake before spawning pickups.
         private void Start()
         {
-            if (workshopRoot == null) BuildWorkshop();
+            if (workshopRoot == null) EnsureLayout();
         }
 
         private void OnEnable()
@@ -64,8 +64,9 @@ namespace C3TreasurePuzzle
             // transaction. Never infer a material type from a cycle counter.
         }
 
-        private void BuildWorkshop()
+        public void EnsureLayout()
         {
+            if (workshopRoot) return;
             GameObject sorter = GameObject.Find("WasteSortingLine");
             if (sorter == null)
             {

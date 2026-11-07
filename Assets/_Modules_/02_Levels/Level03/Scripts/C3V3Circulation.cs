@@ -29,15 +29,18 @@ namespace C3TreasurePuzzle
         public const float GuardHeight = 1.24f;
         private const float DeckThickness = .18f;
         private const string RootName = "C3_V3_VerifiedCirculation";
-        private Transform buildRoot;
+        [SerializeField] private Transform buildRoot;
         private Material deckMat, frameMat, railMat, treadMat, mechanismMat;
         private readonly List<Mesh> railMeshes = new List<Mesh>();
         private readonly List<Material> signMaterials = new List<Material>();
 
-        private void Awake()
+        private void Awake() => EnsureLayout();
+
+        public void EnsureLayout()
         {
-            // Scoped idempotence: disabling/re-enabling this component does not rebuild.
-            if (transform.Find(RootName)) return;
+            if (buildRoot) return;
+            if (transform.Find(RootName))
+                throw new System.InvalidOperationException("Circulation exists without serialized ownership. Validate the bake.");
             RetireLegacyStructure();
             buildRoot = new GameObject(RootName).transform;
             buildRoot.SetParent(transform, true);
@@ -144,7 +147,7 @@ namespace C3TreasurePuzzle
             {
                 Collider collider = item.GetComponent<Collider>();
                 collider.enabled = false;
-                Destroy(collider);
+                C3FactoryLayoutUtility.Remove(collider);
             }
             return item;
         }
@@ -294,15 +297,16 @@ namespace C3TreasurePuzzle
 
         private void OnDestroy()
         {
+            if (!Application.isPlaying) return;
             if (buildRoot)
             {
                 buildRoot.gameObject.SetActive(false);
                 Destroy(buildRoot.gameObject);
             }
-            foreach (Mesh mesh in railMeshes) if (mesh) Destroy(mesh);
-            foreach (Material material in signMaterials) if (material) Destroy(material);
+            foreach (Mesh mesh in railMeshes) C3FactoryLayoutUtility.ReleaseTransient(mesh);
+            foreach (Material material in signMaterials) C3FactoryLayoutUtility.ReleaseTransient(material);
             foreach (Material mat in new[] { deckMat, frameMat, railMat, treadMat, mechanismMat })
-                if (mat) Destroy(mat);
+                C3FactoryLayoutUtility.ReleaseTransient(mat);
         }
     }
 }

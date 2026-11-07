@@ -5,11 +5,11 @@ namespace C3TreasurePuzzle
     // Endpoints describe the actual top surface, not a second animation-only path.
     public sealed class C3ConveyorSection : MonoBehaviour
     {
-        public Transform Start { get; private set; }
-        public Transform End { get; private set; }
-        public BoxCollider Surface { get; private set; }
-        public Renderer SurfaceRenderer { get; private set; }
-        public float Width { get; private set; }
+        [field: SerializeField] public Transform Start { get; private set; }
+        [field: SerializeField] public Transform End { get; private set; }
+        [field: SerializeField] public BoxCollider Surface { get; private set; }
+        [field: SerializeField] public Renderer SurfaceRenderer { get; private set; }
+        [field: SerializeField] public float Width { get; private set; }
         public Vector3 Normal => Surface.transform.up;
         public float Length => Vector3.Distance(Start.position,End.position);
 

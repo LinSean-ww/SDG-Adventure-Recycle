@@ -49,7 +49,7 @@ namespace C3TreasurePuzzle
         {
             GameObject go = GameObject.CreatePrimitive(shape); go.name = name;
             Collider c = go.GetComponent<Collider>();
-            if (c) { c.enabled = false; UnityEngine.Object.Destroy(c); }
+            if (c) { c.enabled = false; C3FactoryLayoutUtility.Remove(c); }
             go.transform.SetParent(parent, false); go.transform.localPosition = position;
             go.transform.localRotation = Quaternion.Euler(euler);
             // Unity's capsule mesh is 2 units high. Worker sizes specify full height.
@@ -157,7 +157,7 @@ namespace C3TreasurePuzzle
         }
         public void Dispose()
         {
-            foreach(Material m in palette.Values)if(m)UnityEngine.Object.Destroy(m);
+            foreach(Material m in palette.Values) C3FactoryLayoutUtility.ReleaseTransient(m);
             palette.Clear();
         }
     }

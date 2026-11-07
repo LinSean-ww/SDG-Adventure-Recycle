@@ -283,6 +283,7 @@ namespace C3TreasurePuzzle
         private void Awake()
         {
             device=GetComponent<C3DeviceState>(); geometry=GetComponent<C3RecyclingLineGeometry>();
+            if (geometry) geometry.EnsureLayout();
             if (!device || !geometry || !geometry.BuildRoot) throw new InvalidOperationException("Recycling line requires device and built geometry");
             visuals=geometry.Visuals;
             if (!visuals) throw new InvalidOperationException("Recycling visual library is not ready");

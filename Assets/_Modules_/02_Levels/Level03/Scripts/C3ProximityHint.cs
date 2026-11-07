@@ -11,16 +11,17 @@ namespace C3TreasurePuzzle
         private Transform player;
         private C3HintVisuals visuals;
         private readonly RaycastHit[] hits = new RaycastHit[32];
-        private Light existingLight;
+        [SerializeField] private Light existingLight;
         private bool originalEnabled, lastEnabled, ownsEnabled, ownsIntensity, lightWritten;
         private float originalIntensity, lastIntensity;
-        private Color color = Color.green;
+        [SerializeField] private Color color = Color.green;
 
         public void Configure(Color value, Light light = null)
         {
             RestoreLight();
             color = value;
             existingLight = light;
+            if (!Application.isPlaying) return;
             lightWritten = false;
             if (!light) return;
             // Capture BEFORE the first change, including when Configure precedes Start.
@@ -30,7 +31,11 @@ namespace C3TreasurePuzzle
             if (isActiveAndEnabled) WriteLight(false, 0f);
         }
 
-        private void Start() => visuals = new C3HintVisuals(transform);
+        private void Start()
+        {
+            Configure(color, existingLight);
+            visuals = new C3HintVisuals(transform);
+        }
         private void OnEnable() => visuals?.SetCue(Color.black, 0f);
 
         public void RegisterVisuals(Transform root)

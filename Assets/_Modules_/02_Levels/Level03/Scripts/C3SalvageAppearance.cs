@@ -6,11 +6,20 @@ namespace C3TreasurePuzzle
     public sealed class C3SalvageAppearance : MonoBehaviour
     {
         private C3VisualBuilder art;
-        private Transform visualRoot;
-        private C3ProximityHint hint;
-        private void Start()
+        private readonly System.Collections.Generic.Dictionary<Material, Material> runtimePalette =
+            new System.Collections.Generic.Dictionary<Material, Material>();
+        [SerializeField] private Transform visualRoot;
+        [SerializeField] private C3ProximityHint hint;
+        private void Start() => EnsureLayout();
+
+        public void EnsureLayout()
         {
-            if(visualRoot)return;
+            if(visualRoot)
+            {
+                if (Application.isPlaying && art == null && runtimePalette.Count == 0)
+                    C3FactoryLayoutUtility.BindOwnedPalette(visualRoot.gameObject, runtimePalette);
+                return;
+            }
             EcoEnergyPickup pickup=GetComponent<EcoEnergyPickup>();if(!pickup)return;
             art=new C3VisualBuilder();
             Transform r=visualRoot=art.Group(transform,"V11_SalvageArt_Visual",Vector3.zero);
@@ -35,6 +44,7 @@ namespace C3TreasurePuzzle
         private void OnDisable(){if(visualRoot)visualRoot.gameObject.SetActive(false);}
         private void OnDestroy()
         {
+            if (!Application.isPlaying) return;
             if(hint){hint.enabled=false;hint.ReleaseVisuals();}
             if(visualRoot)
             {
@@ -44,6 +54,8 @@ namespace C3TreasurePuzzle
                 Destroy(visualRoot.gameObject);
             }
             if(art!=null)art.Dispose();
+            foreach (Material material in runtimePalette.Values) C3FactoryLayoutUtility.ReleaseTransient(material);
+            runtimePalette.Clear();
         }
     }
 }

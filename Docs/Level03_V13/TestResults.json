@@ -1,0 +1,1040 @@
+{
+  "unity": "2023.1.22f1",
+  "baselineCommit": "9e1030c",
+  "baselineMode": "batchmode",
+  "finalMode": "windowed Windows Editor",
+  "editMode": {
+    "total": 9,
+    "passed": 9,
+    "failed": 0
+  },
+  "baselinePlayMode": {
+    "total": 168,
+    "passed": 124,
+    "failed": 41,
+    "skipped": 3
+  },
+  "finalPlayMode": {
+    "total": 169,
+    "passed": 131,
+    "failed": 35,
+    "skipped": 3
+  },
+  "finalFailuresAbsentFromBaseline": [],
+  "tests": [
+    {
+      "name": "M6IntegrationTests.C3FactoryFullArtTests.CaptureFinalFactoryViews",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3FactoryFullArtTests.Final_ConsoleRejectsIncompleteAndWrongOrderThenActivatesAudio",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3FactoryFullArtTests.StageA_UpperDeckChipRemainsCollectibleAndHudHintIsCurrent",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: (-13.20, 5.37, 19.25)\n  But was:  (-13.20, 5.37, 20.52)\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3M2BlockoutPlayModeTests.CaptureBlockoutViewsForManualReview",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3M2BlockoutPlayModeTests.OriginalPartComponentsAndConsoleStillCompleteTheLevel",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3M2BlockoutPlayModeTests.PlayerCapsuleCanUseBothStairsAndMainWalkway",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  West stair did not reach the upper level.\n  Expected: greater than 4.25f\n  But was:  0.629999936f\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3SceneBugFixTests.CaptureBugFixViews",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3SceneBugFixTests.OriginalControllerMovesJumpsAndPhysicalSupportsBlock",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  C3 player must walk into the factory from the new spawn.\n  Expected: less than -1.06665528f\n  But was:  -1.05499983f\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3UpperSupportVisualTests.CaptureUpperSupportViews",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase21FactoryUpgradeTests.AllThreeExhaustRoutesAvoidDeckRailsAndJoinTheExistingRoofHeader",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase21FactoryUpgradeTests.DEntranceLosesOnlyTheDuplicateDecorativeFrame",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase21FactoryUpgradeTests.EndStopsProtectDeadEndsWithoutClosingLiveTransfers",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase21FactoryUpgradeTests.HighCornersHaveNativeSupportAndClearFullRadiusCargo",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase21FactoryUpgradeTests.RefuseCagesAndPurifiersStopTheOriginalPlayer",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase21FactoryUpgradeTests.ReroutedExhaustLeavesRealStandingProneAndEyeLeanEnvelopesClear",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase21FactoryUpgradeTests.UpperSupportsStayBelowDeckAndLeaveBothStancesAThroughRoute",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase2RecyclingLineTests.ActivationState",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase2RecyclingLineTests.CargoFollowsRoute",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase2RecyclingLineTests.ChipAndGuardRegression",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase2RecyclingLineTests.ContinuousConveyorRoute",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase2RecyclingLineTests.ElevatedInfeed",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase2RecyclingLineTests.IngressIdentityAndTriggerDedup",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase2RecyclingLineTests.MachineOutput",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase2RecyclingLineTests.MaterialAccounting",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase2RecyclingLineTests.MetalSorting",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase2RecyclingLineTests.OutputConveyor",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase2RecyclingLineTests.PaperSorting",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase2RecyclingLineTests.PlasticSorting",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase2RecyclingLineTests.ProcessingState",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase2RecyclingLineTests.ProneWalkwayClearance",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase2RecyclingLineTests.Regression",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase2RecyclingLineTests.ReloadSafety",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase2RecyclingLineTests.UpperWalkwayClearance",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11Phase2RecyclingLineTests.WallOpeningClearance",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11RecyclingArtTests.BackOfMachineStockIsDecorationAndLeavesRearMaintenanceAisle",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11RecyclingArtTests.ExternalCargoRetainsStrictEnvelopeAndWholeVisualRoot",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11RecyclingArtTests.FifteenImportedVariantsUseRealVolumeSharedMaterialsAndSafeProxy",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11RecyclingArtTests.MultiMeshBottleCapsAndBodiesCompressTogether",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11RecyclingArtTests.OfficialNineInputsKeepTypesIdsAndDeterministicVisualVariety",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11RecyclingArtTests.RealBalesRetainProductEnvelopeProvenanceAndCollection",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11RecyclingPresentationTests.DisableAndCancellationRestoreFormalActiveRendererAndColliderStates",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11RecyclingPresentationTests.FailedNativeRouteCleansTheSessionAndRestoresFormalProducts",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11RecyclingPresentationTests.LevelCompletionCancelsReplayAndKeepsCompletionInputPriority",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11RecyclingPresentationTests.PauseCloseReopenAndLeavingConsoleDoNotRestartOrCancelTheSession",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11RecyclingPresentationTests.PresentationRequiresRunningCollectedProductionAndTheOpenRealConsole",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11RecyclingPresentationTests.ProductionUguiReceivesARealClickWithoutReactivationOrPuzzleSubmission",
+      "result": "Passed",
+      "failedInV12": true,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11RecyclingPresentationTests.SceneReloadDropsAllReplayStateAndKeepsSharedAssetsBounded",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11RecyclingPresentationTests.TenCompleteNativeSessionsPreserveRewardsIdsPhysicsAndBoundedResources",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11SafeCirculationTests.EveryGuardStopsStandingAndProneCapsulesIncludingCorners",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11SafeCirculationTests.GroundBCDoorApproachRemainsOpenUnderTheEastFlight",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11SafeCirculationTests.LegacyCleanupPreservesFloorTriggersAndSurvivesSceneReload",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11SafeCirculationTests.OriginalPartsConsoleSortingBenchesAndWeaponStillOperate",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11SafeCirculationTests.WalkACollectExactlyOneChipAndReturnDownB",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11SafeCirculationTests.WalkBThenRearConnectionAndDescendA",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11SafeCirculationTests.WorldGeometryMatchesEnabledCollidersAndHasNoHeadObstructions",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11TaskLayoutTests.LongWrappedTraditionalChineseTaskExpandsItsLayoutRow",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11TaskLayoutTests.TaskSheetFitsTheGameView(640,360)",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11TaskLayoutTests.TaskSheetFitsTheGameView(866,838)",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11TaskLayoutTests.TaskSheetFitsTheGameView(1280,720)",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11TaskLayoutTests.TaskSheetFitsTheGameView(1920,1080)",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11ThirdPersonInteractionTests.FirstPersonKeepsItsTwoMetreRayAndOnceOnlyFCollection",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: False\n  But was:  True\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V11ThirdPersonInteractionTests.ThirdPersonMaterialsKeepActivationSortingAndOnceOnlyRecovery",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: 1\n  But was:  0\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V11ThirdPersonInteractionTests.ThirdPersonRejectsCameraWallsBodyWallsAndFloors",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: 1\n  But was:  0\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V11ThirdPersonInteractionTests.ThirdPersonUsesBodyDistanceForAllThreeRealQuestParts",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: False\n  But was:  True\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V11ThirdPersonInteractionTests.UiContextAndBothUpdateOrdersNeverDispatchTwoInteractions",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: 1\n  But was:  0\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V11ThirdPersonWeaponTests.CloseWallRaisesHeldRifleAndKeepsBothHandsOnGrips",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11ThirdPersonWeaponTests.EquippedSceneReloadsReleaseOldViewsAndDoNotDuplicateAnchors",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11ThirdPersonWeaponTests.EquippedWeaponAndBothHandsFollowPitchOrbitAndViewSwitches",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11ThirdPersonWeaponTests.FirstPersonBarrelRetractsBeforeSolidWallWithoutChangingRig",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11ThirdPersonWeaponTests.SwitchingToThirdPersonAfterFpsWallRetractionRestoresRiflePose",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11ThirdPersonWeaponTests.WalkingLeanProneAndAdsKeepGripsWithoutChangingMovementState",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11VisualUpgradeTests.AllThreeLabelsFaceThePlayerOutsideTheirMachineFronts",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11VisualUpgradeTests.AssemblyNativeRayRequiresMaterialsConsumesExactlyOneAndCannotRepeat",
+      "result": "Passed",
+      "failedInV12": true,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11VisualUpgradeTests.CollectibleDisableReenableAndPickupClearTheCueWithoutRepeatingRewards",
+      "result": "Passed",
+      "failedInV12": true,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11VisualUpgradeTests.CollectibleStandaloneRemovalLeavesItsOriginalSurfaceAndNoOwnedBeacon",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11VisualUpgradeTests.ConsoleNativeRayOpensTheOriginalPuzzleAndActivationFlow",
+      "result": "Passed",
+      "failedInV12": true,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11VisualUpgradeTests.ConsoleWorktopHasIndependentSolidCollisionWithoutBlockingInteraction",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11VisualUpgradeTests.DiscoveryCueRejectsAnOpaqueWallAndRecoversAfterItIsRemoved",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11VisualUpgradeTests.FourOriginalStationsKeepTheirGameplayCollidersAndDoNotCreateCargo",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11VisualUpgradeTests.HintDoesNotOverwriteAnotherLightWriterOnDisableOrRemoval",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11VisualUpgradeTests.HintLifecyclePreservesGlobalIndexedAndConcurrentRendererState",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11VisualUpgradeTests.InspectionNativeRayShowsTheOriginalReportWithoutGrantingMaterials",
+      "result": "Passed",
+      "failedInV12": true,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11VisualUpgradeTests.MaintenanceKeepsItsExistingBenchAndNearbyChipWithoutInventingAnFTask",
+      "result": "Passed",
+      "failedInV12": true,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11VisualUpgradeTests.ReloadDoesNotDuplicateWorkerOrStationVisualOwners",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11VisualUpgradeTests.RemovingStationVisualsReturnsBorrowedSignsAndOnlyReleasesOwnedMaterials",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11VisualUpgradeTests.SalvageKeepsWeaponAndFullMagazineGatesAndChargesOnlyOnce",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11VisualUpgradeTests.SalvageVisualDisableReenableAndRemovalCleanOnlyOwnedGeometry",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11VisualUpgradeTests.SharedRifleGeometryUsesViewmodelOffAndAssemblyDisplayOnShadows",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11VisualUpgradeTests.ThirdPersonLeanAnimatesOnlyWorkerPresentation",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11VisualUpgradeTests.WorkerFacesActualControllerTravelWithoutMovingTheCapsuleItself",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11VisualUpgradeTests.WorkerIsVolumetricAndOnlyItsPresentationChangesWithViewMode",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11VisualUpgradeTests.WorkerRemovalRestoresThePerspectiveBaselineAndSupportsReinstall",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V11VisualUpgradeTests.WorkerRemovedWhilePlayerIsInactiveRestoresWhenThePlayerReturns",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FactoryRepairTests.BFlightHasRealLevelDeckAndMatchingPhysicalTreads",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FactoryRepairTests.BNameplateIsBelowTheDeckAndVisibleFromTheGroundAisle",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FactoryRepairTests.BothViewsAndAdsUseActualHitPointAndMuzzleFlash",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FactoryRepairTests.BRouteClimbsAndDescendsInBothViewsAndStances",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FactoryRepairTests.DisablingVfxClearsPulsesAndMissesNeverEmitAnImpact",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FactoryRepairTests.FirstPersonNearPlaneClearsRealSorterFrontAndSideAfterLean",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FactoryRepairTests.HundredShotsReuseMaterialsExpireAndClearWithWeapon",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FactoryRepairTests.MuzzleBehindCoverCannotDrawThroughWallOrChangeGameplayHit",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FactoryRepairTests.OfficialShootUsesPooledVfxAndKeepsHitscanAmmoAndCooldown",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FactoryRepairTests.OriginalCapsuleIsStoppedByRealFrontAndSidePanelsInBothStances",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FactoryRepairTests.QuestPartsRestOnSurfacesWithoutPenetratingEquipment",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FactoryRepairTests.ScenePlacedPartsCanBeCollectedWithFOnceInFirstPerson",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: False\n  But was:  True\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FactoryRepairTests.ScenePlacedPartsCanBeCollectedWithFOnceInThirdPerson",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: False\n  But was:  True\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FactoryRepairTests.SceneReloadRemovesActiveShotPoolAndItsOwnedMaterial",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FactoryRepairTests.ThreeReloadsKeepOneAuthoritativeFactoryAndNoPulseOrphans",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FinalFollowupTests.AirborneSpaceCannotQueueALandingOrDoubleJump",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: True\n  But was:  False\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FinalFollowupTests.DedicatedTestsCanStillInstantiateTheDemoWithoutQuestRewards",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FinalFollowupTests.FirstPersonZThenSpaceStandsBeforeOneGroundedJump",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: True\n  But was:  False\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FinalFollowupTests.HeldCtrlUnpronesToCrouchWithoutADelayedJump",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: True\n  But was:  False\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FinalFollowupTests.JumpDisabledStillAllowsSafeStandingButNoImpulse",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: True\n  But was:  False\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FinalFollowupTests.LowCeilingRejectsSpaceInBothViewsAndZStillRecoversAfterLeaving",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: True\n  But was:  False\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FinalFollowupTests.MaintenanceBoardRestsOnTableAndStaysSeparateFromTheUnmovedQuestChip",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FinalFollowupTests.MaintenanceChipStillAcceptsRealFOnceInFirstPerson",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: False\n  But was:  True\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FinalFollowupTests.MaintenanceChipStillAcceptsRealFOnceInThirdPerson",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: False\n  But was:  True\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FinalFollowupTests.NewCeilingDuringRecoveryCancelsJumpAndReturnsToProne",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: True\n  But was:  False\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FinalFollowupTests.NormalFactoryHasNoDemoInteractionOrTerminalAcrossThreeLoads",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FinalFollowupTests.PliersHaveOnePivotClearTipsAndARealPegWithoutTouchingOtherTools",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FinalFollowupTests.SlowStandExpiresTheRequestInsteadOfJumpingMuchLater",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: True\n  But was:  False\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FinalFollowupTests.ThirdPersonZThenSpaceStandsBeforeOneGroundedJump",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: True\n  But was:  False\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FinalFollowupTests.UiAndUnlockedCursorCancelAnExistingBufferedJump",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: True\n  But was:  False\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FinalFollowupTests.UiSpaceDoesNotUnproneOrJumpInEitherView",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: True\n  But was:  False\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FinalFollowupTests.ViewSwitchDuringRecoveryKeepsExactlyOneJumpSubscriptionAndTakeoff",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: True\n  But was:  False\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V12FinalFollowupTests.ZCancelsAPendingProneJump",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: True\n  But was:  False\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V12WorkerFaceTests.BothEyeAperturesStayOpenBehindSafetyFrames",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V12WorkerFaceTests.FaceFollowsExistingPosesAndViewVisibilityWithoutMovingPlayerOrCamera",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V12WorkerFaceTests.RoundedFeaturesSeparateFromEyesAndThinHelmetBrim",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V12WorkerFaceTests.ThreeSceneLoadsDoNotAccumulateHeadRenderersOrOwnedMaterials",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V13BakedFactoryTests.SavedGeometryRebindsAndReloadsWithoutDuplicateEquipment",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V3CirculationTests.AllFivePedestrianSectionsHavePhysicalFloor",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Gap in 2F route at (-4.65, 5.40, 17.50)\n  Expected: True\n  But was:  False\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V3CirculationTests.ConveyorHasOneFeedAndThreePhysicalIntakeOutputPairs",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: not null\n  But was:  null\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V3CirculationTests.OriginalGameplayObjectsAndPlayerRemain",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V3CirculationTests.StairRampsReachTheirDecksWithoutBarrierAcrossExit",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: String containing \"V8_MAIN_STAIR\"\n  But was:  \"C_Floor\"\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V4BFeedAndAccessTests.BZoneHasVisibleInputBeltRollersAndConveyorLift",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  B to classification path missing: V8_B_To_C_ContinuousRubber\n  Expected: not null\n  But was:  null\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V4BFeedAndAccessTests.RaisedCeilingAndRealAccessibleStairEndpointsExist",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: not null\n  But was:  null\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V4BFeedAndAccessTests.WestStairRampCanCarryARealCharacterController",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Walker's forward route got blocked before the 2F deck\n  Expected: greater than 15.0f\n  But was:  8.89569187f\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V5SpatialIntegrityTests.BDoorHasVisibleFloorHeightConveyorAndOverheadConnection",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  V5 B-door conveyor prefab was not loaded\n  Expected: not null\n  But was:  null\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V5SpatialIntegrityTests.StairAndWalkwayMidlinesHaveNoSupportPosts",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V6AccessRegressionTests.ActualCharacterControllerCanWalkAlongFrontAisle",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V6AccessRegressionTests.BothStairsCanCarryACharacterControllerOntoTheSecondFloor",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V6AccessRegressionTests.ConveyorIsInsideTheMainHallAndConnectsToSorter",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: not null\n  But was:  null\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V6AccessRegressionTests.StairApproachesClearOfQuantumBench",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V7CZoneBoundaryAndAisleTests.CToBIsClosedAndTheReceivingBeltStopsAtThreshold",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  The B room must be hidden from the C factory\n  Expected: not null\n  But was:  null\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V7CZoneBoundaryAndAisleTests.FormerObstructingStairRampHasMovedAwayFromReportedPosition",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: not null\n  But was:  null\n"
+    },
+    {
+      "name": "M6IntegrationTests.C3V7CZoneBoundaryAndAisleTests.RealCapsuleCanCrossPreviouslyBlockedFloorStripeTowardsDExit",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V8FactoryAccessAndFeedTests.BRoomIsHiddenAndOneVisibleConveyorReachesThreeSorters",
+      "result": "Skipped",
+      "failedInV12": false,
+      "message": "V8-only geometry replaced in V9; run C3V9VisibleIndustrialRouteTests instead"
+    },
+    {
+      "name": "M6IntegrationTests.C3V8FactoryAccessAndFeedTests.FormerYellowStripeRemainsTraversableAtReportedPosition",
+      "result": "Skipped",
+      "failedInV12": false,
+      "message": "V8-only geometry replaced in V9; run C3V9VisibleIndustrialRouteTests instead"
+    },
+    {
+      "name": "M6IntegrationTests.C3V8FactoryAccessAndFeedTests.VisibleStairIsRealAndConnectsToOriginalMaintenanceWorkstation",
+      "result": "Skipped",
+      "failedInV12": false,
+      "message": "V8-only geometry replaced in V9; run C3V9VisibleIndustrialRouteTests instead"
+    },
+    {
+      "name": "M6IntegrationTests.C3V9VisibleIndustrialRouteTests.BReceivingBeltActuallyExistsOnCFrontFaceAndMeetsMainHighBelt",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V9VisibleIndustrialRouteTests.PlayerCanClimbRightStairAndReachRearMaintenanceBridge",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V9VisibleIndustrialRouteTests.PriorFloorStripeIsPassable",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V9VisibleIndustrialRouteTests.ReplacementDeckWorldBoundsMatchBothStairExitsAndRearBay",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.C3V9VisibleIndustrialRouteTests.ReplacementStairsHaveMatchingPhysicalTreadsOnBothSides",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.M2CharacterIntegrationTests.C3CameraLookTurnsBodyClampsPitchAndMovesHeadOnce",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.M2CharacterIntegrationTests.C3ControllerStillJumpsFallsAndCollidesWithGround",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.M2CharacterIntegrationTests.C3PlayerVisualUsesActualMovementAndStopsAtWall",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M6IntegrationTests.M6FlowTests.C3CompletionRestartReturnAndReentry",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "SDGAdventure.Testing.C3AbandonedFactoryUpgradeTests.ActivateThenReachDExitToComplete",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "SDGAdventure.Testing.C3AbandonedFactoryUpgradeTests.RuntimeArtHasBFeedAndNonBlockingDecay",
+      "result": "Failed",
+      "failedInV12": true,
+      "message": "  Expected: not null\n  But was:  null\n"
+    },
+    {
+      "name": "SDGAdventure.Testing.C3AbandonedFactoryUpgradeTests.ThreePartsGlowOnlyWhenPlayerIsNear",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "SDGAdventure.Testing.C3V11FactoryAgeTests.AgeingBuildsOnTheCurrentFactoryNotTheRetiredOverlay",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "SDGAdventure.Testing.C3V11FactoryAgeTests.AllAgeingGeometryIsVisualOnly",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "SDGAdventure.Testing.C3V11FactoryAgeTests.ExistingConveyorAndDoorOpeningsRemainIntact",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "SDGAdventure.Testing.C3VisualFPSIntegrationTests.IndustrialSignsAndWorkshopAreInstantiated",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "SDGAdventure.Testing.C3VisualFPSIntegrationTests.RecyclingCraftCreatesHotbarWeapon",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "SDGAdventure.Testing.C3VisualFPSIntegrationTests.ReferenceFactoryBuildsThreeSortersWithoutChangingPuzzle",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    },
+    {
+      "name": "M7SharedPlayerTests.PlayerInputServiceTests.OneServiceSurvivesM6C3SceneChanges",
+      "result": "Passed",
+      "failedInV12": false,
+      "message": ""
+    }
+  ]
+}

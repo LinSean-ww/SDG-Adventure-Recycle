@@ -8,17 +8,22 @@ namespace C3TreasurePuzzle
     public sealed class C3WorkstationVisualUpgrade : MonoBehaviour
     {
         private C3VisualBuilder art;
-        private readonly List<GameObject> roots = new List<GameObject>();
+        [SerializeField] private List<GameObject> roots = new List<GameObject>();
         private readonly Dictionary<Renderer,bool> hidden = new Dictionary<Renderer,bool>();
-        private readonly List<Material> ownedSignMaterials = new List<Material>();
-        private readonly List<BorrowedSign> borrowedSigns = new List<BorrowedSign>();
+        [SerializeField] private List<Material> ownedSignMaterials = new List<Material>();
+        [SerializeField] private List<BorrowedSign> borrowedSigns = new List<BorrowedSign>();
+        private readonly Dictionary<Material, Material> runtimePalette = new Dictionary<Material, Material>();
+        [System.Serializable]
+        private struct HiddenRenderer { public Renderer Renderer; public bool Enabled; }
+        [SerializeField] private List<HiddenRenderer> hiddenLayout = new List<HiddenRenderer>();
+        [System.Serializable]
         private sealed class BorrowedSign
         {
             public Transform Sign, Parent;
             public Vector3 LocalPosition, LocalScale, WorldPosition, WorldScale;
             public Quaternion LocalRotation, WorldRotation;
             public int Sibling;
-            private readonly bool hadParent;
+            [SerializeField] private bool hadParent;
 
             public BorrowedSign(Transform sign)
             {
@@ -38,9 +43,25 @@ namespace C3TreasurePuzzle
                 Sign.localScale=Parent || !hadParent?LocalScale:WorldScale;
             }
         }
-        public int StationCount { get; private set; }
-        private void Start()
+        [field: SerializeField] public int StationCount { get; private set; }
+        private void Start() => EnsureLayout();
+
+        public void EnsureLayout()
         {
+            if (roots.Count != 0)
+            {
+                if (Application.isPlaying && runtimePalette.Count == 0 && art == null)
+                {
+                    // Unity deserializes absent Object references as managed fake-null
+                    // wrappers. Restore the original lease's real null root parent.
+                    foreach (BorrowedSign sign in borrowedSigns) if (!sign.Parent) sign.Parent = null;
+                    foreach (GameObject root in roots) if (root) C3FactoryLayoutUtility.BindOwnedPalette(root, runtimePalette);
+                    for (int i = 0; i < ownedSignMaterials.Count; i++)
+                        if (runtimePalette.TryGetValue(ownedSignMaterials[i], out Material copy)) ownedSignMaterials[i] = copy;
+                    foreach (HiddenRenderer state in hiddenLayout) if (state.Renderer) hidden[state.Renderer] = state.Enabled;
+                }
+                return;
+            }
             art=new C3VisualBuilder();
             // Capture siblings before moving ANY original world-root nameplates.
             foreach(string name in new[]{"ControlCenter","Inspection","Assembly"})
@@ -64,7 +85,9 @@ namespace C3TreasurePuzzle
             // Keep original physical table members visibly present; never create
             // hidden solid furniture by hiding an enabled-collider renderer.
             if(physical && physical.enabled && !physical.isTrigger)return;
-            hidden.Add(r,r.enabled);r.enabled=false;
+            hidden.Add(r,r.enabled);
+            hiddenLayout.Add(new HiddenRenderer { Renderer = r, Enabled = r.enabled });
+            r.enabled=false;
         }
         private void Install(string name,int kind)
         {
@@ -289,6 +312,7 @@ namespace C3TreasurePuzzle
         }
         private void OnDestroy()
         {
+            if (!Application.isPlaying) return;
             // Borrowed signs must leave the outgoing roots BEFORE deferred Destroy.
             // Their original materials belong to their original creators, not us.
             foreach(BorrowedSign sign in borrowedSigns)sign.Restore();
@@ -303,8 +327,10 @@ namespace C3TreasurePuzzle
                     renderer.sharedMaterials=System.Array.Empty<Material>();
                 Destroy(root);
             }
-            foreach(Material m in ownedSignMaterials)if(m)Destroy(m);
+            foreach(Material m in ownedSignMaterials) C3FactoryLayoutUtility.ReleaseTransient(m);
             ownedSignMaterials.Clear();
+            foreach (Material material in runtimePalette.Values) C3FactoryLayoutUtility.ReleaseTransient(material);
+            runtimePalette.Clear();
             if(art!=null)art.Dispose();
         }
     }

@@ -7,8 +7,8 @@ public sealed class EcoWorkshopInteractable : MonoBehaviour
 {
     public enum StationKind { Workbench, PlasticMaterial, MetalMaterial, CircuitMaterial, InspectionWorkbench }
 
-    private EcoFactoryWorkshop workshop;
-    private StationKind kind;
+    [SerializeField] private EcoFactoryWorkshop workshop;
+    [SerializeField] private StationKind kind;
     private bool claimed;
 
     // Material caches expose their identity to the HUD only when the player is nearby.
