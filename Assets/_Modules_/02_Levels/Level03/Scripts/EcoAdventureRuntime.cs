@@ -71,7 +71,6 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
     private bool inventoryOpen;
     private bool reloading;
     private float nextShotTime;
-    private float lastShotFeedbackUntil;
     private int totalShots;
     private string message = "";
     private float messageEnd;
@@ -350,6 +349,15 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             Cursor.visible = false;
         }
 
+        PlayerPauseMenu pauseMenu = activeCamera != null ? activeCamera.GetComponentInParent<PlayerPauseMenu>() : null;
+        bool menuOpen = pauseMenu != null && pauseMenu.State != PlayerMenuState.Playing;
+        if (inventoryOpen && !menuOpen && keyboard.escapeKey.wasPressedThisFrame && pauseMenu != null)
+        {
+            ToggleInventory();
+            pauseMenu.Pause();
+            return;
+        }
+        if (menuOpen) { inventoryOpen = false; return; }
         if (keyboard.tabKey.wasPressedThisFrame &&
             (inventoryOpen || GameplayEnabled()))
             ToggleInventory();
@@ -371,11 +379,13 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             (c3Interactor == null || !c3Interactor.HandlesInteractionInput))
             InteractWorkshop();
 
+        if (reloading && !WeaponEquipped()) CancelReload();
+        if (presentedId != CurrentSlotId()) BuildHeldModel();
         if (WeaponEquipped())
         {
-            if (FirePressed(mouse)) Shoot();
-            if (keyboard.rKey.wasPressedThisFrame && !reloading)
+            if (keyboard.rKey.wasPressedThisFrame && !reloading && ammoInMagazine < MagazineCapacity && reserveAmmo > 0)
                 reloadRoutine = StartCoroutine(Reload());
+            if (FirePressed(mouse)) Shoot();
         }
 
         if (presentedId != CurrentSlotId())
@@ -471,7 +481,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
     private void LateUpdate()
     {
         if (activeCamera == null) return;
-        bool aiming = GameplayEnabled() && WeaponEquipped() &&
+        bool aiming = !reloading && GameplayEnabled() && WeaponEquipped() &&
             Mouse.current != null && Mouse.current.rightButton.isPressed;
         activeCamera.fieldOfView = Mathf.Lerp(activeCamera.fieldOfView,
             aiming ? initialFov * 0.74f : initialFov, Time.deltaTime * 11f);
@@ -517,7 +527,6 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         if (activeCamera == null) return;
         ammoInMagazine--;
         totalShots++;
-        lastShotFeedbackUntil = Time.unscaledTime + 0.22f;
         nextShotTime = Time.time + 0.18f;
         Ray ray = new Ray(activeCamera.transform.position, activeCamera.transform.forward);
         Vector3 destination = ray.GetPoint(85f);
@@ -543,15 +552,33 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
 
     private IEnumerator Reload()
     {
-        if (ammoInMagazine >= MagazineCapacity || reserveAmmo <= 0) yield break;
+        if (reloading || ammoInMagazine >= MagazineCapacity || reserveAmmo <= 0) yield break;
         reloading = true;
-        Notify("正在更換能源匣");
-        yield return new WaitForSeconds(1.35f);
+        EcoQuantumWeaponView visual = weaponModel != null ? weaponModel.GetComponent<EcoQuantumWeaponView>() : null;
+        if (visual != null) visual.BeginReload();
+        float elapsed = 0f;
+        while (elapsed < 1.35f)
+        {
+            if (!WeaponEquipped() || visual == null) { if (visual != null) visual.EndReload(); reloading = false; reloadRoutine = null; yield break; }
+            elapsed += Time.deltaTime;
+            visual.SetReloadProgress(Mathf.Clamp01(elapsed / 1.35f));
+            yield return null;
+        }
         int amount = Mathf.Min(MagazineCapacity - ammoInMagazine, reserveAmmo);
         ammoInMagazine += amount;
         reserveAmmo -= amount;
+        visual.EndReload();
         reloading = false;
         reloadRoutine = null;
+    }
+
+    private void CancelReload()
+    {
+        if (reloadRoutine != null) StopCoroutine(reloadRoutine);
+        reloadRoutine = null;
+        reloading = false;
+        EcoQuantumWeaponView visual = weaponModel != null ? weaponModel.GetComponent<EcoQuantumWeaponView>() : null;
+        if (visual != null) visual.EndReload();
     }
 
     private void BuildHeldModel()
@@ -614,6 +641,8 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
     private void OnGUI()
     {
         if (Instance != this || activeCamera == null) return;
+        PlayerPauseMenu menu = activeCamera.GetComponentInParent<PlayerPauseMenu>();
+        if (menu != null && menu.State != PlayerMenuState.Playing) return;
         Font font = PlayerGuiFont.Load();
         if (GUI.skin != null && font != null) GUI.skin.font = font;
         if (C3CompletionScreen.BlocksGameplayInputThisFrame && !inventoryOpen)
@@ -633,9 +662,6 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             GUI.Box(new Rect(12, height - 80, 200, 50),
                 "槍內 " + ammoInMagazine + "/" + MagazineCapacity +
                 "  |  備用 " + reserveAmmo);
-            if (Time.unscaledTime < lastShotFeedbackUntil)
-                GUI.Box(new Rect(width * 0.5f - 60f, height * 0.5f + 44f,
-                    120f, 28f), "發射 #" + totalShots);
         }
 
         if (Time.unscaledTime < messageEnd)
