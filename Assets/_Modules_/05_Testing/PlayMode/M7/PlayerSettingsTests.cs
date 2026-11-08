@@ -150,7 +150,7 @@ namespace M7SharedPlayerTests
         {
             string[] names = { "LeanLeft", "LeanRight", "Inventory", "Slot1", "Slot2", "Slot3", "Slot4", "Slot5" };
             string[] defaults = { "q", "e", "tab", "1", "2", "3", "4", "5" };
-            string[] keys = { "b", "c", "g", "h", "j", "k", "l", "v" };
+            string[] keys = { "b", "c", "n", "h", "j", "k", "l", "v" };
             for (int i = 0; i < names.Length; i++)
             {
                 Assert.AreEqual("<Keyboard>/" + defaults[i], actions.FindAction("Gameplay/" + names[i], true).bindings[0].effectivePath);

@@ -118,6 +118,12 @@
           "type": "Button",
           "id": "2c19c94a-615a-4faa-b154-fbe427ca76e1",
           "expectedControlType": "Button"
+        },
+        {
+          "name": "ScanAim",
+          "type": "Button",
+          "id": "a84f6938-6b96-4788-9109-1b70a58b41e5",
+          "expectedControlType": "Button"
         }
       ],
       "bindings": [
@@ -263,6 +269,12 @@
           "id": "86892f9d-e4be-4b83-9b3f-2b054fe75ab8",
           "path": "<Keyboard>/g",
           "action": "Drop"
+        },
+        {
+          "name": "",
+          "id": "e2f14d8c-736e-40ce-871a-6f331d43588e",
+          "path": "<Mouse>/rightButton",
+          "action": "ScanAim"
         }
       ]
     },

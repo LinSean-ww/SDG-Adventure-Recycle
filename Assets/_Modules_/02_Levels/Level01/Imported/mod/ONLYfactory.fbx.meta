@@ -1,0 +1,307 @@
+fileFormatVersion: 2
+guid: b60b11623ef364a48b2986ed5c41f17e
+ModelImporter:
+  serializedVersion: 22200
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: CoreLine
+    second: {fileID: 2100000, guid: a9fdb4371e415e14ba672ba9d5ede938, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: FNC_FactoryNormalColor
+    second: {fileID: 2100000, guid: bb806fb8616578b4baf930e8c0a31ce6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: FrontDoorGard
+    second: {fileID: 2100000, guid: 1ffad58d207a0ff48b59dbc151aadbb4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: InSideCore
+    second: {fileID: 2100000, guid: d4067bc48244fdf499736891940ca13d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: LineOutPut
+    second: {fileID: 2100000, guid: 56b66a72212fcf74aab1975069e66fcc, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: OutSideCore
+    second: {fileID: 2100000, guid: 7de00349438f0fe4c80483ae19c47fe4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Pillar
+    second: {fileID: 2100000, guid: 5ef8976f883c1bc4bafc9bdd9147129f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: door_frame
+    second: {fileID: 2100000, guid: 6a9854cef9956184d9a1704bea78335b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: fence.003
+    second: {fileID: 2100000, guid: 2c018f296079325469875e582ffa0ad0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: fence.004
+    second: {fileID: 2100000, guid: 06fac2808726abb4a8cd877e8b2e7f50, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: fence.005
+    second: {fileID: 2100000, guid: ba7496f0178e16949aca18529b1ce6d6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: fence.006
+    second: {fileID: 2100000, guid: fb7c9bbb81e5d2545999c8204885f0f5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: fence.007
+    second: {fileID: 2100000, guid: 657b63bef003387419ebdeea201db073, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: fence.008
+    second: {fileID: 2100000, guid: 09a32d1eaba6b5648b67497502fd1c48, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: garden
+    second: {fileID: 2100000, guid: 58a76074266e2ce45bb4fae1fbbd1a30, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: out_Site_wall
+    second: {fileID: 2100000, guid: 489c1cce9e557eb44adeb668064fa1af, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: road
+    second: {fileID: 2100000, guid: b7618cf730ac5b448b5a9addc018410d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: roadplane
+    second: {fileID: 2100000, guid: c88cba5aab653c741b1ab1d9f4049fbf, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: siteA_Grund_NC
+    second: {fileID: 2100000, guid: 7d2ae84d02833e344b8b2718888f38c1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: siteB_ceiling
+    second: {fileID: 2100000, guid: 986fa5a9309644c41ba25b26d30b92b3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: siteB_chimney
+    second: {fileID: 2100000, guid: 657df3bae638f0b409e18c661daaf7ec, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: siteB_floor
+    second: {fileID: 2100000, guid: fe013d039b087d349a3aa3b30f2e4fb1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: siteB_wall_1
+    second: {fileID: 2100000, guid: 06286c7a2074af241be47af7fce9122f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: siteB_wall_2
+    second: {fileID: 2100000, guid: 959e1019308bb184380e97fa34d1e8c3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: siteB_wall_3
+    second: {fileID: 2100000, guid: 9180e5f2db0ab474a855a69780b2c4dd, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: siteB_wall_4
+    second: {fileID: 2100000, guid: 542f1490332155245876bf66d77225ce, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: siteC_Big_Chimney
+    second: {fileID: 2100000, guid: ef9cac1593160b2469ce2c3dacb665f2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: siteC_ceiling
+    second: {fileID: 2100000, guid: 5b592cf401a38cc489f9623379805961, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: siteC_floor
+    second: {fileID: 2100000, guid: 7c8c4814fdafb95408320b72e4324330, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: siteC_wall_1
+    second: {fileID: 2100000, guid: 15d2673dfdc588c45a162c44120e2271, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: siteC_wall_2
+    second: {fileID: 2100000, guid: 9ca9ff6edf119bc42b7d95a6f0d874a6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: siteC_wall_3
+    second: {fileID: 2100000, guid: 715dd8332d656254ba14b6908e7015aa, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: siteC_wall_4
+    second: {fileID: 2100000, guid: 5cb5c46d0b5574843a2cbfdea94d161f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: siteD_Big_Bucket
+    second: {fileID: 2100000, guid: a235cc6dd4aa46b428b5979c410361c2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: siteD_ceiling
+    second: {fileID: 2100000, guid: 743098c201ee8ac4b9eb031b3ca1cbcc, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: siteD_floor
+    second: {fileID: 2100000, guid: 9adb2e46c0ebbdd4dab407edf986fd90, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: siteD_wall_1
+    second: {fileID: 2100000, guid: a9e1a83b1ab25824882abee0d6f45fb5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: siteD_wall_2
+    second: {fileID: 2100000, guid: 69a1244fd07f13040905e17ef349d778, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: siteD_wall_3
+    second: {fileID: 2100000, guid: c0c871020a6a5d742aab0add23cbcb2c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: siteD_wall_4
+    second: {fileID: 2100000, guid: f7e33ba75bacc8548a993db122d20de9, type: 2}
+  materials:
+    materialImportMode: 2
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 0
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    nodeNameCollisionStrategy: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    strictVertexDataChecks: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 2
+  humanoidOversampling: 1
+  avatarSetup: 0
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  importBlendShapeDeformPercent: 1
+  remapMaterialsIfMaterialImportModeIsNone: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

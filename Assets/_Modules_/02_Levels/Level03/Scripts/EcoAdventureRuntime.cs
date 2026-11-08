@@ -62,6 +62,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
 
     // A weapon carried in inventory does not recharge unless it is held.
     public bool IsQuantumWeaponEquipped => WeaponEquipped();
+    public bool IsGameplayInputAllowed => GameplayEnabled();
     public bool CanAutoRecharge => IsQuantumWeaponEquipped &&
         !inventoryOpen && !reloading && ammoInMagazine < MagazineCapacity;
 
@@ -466,7 +467,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             if ((input != null ? input.ReloadWasPressed : keyboard.rKey.wasPressedThisFrame) &&
                 !reloading && ammoInMagazine < MagazineCapacity && reserveAmmo > 0)
                 reloadRoutine = StartCoroutine(Reload());
-            if (FirePressed(mouse)) Shoot();
+            if ((input == null || !input.GameplayActionsBlocked) && FirePressed(mouse)) Shoot();
         }
 
         if (presentedId != CurrentSlotId())
@@ -788,7 +789,9 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
     {
         if (activeCamera == null) return;
         bool aiming = !reloading && GameplayEnabled() && WeaponEquipped() &&
-            Mouse.current != null && Mouse.current.rightButton.isPressed;
+            (PlayerInputService.Instance == null || !PlayerInputService.Instance.GameplayActionsBlocked) &&
+            (PlayerInputService.Instance != null ? PlayerInputService.Instance.SecondaryHeld :
+             Mouse.current != null && Mouse.current.rightButton.isPressed);
         activeCamera.fieldOfView = Mathf.Lerp(activeCamera.fieldOfView,
             aiming ? initialFov * 0.74f : initialFov, Time.deltaTime * 11f);
 

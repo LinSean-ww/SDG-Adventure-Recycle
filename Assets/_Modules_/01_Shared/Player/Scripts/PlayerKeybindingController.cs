@@ -90,15 +90,15 @@ namespace SDGAdventure.SharedPlayer
             InputAction action = FindAction(mapName, actionName);
             if (action == null || bindingIndex < 0 || bindingIndex >= action.bindings.Count ||
                 action.bindings[bindingIndex].isComposite ||
-                !action.bindings[bindingIndex].path.StartsWith("<Keyboard>/", StringComparison.OrdinalIgnoreCase))
+                !IsRebindable(action, bindingIndex))
             {
                 error = "The binding is not a rebindable keyboard key.";
                 return false;
             }
 
-            if (!TryNormalizeKey(path, out string normalized))
+            if (!TryNormalizeBinding(action, path, out string normalized))
             {
-                error = "Choose a valid keyboard key.";
+                error = "Choose a valid keyboard key or mouse button.";
                 return false;
             }
 
@@ -151,7 +151,7 @@ namespace SDGAdventure.SharedPlayer
             InputAction action = FindAction(mapName, actionName);
             if (action == null || bindingIndex < 0 || bindingIndex >= action.bindings.Count ||
                 action.bindings[bindingIndex].isComposite ||
-                !action.bindings[bindingIndex].path.StartsWith("<Keyboard>/", StringComparison.OrdinalIgnoreCase))
+                !IsRebindable(action, bindingIndex))
                 throw new ArgumentException("The binding is not a rebindable keyboard key.");
 
             bool wasEnabled = action.enabled;
@@ -159,8 +159,11 @@ namespace SDGAdventure.SharedPlayer
             bool accepted = false;
             string failure = "Rebind cancelled.";
             var operation = action.PerformInteractiveRebinding(bindingIndex)
-                .WithControlsHavingToMatchPath("<Keyboard>")
-                .WithCancelingThrough("<Keyboard>/escape")
+                .WithControlsHavingToMatchPath("<Keyboard>");
+            if (IsPrimaryOrSecondary(action))
+                foreach (string button in new[] { "leftButton", "rightButton", "middleButton", "forwardButton", "backButton" })
+                    operation.WithControlsHavingToMatchPath("<Mouse>/" + button);
+            operation.WithCancelingThrough("<Keyboard>/escape")
                 .OnApplyBinding((_, path) => accepted = TryApply(mapName, actionName, bindingIndex, path, out failure))
                 .OnComplete(op =>
                 {
@@ -209,6 +212,24 @@ namespace SDGAdventure.SharedPlayer
 
         private static bool CanCoexist(string first, string second) =>
             first == second || (first != "UI" && second != "UI");
+
+        private static bool IsPrimaryOrSecondary(InputAction action) =>
+            action.actionMap.name == "Gameplay" && (action.name == "Fire" || action.name == "ScanAim");
+
+        private static bool IsRebindable(InputAction action, int index) =>
+            action.bindings[index].path.StartsWith("<Keyboard>/", StringComparison.OrdinalIgnoreCase) ||
+            (IsPrimaryOrSecondary(action) && action.bindings[index].path.StartsWith("<Mouse>/", StringComparison.OrdinalIgnoreCase));
+
+        private static bool TryNormalizeBinding(InputAction action, string path, out string normalized)
+        {
+            if (IsPrimaryOrSecondary(action) && !string.IsNullOrEmpty(path))
+            {
+                foreach (string button in new[] { "leftButton", "rightButton", "middleButton", "forwardButton", "backButton" })
+                    if (string.Equals(path, "<Mouse>/" + button, StringComparison.OrdinalIgnoreCase))
+                    { normalized = "<Mouse>/" + button; return true; }
+            }
+            return TryNormalizeKey(path, out normalized);
+        }
 
         private static bool TryNormalizeKey(string path, out string normalized)
         {

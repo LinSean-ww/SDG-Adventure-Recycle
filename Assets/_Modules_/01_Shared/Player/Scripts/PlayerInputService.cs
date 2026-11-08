@@ -66,6 +66,11 @@ namespace SDGAdventure.SharedPlayer
         public static PlayerInputService Instance { get; private set; }
         public PlayerInputContext Context { get; private set; } = PlayerInputContext.Inactive;
         public PlayerKeybindingController Keybindings { get; private set; }
+        private Func<bool> gameplayActionBlocker;
+        public bool GameplayActionsBlocked => gameplayActionBlocker != null && gameplayActionBlocker();
+        public void SetGameplayActionBlocker(Func<bool> blocker) => gameplayActionBlocker = blocker;
+        public void ClearGameplayActionBlocker(Func<bool> blocker)
+        { if (gameplayActionBlocker == blocker) gameplayActionBlocker = null; }
         public InputActionAsset Actions => actions;
         public Vector2 Move => Context == PlayerInputContext.Gameplay ? move.ReadValue<Vector2>() : Vector2.zero;
         public Vector2 Look => Context == PlayerInputContext.Gameplay ? look.ReadValue<Vector2>() : Vector2.zero;
@@ -74,6 +79,10 @@ namespace SDGAdventure.SharedPlayer
         public bool CrouchActive => Context == PlayerInputContext.Gameplay &&
             (Keybindings.Settings.crouchMode == ButtonMode.Hold ? crouch.IsPressed() : crouchToggled);
 
+        public bool InteractWasPressed => Context == PlayerInputContext.Gameplay && interact.WasPressedThisFrame();
+        public bool PrimaryPressed => Context == PlayerInputContext.Gameplay && primary.WasPressedThisFrame();
+        public bool SecondaryPressed => Context == PlayerInputContext.Gameplay && secondary.WasPressedThisFrame();
+        public bool SecondaryHeld => Context == PlayerInputContext.Gameplay && secondary.IsPressed();
         public bool LeanLeftActive => Context == PlayerInputContext.Gameplay && leanLeft.IsPressed();
         public bool LeanRightActive => Context == PlayerInputContext.Gameplay && leanRight.IsPressed();
         public bool InventoryWasPressed => Context == PlayerInputContext.Gameplay ? inventory.WasPressedThisFrame() :
@@ -102,6 +111,7 @@ namespace SDGAdventure.SharedPlayer
         private InputActionMap ui;
         private InputAction leanLeft, leanRight, inventory, uiInventory;
         private InputAction[] slots;
+        private InputAction primary, secondary;
         private InputAction move;
         private InputAction look;
         private InputAction reload;
@@ -154,6 +164,8 @@ namespace SDGAdventure.SharedPlayer
             uiInventory = ui.FindAction("Inventory", true);
             slots = new InputAction[5];
             for (int i = 0; i < slots.Length; i++) slots[i] = gameplay.FindAction("Slot" + (i + 1), true);
+            primary = gameplay.FindAction("Fire", true);
+            secondary = gameplay.FindAction("ScanAim", true);
             move = gameplay.FindAction("Move", true);
             look = gameplay.FindAction("Look", true);
             reload = gameplay.FindAction("Reload", true);

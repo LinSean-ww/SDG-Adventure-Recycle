@@ -89,6 +89,7 @@ namespace SDGAdventure.ModuleSystem
 
         private void PrepareTransition()
         {
+            if (selectionUi != null) selectionUi.Hide();
             ShutdownAdapter();
             CurrentModuleId = null;
             completionReceived = false;

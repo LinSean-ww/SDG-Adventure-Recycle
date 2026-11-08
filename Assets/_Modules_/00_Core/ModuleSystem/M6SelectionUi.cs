@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using SDGAdventure.SharedPlayer;
 
@@ -10,24 +11,37 @@ namespace SDGAdventure.ModuleSystem
     public sealed class M6SelectionUi : MonoBehaviour
     {
         private GameObject canvasObject;
+        private GameObject ownedEventSystem;
         private RectTransform panelRect, launchRect;
         private Text result, error;
         private ModuleCoordinator coordinator;
+
+        private void OnEnable() => SceneManager.sceneUnloaded += HandleSceneUnloaded;
+        private void OnDisable() => SceneManager.sceneUnloaded -= HandleSceneUnloaded;
+        private void HandleSceneUnloaded(Scene scene)
+        {
+            if (scene.path == ModuleCoordinator.SelectionScenePath) Hide();
+        }
 
         public void Show(ModuleCoordinator owner)
         {
             coordinator = owner;
             if (canvasObject == null) Build();
+            if (ownedEventSystem != null) ownedEventSystem.SetActive(true);
             canvasObject.SetActive(true);
         }
 
-        public void Hide() { if (canvasObject != null) canvasObject.SetActive(false); }
+        public void Hide()
+        {
+            if (canvasObject != null) canvasObject.SetActive(false);
+            if (ownedEventSystem != null) ownedEventSystem.SetActive(false);
+        }
 
         private void Update()
         {
             if (!canvasObject || !canvasObject.activeSelf || !coordinator) return;
             float width = Mathf.Min(600, Screen.width - 32);
-            panelRect.sizeDelta = new Vector2(width, 290);
+            panelRect.sizeDelta = new Vector2(width, 350);
             launchRect.sizeDelta = new Vector2(width - 40, 50);
             ModuleResult? last = coordinator.LastResult;
             result.text = last.HasValue ? "最近結果：" + last.Value.ModuleId + (last.Value.Completed ? " 通關" : " 未完成") : "";
@@ -38,6 +52,7 @@ namespace SDGAdventure.ModuleSystem
             if (FindObjectOfType<EventSystem>() == null)
             {
                 GameObject events = new GameObject("M6EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
+                ownedEventSystem = events;
                 events.transform.SetParent(transform, false);
                 events.GetComponent<InputSystemUIInputModule>().AssignDefaultActions();
             }
@@ -47,7 +62,7 @@ namespace SDGAdventure.ModuleSystem
             CanvasScaler scaler = canvasObject.GetComponent<CanvasScaler>(); scaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
             GameObject panel = new GameObject("Panel", typeof(RectTransform), typeof(Image)); panel.transform.SetParent(canvasObject.transform, false);
             panelRect = (RectTransform)panel.transform; panelRect.anchorMin = panelRect.anchorMax = panelRect.pivot = new Vector2(0.5f, 1f);
-            panelRect.anchoredPosition = new Vector2(0, -40); panelRect.sizeDelta = new Vector2(600, 290); panel.GetComponent<Image>().color = new Color(0.22f, 0.22f, 0.22f, 0.95f);
+            panelRect.anchoredPosition = new Vector2(0, -40); panelRect.sizeDelta = new Vector2(600, 350); panel.GetComponent<Image>().color = new Color(0.22f, 0.22f, 0.22f, 0.95f);
             Font font = PlayerGuiFont.Load();
             AddText(panel.transform, font, "SDG Adventure｜M6 開發驗證選關入口", 14, 130, 28);
             AddText(panel.transform, font, "僅供整合驗證；不是正式遊戲 UI。", 14, 81, 44);
@@ -60,8 +75,16 @@ namespace SDGAdventure.ModuleSystem
             { if (!coordinator.TryLaunch("c3_treasure_puzzle", out string message)) error.text = message; });
             Text buttonText = AddText(buttonObject.transform, font, "進入 C3_TreasurePuzzle", 14, 0, 50);
             buttonText.rectTransform.sizeDelta = new Vector2(-20, 50);
-            result = AddText(panel.transform, font, "", 14, -37, 44);
-            error = AddText(panel.transform, font, "", 14, -95, 50);
+            GameObject level01 = Instantiate(buttonObject, panel.transform);
+            level01.name = "LaunchLevel01";
+            ((RectTransform)level01.transform).anchoredPosition = new Vector2(0, -35);
+            Button level01Button = level01.GetComponent<Button>();
+            level01Button.onClick.RemoveAllListeners();
+            level01Button.onClick.AddListener(() =>
+            { if (!coordinator.TryLaunch("level01", out string message)) error.text = message; });
+            level01.GetComponentInChildren<Text>().text = "進入第一關";
+            result = AddText(panel.transform, font, "", 14, -95, 44);
+            error = AddText(panel.transform, font, "", 14, -145, 50);
         }
 
         private static Text AddText(Transform parent, Font font, string value, int size, float y, float height)

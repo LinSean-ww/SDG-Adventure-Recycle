@@ -107,3 +107,15 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+# Level01 third-party resources: retain locally until redistribution rights are verified.
+/Assets/_Modules_/02_Levels/Level01/Imported/Nicrom/
+/Assets/_Modules_/02_Levels/Level01/Imported/Nicrom.meta
+/Assets/_Modules_/02_Levels/Level01/Imported/language/
+/Assets/_Modules_/02_Levels/Level01/Imported/language.meta
+
+# EmojiOne sample: redistribution rights not yet established.
+/Assets/_Modules_/02_Levels/Level01/Imported/TextMesh Pro/Resources/Sprite Assets/EmojiOne.asset
+/Assets/_Modules_/02_Levels/Level01/Imported/TextMesh Pro/Resources/Sprite Assets/EmojiOne.asset.meta
+/Assets/_Modules_/02_Levels/Level01/Imported/TextMesh Pro/Sprites/EmojiOne.png
+/Assets/_Modules_/02_Levels/Level01/Imported/TextMesh Pro/Sprites/EmojiOne.png.meta
