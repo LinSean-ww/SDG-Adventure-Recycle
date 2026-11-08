@@ -1,5 +1,6 @@
 using UnityEngine;
 using SDGAdventure.ModuleSystem;
+using SDGAdventure.SharedPlayer;
 
 namespace C3TreasurePuzzle
 {
@@ -49,7 +50,7 @@ namespace C3TreasurePuzzle
             if (visible || device == null || !device.LevelCompleted) return;
             visible = true;
             active = this;
-            Cursor.lockState = CursorLockMode.None;
+            PlayerCursor.LockState = CursorLockMode.None;
             Cursor.visible = true;
         }
 

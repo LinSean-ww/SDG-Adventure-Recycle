@@ -26,9 +26,10 @@ namespace M6IntegrationTests
             Component[] parts = UnityEngine.Object.FindObjectsOfType(partType).Cast<Component>().ToArray();
             Assert.AreEqual(3, parts.Length);
             Component chip = parts.Single(part => (string)partType.GetProperty("PartId").GetValue(part) == "control_chip");
-            Assert.AreEqual(new Vector3(-13.2f, 5.37f, 19.25f), chip.transform.position);
+            // V12 moved the chip onto the saved upper maintenance workbench.
+            Assert.AreEqual(new Vector3(-13.2f, 5.37f, 20.52f), chip.transform.position);
             Assert.IsNotNull(chip.GetComponent<Collider>());
-            Vector3 eye = new Vector3(-13.2f, 6f, 18f);
+            Vector3 eye = new Vector3(-13.2f, 6f, 19.3f);
             Vector3 direction = (chip.transform.position - eye).normalized;
             Assert.IsTrue(Physics.Raycast(eye, direction, out RaycastHit hit, 3f, ~0, QueryTriggerInteraction.Ignore));
             Assert.AreEqual(chip.gameObject, hit.collider.gameObject, "A normal upper-deck view must hit the chip first.");

@@ -56,7 +56,7 @@ namespace C3TreasurePuzzle
             bool interact = sharedInput != null ? interactQueued : Input.GetKeyDown(KeyCode.F);
             interactQueued = false;
             currentTarget = null;
-            if (playerCamera == null || Cursor.lockState != CursorLockMode.Locked ||
+            if (playerCamera == null || PlayerCursor.LockState != CursorLockMode.Locked ||
                 (sharedInput != null && sharedInput.Context != PlayerInputContext.Gameplay) ||
                 C3PuzzleConsole.BlocksGameplayInputThisFrame || C3CompletionScreen.BlocksGameplayInputThisFrame) return;
 

@@ -95,7 +95,7 @@ namespace SDGAdventure.SharedPlayer
                 return;
             }
 
-            if (Cursor.lockState == CursorLockMode.Locked)
+            if (PlayerCursor.LockState == CursorLockMode.Locked)
             {
                 Vector2 look = input.Look * (degreesPerMousePixel * input.Keybindings.Settings.mouseSensitivity);
                 if (perspective != null && perspective.IsThirdPerson)
@@ -111,7 +111,7 @@ namespace SDGAdventure.SharedPlayer
                 }
             }
 
-            bool acceptsInput = Cursor.lockState == CursorLockMode.Locked;
+            bool acceptsInput = PlayerCursor.LockState == CursorLockMode.Locked;
             Vector2 movement = acceptsInput ? input.Move : Vector2.zero;
             TickMotor(movement, acceptsInput && input.SprintActive, acceptsInput && input.CrouchActive,
                 acceptsInput && jumpQueued, Time.deltaTime);
@@ -171,7 +171,7 @@ namespace SDGAdventure.SharedPlayer
 
         private void ToggleProne()
         {
-            if (Cursor.lockState != CursorLockMode.Locked) return;
+            if (PlayerCursor.LockState != CursorLockMode.Locked) return;
             if (!prone) prone = true;
             else if (CanStand()) prone = false;
         }
@@ -183,12 +183,12 @@ namespace SDGAdventure.SharedPlayer
             Keyboard keyboard = Keyboard.current;
             bool allowed = keyboard != null && input != null &&
                 input.Context == PlayerInputContext.Gameplay &&
-                Cursor.lockState == CursorLockMode.Locked;
+                PlayerCursor.LockState == CursorLockMode.Locked;
             float target = 0f;
             if (allowed)
             {
-                if (keyboard.qKey.isPressed) target = -1f;
-                if (keyboard.eKey.isPressed) target = 1f;
+                if (input.LeanLeftActive) target = -1f;
+                if (input.LeanRightActive) target = 1f;
             }
             if (target != 0f)
             {

@@ -13,26 +13,101 @@ namespace SDGAdventure.CompletePlayer.Editor
     public static class CompletePlayerBuilder
     {
         private const string Root = "Assets/_Modules_/01_Shared/CompletePlayer";
-        private const string Model = Root + "/Models/fk.fbx";
         private const string Prefab = Root + "/Prefabs/CompletePlayer.prefab";
         private const string Demo = Root + "/Demo/CompletePlayer_Demo.unity";
         private const string Shared = "Assets/_Modules_/01_Shared/Player";
-        private const string SourceModel = "Assets/_Modules_/02_Levels/Level03/Models/fk.fbx";
         private const string License = "Assets/_Modules_/06_ExternalAssets/ThirdPartyNotices/SharedPlayer";
+        private const string ExportPath = "Exports/SDGAdventure_CompletePlayer_v1.3.unitypackage";
 
-        [MenuItem("SDG Adventure/Complete Player/Build and Export")]
+        [MenuItem("SDG Adventure/Complete Player/Export Runtime v1.3 (No Demo)")]
         public static void BuildAndExport()
         {
-            Build();
-            string output = Path.GetFullPath("../Exports/SDGAdventure_CompletePlayer.unitypackage");
+            string output = Path.GetFullPath(ExportPath);
+            if (File.Exists(output) || Directory.Exists(output))
+                throw new InvalidOperationException("Export already exists; it will not be overwritten: " + output);
+            string[] assets = RuntimeExportAssets();
+            ValidateRuntimeExport(assets);
             Directory.CreateDirectory(Path.GetDirectoryName(output));
-            // These three complete roots are the audited asset boundary. IncludeDependencies
-            // would also pull Package Manager source files into the unitypackage.
-            AssetDatabase.ExportPackage(new[] { Root, Shared, License }, output,
-                ExportPackageOptions.Recurse);
-            if (!File.Exists(output) || new FileInfo(output).Length == 0)
-                throw new InvalidOperationException("Unity did not create a nonempty unitypackage.");
+            // Export to a unique temporary name and use a non-overwriting move for the final name.
+            // The current Prefab is validated in place: no rebuild or scene replacement occurs.
+            string temporary = Path.Combine(Path.GetDirectoryName(output),
+                ".CompletePlayer-" + Guid.NewGuid().ToString("N") + ".unitypackage");
+            try
+            {
+                AssetDatabase.ExportPackage(assets, temporary, ExportPackageOptions.Default);
+                if (!File.Exists(temporary) || new FileInfo(temporary).Length == 0)
+                    throw new InvalidOperationException("Unity did not create a nonempty unitypackage.");
+                File.Move(temporary, output);
+            }
+            finally
+            {
+                if (File.Exists(temporary)) File.Delete(temporary);
+            }
             Debug.Log("COMPLETE_PLAYER_PACKAGE=" + output + " bytes=" + new FileInfo(output).Length);
+        }
+
+        private static string[] RuntimeExportAssets()
+        {
+            // Enumerate individual files, never folders: this keeps Demo, Editor, legacy FK,
+            // generated demo materials and demo-only scripts out of the runtime package.
+            string[] fixedAssets = {
+                Prefab,
+                Root + "/Scripts/SDGAdventure.CompletePlayer.asmdef",
+                Root + "/Scripts/CompletePlayerWorkerAppearance.cs",
+                Root + "/Scripts/SharedWorkerVisualBuilder.cs",
+                Root + "/Resources/SharedWorker/Rust.png",
+                Root + "/Resources/SharedWorker/Steel.png",
+                Root + "/README_同學匯入教學.md",
+                Root + "/操作鍵位對照表.md"
+            };
+            var files = fixedAssets.Concat(new[] { Shared, License }.SelectMany(directory =>
+                Directory.GetFiles(directory, "*", SearchOption.AllDirectories)
+                    .Where(path => !path.EndsWith(".meta", StringComparison.OrdinalIgnoreCase))
+                    .Select(path => path.Replace('\\', '/')))).Distinct().OrderBy(path => path).ToArray();
+            foreach (string path in files)
+                if (!File.Exists(path) || !File.Exists(path + ".meta") || string.IsNullOrEmpty(AssetDatabase.AssetPathToGUID(path)))
+                    throw new InvalidOperationException("Missing export asset, meta or imported GUID: " + path);
+            return files;
+        }
+
+        private static void ValidateRuntimeExport(string[] assets)
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(Prefab);
+            if (!prefab) throw new InvalidOperationException("CompletePlayer prefab is missing.");
+            if (prefab.GetComponentsInChildren<CharacterController>(true).Length != 1 ||
+                prefab.GetComponentsInChildren<SharedFirstPersonController>(true).Length != 1 ||
+                prefab.GetComponentsInChildren<Camera>(true).Length != 1 ||
+                prefab.GetComponentsInChildren<AudioListener>(true).Length != 1 ||
+                prefab.GetComponentsInChildren<PlayerInteractor>(true).Length != 1 ||
+                prefab.GetComponentsInChildren<PlayerPauseMenu>(true).Length != 1 ||
+                prefab.GetComponentsInChildren<CompletePlayerWorkerAppearance>(true).Length != 1)
+                throw new InvalidOperationException("Player core components are missing or duplicated.");
+            if (prefab.GetComponentsInChildren<CompletePlayerAnimation>(true).Length != 0 ||
+                prefab.GetComponentsInChildren<SkinnedMeshRenderer>(true).Length != 0)
+                throw new InvalidOperationException("Legacy FK visual is still attached to the player.");
+            if ((prefab.GetComponentInChildren<Camera>(true).cullingMask & 1) == 0)
+                throw new InvalidOperationException("Camera excludes the worker layer.");
+            CheckReferences(prefab.GetComponentsInChildren<Component>(true), "Prefab");
+            var controls = Resources.Load<UnityEngine.InputSystem.InputActionAsset>("SDGPlayerControls");
+            if (!controls) throw new InvalidOperationException("Shared input actions are missing.");
+            foreach (string action in new[] { "Move", "Look", "Jump", "Sprint", "Crouch", "Prone", "LeanLeft", "LeanRight", "Interact", "Inventory", "Slot1", "Slot2", "Slot3", "Slot4", "Slot5", "TaskList", "Reload", "Drop" })
+                if (controls.FindAction("Gameplay/" + action) == null)
+                    throw new InvalidOperationException("Missing gameplay action: " + action);
+            foreach (string action in new[] { "UI/Inventory", "UI/TaskList", "UI/Cancel", "Global/Pause" })
+                if (controls.FindAction(action) == null) throw new InvalidOperationException("Missing action: " + action);
+            foreach (string texture in new[] { "Rust", "Steel" })
+                if (!Resources.Load<Texture2D>("SharedWorker/" + texture))
+                    throw new InvalidOperationException("Worker texture missing: " + texture);
+            if (!Resources.Load<Font>("SharedPlayer/Fonts/NotoSansCJKtc-Regular") ||
+                !AssetDatabase.LoadAssetAtPath<TextAsset>(License + "/NotoSansCJK-OFL.txt"))
+                throw new InvalidOperationException("Shared UI font or its license is missing.");
+            var included = new System.Collections.Generic.HashSet<string>(assets, StringComparer.Ordinal);
+            string[] missing = AssetDatabase.GetDependencies(assets, true)
+                .Where(path => path.StartsWith("Assets/", StringComparison.Ordinal) &&
+                    !AssetDatabase.IsValidFolder(path) && !included.Contains(path)).ToArray();
+            if (missing.Length != 0)
+                throw new InvalidOperationException("Export has dependencies outside the runtime list: " + string.Join(", ", missing));
+            Debug.Log("COMPLETE_PLAYER_RUNTIME_VALIDATION_OK assets=" + assets.Length);
         }
 
         [MenuItem("SDG Adventure/Complete Player/Build")]
@@ -43,13 +118,6 @@ namespace SDGAdventure.CompletePlayer.Editor
             EnsureFolder(Root + "/Animations");
             EnsureFolder(Root + "/Prefabs");
             EnsureFolder(Root + "/Demo");
-            if (!AssetDatabase.LoadAssetAtPath<GameObject>(Model))
-            {
-                if (!AssetDatabase.CopyAsset(SourceModel, Model))
-                    throw new InvalidOperationException("Could not copy the FK model.");
-                AssetDatabase.ImportAsset(Model, ImportAssetOptions.ForceUpdate);
-            }
-
             CreatePrefab();
             CreateDemo();
             AssetDatabase.SaveAssets();
@@ -70,53 +138,77 @@ namespace SDGAdventure.CompletePlayer.Editor
                 prefab.GetComponentsInChildren<PlayerInteractor>(true).Length != 1 ||
                 prefab.GetComponentsInChildren<PlayerPauseMenu>(true).Length != 1)
                 throw new InvalidOperationException("Player has duplicate or missing core components.");
-            CompletePlayerAnimation animation = prefab.GetComponentInChildren<CompletePlayerAnimation>(true);
-            if (!animation || !animation.TryResolveBones())
-                throw new InvalidOperationException("FK arm/leg bones are missing.");
-            if (prefab.GetComponentsInChildren<SkinnedMeshRenderer>(true).Length == 0)
-                throw new InvalidOperationException("The character mesh is missing.");
+            if (prefab.GetComponentsInChildren<CompletePlayerWorkerAppearance>(true).Length != 1)
+                throw new InvalidOperationException("Worker appearance missing or duplicated.");
+            if (prefab.GetComponentsInChildren<CompletePlayerAnimation>(true).Length != 0 ||
+                prefab.GetComponentsInChildren<SkinnedMeshRenderer>(true).Length != 0)
+                throw new InvalidOperationException("Legacy FK visual must not be the default player.");
+            var camera = prefab.GetComponentInChildren<Camera>(true);
+            if ((camera.cullingMask & 1) == 0)
+                throw new InvalidOperationException("Camera excludes worker default layer.");
+            foreach (string texture in new[] { "Rust", "Steel" })
+                if (!Resources.Load<Texture2D>("SharedWorker/" + texture))
+                    throw new InvalidOperationException("Worker texture missing: " + texture);
             if (prefab.GetComponentsInChildren<MonoBehaviour>(true).Any(x => !x))
                 throw new InvalidOperationException("Prefab has a missing script.");
+            CheckReferences(prefab.GetComponentsInChildren<Component>(true), "Prefab");
+            var controls = Resources.Load<UnityEngine.InputSystem.InputActionAsset>("SDGPlayerControls");
+            if (!controls) throw new InvalidOperationException("Shared input actions are missing.");
+            foreach (string action in new[] { "Prone", "LeanLeft", "LeanRight", "Inventory", "Slot1", "Slot2", "Slot3", "Slot4", "Slot5" })
+                if (controls.FindAction("Gameplay/" + action) == null)
+                    throw new InvalidOperationException("Missing gameplay action: " + action);
+            if (controls.FindAction("UI/Inventory") == null)
+                throw new InvalidOperationException("Missing UI inventory action.");
+            if (!Resources.Load<Font>("SharedPlayer/Fonts/NotoSansCJKtc-Regular"))
+                throw new InvalidOperationException("Shared UI font is missing.");
+            if (!AssetDatabase.LoadAssetAtPath<TextAsset>(License + "/NotoSansCJK-OFL.txt"))
+                throw new InvalidOperationException("Shared UI font license is missing.");
             string[] dependencies = AssetDatabase.GetDependencies(new[] { Prefab, Demo }, true);
-            if (!dependencies.Contains(Model)) throw new InvalidOperationException("Prefab does not depend on copied FK model.");
             if (dependencies.Any(x => x.StartsWith("Assets/_Modules_/02_Levels/Level03/", StringComparison.Ordinal)))
                 throw new InvalidOperationException("CompletePlayer still depends on Level03 assets.");
             if (!AssetDatabase.LoadAssetAtPath<SceneAsset>(Demo))
                 throw new InvalidOperationException("Demo scene is missing.");
             Scene scene = EditorSceneManager.OpenScene(Demo, OpenSceneMode.Single);
             GameObject[] roots = scene.GetRootGameObjects();
+            CheckReferences(roots.SelectMany(x => x.GetComponentsInChildren<Component>(true)), "Demo");
             int players = roots.SelectMany(x => x.GetComponentsInChildren<SharedFirstPersonController>(true)).Count();
             int cameras = roots.SelectMany(x => x.GetComponentsInChildren<Camera>(true)).Count();
             int listeners = roots.SelectMany(x => x.GetComponentsInChildren<AudioListener>(true)).Count();
             int interactables = roots.SelectMany(x => x.GetComponentsInChildren<CompletePlayerDemoInteractable>(true)).Count();
             int tasks = roots.SelectMany(x => x.GetComponentsInChildren<CompletePlayerDemoTasks>(true)).Count();
+            int inventoryDemos = roots.SelectMany(x => x.GetComponentsInChildren<CompletePlayerDemoInventory>(true)).Count();
+            if (inventoryDemos != 1) throw new InvalidOperationException("Demo inventory UI missing or duplicated.");
             int missing = roots.SelectMany(x => x.GetComponentsInChildren<MonoBehaviour>(true)).Count(x => !x);
             if (players != 1 || cameras != 1 || listeners != 1 || interactables != 1 || tasks != 1 || missing != 0)
                 throw new InvalidOperationException($"Demo components: players={players}, cameras={cameras}, listeners={listeners}, interactables={interactables}, tasks={tasks}, missing={missing}.");
             Debug.Log("COMPLETE_PLAYER_VALIDATION_OK dependencies=" + dependencies.Length);
         }
 
+        private static void CheckReferences(System.Collections.Generic.IEnumerable<Component> components, string owner)
+        {
+            foreach (Component component in components)
+            {
+                if (!component) throw new InvalidOperationException(owner + " has a missing component.");
+                var properties = new SerializedObject(component).GetIterator();
+                while (properties.Next(true))
+                    if (properties.propertyType == SerializedPropertyType.ObjectReference &&
+                        properties.objectReferenceValue == null && properties.objectReferenceInstanceIDValue != 0)
+                        throw new InvalidOperationException(owner + " has a missing reference: " + component.name + "/" + properties.propertyPath);
+            }
+        }
+
         private static void CreatePrefab()
         {
             GameObject shared = AssetDatabase.LoadAssetAtPath<GameObject>(Shared + "/Prefabs/SharedPlayer.prefab");
-            GameObject model = AssetDatabase.LoadAssetAtPath<GameObject>(Model);
-            if (!shared || !model) throw new InvalidOperationException("SharedPlayer or FK model missing.");
+            if (!shared) throw new InvalidOperationException("SharedPlayer missing.");
             GameObject player = (GameObject)PrefabUtility.InstantiatePrefab(shared);
-            GameObject visual = (GameObject)PrefabUtility.InstantiatePrefab(model);
             try
             {
                 player.name = "CompletePlayer";
                 player.GetComponent<PlayerPauseMenu>().SetStandaloneLevelActions(true);
-                visual.name = "CharacterVisual";
-                visual.transform.SetParent(player.transform, false);
-                visual.transform.localPosition = Vector3.zero;
-                visual.transform.localRotation = Quaternion.Euler(0f, -90f, 0f);
-                visual.transform.localScale = Vector3.one * 0.14f;
-                foreach (Transform item in visual.GetComponentsInChildren<Transform>(true)) item.gameObject.layer = 2;
-                if (!visual.AddComponent<CompletePlayerAnimation>().TryResolveBones())
-                    throw new InvalidOperationException("Copied FBX does not contain the expected FK skeleton.");
+                player.AddComponent<CompletePlayerWorkerAppearance>();
                 Camera camera = player.GetComponentInChildren<Camera>();
-                camera.cullingMask &= ~(1 << 2); // Built-in Ignore Raycast layer: visible in Scene and to other cameras.
+                camera.cullingMask |= 1 << 2;
                 if (!PrefabUtility.SaveAsPrefabAsset(player, Prefab))
                     throw new InvalidOperationException("Could not save CompletePlayer prefab.");
             }
@@ -150,6 +242,8 @@ namespace SDGAdventure.CompletePlayer.Editor
             GameObject player = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(Prefab), scene);
             player.transform.SetPositionAndRotation(spawn.transform.position, spawn.transform.rotation);
             player.GetComponent<PlayerPauseMenu>().SetTestReturnPoint(spawn.transform);
+            new GameObject("CompletePlayerDemoInventory").AddComponent<CompletePlayerDemoInventory>()
+                .Configure(player.GetComponent<PlayerPauseMenu>());
             new GameObject("CompletePlayerDemoTasks").AddComponent<CompletePlayerDemoTasks>()
                 .Configure(player.GetComponent<SharedFirstPersonController>(), interactable);
             if (!EditorSceneManager.SaveScene(scene, Demo))
@@ -215,10 +309,10 @@ namespace SDGAdventure.CompletePlayer.Editor
                 var player = UnityEngine.Object.FindFirstObjectByType<SharedFirstPersonController>();
                 var service = PlayerInputService.Instance;
                 var menu = player ? player.GetComponent<PlayerPauseMenu>() : null;
-                var model = player ? player.GetComponentInChildren<CompletePlayerAnimation>() : null;
+                var model = player ? player.GetComponentInChildren<CompletePlayerWorkerAppearance>() : null;
                 var target = UnityEngine.Object.FindFirstObjectByType<CompletePlayerDemoInteractable>();
                 var tasks = UnityEngine.Object.FindFirstObjectByType<CompletePlayerDemoTasks>();
-                if (!player || !service || !menu || !model || !model.HasRequiredBones || !target || !tasks ||
+                if (!player || !service || !menu || !model || !model.HasWorker || !target || !tasks ||
                     !menu.View || !menu.Journal || menu.Journal.TotalCount != 3 ||
                     service.Context != PlayerInputContext.Gameplay ||
                     UnityEngine.Object.FindObjectsByType<Camera>(FindObjectsSortMode.None).Length != 1 ||

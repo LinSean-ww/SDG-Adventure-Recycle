@@ -8,6 +8,8 @@ namespace C3TreasurePuzzle
     public sealed class C3WorkstationVisualUpgrade : MonoBehaviour
     {
         private C3VisualBuilder art;
+        private C3VisualBuilder runtimeSightArt;
+        private bool runtimeSightUpgraded;
         [SerializeField] private List<GameObject> roots = new List<GameObject>();
         private readonly Dictionary<Renderer,bool> hidden = new Dictionary<Renderer,bool>();
         [SerializeField] private List<Material> ownedSignMaterials = new List<Material>();
@@ -60,6 +62,7 @@ namespace C3TreasurePuzzle
                         if (runtimePalette.TryGetValue(ownedSignMaterials[i], out Material copy)) ownedSignMaterials[i] = copy;
                     foreach (HiddenRenderer state in hiddenLayout) if (state.Renderer) hidden[state.Renderer] = state.Enabled;
                 }
+                if (Application.isPlaying) UpgradeBakedRifleSight();
                 return;
             }
             art=new C3VisualBuilder();
@@ -77,6 +80,22 @@ namespace C3TreasurePuzzle
             DecorateMaterialCache("Distributed_RecycledPlastic_F",1);
             DecorateMaterialCache("Distributed_RecycledMetal_F",2);
             DecorateWear();
+        }
+        private void UpgradeBakedRifleSight()
+        {
+            if (runtimeSightUpgraded) return;
+            GameObject bench=GameObject.Find("Hidden_WeaponAssemblyBench_F");
+            if (!bench) return;
+            Transform display=bench.transform.Find("V11_StationArt_Hidden_WeaponAssemblyBench_F/ClampedWeaponDisplay/ReclaimedQuantumRifle_Visual");
+            if (!display) return;
+            Transform legacy=display.Find("Sight");
+            if (!legacy) { runtimeSightUpgraded=true; return; }
+            // Replace only the obsolete display optic in memory. The saved V13 scene,
+            // all other geometry, and its owned materials remain untouched.
+            legacy.gameObject.SetActive(false);
+            runtimeSightArt=new C3VisualBuilder();
+            runtimeSightArt.OpenRifleSight(display);
+            runtimeSightUpgraded=true;
         }
         private void Hide(Renderer r)
         {
@@ -332,6 +351,7 @@ namespace C3TreasurePuzzle
             foreach (Material material in runtimePalette.Values) C3FactoryLayoutUtility.ReleaseTransient(material);
             runtimePalette.Clear();
             if(art!=null)art.Dispose();
+            if(runtimeSightArt!=null)runtimeSightArt.Dispose();
         }
     }
 }

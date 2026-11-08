@@ -104,9 +104,15 @@ namespace M6IntegrationTests
             MethodInfo tick = controller.GetType().GetMethod("TickMovement", BindingFlags.NonPublic | BindingFlags.Instance);
             Assert.IsNotNull(tick);
             capsule.Move(Vector3.down * 0.1f);
-            float startX = player.transform.position.x;
+            var contactEvidence=player.AddComponent<C3V11CollisionRecorder>();
+            contactEvidence.CaptureDetails=true;
+            Vector3 beforeMove=player.transform.position;
             tick.Invoke(controller, new object[] { new Vector2(0f, 1f), false, false, false, 0.1f });
-            Assert.Less(player.transform.position.x, startX - 0.25f, "C3 player must walk into the factory from the new spawn.");
+            string evidence="Start="+beforeMove+" end="+player.transform.position+
+                " forward="+player.transform.forward+" speed="+controller.GetType().GetField("currentMoveSpeed",BindingFlags.NonPublic|BindingFlags.Instance).GetValue(controller)+
+                " contacts="+string.Join(", ",contactEvidence.DetailedContacts.Select(c=>c.Collider.name+" normal="+c.Normal));
+            UnityEngine.Object.Destroy(contactEvidence);
+            Assert.Greater(Vector3.Dot(player.transform.position - beforeMove, player.transform.forward), 0.25f, "C3 player must move forward from the spawn. "+evidence);
             capsule.Move(Vector3.down * 0.1f);
             float beforeJump = player.transform.position.y;
             tick.Invoke(controller, new object[] { Vector2.zero, false, false, true, 0.02f });
@@ -125,6 +131,49 @@ namespace M6IntegrationTests
             yield return null;
             for (int i = 0; i < 40; i++) capsule.Move(new Vector3(-0.05f, 0f, 0f));
             Assert.Greater(player.transform.position.x, -9.82f, "Main deck brace collision did not stop the player capsule.");
+        }
+
+        [UnityTest]
+        public IEnumerator BDoorSpawnIsCenteredClearStableAndCanApproachDoor()
+        {
+            yield return SceneManager.LoadSceneAsync(Scene, LoadSceneMode.Single);
+            yield return null;
+            GameObject player = GameObject.Find("M2_Player");
+            var body = player.GetComponent<CharacterController>();
+            Assert.AreEqual(1, UnityEngine.Object.FindObjectsByType<CharacterController>(FindObjectsSortMode.None)
+                .Count(c => c.gameObject.name == "M2_Player"));
+            var nearWall = GameObject.Find("C_Wall_4_Near").GetComponent<Collider>();
+            var farWall = GameObject.Find("C_Wall_4_Far").GetComponent<Collider>();
+            float centerZ = (nearWall.bounds.max.z + farWall.bounds.min.z) * .5f;
+            Assert.That(player.transform.position.z, Is.EqualTo(centerZ).Within(.01f));
+            Assert.That(player.transform.position.x, Is.EqualTo(-1.35f).Within(.02f));
+            Assert.Greater(Vector3.Dot(player.transform.forward, Vector3.left), .99f);
+            Assert.That(player.transform.position.y, Is.InRange(.53f, .62f));
+            Physics.SyncTransforms();
+            foreach (var other in Physics.OverlapCapsule(player.transform.position + Vector3.up * body.radius,
+                player.transform.position + Vector3.up * (body.height - body.radius), body.radius,
+                ~0, QueryTriggerInteraction.Ignore))
+            {
+                if (other == body || other.transform.IsChildOf(player.transform)) continue;
+                Assert.IsFalse(Physics.ComputePenetration(body, player.transform.position, player.transform.rotation,
+                    other, other.transform.position, other.transform.rotation, out _, out float distance) && distance > .001f,
+                    "Spawn overlaps " + other.name);
+            }
+            var position = player.transform.position;
+            yield return null;
+            yield return null;
+            Assert.That(player.transform.position.x, Is.EqualTo(position.x).Within(.02f), "Scene initialization moved the spawn.");
+            Assert.That(player.transform.position.z, Is.EqualTo(position.z).Within(.02f));
+            Assert.Greater(Vector3.Dot(player.transform.forward, Vector3.left), .99f, "Scene initialization changed the spawn rotation.");
+            var controller = player.GetComponents<MonoBehaviour>().Single(x => x.GetType().Name == "C3FirstPersonController");
+            controller.enabled = false;
+            for (int step = 0; step < 20; step++) body.Move(Vector3.right * .05f + Vector3.down * .01f);
+            Assert.Greater(player.transform.position.x, -.5f, "The player could not reach the B doorway.");
+            Assert.That(player.transform.position.y, Is.InRange(.50f, .65f), "Player fell through the floor.");
+            var endBarrier = GameObject.Find("B_Safety_End").GetComponent<Collider>();
+            for (int step = 0; step < 60; step++) body.Move(Vector3.right * .05f + Vector3.down * .01f);
+            Assert.Less(player.transform.position.x, endBarrier.bounds.min.x, "The existing B safety barrier no longer blocks the route.");
+            Debug.Log("B doorway route stops at x=" + player.transform.position.x + " before " + endBarrier.name + " at x=" + endBarrier.bounds.min.x);
         }
 
         private static void Capture(Camera camera, string file)

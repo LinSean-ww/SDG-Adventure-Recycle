@@ -181,21 +181,33 @@ namespace SDGAdventure.Testing
         [UnityTest]
         public IEnumerator QuestionOptionsChangeBetweenLevelEntries()
         {
+            const string previousOrderKey = "SDG_C3_LastPuzzleOptionOrder";
+            bool hadPreviousOrder = PlayerPrefs.HasKey(previousOrderKey);
+            string savedPreviousOrder = PlayerPrefs.GetString(previousOrderKey);
             Type viewType = Type.GetType("C3TreasurePuzzle.C3UiView, Assembly-CSharp", true);
             MethodInfo option = viewType.GetMethod("GetOptionAt");
             string previous = null;
-            for (int load = 0; load < 3; load++)
+            try
             {
-                yield return SceneManager.LoadSceneAsync(ScenePath, LoadSceneMode.Single);
-                yield return null;
-                Component view = UnityEngine.Object.FindObjectOfType(viewType) as Component;
-                Assert.IsNotNull(view);
-                string order = string.Join("", Enumerable.Range(0, 3)
-                    .Select(i => Convert.ToInt32(option.Invoke(view, new object[] { i })).ToString()).ToArray());
-                Assert.AreEqual(3, order.Distinct().Count(), "All three steps must appear once");
-                if (previous != null) Assert.AreNotEqual(previous, order,
-                    "Re-entering Level03 must change the displayed option order");
-                previous = order;
+                for (int load = 0; load < 3; load++)
+                {
+                    yield return SceneManager.LoadSceneAsync(ScenePath, LoadSceneMode.Single);
+                    yield return null;
+                    Component view = UnityEngine.Object.FindObjectOfType(viewType) as Component;
+                    Assert.IsNotNull(view);
+                    string order = string.Join("", Enumerable.Range(0, 3)
+                        .Select(i => Convert.ToInt32(option.Invoke(view, new object[] { i })).ToString()).ToArray());
+                    Assert.AreEqual(3, order.Distinct().Count(), "All three steps must appear once");
+                    if (previous != null) Assert.AreNotEqual(previous, order,
+                        "Re-entering Level03 must change the displayed option order");
+                    previous = order;
+                }
+            }
+            finally
+            {
+                if (hadPreviousOrder) PlayerPrefs.SetString(previousOrderKey, savedPreviousOrder);
+                else PlayerPrefs.DeleteKey(previousOrderKey);
+                PlayerPrefs.Save();
             }
         }
     }

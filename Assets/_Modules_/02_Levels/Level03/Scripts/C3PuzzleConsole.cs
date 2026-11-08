@@ -72,15 +72,23 @@ namespace C3TreasurePuzzle
             if (!isActiveAndEnabled || panelOpen || activePanel != null || progress == null || puzzle == null || device == null ||
                 device.LevelCompleted || C3CompletionScreen.BlocksGameplayInputThisFrame || !progress.AllPartsCollected) return false;
             if (device.IsActivated && !ProductionInputAvailable) return false;
+            // Opening the console for the first time is the accepted hand-in.
+            // A collection receipt alone is insufficient if a part is on the ground.
+            if (!progress.PartsSubmitted && !progress.TrySubmitParts(EcoAdventureRuntime.Instance))
+            {
+                feedback = "請先持有保險絲、控制晶片及過濾模組，再提交控制台。";
+                noticeUntil = Time.unscaledTime + 4f;
+                return false;
+            }
             selection.Clear();
             Mode=device.IsActivated?ConsoleMode.ProductionControl:puzzle.PuzzleSolved?ConsoleMode.Activation:ConsoleMode.Puzzle;
             feedback = Mode==ConsoleMode.ProductionControl?ProductionStatus:
                 puzzle.PuzzleSolved ? "解謎已完成；設備尚未啟動。請確認啟動。" : "請依線索選擇三個處理步驟。";
-            previousLock = Cursor.lockState;
+            previousLock = PlayerCursor.LockState;
             previousVisible = Cursor.visible;
             activePanel = this;
             panelOpen = true;
-            Cursor.lockState = CursorLockMode.None;
+            PlayerCursor.LockState = CursorLockMode.None;
             Cursor.visible = true;
             return true;
         }
@@ -92,12 +100,12 @@ namespace C3TreasurePuzzle
             if (activePanel == this) activePanel = null;
             closedFrame = Time.frameCount;
             if (C3CompletionScreen.BlocksGameplayInputThisFrame || (device && device.LevelCompleted))
-            { Cursor.lockState=CursorLockMode.None; Cursor.visible=true; }
+            { PlayerCursor.LockState=CursorLockMode.None; Cursor.visible=true; }
             else
             {
                 PlayerInputService input=PlayerInputService.Instance;
                 if (input==null || input.Context==PlayerInputContext.Gameplay)
-                { Cursor.lockState=previousLock; Cursor.visible=previousVisible; }
+                { PlayerCursor.LockState=previousLock; Cursor.visible=previousVisible; }
             }
         }
 

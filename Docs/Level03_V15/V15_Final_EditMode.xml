@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="14" result="Passed" total="14" passed="14" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-07 11:10:24Z" end-time="2026-11-07 11:10:25Z" duration="0.2552201">
+  <test-suite type="TestSuite" id="1000" name="My project" fullname="My project" runstate="Runnable" testcasecount="14" result="Passed" start-time="2026-11-07 11:10:24Z" end-time="2026-11-07 11:10:25Z" duration="0.255220" total="14" passed="14" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1013" name="C3TextLifecycle.EditModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/C3TextLifecycle.EditModeTests.dll" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-11-07 11:10:24Z" end-time="2026-11-07 11:10:24Z" duration="0.020681" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="16552" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+      </properties>
+      <test-suite type="TestFixture" id="1001" name="C3TextLifecycleTests" fullname="C3TextLifecycleTests" classname="C3TextLifecycleTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-11-07 11:10:24Z" end-time="2026-11-07 11:10:24Z" duration="0.006537" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="EditMode" />
+        </properties>
+        <test-case id="1002" name="PlayModeCycleOne" fullname="C3TextLifecycleTests.PlayModeCycleOne" methodname="PlayModeCycleOne" classname="C3TextLifecycleTests" runstate="Runnable" seed="1218724340" result="Passed" start-time="2026-11-07 11:09:55Z" end-time="2026-11-07 11:10:00Z" duration="5.033879" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="platform" value="EditMode" />
+          </properties>
+        </test-case>
+        <test-case id="1004" name="PlayModeCycleThree" fullname="C3TextLifecycleTests.PlayModeCycleThree" methodname="PlayModeCycleThree" classname="C3TextLifecycleTests" runstate="Runnable" seed="1190243812" result="Passed" start-time="2026-11-07 11:10:00Z" end-time="2026-11-07 11:10:05Z" duration="4.428398" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="platform" value="EditMode" />
+          </properties>
+        </test-case>
+        <test-case id="1003" name="PlayModeCycleTwo" fullname="C3TextLifecycleTests.PlayModeCycleTwo" methodname="PlayModeCycleTwo" classname="C3TextLifecycleTests" runstate="Runnable" seed="2088161488" result="Passed" start-time="2026-11-07 11:10:05Z" end-time="2026-11-07 11:10:09Z" duration="4.397042" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="platform" value="EditMode" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1005" name="C3V12PreviewTests" fullname="C3V12PreviewTests" classname="C3V12PreviewTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-07 11:10:24Z" end-time="2026-11-07 11:10:24Z" duration="0.000931" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="EditMode" />
+        </properties>
+        <test-case id="1006" name="RepeatedEditCaptureDoesNotBakeObjectsDirtyTheSceneOrLeaveACamera" fullname="C3V12PreviewTests.RepeatedEditCaptureDoesNotBakeObjectsDirtyTheSceneOrLeaveACamera" methodname="RepeatedEditCaptureDoesNotBakeObjectsDirtyTheSceneOrLeaveACamera" classname="C3V12PreviewTests" runstate="Runnable" seed="1008395191" result="Passed" start-time="2026-11-07 11:10:09Z" end-time="2026-11-07 11:10:10Z" duration="0.806652" asserts="0">
+          <properties>
+            <property name="platform" value="EditMode" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1007" name="C3V13FactoryBakeTests" fullname="C3V13FactoryBakeTests" classname="C3V13FactoryBakeTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-07 11:10:24Z" end-time="2026-11-07 11:10:24Z" duration="0.000934" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="EditMode" />
+        </properties>
+        <test-case id="1010" name="DamagedBakeRefusesToRebuildOrOverwriteUserObjects" fullname="C3V13FactoryBakeTests.DamagedBakeRefusesToRebuildOrOverwriteUserObjects" methodname="DamagedBakeRefusesToRebuildOrOverwriteUserObjects" classname="C3V13FactoryBakeTests" runstate="Runnable" seed="1974265312" result="Passed" start-time="2026-11-07 11:10:10Z" end-time="2026-11-07 11:10:10Z" duration="0.420432" asserts="0">
+          <properties>
+            <property name="platform" value="EditMode" />
+          </properties>
+        </test-case>
+        <test-case id="1011" name="FreshBakeUndoRedoRestoresHierarchyCollidersAndBindings" fullname="C3V13FactoryBakeTests.FreshBakeUndoRedoRestoresHierarchyCollidersAndBindings" methodname="FreshBakeUndoRedoRestoresHierarchyCollidersAndBindings" classname="C3V13FactoryBakeTests" runstate="Runnable" seed="576241817" result="Passed" start-time="2026-11-07 11:10:10Z" end-time="2026-11-07 11:10:12Z" duration="1.978830" asserts="0">
+          <properties>
+            <property name="platform" value="EditMode" />
+          </properties>
+        </test-case>
+        <test-case id="1012" name="PlayStopPreservesAuthoredFactoryAndDiskScene" fullname="C3V13FactoryBakeTests.PlayStopPreservesAuthoredFactoryAndDiskScene" methodname="PlayStopPreservesAuthoredFactoryAndDiskScene" classname="C3V13FactoryBakeTests" runstate="Runnable" seed="1186719178" result="Passed" start-time="2026-11-07 11:10:12Z" end-time="2026-11-07 11:10:17Z" duration="4.327607" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="platform" value="EditMode" />
+          </properties>
+        </test-case>
+        <test-case id="1009" name="RepeatedBakePreservesManualEditsAndReferencesAfterSaveReload" fullname="C3V13FactoryBakeTests.RepeatedBakePreservesManualEditsAndReferencesAfterSaveReload" methodname="RepeatedBakePreservesManualEditsAndReferencesAfterSaveReload" classname="C3V13FactoryBakeTests" runstate="Runnable" seed="1946406596" result="Passed" start-time="2026-11-07 11:10:17Z" end-time="2026-11-07 11:10:21Z" duration="4.661348" asserts="0">
+          <properties>
+            <property name="platform" value="EditMode" />
+          </properties>
+        </test-case>
+        <test-case id="1008" name="SavedFactoryHasPersistentMeshesMaterialsAndConnectedBindings" fullname="C3V13FactoryBakeTests.SavedFactoryHasPersistentMeshesMaterialsAndConnectedBindings" methodname="SavedFactoryHasPersistentMeshesMaterialsAndConnectedBindings" classname="C3V13FactoryBakeTests" runstate="Runnable" seed="249191756" result="Passed" start-time="2026-11-07 11:10:21Z" end-time="2026-11-07 11:10:22Z" duration="0.434557" asserts="0">
+          <properties>
+            <property name="platform" value="EditMode" />
+          </properties>
+        </test-case>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1020" name="PlayerControl.EditModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/PlayerControl.EditModeTests.dll" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-07 11:10:24Z" end-time="2026-11-07 11:10:25Z" duration="0.193039" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="16552" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+      </properties>
+      <test-suite type="TestSuite" id="1021" name="SDGAdventure" fullname="SDGAdventure" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-07 11:10:24Z" end-time="2026-11-07 11:10:25Z" duration="0.186587" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="EditMode" />
+        </properties>
+        <test-suite type="TestSuite" id="1022" name="PlayerControlTests" fullname="SDGAdventure.PlayerControlTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-07 11:10:24Z" end-time="2026-11-07 11:10:25Z" duration="0.177888" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="EditMode" />
+          </properties>
+          <test-suite type="TestFixture" id="1014" name="PlayerControlAssetTests" fullname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests" classname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-07 11:10:24Z" end-time="2026-11-07 11:10:25Z" duration="0.172036" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties>
+              <property name="platform" value="EditMode" />
+            </properties>
+            <test-case id="1015" name="SharedCanvasFontLoadsWithoutChangingGuiSkin" fullname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests.SharedCanvasFontLoadsWithoutChangingGuiSkin" methodname="SharedCanvasFontLoadsWithoutChangingGuiSkin" classname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests" runstate="Runnable" seed="1846340636" result="Passed" start-time="2026-11-07 11:10:22Z" end-time="2026-11-07 11:10:22Z" duration="0.006552" asserts="0">
+              <properties>
+                <property name="platform" value="EditMode" />
+              </properties>
+            </test-case>
+            <test-case id="1017" name="SharedPlayerPrefabHasOneMotorCameraAndMenu" fullname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests.SharedPlayerPrefabHasOneMotorCameraAndMenu" methodname="SharedPlayerPrefabHasOneMotorCameraAndMenu" classname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests" runstate="Runnable" seed="2052190578" result="Passed" start-time="2026-11-07 11:10:22Z" end-time="2026-11-07 11:10:22Z" duration="0.002493" asserts="0">
+              <properties>
+                <property name="platform" value="EditMode" />
+              </properties>
+            </test-case>
+            <test-case id="1019" name="StandaloneSceneEntersPlayModeWithoutBuildSettings" fullname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests.StandaloneSceneEntersPlayModeWithoutBuildSettings" methodname="StandaloneSceneEntersPlayModeWithoutBuildSettings" classname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests" runstate="Runnable" seed="840722166" result="Passed" start-time="2026-11-07 11:10:22Z" end-time="2026-11-07 11:10:24Z" duration="2.531337" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="platform" value="EditMode" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1018" name="StandaloneSceneReferencesPrefabAndTestObjects" fullname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests.StandaloneSceneReferencesPrefabAndTestObjects" methodname="StandaloneSceneReferencesPrefabAndTestObjects" classname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests" runstate="Runnable" seed="423779002" result="Passed" start-time="2026-11-07 11:10:24Z" end-time="2026-11-07 11:10:25Z" duration="0.057080" asserts="0">
+              <properties>
+                <property name="platform" value="EditMode" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1016" name="TaskListActionIsBoundToPInSharedInputAsset" fullname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests.TaskListActionIsBoundToPInSharedInputAsset" methodname="TaskListActionIsBoundToPInSharedInputAsset" classname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests" runstate="Runnable" seed="2085124802" result="Passed" start-time="2026-11-07 11:10:25Z" end-time="2026-11-07 11:10:25Z" duration="0.001238" asserts="0">
+              <properties>
+                <property name="platform" value="EditMode" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Docs\Level03_V15\V15_Final_EditMode.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

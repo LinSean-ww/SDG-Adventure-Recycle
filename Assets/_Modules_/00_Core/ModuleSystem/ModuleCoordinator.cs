@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using SDGAdventure.SharedPlayer;
 
 namespace SDGAdventure.ModuleSystem
 {
@@ -93,7 +94,7 @@ namespace SDGAdventure.ModuleSystem
             completionReceived = false;
             errorText = null;
             Time.timeScale = 1f;
-            Cursor.lockState = CursorLockMode.None;
+            PlayerCursor.LockState = CursorLockMode.None;
             Cursor.visible = true;
         }
 
@@ -119,7 +120,7 @@ namespace SDGAdventure.ModuleSystem
                 CurrentModuleId = null;
                 completionReceived = false;
                 Time.timeScale = 1f;
-                Cursor.lockState = CursorLockMode.None;
+                PlayerCursor.LockState = CursorLockMode.None;
                 Cursor.visible = true;
                 return;
             }

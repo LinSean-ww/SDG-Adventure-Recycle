@@ -47,7 +47,7 @@ namespace SDGAdventure.SharedPlayer
         {
             target = null;
             if (input == null || input.Context != PlayerInputContext.Gameplay || playerCamera == null ||
-                Cursor.lockState != CursorLockMode.Locked) return;
+                PlayerCursor.LockState != CursorLockMode.Locked) return;
             target = FindTarget();
         }
 

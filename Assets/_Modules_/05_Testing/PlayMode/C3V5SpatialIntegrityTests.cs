@@ -23,21 +23,19 @@ namespace M6IntegrationTests
         public IEnumerator BDoorHasVisibleFloorHeightConveyorAndOverheadConnection()
         {
             yield return Open();
-            var belt = GameObject.Find("V8_B_To_C_ContinuousRubber");
-            Assert.IsNotNull(belt, "V5 B-door conveyor prefab was not loaded");
-            var renderers = belt.GetComponentsInChildren<MeshRenderer>(true);
-            Assert.Greater(renderers.Length, 0, "B conveyor has no renderable mesh");
-            Bounds all = renderers[0].bounds;
-            foreach (var renderer in renderers) all.Encapsulate(renderer.bounds);
-            Assert.LessOrEqual(all.min.x, -2.9f, "B-floor belt does not reach the lift");
-            Assert.GreaterOrEqual(all.max.x, -.88f, "C-side receiving end does not reach the B door");
-            Assert.LessOrEqual(all.max.x, -0.55f, "B belt protrudes through the B doorway into Zone B");
-            Assert.LessOrEqual(all.min.y, 1.25f, "B-side receiving belt is still mounted too high");
-            Assert.GreaterOrEqual(all.max.y, 5.6f, "B stair-clearance crossover is missing");
-            Assert.LessOrEqual(all.max.y, 5.72f, "Conveyor crossover rises above the designed clearance");
-            Assert.GreaterOrEqual(all.max.z, 16.8f, "B line does not reach the main conveyor");
-            Assert.IsNotNull(GameObject.Find("V8_B_To_C_YellowGuidesAndCleats"));
-            Assert.IsNotNull(GameObject.Find("V8_B_To_C_DrumRollers"));
+            // The V11 route replaces the V8 floor belt with an elevated infeed.
+            // Exercise its actual section joints, surfaces and doorway clearance.
+            Component geometry=C3V11Phase2RecyclingLineTests.Find("C3TreasurePuzzle.C3RecyclingLineGeometry");
+            Assert.IsNotNull(geometry);
+            Transform entry=(Transform)C3V11Phase2RecyclingLineTests.Member(geometry,"BMaterialInterface");
+            Assert.Greater(entry.position.y,6.8f);
+            Assert.Greater(entry.position.x,0f);
+            C3V11Phase2RecyclingLineTests.AssertEquipmentConnections(geometry);
+            Transform proxies=GameObject.Find("C_CollisionProxies").transform;
+            foreach(RaycastHit hit in Physics.SphereCastAll(new Vector3(.7f,7.12f,12.5f),.12f,Vector3.left,2f,~0,QueryTriggerInteraction.Ignore))
+                Assert.IsFalse(hit.collider.transform.IsChildOf(proxies),"Infeed hits wall proxy "+hit.collider.name);
+            foreach(string name in new[]{"C_Wall_4_Lintel","C_Wall_4_Near","C_Wall_4_Far","B_Door_Floor"})
+                Assert.IsTrue(GameObject.Find(name).GetComponent<Collider>().enabled,name);
         }
 
         [UnityTest]

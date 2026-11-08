@@ -6,6 +6,7 @@ using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using SDGAdventure.SharedPlayer;
 using Object=UnityEngine.Object;
 
 namespace M6IntegrationTests
@@ -35,7 +36,7 @@ namespace M6IntegrationTests
         private static void Context(string n)
         {
             Call(Service,"SetContext",Enum.Parse(Get(Service,"Context").GetType(),n));
-            Cursor.lockState=CursorLockMode.Locked;Cursor.visible=false;
+            PlayerCursor.LockState=CursorLockMode.Locked;Cursor.visible=false;
         }
         private static Type InputType(string n)=>Type.GetType("UnityEngine.InputSystem."+n+", Unity.InputSystem",true);
         private void Keys(params string[] names)
@@ -168,8 +169,8 @@ namespace M6IntegrationTests
             Context("Gameplay");for(int i=0;i<40;i++){Tick();Assert.LessOrEqual((float)Get(Controller,"verticalSpeed"),0f);}
             Press("Z");for(int i=0;i<25;i++)Tick();Press("Space");
             Assert.Greater((float)Get(Controller,"proneJumpRemaining"),0f);
-            Cursor.lockState=CursorLockMode.None;Call(Controller,"Update");
-            Assert.AreEqual(0f,Get(Controller,"proneJumpRemaining"));Cursor.lockState=CursorLockMode.Locked;
+            PlayerCursor.LockState=CursorLockMode.None;Call(Controller,"Update");
+            Assert.AreEqual(0f,Get(Controller,"proneJumpRemaining"));PlayerCursor.LockState=CursorLockMode.Locked;
             yield return null;
         }
         [UnityTest] public IEnumerator HeldCtrlUnpronesToCrouchWithoutADelayedJump()

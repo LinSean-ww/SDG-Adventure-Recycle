@@ -330,6 +330,7 @@ namespace M6IntegrationTests
             device.GetType().GetEvent("Running").AddEventHandler(device, (Action)(() => running++));
             device.GetType().GetEvent("Completed").AddEventHandler(device, (Action)(() => completed++));
             object coordinator = Coordinator;
+            object previousResult = Get(coordinator, "LastResult");
             EventInfo completedEvent = coordinator.GetType().GetEvent("Completed");
             Type resultType = RuntimeType("SDGAdventure.ModuleSystem.ModuleResult");
             // Count coordinator notifications without a compile-time reference to Assembly-CSharp.
@@ -337,6 +338,8 @@ namespace M6IntegrationTests
             Delegate handler = Delegate.CreateDelegate(completedEvent.EventHandlerType, counter,
                 typeof(NotificationCounter).GetMethod("OnCompleted").MakeGenericMethod(resultType));
             completedEvent.AddEventHandler(coordinator, handler);
+            try
+            {
             foreach (string id in new[] { "fuse", "control_chip", "filter_module" })
                 Assert.IsTrue((bool)Call(progress, "TryCollect", id, id));
             Assert.AreEqual(3, Get(progress, "CollectedCount"));
@@ -354,7 +357,9 @@ namespace M6IntegrationTests
             Assert.IsFalse((bool)Get(screen, "Visible"));
             Assert.IsTrue(player.enabled);
             Assert.IsFalse((bool)Call(exit, "TryEnter", player));
-            Assert.IsNull(Get(coordinator, "LastResult"));
+            Assert.AreEqual(previousResult, Get(coordinator, "LastResult"),
+                "A premature exit must not replace a prior module result.");
+            Assert.AreEqual(0, counter.Count, "A premature exit must not report completion.");
             Call(device, "NotifyStartupFinished");
             Call(device, "NotifyStartupFinished");
             Assert.AreEqual(1, running);
@@ -370,7 +375,8 @@ namespace M6IntegrationTests
             Assert.AreEqual(1, reported);
             Assert.IsTrue((bool)Get(screen, "Visible"));
             Assert.AreEqual("Completed", Get(device, "FactoryState").ToString());
-            completedEvent.RemoveEventHandler(coordinator, handler);
+            }
+            finally { completedEvent.RemoveEventHandler(coordinator, handler); }
         }
 
         private sealed class NotificationCounter

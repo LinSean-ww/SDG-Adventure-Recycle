@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="27" result="Passed" total="27" passed="27" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-07 12:38:39Z" end-time="2026-11-07 12:38:49Z" duration="9.8332327">
+  <test-suite type="TestSuite" id="1000" name="My project" fullname="My project" runstate="Runnable" testcasecount="217" result="Passed" start-time="2026-11-07 12:38:39Z" end-time="2026-11-07 12:38:49Z" duration="9.833233" total="27" passed="27" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1222" name="M6Integration.PlayModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/M6Integration.PlayModeTests.dll" runstate="Runnable" testcasecount="187" result="Passed" start-time="2026-11-07 12:38:39Z" end-time="2026-11-07 12:38:48Z" duration="8.739523" total="23" passed="23" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="39480" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <test-suite type="TestSuite" id="1223" name="M6IntegrationTests" fullname="M6IntegrationTests" runstate="Runnable" testcasecount="174" result="Passed" start-time="2026-11-07 12:38:39Z" end-time="2026-11-07 12:38:48Z" duration="8.736536" total="23" passed="23" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <test-suite type="TestFixture" id="1072" name="C3V11ThirdPersonInteractionTests" fullname="M6IntegrationTests.C3V11ThirdPersonInteractionTests" classname="M6IntegrationTests.C3V11ThirdPersonInteractionTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-07 12:38:39Z" end-time="2026-11-07 12:38:42Z" duration="2.778774" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-case id="1073" name="FirstPersonKeepsItsTwoMetreRayAndOnceOnlyFCollection" fullname="M6IntegrationTests.C3V11ThirdPersonInteractionTests.FirstPersonKeepsItsTwoMetreRayAndOnceOnlyFCollection" methodname="FirstPersonKeepsItsTwoMetreRayAndOnceOnlyFCollection" classname="M6IntegrationTests.C3V11ThirdPersonInteractionTests" runstate="Runnable" seed="521177206" result="Passed" start-time="2026-11-07 12:38:39Z" end-time="2026-11-07 12:38:41Z" duration="1.518785" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1077" name="ThirdPersonMaterialsKeepActivationSortingAndOnceOnlyRecovery" fullname="M6IntegrationTests.C3V11ThirdPersonInteractionTests.ThirdPersonMaterialsKeepActivationSortingAndOnceOnlyRecovery" methodname="ThirdPersonMaterialsKeepActivationSortingAndOnceOnlyRecovery" classname="M6IntegrationTests.C3V11ThirdPersonInteractionTests" runstate="Runnable" seed="1066704814" result="Passed" start-time="2026-11-07 12:38:41Z" end-time="2026-11-07 12:38:41Z" duration="0.351185" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1075" name="ThirdPersonRejectsCameraWallsBodyWallsAndFloors" fullname="M6IntegrationTests.C3V11ThirdPersonInteractionTests.ThirdPersonRejectsCameraWallsBodyWallsAndFloors" methodname="ThirdPersonRejectsCameraWallsBodyWallsAndFloors" classname="M6IntegrationTests.C3V11ThirdPersonInteractionTests" runstate="Runnable" seed="271580534" result="Passed" start-time="2026-11-07 12:38:41Z" end-time="2026-11-07 12:38:41Z" duration="0.313109" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1074" name="ThirdPersonUsesBodyDistanceForAllThreeRealQuestParts" fullname="M6IntegrationTests.C3V11ThirdPersonInteractionTests.ThirdPersonUsesBodyDistanceForAllThreeRealQuestParts" methodname="ThirdPersonUsesBodyDistanceForAllThreeRealQuestParts" classname="M6IntegrationTests.C3V11ThirdPersonInteractionTests" runstate="Runnable" seed="1138310128" result="Passed" start-time="2026-11-07 12:38:41Z" end-time="2026-11-07 12:38:42Z" duration="0.305999" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1076" name="UiContextAndBothUpdateOrdersNeverDispatchTwoInteractions" fullname="M6IntegrationTests.C3V11ThirdPersonInteractionTests.UiContextAndBothUpdateOrdersNeverDispatchTwoInteractions" methodname="UiContextAndBothUpdateOrdersNeverDispatchTwoInteractions" classname="M6IntegrationTests.C3V11ThirdPersonInteractionTests" runstate="Runnable" seed="654420176" result="Passed" start-time="2026-11-07 12:38:42Z" end-time="2026-11-07 12:38:42Z" duration="0.269388" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="TestFixture" id="1125" name="C3V12FinalFollowupTests" fullname="M6IntegrationTests.C3V12FinalFollowupTests" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" testcasecount="18" result="Passed" start-time="2026-11-07 12:38:42Z" end-time="2026-11-07 12:38:48Z" duration="5.943822" total="18" passed="18" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-case id="1130" name="AirborneSpaceCannotQueueALandingOrDoubleJump" fullname="M6IntegrationTests.C3V12FinalFollowupTests.AirborneSpaceCannotQueueALandingOrDoubleJump" methodname="AirborneSpaceCannotQueueALandingOrDoubleJump" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="211931836" result="Passed" start-time="2026-11-07 12:38:42Z" end-time="2026-11-07 12:38:42Z" duration="0.330711" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1143" name="DedicatedTestsCanStillInstantiateTheDemoWithoutQuestRewards" fullname="M6IntegrationTests.C3V12FinalFollowupTests.DedicatedTestsCanStillInstantiateTheDemoWithoutQuestRewards" methodname="DedicatedTestsCanStillInstantiateTheDemoWithoutQuestRewards" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="1475580316" result="Passed" start-time="2026-11-07 12:38:42Z" end-time="2026-11-07 12:38:42Z" duration="0.263461" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <output><![CDATA[M2 測試互動：測試互動物件，次數 1
+]]></output>
+          </test-case>
+          <test-case id="1126" name="FirstPersonZThenSpaceStandsBeforeOneGroundedJump" fullname="M6IntegrationTests.C3V12FinalFollowupTests.FirstPersonZThenSpaceStandsBeforeOneGroundedJump" methodname="FirstPersonZThenSpaceStandsBeforeOneGroundedJump" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="2023856434" result="Passed" start-time="2026-11-07 12:38:42Z" end-time="2026-11-07 12:38:43Z" duration="0.317106" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1133" name="HeldCtrlUnpronesToCrouchWithoutADelayedJump" fullname="M6IntegrationTests.C3V12FinalFollowupTests.HeldCtrlUnpronesToCrouchWithoutADelayedJump" methodname="HeldCtrlUnpronesToCrouchWithoutADelayedJump" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="1280575180" result="Passed" start-time="2026-11-07 12:38:43Z" end-time="2026-11-07 12:38:43Z" duration="0.303748" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1136" name="JumpDisabledStillAllowsSafeStandingButNoImpulse" fullname="M6IntegrationTests.C3V12FinalFollowupTests.JumpDisabledStillAllowsSafeStandingButNoImpulse" methodname="JumpDisabledStillAllowsSafeStandingButNoImpulse" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="183641502" result="Passed" start-time="2026-11-07 12:38:43Z" end-time="2026-11-07 12:38:43Z" duration="0.320372" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1128" name="LowCeilingRejectsSpaceInBothViewsAndZStillRecoversAfterLeaving" fullname="M6IntegrationTests.C3V12FinalFollowupTests.LowCeilingRejectsSpaceInBothViewsAndZStillRecoversAfterLeaving" methodname="LowCeilingRejectsSpaceInBothViewsAndZStillRecoversAfterLeaving" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="1566956137" result="Passed" start-time="2026-11-07 12:38:43Z" end-time="2026-11-07 12:38:44Z" duration="0.320271" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1138" name="MaintenanceBoardRestsOnTableAndStaysSeparateFromTheUnmovedQuestChip" fullname="M6IntegrationTests.C3V12FinalFollowupTests.MaintenanceBoardRestsOnTableAndStaysSeparateFromTheUnmovedQuestChip" methodname="MaintenanceBoardRestsOnTableAndStaysSeparateFromTheUnmovedQuestChip" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="981626335" result="Passed" start-time="2026-11-07 12:38:44Z" end-time="2026-11-07 12:38:44Z" duration="0.334977" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1140" name="MaintenanceChipStillAcceptsRealFOnceInFirstPerson" fullname="M6IntegrationTests.C3V12FinalFollowupTests.MaintenanceChipStillAcceptsRealFOnceInFirstPerson" methodname="MaintenanceChipStillAcceptsRealFOnceInFirstPerson" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="1351776152" result="Passed" start-time="2026-11-07 12:38:44Z" end-time="2026-11-07 12:38:44Z" duration="0.326047" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1141" name="MaintenanceChipStillAcceptsRealFOnceInThirdPerson" fullname="M6IntegrationTests.C3V12FinalFollowupTests.MaintenanceChipStillAcceptsRealFOnceInThirdPerson" methodname="MaintenanceChipStillAcceptsRealFOnceInThirdPerson" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="145323758" result="Passed" start-time="2026-11-07 12:38:44Z" end-time="2026-11-07 12:38:45Z" duration="0.305791" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1129" name="NewCeilingDuringRecoveryCancelsJumpAndReturnsToProne" fullname="M6IntegrationTests.C3V12FinalFollowupTests.NewCeilingDuringRecoveryCancelsJumpAndReturnsToProne" methodname="NewCeilingDuringRecoveryCancelsJumpAndReturnsToProne" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="553773593" result="Passed" start-time="2026-11-07 12:38:45Z" end-time="2026-11-07 12:38:45Z" duration="0.278930" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1142" name="NormalFactoryHasNoDemoInteractionOrTerminalAcrossThreeLoads" fullname="M6IntegrationTests.C3V12FinalFollowupTests.NormalFactoryHasNoDemoInteractionOrTerminalAcrossThreeLoads" methodname="NormalFactoryHasNoDemoInteractionOrTerminalAcrossThreeLoads" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="744414137" result="Passed" start-time="2026-11-07 12:38:45Z" end-time="2026-11-07 12:38:46Z" duration="0.766451" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1139" name="PliersHaveOnePivotClearTipsAndARealPegWithoutTouchingOtherTools" fullname="M6IntegrationTests.C3V12FinalFollowupTests.PliersHaveOnePivotClearTipsAndARealPegWithoutTouchingOtherTools" methodname="PliersHaveOnePivotClearTipsAndARealPegWithoutTouchingOtherTools" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="2030686118" result="Passed" start-time="2026-11-07 12:38:46Z" end-time="2026-11-07 12:38:46Z" duration="0.325261" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1135" name="SlowStandExpiresTheRequestInsteadOfJumpingMuchLater" fullname="M6IntegrationTests.C3V12FinalFollowupTests.SlowStandExpiresTheRequestInsteadOfJumpingMuchLater" methodname="SlowStandExpiresTheRequestInsteadOfJumpingMuchLater" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="1335012398" result="Passed" start-time="2026-11-07 12:38:46Z" end-time="2026-11-07 12:38:46Z" duration="0.308337" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1127" name="ThirdPersonZThenSpaceStandsBeforeOneGroundedJump" fullname="M6IntegrationTests.C3V12FinalFollowupTests.ThirdPersonZThenSpaceStandsBeforeOneGroundedJump" methodname="ThirdPersonZThenSpaceStandsBeforeOneGroundedJump" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="866350852" result="Passed" start-time="2026-11-07 12:38:46Z" end-time="2026-11-07 12:38:47Z" duration="0.286765" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1132" name="UiAndUnlockedCursorCancelAnExistingBufferedJump" fullname="M6IntegrationTests.C3V12FinalFollowupTests.UiAndUnlockedCursorCancelAnExistingBufferedJump" methodname="UiAndUnlockedCursorCancelAnExistingBufferedJump" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="1620926594" result="Passed" start-time="2026-11-07 12:38:47Z" end-time="2026-11-07 12:38:47Z" duration="0.286466" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1131" name="UiSpaceDoesNotUnproneOrJumpInEitherView" fullname="M6IntegrationTests.C3V12FinalFollowupTests.UiSpaceDoesNotUnproneOrJumpInEitherView" methodname="UiSpaceDoesNotUnproneOrJumpInEitherView" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="802169577" result="Passed" start-time="2026-11-07 12:38:47Z" end-time="2026-11-07 12:38:47Z" duration="0.283852" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1137" name="ViewSwitchDuringRecoveryKeepsExactlyOneJumpSubscriptionAndTakeoff" fullname="M6IntegrationTests.C3V12FinalFollowupTests.ViewSwitchDuringRecoveryKeepsExactlyOneJumpSubscriptionAndTakeoff" methodname="ViewSwitchDuringRecoveryKeepsExactlyOneJumpSubscriptionAndTakeoff" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="1908258463" result="Passed" start-time="2026-11-07 12:38:47Z" end-time="2026-11-07 12:38:47Z" duration="0.283352" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1134" name="ZCancelsAPendingProneJump" fullname="M6IntegrationTests.C3V12FinalFollowupTests.ZCancelsAPendingProneJump" methodname="ZCancelsAPendingProneJump" classname="M6IntegrationTests.C3V12FinalFollowupTests" runstate="Runnable" seed="270930738" result="Passed" start-time="2026-11-07 12:38:47Z" end-time="2026-11-07 12:38:48Z" duration="0.295682" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1243" name="M7SharedPlayer.PlayModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/M7SharedPlayer.PlayModeTests.dll" runstate="Runnable" testcasecount="14" result="Passed" start-time="2026-11-07 12:38:48Z" end-time="2026-11-07 12:38:49Z" duration="1.076951" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="39480" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <test-suite type="TestSuite" id="1244" name="M7SharedPlayerTests" fullname="M7SharedPlayerTests" runstate="Runnable" testcasecount="14" result="Passed" start-time="2026-11-07 12:38:48Z" end-time="2026-11-07 12:38:49Z" duration="1.076004" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <test-suite type="TestFixture" id="1226" name="PlayerInputServiceTests" fullname="M7SharedPlayerTests.PlayerInputServiceTests" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-11-07 12:38:48Z" end-time="2026-11-07 12:38:49Z" duration="1.075048" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-case id="1228" name="EscapeHasOneEnabledActionInEachContext" fullname="M7SharedPlayerTests.PlayerInputServiceTests.EscapeHasOneEnabledActionInEachContext" methodname="EscapeHasOneEnabledActionInEachContext" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" seed="884556824" result="Passed" start-time="2026-11-07 12:38:48Z" end-time="2026-11-07 12:38:48Z" duration="0.003166" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1230" name="Level03MenuPausesResumesAndUsesExistingTransitions" fullname="M7SharedPlayerTests.PlayerInputServiceTests.Level03MenuPausesResumesAndUsesExistingTransitions" methodname="Level03MenuPausesResumesAndUsesExistingTransitions" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" seed="1899169972" result="Passed" start-time="2026-11-07 12:38:48Z" end-time="2026-11-07 12:38:48Z" duration="0.566450" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1229" name="OneServiceSurvivesM6C3SceneChanges" fullname="M7SharedPlayerTests.PlayerInputServiceTests.OneServiceSurvivesM6C3SceneChanges" methodname="OneServiceSurvivesM6C3SceneChanges" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" seed="99554319" result="Passed" start-time="2026-11-07 12:38:48Z" end-time="2026-11-07 12:38:49Z" duration="0.503097" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1227" name="SimulatedCursorSeparatesRequestedAndOsState" fullname="M7SharedPlayerTests.PlayerInputServiceTests.SimulatedCursorSeparatesRequestedAndOsState" methodname="SimulatedCursorSeparatesRequestedAndOsState" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" seed="2146186432" result="Passed" start-time="2026-11-07 12:38:49Z" end-time="2026-11-07 12:38:49Z" duration="0.000463" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

@@ -3,7 +3,9 @@
     "rootNamespace": "M6IntegrationTests",
     "references": [
         "SDGAdventure.TestOutput",
-        "Unity.ugui"
+        "SDGAdventure.SharedPlayer",
+        "Unity.ugui",
+        "Unity.InputSystem"
     ],
     "optionalUnityReferences": [
         "TestAssemblies"

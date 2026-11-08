@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="2" result="Passed" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-07 11:06:09Z" end-time="2026-11-07 11:06:10Z" duration="1.4315862">
+  <test-suite type="TestSuite" id="1000" name="My project" fullname="My project" runstate="Runnable" testcasecount="216" result="Passed" start-time="2026-11-07 11:06:09Z" end-time="2026-11-07 11:06:10Z" duration="1.431586" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1222" name="M6Integration.PlayModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/M6Integration.PlayModeTests.dll" runstate="Runnable" testcasecount="187" result="Passed" start-time="2026-11-07 11:06:09Z" end-time="2026-11-07 11:06:10Z" duration="1.347746" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="35276" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <test-suite type="TestSuite" id="1224" name="SDGAdventure" fullname="SDGAdventure" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-11-07 11:06:09Z" end-time="2026-11-07 11:06:10Z" duration="1.342310" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <test-suite type="TestSuite" id="1225" name="Testing" fullname="SDGAdventure.Testing" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-11-07 11:06:09Z" end-time="2026-11-07 11:06:10Z" duration="1.341813" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-suite type="TestFixture" id="1217" name="EcoEnergyPickupPlayModeTests" fullname="SDGAdventure.Testing.EcoEnergyPickupPlayModeTests" classname="SDGAdventure.Testing.EcoEnergyPickupPlayModeTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-11-07 11:06:09Z" end-time="2026-11-07 11:06:10Z" duration="1.340462" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+            </properties>
+            <test-case id="1221" name="QuestionOptionsChangeBetweenLevelEntries" fullname="SDGAdventure.Testing.EcoEnergyPickupPlayModeTests.QuestionOptionsChangeBetweenLevelEntries" methodname="QuestionOptionsChangeBetweenLevelEntries" classname="SDGAdventure.Testing.EcoEnergyPickupPlayModeTests" runstate="Runnable" seed="1287623664" result="Passed" start-time="2026-11-07 11:06:09Z" end-time="2026-11-07 11:06:10Z" duration="1.329023" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="platform" value="PlayMode" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1242" name="M7SharedPlayer.PlayModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/M7SharedPlayer.PlayModeTests.dll" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-11-07 11:06:10Z" end-time="2026-11-07 11:06:10Z" duration="0.073430" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="35276" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <test-suite type="TestSuite" id="1243" name="M7SharedPlayerTests" fullname="M7SharedPlayerTests" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-11-07 11:06:10Z" end-time="2026-11-07 11:06:10Z" duration="0.071468" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <test-suite type="TestFixture" id="1234" name="PlayerSettingsTests" fullname="M7SharedPlayerTests.PlayerSettingsTests" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-11-07 11:06:10Z" end-time="2026-11-07 11:06:10Z" duration="0.070065" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-case id="1239" name="ProneActionRespondsOnlyToCurrentKey" fullname="M7SharedPlayerTests.PlayerSettingsTests.ProneActionRespondsOnlyToCurrentKey" methodname="ProneActionRespondsOnlyToCurrentKey" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="119850207" result="Passed" start-time="2026-11-07 11:06:10Z" end-time="2026-11-07 11:06:10Z" duration="0.067430" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

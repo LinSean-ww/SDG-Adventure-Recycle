@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="1" result="Failed(Child)" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-07 15:28:04Z" end-time="2026-11-07 15:28:05Z" duration="1.2470208">
+  <test-suite type="TestSuite" id="1000" name="My project" fullname="My project" runstate="Runnable" testcasecount="217" result="Failed" site="Child" start-time="2026-11-07 15:28:04Z" end-time="2026-11-07 15:28:05Z" duration="1.247021" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1222" name="M6Integration.PlayModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/M6Integration.PlayModeTests.dll" runstate="Runnable" testcasecount="187" result="Failed" site="Child" start-time="2026-11-07 15:28:04Z" end-time="2026-11-07 15:28:05Z" duration="1.231575" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="47020" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1223" name="M6IntegrationTests" fullname="M6IntegrationTests" runstate="Runnable" testcasecount="174" result="Failed" site="Child" start-time="2026-11-07 15:28:04Z" end-time="2026-11-07 15:28:05Z" duration="1.225418" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestFixture" id="1203" name="M6VisualRuntimeTests" fullname="M6IntegrationTests.M6VisualRuntimeTests" classname="M6IntegrationTests.M6VisualRuntimeTests" runstate="Runnable" testcasecount="1" result="Failed" site="Child" start-time="2026-11-07 15:28:04Z" end-time="2026-11-07 15:28:05Z" duration="1.220466" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-case id="1204" name="DirectVersusSelectionSceneLighting" fullname="M6IntegrationTests.M6VisualRuntimeTests.DirectVersusSelectionSceneLighting" methodname="DirectVersusSelectionSceneLighting" classname="M6IntegrationTests.M6VisualRuntimeTests" runstate="Runnable" seed="303939124" result="Failed" start-time="2026-11-07 15:28:04Z" end-time="2026-11-07 15:28:05Z" duration="1.207732" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  DirectC3 differs from the V15 C3 reference image.
+  Expected: less than or equal to 36
+  But was:  10309
+]]></message>
+              <stack-trace><![CDATA[at M6IntegrationTests.M6VisualRuntimeTests.CompareToCurrentBaseline (UnityEngine.Color32[] actual, System.String label, System.Double darkFraction) [0x0020c] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\M6VisualRuntimeTests.cs:106
+at M6IntegrationTests.M6VisualRuntimeTests.Capture (System.String label) [0x002e0] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\M6VisualRuntimeTests.cs:63
+at M6IntegrationTests.M6VisualRuntimeTests+<DirectVersusSelectionSceneLighting>d__6.MoveNext () [0x00079] in C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\Assets\_Modules_\05_Testing\PlayMode\M6VisualRuntimeTests.cs:123
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@1.3.9\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+            </failure>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

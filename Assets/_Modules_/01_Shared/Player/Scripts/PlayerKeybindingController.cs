@@ -15,7 +15,52 @@ namespace SDGAdventure.SharedPlayer
             this.actions = actions != null ? actions : throw new ArgumentNullException(nameof(actions));
             this.store = store ?? throw new ArgumentNullException(nameof(store));
             Settings = store.Load(actions);
-            MirrorTaskListBinding();
+            // Older versions stored E for interaction before right lean became configurable.
+            var interact = FindAction("Gameplay", "Interact");
+            var rightLean = FindAction("Gameplay", "LeanRight");
+            if (interact != null && rightLean != null &&
+                string.Equals(interact.bindings[0].effectivePath, "<Keyboard>/e", StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(rightLean.bindings[0].effectivePath, "<Keyboard>/e", StringComparison.OrdinalIgnoreCase))
+                interact.ApplyBindingOverride(0, "<Keyboard>/f");
+            MirrorBinding("TaskList");
+            MirrorBinding("Inventory");
+            ResolveDropCollision();
+        }
+
+        // Preserve existing user bindings when the newly introduced default G
+        // overlaps an older override. Move only Drop to a free keyboard key.
+        private void ResolveDropCollision()
+        {
+            InputAction drop = FindAction("Gameplay", "Drop");
+            if (drop == null || drop.bindings.Count == 0) return;
+            bool Occupied(string path)
+            {
+                foreach (InputActionMap map in actions.actionMaps)
+                {
+                    if (!CanCoexist("Gameplay", map.name)) continue;
+                    foreach (InputAction action in map.actions)
+                    {
+                        if (action == drop) continue;
+                        foreach (InputBinding binding in action.bindings)
+                            if (!binding.isComposite && string.Equals(binding.effectivePath, path, StringComparison.OrdinalIgnoreCase)) return true;
+                    }
+                }
+                return false;
+            }
+            if (!Occupied(drop.bindings[0].effectivePath)) return;
+            foreach (string key in new[] { "h", "j", "k", "l", "b", "n", "v", "x", "c", "y", "u", "i", "o", "t" })
+            {
+                string path = "<Keyboard>/" + key;
+                if (Occupied(path)) continue;
+                drop.ApplyBindingOverride(0, path);
+                store.Save(actions, Settings);
+                Debug.LogWarning("Drop binding moved to " + key.ToUpperInvariant() + " to preserve an existing key binding.");
+                return;
+            }
+            // No silent collision: leave Drop unbound until the player chooses a key.
+            drop.ApplyBindingOverride(0, string.Empty);
+            store.Save(actions, Settings);
+            Debug.LogWarning("Drop binding is unassigned because available keys are already in use.");
         }
 
         public void SetSprintMode(ButtonMode mode)
@@ -45,7 +90,7 @@ namespace SDGAdventure.SharedPlayer
             InputAction action = FindAction(mapName, actionName);
             if (action == null || bindingIndex < 0 || bindingIndex >= action.bindings.Count ||
                 action.bindings[bindingIndex].isComposite ||
-                !action.bindings[bindingIndex].effectivePath.StartsWith("<Keyboard>/", StringComparison.OrdinalIgnoreCase))
+                !action.bindings[bindingIndex].path.StartsWith("<Keyboard>/", StringComparison.OrdinalIgnoreCase))
             {
                 error = "The binding is not a rebindable keyboard key.";
                 return false;
@@ -54,15 +99,6 @@ namespace SDGAdventure.SharedPlayer
             if (!TryNormalizeKey(path, out string normalized))
             {
                 error = "Choose a valid keyboard key.";
-                return false;
-            }
-
-            // Q/E are used by the existing lean controls outside the action maps.
-            if (mapName == "Gameplay" && actionName == "Prone" &&
-                (string.Equals(normalized, "<Keyboard>/q", StringComparison.OrdinalIgnoreCase) ||
-                 string.Equals(normalized, "<Keyboard>/e", StringComparison.OrdinalIgnoreCase)))
-            {
-                error = "Already bound to lean.";
                 return false;
             }
 
@@ -84,12 +120,12 @@ namespace SDGAdventure.SharedPlayer
                 }
             }
 
-            if (mapName == "Gameplay" && actionName == "TaskList")
+            if (mapName == "Gameplay" && (actionName == "TaskList" || actionName == "Inventory"))
             {
                 InputActionMap ui = actions.FindActionMap("UI", true);
                 foreach (InputAction other in ui.actions)
                 {
-                    if (other.name == "TaskList") continue;
+                    if (other.name == actionName) continue;
                     for (int i = 0; i < other.bindings.Count; i++)
                     {
                         if (other.bindings[i].isComposite) continue;
@@ -102,7 +138,7 @@ namespace SDGAdventure.SharedPlayer
             }
 
             action.ApplyBindingOverride(bindingIndex, normalized);
-            if (mapName == "Gameplay" && actionName == "TaskList") MirrorTaskListBinding();
+            if (mapName == "Gameplay" && (actionName == "TaskList" || actionName == "Inventory")) MirrorBinding(actionName);
             store.Save(actions, Settings);
             error = null;
             return true;
@@ -115,7 +151,7 @@ namespace SDGAdventure.SharedPlayer
             InputAction action = FindAction(mapName, actionName);
             if (action == null || bindingIndex < 0 || bindingIndex >= action.bindings.Count ||
                 action.bindings[bindingIndex].isComposite ||
-                !action.bindings[bindingIndex].effectivePath.StartsWith("<Keyboard>/", StringComparison.OrdinalIgnoreCase))
+                !action.bindings[bindingIndex].path.StartsWith("<Keyboard>/", StringComparison.OrdinalIgnoreCase))
                 throw new ArgumentException("The binding is not a rebindable keyboard key.");
 
             bool wasEnabled = action.enabled;
@@ -159,10 +195,10 @@ namespace SDGAdventure.SharedPlayer
         private InputAction FindAction(string mapName, string actionName) =>
             actions.FindActionMap(mapName)?.FindAction(actionName);
 
-        private void MirrorTaskListBinding()
+        private void MirrorBinding(string name)
         {
-            InputAction gameplayTask = FindAction("Gameplay", "TaskList");
-            InputAction uiTask = FindAction("UI", "TaskList");
+            InputAction gameplayTask = FindAction("Gameplay", name);
+            InputAction uiTask = FindAction("UI", name);
             if (gameplayTask == null || uiTask == null) return;
             string path = gameplayTask.bindings[0].effectivePath;
             if (!string.Equals(uiTask.bindings[0].effectivePath, path, StringComparison.OrdinalIgnoreCase))
@@ -181,6 +217,12 @@ namespace SDGAdventure.SharedPlayer
             if (string.IsNullOrEmpty(path) || !path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                 return false;
             string name = path.Substring(prefix.Length);
+            // Input System uses paths such as /1, while its enum names are Digit1.
+            if (name.Length == 1 && name[0] >= '0' && name[0] <= '9')
+            {
+                normalized = prefix + name;
+                return true;
+            }
             if (!Enum.TryParse(name, true, out Key key) || key == Key.None || !Enum.IsDefined(typeof(Key), key))
                 return false;
             normalized = prefix + key;
