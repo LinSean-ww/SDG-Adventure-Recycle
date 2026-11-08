@@ -1,7 +1,13 @@
 {
     "name": "SDGAdventure.CompletePlayer.Editor",
     "rootNamespace": "SDGAdventure.CompletePlayer.Editor",
-    "references": ["SDGAdventure.CompletePlayer", "SDGAdventure.SharedPlayer"],
-    "includePlatforms": ["Editor"],
+    "references": [
+        "SDGAdventure.CompletePlayer",
+        "SDGAdventure.SharedPlayer",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
     "autoReferenced": true
 }
