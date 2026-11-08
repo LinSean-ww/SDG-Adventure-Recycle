@@ -17,6 +17,22 @@ namespace SDGAdventure.PlayerControlTests
         private const string ScenePath = "Assets/_Modules_/05_Testing/SharedPlayer/PlayerControlTest.unity";
 
         [Test]
+        public void CMainAndSharedPlayerPrefabHaveNoMissingScripts()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
+            Assert.IsNotNull(prefab);
+            Assert.IsFalse(prefab.GetComponentsInChildren<MonoBehaviour>(true).Any(component => component == null), PrefabPath);
+            const string cMain = "Assets/_Modules_/02_Levels/Level03/Scenes/C_Main.unity";
+            var scene = EditorSceneManager.OpenScene(cMain, OpenSceneMode.Additive);
+            try
+            {
+                Assert.IsFalse(scene.GetRootGameObjects().SelectMany(root => root.GetComponentsInChildren<MonoBehaviour>(true))
+                    .Any(component => component == null), cMain);
+            }
+            finally { EditorSceneManager.CloseScene(scene, true); }
+        }
+
+        [Test]
         public void SharedCanvasFontLoadsWithoutChangingGuiSkin()
         {
             GUISkin source = EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector);

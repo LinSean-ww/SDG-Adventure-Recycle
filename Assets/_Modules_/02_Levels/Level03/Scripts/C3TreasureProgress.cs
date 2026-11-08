@@ -13,6 +13,7 @@ namespace C3TreasurePuzzle
         public const int RequiredCount = 3;
         private readonly HashSet<string> collected = new HashSet<string>();
         public event Action Changed;
+        public bool PartsSubmitted { get; private set; }
         public int CollectedCount => collected.Count;
         public bool AllPartsCollected => collected.Contains(FuseId) && collected.Contains(ChipId) && collected.Contains(FilterId);
         public string Objective => AllPartsCollected ? "零件收集完成，請前往控制台" :
@@ -23,9 +24,29 @@ namespace C3TreasurePuzzle
 
         public bool HasPart(string id) => collected.Contains(id);
 
+        // Collection is a historical quest receipt; submission is a separate,
+        // once-per-scene transition and requires the three items actually held.
+        public bool TrySubmitParts(EcoAdventureRuntime inventoryOwner)
+        {
+            if (PartsSubmitted) return true;
+            if (!AllPartsCollected || !inventoryOwner) return false;
+            var sceneParts = new List<C3CollectiblePart>();
+            foreach (GameObject root in gameObject.scene.GetRootGameObjects())
+                foreach (C3CollectiblePart part in root.GetComponentsInChildren<C3CollectiblePart>(true))
+                    if (part.PartId == FuseId || part.PartId == ChipId || part.PartId == FilterId)
+                        sceneParts.Add(part);
+            if (!inventoryOwner.ConsumeSubmittedParts()) return false;
+            PartsSubmitted = true;
+            foreach (C3CollectiblePart part in sceneParts) if (part) part.MarkSubmitted();
+            inventoryOwner.RefreshInventoryPresentation();
+            LastFeedback = "已提交三種任務零件";
+            Changed?.Invoke();
+            return true;
+        }
+
         public bool TryCollect(string id, string displayName)
         {
-            if (id != FuseId && id != ChipId && id != FilterId) return false;
+            if (PartsSubmitted || (id != FuseId && id != ChipId && id != FilterId)) return false;
             if (!collected.Add(id)) return false;
             LastFeedback = "已取得：" + displayName;
             if (EcoAdventureRuntime.Instance != null)

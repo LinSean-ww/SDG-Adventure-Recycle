@@ -44,18 +44,18 @@ namespace SDGAdventure.PlayerControlTests
                 Assert.AreEqual("<Keyboard>/space", gameplay.FindAction("Jump").bindings[0].effectivePath);
                 Assert.AreEqual("<Keyboard>/leftShift", gameplay.FindAction("Sprint").bindings[0].effectivePath);
                 Assert.AreEqual("<Keyboard>/leftCtrl", gameplay.FindAction("Crouch").bindings[0].effectivePath);
-                Assert.AreEqual("<Keyboard>/e", gameplay.FindAction("Interact").bindings[0].effectivePath);
+                Assert.AreEqual("<Keyboard>/f", gameplay.FindAction("Interact").bindings[0].effectivePath);
                 Assert.AreEqual("<Keyboard>/p", gameplay.FindAction("TaskList").bindings[0].effectivePath);
                 Assert.AreEqual("<Keyboard>/p", actions.FindActionMap("UI").FindAction("TaskList").bindings[0].effectivePath);
                 Assert.AreEqual("<Keyboard>/escape", actions.FindActionMap("Global").FindAction("Pause").bindings[0].effectivePath);
                 Assert.AreEqual(2f, settings.Settings.mouseSensitivity);
                 Assert.IsFalse(settings.TryApply("Gameplay", "Interact", 0, "<Keyboard>/space", out string conflict));
                 StringAssert.Contains("Gameplay/Jump", conflict);
-                Assert.IsFalse(settings.TryApply("Gameplay", "TaskList", 0, "<Keyboard>/e", out conflict));
+                Assert.IsFalse(settings.TryApply("Gameplay", "TaskList", 0, "<Keyboard>/f", out conflict));
                 StringAssert.Contains("Gameplay/Interact", conflict);
                 Assert.IsFalse(settings.TryApply("Gameplay", "TaskList", 0, "<Keyboard>/enter", out conflict));
                 StringAssert.Contains("UI/Submit", conflict);
-                Assert.IsTrue(settings.TryApply("Gameplay", "Interact", 0, "<Keyboard>/g", out string error), error);
+                Assert.IsTrue(settings.TryApply("Gameplay", "Interact", 0, "<Keyboard>/n", out string error), error);
                 Assert.IsTrue(settings.TryApply("Gameplay", "TaskList", 0, "<Keyboard>/o", out error), error);
                 Assert.AreEqual("<Keyboard>/O", actions.FindActionMap("UI").FindAction("TaskList").bindings[0].effectivePath);
                 settings.SetMouseSensitivity(4.5f);
@@ -66,14 +66,14 @@ namespace SDGAdventure.PlayerControlTests
                 try
                 {
                     var loaded = new PlayerKeybindingController(reloaded, store);
-                    Assert.AreEqual("<Keyboard>/G", reloaded.FindActionMap("Gameplay").FindAction("Interact").bindings[0].effectivePath);
+                    Assert.AreEqual("<Keyboard>/N", reloaded.FindActionMap("Gameplay").FindAction("Interact").bindings[0].effectivePath);
                     Assert.AreEqual("<Keyboard>/O", reloaded.FindActionMap("Gameplay").FindAction("TaskList").bindings[0].effectivePath);
                     Assert.AreEqual("<Keyboard>/O", reloaded.FindActionMap("UI").FindAction("TaskList").bindings[0].effectivePath);
                     Assert.AreEqual(4.5f, loaded.Settings.mouseSensitivity);
                     Assert.AreEqual(ButtonMode.Toggle, loaded.Settings.sprintMode);
                     Assert.AreEqual(ButtonMode.Toggle, loaded.Settings.crouchMode);
                     loaded.RestoreDefaults();
-                    Assert.AreEqual("<Keyboard>/e", reloaded.FindActionMap("Gameplay").FindAction("Interact").bindings[0].effectivePath);
+                    Assert.AreEqual("<Keyboard>/f", reloaded.FindActionMap("Gameplay").FindAction("Interact").bindings[0].effectivePath);
                     Assert.AreEqual("<Keyboard>/p", reloaded.FindActionMap("Gameplay").FindAction("TaskList").bindings[0].effectivePath);
                     Assert.AreEqual("<Keyboard>/p", reloaded.FindActionMap("UI").FindAction("TaskList").bindings[0].effectivePath);
                     Assert.AreEqual(2f, loaded.Settings.mouseSensitivity);
@@ -107,7 +107,7 @@ namespace SDGAdventure.PlayerControlTests
                     });
                 operation.Cancel();
                 Assert.IsTrue(called);
-                Assert.AreEqual("<Keyboard>/e", actions.FindActionMap("Gameplay")
+                Assert.AreEqual("<Keyboard>/f", actions.FindActionMap("Gameplay")
                     .FindAction("Interact").bindings[0].effectivePath);
                 Assert.IsFalse(PlayerPrefs.HasKey(key));
             }

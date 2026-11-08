@@ -5,6 +5,8 @@ using SDGAdventure.SharedPlayer;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -176,5 +178,52 @@ namespace M7SharedPlayerTests
             Assert.AreEqual(CursorLockMode.None, PlayerCursor.RequestedLockState);
             Assert.AreEqual(1, Object.FindObjectsByType<PlayerInputService>(FindObjectsSortMode.None).Length);
         }
+        [UnityTest]
+        public IEnumerator BDoorSpawnAcceptsWasdInput()
+        {
+            var background = InputSystem.settings.backgroundBehavior;
+            var editorInput = InputSystem.settings.editorInputBehaviorInPlayMode;
+            InputSystem.settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
+            InputSystem.settings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
+            var keyboard = InputSystem.AddDevice<Keyboard>();
+            InputAction move = null;
+            string[] previous = null;
+            try
+            {
+                yield return SceneManager.LoadSceneAsync(C3, LoadSceneMode.Single);
+                yield return null;
+                var player = GameObject.Find("M2_Player");
+                var service = PlayerInputService.Instance;
+                move = service.Actions.FindAction("Gameplay/Move", true);
+                previous = Enumerable.Range(1, 4).Select(index => move.bindings[index].overridePath).ToArray();
+                string[] paths = { "<Keyboard>/w", "<Keyboard>/s", "<Keyboard>/a", "<Keyboard>/d" };
+                for (int i = 0; i < paths.Length; i++) move.ApplyBindingOverride(i + 1, paths[i]);
+                PlayerCursor.LockState = CursorLockMode.Locked;
+                Key[] keys = { Key.W, Key.S, Key.A, Key.D };
+                Vector3[] directions = { player.transform.forward, -player.transform.forward, -player.transform.right, player.transform.right };
+                for (int i = 0; i < keys.Length; i++)
+                {
+                    Vector3 start = player.transform.position;
+                    InputSystem.QueueStateEvent(keyboard, new KeyboardState(keys[i]));
+                    InputSystem.Update();
+                    yield return new WaitForSeconds(.15f);
+                    InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+                    InputSystem.Update();
+                    yield return null;
+                    Assert.Greater(Vector3.Dot(player.transform.position - start, directions[i]), .05f, keys[i] + " did not move the player.");
+                }
+            }
+            finally
+            {
+                if (move != null && previous != null)
+                    for (int i = 0; i < previous.Length; i++)
+                        if (previous[i] == null) move.RemoveBindingOverride(i + 1);
+                        else move.ApplyBindingOverride(i + 1, previous[i]);
+                InputSystem.RemoveDevice(keyboard);
+                InputSystem.settings.editorInputBehaviorInPlayMode = editorInput;
+                InputSystem.settings.backgroundBehavior = background;
+            }
+        }
+
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 namespace C3TreasurePuzzle
@@ -18,6 +19,8 @@ namespace C3TreasurePuzzle
         private readonly RaycastHit[] visibilityHits = new RaycastHit[32];
         private bool glowing;
         private bool collected;
+        private bool dropped;
+        public bool CanDropFromInventory => collected && !gameObject.activeSelf && progress && !progress.PartsSubmitted && progress.HasPart(partId);
         public bool IsGlowing => glowing;
         public string PartId => partId;
         public override string DisplayName => displayName;
@@ -99,11 +102,78 @@ namespace C3TreasurePuzzle
         private void OnDisable() => ClearCue();
 
         public override bool CanInteract(GameObject actor) =>
-            isActiveAndEnabled && !collected && progress != null && !progress.HasPart(partId);
+            isActiveAndEnabled && progress != null && !progress.PartsSubmitted && (dropped || (!collected && !progress.HasPart(partId)));
+
+        public void MarkSubmitted()
+        {
+            dropped = false;
+            collected = true;
+            Rigidbody body = GetComponent<Rigidbody>();
+            if (body) { body.isKinematic = true; body.detectCollisions = false; }
+            if (gameObject.activeSelf) gameObject.SetActive(false);
+        }
+
+        public bool PrepareDrop(Vector3 position, Vector3 velocity, Collider playerCollider)
+        {
+            if (!CanDropFromInventory) return false;
+            Collider volume = GetComponent<Collider>();
+            if (!volume || volume.isTrigger) return false;
+            transform.SetParent(null, true);
+            transform.position = position;
+            Rigidbody body = GetComponent<Rigidbody>();
+            if (!body) body = gameObject.AddComponent<Rigidbody>();
+            body.isKinematic = true;
+            body.useGravity = true;
+            body.detectCollisions = true;
+            dropped = true;
+            collected = false;
+            gameObject.SetActive(true);
+            if (playerCollider)
+            {
+                Physics.IgnoreCollision(volume, playerCollider, true);
+                StartCoroutine(RestorePlayerCollisionWhenClear(volume, playerCollider));
+            }
+            body.isKinematic = false;
+            body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            body.velocity = velocity;
+            return true;
+        }
+
+        private IEnumerator RestorePlayerCollisionWhenClear(Collider volume, Collider playerCollider)
+        {
+            do
+            {
+                yield return new WaitForFixedUpdate();
+                if (!volume || !playerCollider) yield break;
+            }
+            while (Physics.ComputePenetration(volume, volume.transform.position, volume.transform.rotation,
+                playerCollider, playerCollider.transform.position, playerCollider.transform.rotation,
+                out _, out _));
+            Physics.IgnoreCollision(volume, playerCollider, false);
+        }
+
+        public void RollbackDrop()
+        {
+            Rigidbody body = GetComponent<Rigidbody>();
+            if (body) { body.isKinematic = true; body.detectCollisions = false; }
+            dropped = false;
+            collected = true;
+            gameObject.SetActive(false);
+        }
 
         public override void Interact(GameObject actor)
         {
-            if (!CanInteract(actor) || !progress.TryCollect(partId, displayName)) return;
+            if (!CanInteract(actor)) return;
+            if (dropped)
+            {
+                EcoAdventureRuntime game = EcoAdventureRuntime.Instance;
+                if (!game) return;
+                game.AddItem(partId, displayName);
+                dropped = false;
+                Rigidbody body = GetComponent<Rigidbody>();
+                if (body) { body.isKinematic = true; body.detectCollisions = false; }
+            }
+            else if (!progress.TryCollect(partId, displayName)) return;
             collected = true;
             // TryCollect owns both the once-only quest transition and inventory grant.
             gameObject.SetActive(false);

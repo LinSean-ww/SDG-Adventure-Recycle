@@ -67,6 +67,9 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
 
     private Camera activeCamera;
     private GameObject weaponModel;
+    private EcoQuantumWorldPickup droppedWeapon;
+    private readonly HashSet<string> collectedWorkshopMaterials = new HashSet<string>(StringComparer.Ordinal);
+    private readonly HashSet<EcoMaterialWorldPickup> droppedMaterials = new HashSet<EcoMaterialWorldPickup>();
     private string presentedId;
     private bool inventoryOpen;
     private bool reloading;
@@ -164,7 +167,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
 
     public void AddItem(string id, string displayName, int quantity = 1)
     {
-        if (string.IsNullOrEmpty(id) || quantity <= 0) return;
+        if (string.IsNullOrEmpty(id) || quantity <= 0 || (id == WeaponId && (droppedWeapon || Has(WeaponId)))) return;
         InventoryItem entry = inventory.Find(x => x.id == id);
         if (entry == null)
         {
@@ -172,31 +175,95 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             inventory.Add(entry);
         }
         entry.quantity += quantity;
+        EquipFirstAvailable(id);
         Notify("已取得 " + displayName + " × " + quantity);
+    }
+
+    // All slot mutations pass through these helpers. Inventory quantities remain
+    // independent from slot assignments, including stacks of the same ID.
+    public bool AssignQuickSlot(int target, string id)
+    {
+        RepairQuickSlots();
+        if (target < 0 || target >= quickSlots.Length ||
+            (!string.IsNullOrEmpty(id) && !Has(id))) return false;
+        string previous = quickSlots[target];
+        int source = string.IsNullOrEmpty(id) ? -1 : Array.IndexOf(quickSlots, id);
+        if (source == target) return true;
+        if (source >= 0) quickSlots[source] = previous;
+        quickSlots[target] = string.IsNullOrEmpty(id) ? null : id;
+        RefreshHeldAfterSlotsChanged();
+        return true;
+    }
+
+    public void RepairQuickSlots()
+    {
+        // Preserve the selected copy of an old duplicate so it stays held.
+        string selected = CurrentSlotId();
+        bool changed = false;
+        for (int i = 0; i < quickSlots.Length; i++)
+        {
+            string id = quickSlots[i];
+            if (string.IsNullOrEmpty(id)) continue;
+            bool duplicate = i != selectedSlot && id == selected;
+            for (int j = 0; !duplicate && j < i; j++)
+                duplicate = quickSlots[j] == id;
+            if (!Has(id) || duplicate)
+            { quickSlots[i] = null; changed = true; }
+        }
+        if (changed) RefreshHeldAfterSlotsChanged();
+    }
+
+    private void RefreshHeldAfterSlotsChanged()
+    {
+        if (reloading && !WeaponEquipped()) CancelReload();
+        if (activeCamera != null && presentedId != CurrentSlotId()) BuildHeldModel();
+    }
+
+    private void RemoveSlotsFor(string id)
+    {
+        for (int i = 0; i < quickSlots.Length; i++)
+            if (quickSlots[i] == id) quickSlots[i] = null;
     }
 
     public bool Consume(string id, int count)
     {
+        if (count <= 0) return false;
         InventoryItem entry = inventory.Find(x => x.id == id);
         if (entry == null || entry.quantity < count) return false;
         entry.quantity -= count;
         if (entry.quantity == 0)
         {
             inventory.Remove(entry);
-            for (int i = 0; i < quickSlots.Length; i++)
-                if (quickSlots[i] == id) quickSlots[i] = null;
+            RemoveSlotsFor(id);
+            RefreshHeldAfterSlotsChanged();
         }
         return true;
     }
 
+    // Validates all prerequisites before removing any of the three stacks.
+    public bool ConsumeSubmittedParts()
+    {
+        string[] ids = { C3TreasureProgress.FuseId, C3TreasureProgress.ChipId, C3TreasureProgress.FilterId };
+        foreach (string id in ids) if (!Has(id)) return false;
+        foreach (string id in ids)
+        {
+            inventory.RemoveAll(item => item.id == id);
+            RemoveSlotsFor(id);
+        }
+        return true;
+    }
+
+    public void RefreshInventoryPresentation() => RefreshHeldAfterSlotsChanged();
+
     public void EquipFirstAvailable(string id)
     {
+        RepairQuickSlots();
+        if (string.IsNullOrEmpty(id) || !Has(id) || Array.IndexOf(quickSlots, id) >= 0) return;
+        if (selectedSlot >= 0 && selectedSlot < quickSlots.Length && string.IsNullOrEmpty(quickSlots[selectedSlot]))
+        { AssignQuickSlot(selectedSlot, id); return; }
         for (int i = 0; i < quickSlots.Length; i++)
             if (string.IsNullOrEmpty(quickSlots[i]))
-            {
-                quickSlots[i] = id;
-                return;
-            }
+            { AssignQuickSlot(i, id); return; }
     }
 
     public void FactoryPoweredOn()
@@ -236,8 +303,9 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             return false;
         }
         string id = kind == 0 ? PlasticId : MetalId;
-        if (Has(id) || weaponCrafted) return false;
+        if (Has(id) || weaponCrafted || WasWorkshopMaterialCollected(id)) return false;
         AddItem(id, kind == 0 ? "再生塑膠" : "再生金屬");
+        collectedWorkshopMaterials.Add(id);
         return true;
     }
 
@@ -264,12 +332,13 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             Notify("請先恢復工廠運作");
             return false;
         }
-        if (Has(CircuitId) || weaponCrafted)
+        if (Has(CircuitId) || weaponCrafted || WasWorkshopMaterialCollected(CircuitId))
         {
             Notify("已取回電路板");
             return false;
         }
         AddItem(CircuitId, "廢棄電路板");
+        collectedWorkshopMaterials.Add(CircuitId);
         return true;
     }
 
@@ -280,7 +349,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             Notify("需要先啟動控制器");
             return false;
         }
-        if (weaponCrafted)
+        if (weaponCrafted || Has(WeaponId) || droppedWeapon)
         {
             Notify("循環量子投射器已組裝完成");
             return false;
@@ -297,7 +366,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         weaponCrafted = true;
         AddItem(WeaponId, "循環量子投射器");
         EquipFirstAvailable(WeaponId);
-        Notify("彩蛋解鎖！按 Tab 查看背包，使用 1～5 裝備");
+        Notify("彩蛋解鎖！開啟背包並使用快捷欄裝備");
         return true;
     }
 
@@ -331,6 +400,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
     private void Update()
     {
         BindCamera();
+        RepairQuickSlots();
         Keyboard keyboard = Keyboard.current;
         Mouse mouse = Mouse.current;
         if (keyboard == null) return;
@@ -358,17 +428,25 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             return;
         }
         if (menuOpen) { inventoryOpen = false; return; }
-        if (keyboard.tabKey.wasPressedThisFrame &&
+        if ((input != null ? input.InventoryWasPressed : keyboard.tabKey.wasPressedThisFrame) &&
             (inventoryOpen || GameplayEnabled()))
             ToggleInventory();
 
         if (!GameplayEnabled()) return;
 
-        if (keyboard.digit1Key.wasPressedThisFrame) selectedSlot = 0;
-        if (keyboard.digit2Key.wasPressedThisFrame) selectedSlot = 1;
-        if (keyboard.digit3Key.wasPressedThisFrame) selectedSlot = 2;
-        if (keyboard.digit4Key.wasPressedThisFrame) selectedSlot = 3;
-        if (keyboard.digit5Key.wasPressedThisFrame) selectedSlot = 4;
+        if (input != null)
+        {
+            for (int i = 1; i <= 5; i++)
+                if (input.SlotWasPressed(i)) selectedSlot = i - 1;
+        }
+        else
+        {
+            if (keyboard.digit1Key.wasPressedThisFrame) selectedSlot = 0;
+            if (keyboard.digit2Key.wasPressedThisFrame) selectedSlot = 1;
+            if (keyboard.digit3Key.wasPressedThisFrame) selectedSlot = 2;
+            if (keyboard.digit4Key.wasPressedThisFrame) selectedSlot = 3;
+            if (keyboard.digit5Key.wasPressedThisFrame) selectedSlot = 4;
+        }
 
         // In C3 the existing action-service interactor dispatches quest OR
         // workshop interaction. Retain raw-F fallback in other scenes or when
@@ -379,11 +457,14 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             (c3Interactor == null || !c3Interactor.HandlesInteractionInput))
             InteractWorkshop();
 
+        if (input != null && input.DropWasPressed) TryDropCurrent();
+
         if (reloading && !WeaponEquipped()) CancelReload();
         if (presentedId != CurrentSlotId()) BuildHeldModel();
         if (WeaponEquipped())
         {
-            if (keyboard.rKey.wasPressedThisFrame && !reloading && ammoInMagazine < MagazineCapacity && reserveAmmo > 0)
+            if ((input != null ? input.ReloadWasPressed : keyboard.rKey.wasPressedThisFrame) &&
+                !reloading && ammoInMagazine < MagazineCapacity && reserveAmmo > 0)
                 reloadRoutine = StartCoroutine(Reload());
             if (FirePressed(mouse)) Shoot();
         }
@@ -407,6 +488,231 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
     {
         return selectedSlot >= 0 && selectedSlot < quickSlots.Length
             ? quickSlots[selectedSlot] : null;
+    }
+
+    // The original scene-owned quest object is the world representation. Its
+    // quest receipt is separate and remains completed during drop and pickup.
+    private C3CollectiblePart FindPart(string id)
+    {
+        if (!activeCamera || activeCamera.gameObject.scene.name != "C_Main") return null;
+        foreach (GameObject root in activeCamera.gameObject.scene.GetRootGameObjects())
+            foreach (C3CollectiblePart part in root.GetComponentsInChildren<C3CollectiblePart>(true))
+                if (part.PartId == id) return part;
+        return null;
+    }
+
+    private bool TryDropCurrent()
+    {
+        string id = CurrentSlotId();
+        if (string.IsNullOrEmpty(id) || !Has(id) || !activeCamera) return false;
+        if (id == WeaponId) return TryDropQuantumWeapon();
+        if (IsWorkshopMaterial(id)) return TryDropWorkshopMaterial(id);
+        C3CollectiblePart part = FindPart(id);
+        CharacterController player = activeCamera.GetComponentInParent<CharacterController>();
+        if (!part || !part.CanDropFromInventory || !player)
+        {
+            Notify("此物品目前無法安全丟棄");
+            return false;
+        }
+        Vector3 forward = Vector3.ProjectOnPlane(activeCamera.transform.forward, Vector3.up).normalized;
+        if (forward.sqrMagnitude < .01f) forward = player.transform.forward;
+        Vector3 origin = player.transform.TransformPoint(player.center);
+        float distance = player.radius + .8f;
+        const float clearance = .52f;
+        // Ignore only the player's own colliders; walls and floors block placement.
+        foreach (RaycastHit hit in Physics.SphereCastAll(origin, clearance, forward, distance, ~0, QueryTriggerInteraction.Ignore))
+            if (hit.collider && !hit.collider.transform.IsChildOf(player.transform))
+            { Notify("前方空間不足，無法丟棄"); return false; }
+        Vector3 position = origin + forward * distance;
+        foreach (Collider obstacle in Physics.OverlapSphere(position, clearance, ~0, QueryTriggerInteraction.Ignore))
+            if (obstacle && !obstacle.transform.IsChildOf(player.transform))
+            { Notify("前方空間不足，無法丟棄"); return false; }
+        if (!part.PrepareDrop(position, forward * 1.2f + Vector3.up * .35f, player)) return false;
+        // No asynchronous work intervenes between the checked inventory and debit.
+        if (!Consume(id, 1)) { part.RollbackDrop(); return false; }
+        presentedId = null;
+        BuildHeldModel();
+        return true;
+    }
+
+    private static bool IsWorkshopMaterial(string id) => id == PlasticId || id == MetalId || id == CircuitId;
+    public bool WasWorkshopMaterialCollected(string id) => !string.IsNullOrEmpty(id) && collectedWorkshopMaterials.Contains(id);
+    private static string MaterialName(string id) => id == PlasticId ? "再生塑膠" : id == MetalId ? "再生金屬" : "廢棄電路板";
+
+    private bool TryDropWorkshopMaterial(string id)
+    {
+        if (!activeCamera || activeCamera.gameObject.scene.name != "C_Main" || !Has(id)) return false;
+        Transform source = FindMaterialVisual(id);
+        CharacterController player = activeCamera.GetComponentInParent<CharacterController>();
+        if (!source || !player) { Notify("找不到材料原模型，無法安全丟棄"); return false; }
+        Vector3 forward = Vector3.ProjectOnPlane(activeCamera.transform.forward, Vector3.up).normalized;
+        if (forward.sqrMagnitude < .01f) forward = player.transform.forward;
+        Vector3 origin = player.transform.TransformPoint(player.center);
+        float distance = player.radius + .8f;
+        const float clearance = .52f;
+        foreach (RaycastHit hit in Physics.SphereCastAll(origin, clearance, forward, distance, ~0, QueryTriggerInteraction.Ignore))
+            if (hit.collider && !hit.collider.transform.IsChildOf(player.transform))
+            { Notify("前方空間不足，無法丟棄"); return false; }
+        Vector3 position = origin + forward * distance;
+        foreach (Collider obstacle in Physics.OverlapSphere(position, clearance, ~0, QueryTriggerInteraction.Ignore))
+            if (obstacle && !obstacle.transform.IsChildOf(player.transform))
+            { Notify("前方空間不足，無法丟棄"); return false; }
+
+        InventoryItem before = inventory.Find(x => x.id == id);
+        int quantityBefore = before.quantity;
+        GameObject world = null;
+        EcoMaterialWorldPickup pickup = null;
+        try
+        {
+            world = new GameObject("DroppedWorkshopMaterial_" + id);
+            world.SetActive(false);
+            SceneManager.MoveGameObjectToScene(world, activeCamera.gameObject.scene);
+            pickup = world.AddComponent<EcoMaterialWorldPickup>();
+            if (!pickup.Prepare(this, id, MaterialName(id), source, position, Quaternion.LookRotation(forward)))
+            { Destroy(world); return false; }
+            world.SetActive(true);
+            pickup.Launch(forward * 1.0f + Vector3.up * .25f, player);
+            if (!Consume(id, 1)) { world.SetActive(false); Destroy(world); return false; }
+            droppedMaterials.Add(pickup);
+            collectedWorkshopMaterials.Add(id);
+            pickup.Commit();
+            return true;
+        }
+        catch (Exception exception)
+        {
+            if (pickup) droppedMaterials.Remove(pickup);
+            if (world) { world.SetActive(false); Destroy(world); }
+            InventoryItem after = inventory.Find(x => x.id == id);
+            int remaining = after != null ? after.quantity : 0;
+            if (remaining < quantityBefore) AddItem(id, MaterialName(id), quantityBefore - remaining);
+            Debug.LogException(exception);
+            Notify("材料掉落失敗");
+            return false;
+        }
+    }
+
+    public bool IsDroppedMaterial(EcoMaterialWorldPickup pickup) => pickup && droppedMaterials.Contains(pickup);
+    public bool RecoverDroppedMaterial(EcoMaterialWorldPickup pickup, string id, string name)
+    {
+        if (!IsWorkshopMaterial(id) || !IsDroppedMaterial(pickup)) return false;
+        droppedMaterials.Remove(pickup);
+        pickup.gameObject.SetActive(false);
+        AddItem(id, name, 1);
+        Destroy(pickup.gameObject);
+        return true;
+    }
+    public void DroppedMaterialDestroyed(EcoMaterialWorldPickup pickup, string id, string name)
+    {
+        if (!droppedMaterials.Remove(pickup) || !IsWorkshopMaterial(id)) return;
+        AddItem(id, name, 1);
+    }
+
+    private bool TryDropQuantumWeapon()
+    {
+        if (!activeCamera || activeCamera.gameObject.scene.name != "C_Main" || droppedWeapon || !WeaponEquipped()) return false;
+        InventoryItem entry = inventory.Find(x => x.id == WeaponId);
+        CharacterController player = activeCamera.GetComponentInParent<CharacterController>();
+        if (entry == null || entry.quantity != 1 || !player)
+        { Notify("武器狀態不明，無法安全丟棄"); return false; }
+        Vector3 forward = Vector3.ProjectOnPlane(activeCamera.transform.forward, Vector3.up).normalized;
+        if (forward.sqrMagnitude < .01f) forward = player.transform.forward;
+        Vector3 origin = player.transform.TransformPoint(player.center);
+        float distance = player.radius + 1.0f;
+        const float clearance = .65f; // Encloses the scaled, asymmetric rifle collider.
+        foreach (RaycastHit hit in Physics.SphereCastAll(origin, clearance, forward, distance, ~0, QueryTriggerInteraction.Ignore))
+            if (hit.collider && !hit.collider.transform.IsChildOf(player.transform))
+            { Notify("前方空間不足，無法丟棄"); return false; }
+        Vector3 position = origin + forward * distance;
+        foreach (Collider obstacle in Physics.OverlapSphere(position, clearance, ~0, QueryTriggerInteraction.Ignore))
+            if (obstacle && !obstacle.transform.IsChildOf(player.transform))
+            { Notify("前方空間不足，無法丟棄"); return false; }
+
+        GameObject world = null;
+        try
+        {
+            world = new GameObject("DroppedQuantumProjector");
+            world.SetActive(false);
+            SceneManager.MoveGameObjectToScene(world, activeCamera.gameObject.scene);
+            EcoQuantumWorldPickup pickup = world.AddComponent<EcoQuantumWorldPickup>();
+            pickup.Prepare(this, position, Quaternion.LookRotation(forward), player);
+            world.SetActive(true);
+            pickup.Launch(forward * 1.0f + Vector3.up * .25f, player);
+            droppedWeapon = pickup;
+            if (!Consume(WeaponId, 1))
+            {
+                droppedWeapon = null;
+                world.SetActive(false);
+                Destroy(world);
+                return false;
+            }
+            pickup.Commit();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            if (world) { world.SetActive(false); Destroy(world); }
+            droppedWeapon = null;
+            if (!Has(WeaponId)) AddItem(WeaponId, "循環量子投射器");
+            Debug.LogException(ex);
+            Notify("武器掉落失敗");
+            return false;
+        }
+    }
+
+    // The persistent runtime remains the only owner of magazine/reserve values;
+    // the world representation carries no independent copy of ammunition.
+    public bool IsWorldQuantumWeapon(EcoQuantumWorldPickup pickup) => droppedWeapon == pickup && !Has(WeaponId);
+
+    public bool RecoverQuantumWeapon(EcoQuantumWorldPickup pickup)
+    {
+        if (!pickup || droppedWeapon != pickup || Has(WeaponId)) return false;
+        droppedWeapon = null;
+        pickup.gameObject.SetActive(false);
+        AddItem(WeaponId, "循環量子投射器");
+        Destroy(pickup.gameObject);
+        return true;
+    }
+
+    // A scene unload or accidental external destruction must not delete the
+    // only weapon. The same runtime retains both ammunition values.
+    public void WorldQuantumWeaponDestroyed(EcoQuantumWorldPickup pickup)
+    {
+        if (droppedWeapon != pickup) return;
+        droppedWeapon = null;
+        if (!Has(WeaponId)) AddItem(WeaponId, "循環量子投射器");
+    }
+
+    private Transform FindMaterialVisual(string id)
+    {
+        if (!activeCamera || activeCamera.gameObject.scene.name != "C_Main") return null;
+        foreach (GameObject root in activeCamera.gameObject.scene.GetRootGameObjects())
+            foreach (EcoWorkshopInteractable cache in root.GetComponentsInChildren<EcoWorkshopInteractable>(true))
+                if (cache.MaterialItemId == id)
+                    return cache.transform.Find("V11_CacheContents_Visual");
+        return null;
+    }
+
+    // Copy only the existing meshes, transforms and shared materials; no gameplay,
+    // physics, hint overlays or source data are copied to the held presentation.
+    internal static void CopyPartVisual(Transform source, Transform target)
+    {
+        foreach (Transform child in source)
+        {
+            if (child.name.StartsWith("V11_HintOverlay_", StringComparison.Ordinal) || child.name == "NearbyPartGlow_DoNotCollect") continue;
+            GameObject copy = new GameObject(child.name);
+            copy.transform.SetParent(target, false);
+            copy.transform.localPosition = child.localPosition;
+            copy.transform.localRotation = child.localRotation;
+            copy.transform.localScale = child.localScale;
+            MeshRenderer renderer = child.GetComponent<MeshRenderer>();
+            MeshFilter filter = child.GetComponent<MeshFilter>();
+            if (renderer && renderer.enabled && filter && filter.sharedMesh)
+            {
+                copy.AddComponent<MeshFilter>().sharedMesh = filter.sharedMesh;
+                copy.AddComponent<MeshRenderer>().sharedMaterials = renderer.sharedMaterials;
+            }
+            CopyPartVisual(child, copy.transform);
+        }
     }
 
     private bool WeaponEquipped()
@@ -498,14 +804,17 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
                 visual.SetThirdPersonPresentation(rig, thirdPerson, aiming);
                 if (thirdPerson) return; // Final visual pose is owned by the view after the camera rig.
             }
-            Transform parent = thirdPerson ? rig.transform : activeCamera.transform;
+            C3WorkerAppearance worker = thirdPerson ? rig.GetComponent<C3WorkerAppearance>() : null;
+            Transform parent = thirdPerson && worker && worker.ItemHand ? worker.ItemHand :
+                thirdPerson ? rig.transform : activeCamera.transform;
+            bool handAttached = thirdPerson && worker && parent == worker.ItemHand;
             if (weaponModel.transform.parent != parent)
             {
                 weaponModel.transform.SetParent(parent, false);
-                weaponModel.transform.localPosition = thirdPerson
+                weaponModel.transform.localPosition = handAttached ? Vector3.zero : thirdPerson
                     ? new Vector3(0.23f, 1.03f, 0.23f) : new Vector3(0.32f, -0.29f, 0.55f);
             }
-            Vector3 localTarget = thirdPerson ? new Vector3(0.23f, 1.03f, 0.23f) :
+            Vector3 localTarget = handAttached ? Vector3.zero : thirdPerson ? new Vector3(0.23f, 1.03f, 0.23f) :
                 aiming ? new Vector3(0f, -0.20f, 0.52f) :
                          new Vector3(0.32f, -0.29f, 0.55f);
             weaponModel.transform.localPosition = Vector3.Lerp(
@@ -517,10 +826,12 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
 
     private void Shoot()
     {
-        if (reloading || Time.time < nextShotTime) return;
+        if (!WeaponEquipped() || reloading || Time.time < nextShotTime) return;
         if (ammoInMagazine <= 0)
         {
-            Notify("能量彈匣已用盡，按 R 更換");
+            PlayerInputService input = PlayerInputService.Instance;
+            string reloadKey = input != null ? input.Keybindings.BindingDisplay("Gameplay", "Reload", 0) : "R";
+            Notify("能量彈匣已用盡，按 " + reloadKey + " 更換");
             nextShotTime = Time.time + 0.3f;
             return;
         }
@@ -552,7 +863,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
 
     private IEnumerator Reload()
     {
-        if (reloading || ammoInMagazine >= MagazineCapacity || reserveAmmo <= 0) yield break;
+        if (!WeaponEquipped() || reloading || ammoInMagazine >= MagazineCapacity || reserveAmmo <= 0) yield break;
         reloading = true;
         EcoQuantumWeaponView visual = weaponModel != null ? weaponModel.GetComponent<EcoQuantumWeaponView>() : null;
         if (visual != null) visual.BeginReload();
@@ -584,7 +895,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
     private void BuildHeldModel()
     {
         presentedId = CurrentSlotId();
-        if (weaponModel != null) Destroy(weaponModel);
+        if (weaponModel != null) { weaponModel.SetActive(false); Destroy(weaponModel); }
         weaponModel = null;
         string selected = CurrentSlotId();
         if (activeCamera == null || string.IsNullOrEmpty(selected) || !Has(selected)) return;
@@ -594,16 +905,18 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         weaponModel.transform.localPosition = new Vector3(0.32f, -0.29f, 0.55f);
         if (selected != WeaponId)
         {
-            bool fuse = selected == C3TreasureProgress.FuseId;
-            bool chip = selected == C3TreasureProgress.ChipId;
-            bool filter = selected == C3TreasureProgress.FilterId;
-            Color color = fuse ? new Color(1f, 0.58f, 0.11f) :
-                chip ? new Color(0.15f, 0.8f, 1f) :
-                filter ? new Color(0.23f, 0.83f, 0.40f) :
-                new Color(0.5f, 0.72f, 0.65f);
-            AddGunPart(fuse || filter ? PrimitiveType.Cylinder : PrimitiveType.Cube,
-                "Held_" + selected, Vector3.zero,
-                new Vector3(0.13f, 0.16f, 0.13f), color);
+            C3CollectiblePart part = FindPart(selected);
+            Transform source = part ? part.transform : FindMaterialVisual(selected);
+            if (!source)
+            {
+                Destroy(weaponModel);
+                weaponModel = null;
+                return;
+            }
+            GameObject visual = new GameObject(part ? "OriginalPartVisual" : "OriginalWorkshopMaterialVisual");
+            visual.transform.SetParent(weaponModel.transform, false);
+            visual.transform.localScale = part ? part.transform.lossyScale * .5f : Vector3.one * .6f;
+            CopyPartVisual(source, visual.transform);
             return;
         }
         EcoQuantumWeaponView appearance = weaponModel.AddComponent<EcoQuantumWeaponView>();
@@ -655,7 +968,9 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             string name = item != null ? item.name : "空手";
             float x = width * 0.5f - 250f + i * 100f;
             GUI.Box(new Rect(x, height - 70f, 98f, 54f),
-                (selectedSlot == i ? "▼ " : "") + (i + 1) + "  " + name);
+                (selectedSlot == i ? "▼ " : "") + (PlayerInputService.Instance != null
+                    ? PlayerInputService.Instance.Keybindings.BindingDisplay("Gameplay", "Slot" + (i + 1), 0)
+                    : (i + 1).ToString()) + "  " + name);
         }
         if (WeaponEquipped())
         {
@@ -694,24 +1009,180 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         float px = width * 0.5f - 270, py = Mathf.Max(30, height * 0.5f - 260);
         GUI.Box(new Rect(px, py, 540, 520), "背包 INVENTORY");
         GUI.Label(new Rect(px + 24, py + 36, 490, 24),
-            "先按 1～5 選擇快捷欄，背包開啟後點選物品裝備。");
+            "先選擇快捷欄，背包開啟後點選物品裝備。");
         for (int i = 0; i < inventory.Count && i < 12; i++)
         {
             InventoryItem entry = inventory[i];
             if (GUI.Button(new Rect(px + 24, py + 66 + i * 32f, 488, 29),
                 entry.name + "  ×" + entry.quantity))
             {
-                quickSlots[selectedSlot] = entry.id;
-                presentedId = null;
+                AssignQuickSlot(selectedSlot, entry.id);
             }
         }
         if (GUI.Button(new Rect(px + 24, py + 452, 231, 36),
             "清空目前快捷欄（空手）"))
         {
-            quickSlots[selectedSlot] = null;
-            presentedId = null;
+            AssignQuickSlot(selectedSlot, null);
         }
-        if (GUI.Button(new Rect(px + 283, py + 452, 229, 36), "關閉背包 [Tab]"))
+        if (GUI.Button(new Rect(px + 283, py + 452, 229, 36), "關閉背包"))
             ToggleInventory();
+    }
+}
+
+// Scene representation only. Inventory and ammunition remain owned by the
+// persistent EcoAdventureRuntime, never by this visual/interaction component.
+public sealed class EcoQuantumWorldPickup : C3Interactable
+{
+    private EcoAdventureRuntime owner;
+    private C3VisualBuilder art;
+    private Rigidbody body;
+    private BoxCollider volume;
+    private bool committed;
+    public override string DisplayName => "循環量子投射器";
+
+    public void Prepare(EcoAdventureRuntime runtime, Vector3 position, Quaternion rotation, Collider player)
+    {
+        owner = runtime;
+        transform.SetPositionAndRotation(position, rotation);
+        art = new C3VisualBuilder();
+        // The exact same geometry and palette builder as EcoQuantumWeaponView.
+        art.QuantumRifle(transform, .60f);
+        volume = gameObject.AddComponent<BoxCollider>();
+        volume.center = new Vector3(0f, -.025f, .105f);
+        volume.size = new Vector3(.24f, .36f, 1.02f);
+        body = gameObject.AddComponent<Rigidbody>();
+        body.isKinematic = true;
+        body.useGravity = true;
+        body.mass = 1.5f;
+        body.drag = .4f;
+        body.angularDrag = 1.5f;
+        gameObject.AddComponent<C3ProximityHint>().Configure(new Color(.2f, .85f, 1f));
+    }
+
+    public void Launch(Vector3 velocity, Collider player)
+    {
+        if (player && volume)
+        {
+            Physics.IgnoreCollision(volume, player, true);
+            StartCoroutine(RestoreCollisionWhenClear(player));
+        }
+        body.isKinematic = false;
+        body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        body.velocity = velocity;
+    }
+
+    public void Commit() => committed = true;
+    public override bool CanInteract(GameObject actor) => isActiveAndEnabled && committed && owner && owner.IsWorldQuantumWeapon(this);
+    public override void Interact(GameObject actor)
+    {
+        if (CanInteract(actor)) owner.RecoverQuantumWeapon(this);
+    }
+
+    private IEnumerator RestoreCollisionWhenClear(Collider player)
+    {
+        do
+        {
+            yield return new WaitForFixedUpdate();
+            if (!volume || !player) yield break;
+        }
+        while (Physics.ComputePenetration(volume, transform.position, transform.rotation,
+            player, player.transform.position, player.transform.rotation, out _, out _));
+        Physics.IgnoreCollision(volume, player, false);
+    }
+
+    private void OnDestroy()
+    {
+        if (committed && owner) owner.WorldQuantumWeaponDestroyed(this);
+        C3ProximityHint hint = GetComponent<C3ProximityHint>();
+        if (hint) hint.ReleaseVisuals();
+        foreach (Renderer renderer in GetComponentsInChildren<Renderer>(true))
+            if (renderer) renderer.sharedMaterials = Array.Empty<Material>();
+        if (art != null) art.Dispose();
+    }
+}
+
+// One scene object represents exactly one unit. The persistent inventory owner
+// tracks committed objects and recovers them if the scene unloads unexpectedly.
+public sealed class EcoMaterialWorldPickup : C3Interactable
+{
+    private EcoAdventureRuntime owner;
+    private string itemId, itemName;
+    private Rigidbody body;
+    private BoxCollider volume;
+    private bool committed;
+    public override string DisplayName => itemName;
+
+    public bool Prepare(EcoAdventureRuntime runtime, string id, string name, Transform source,
+        Vector3 position, Quaternion rotation)
+    {
+        if (!runtime || !source) return false;
+        owner = runtime; itemId = id; itemName = name;
+        transform.SetPositionAndRotation(position, rotation);
+        var visual = new GameObject("OriginalWorkshopMaterialVisual");
+        visual.transform.SetParent(transform, false);
+        visual.transform.localScale = Vector3.one * .6f; // same scale and source as the held model
+        EcoAdventureRuntime.CopyPartVisual(source, visual.transform);
+        Bounds bounds = default(Bounds);
+        bool any = false;
+        foreach (MeshFilter filter in visual.GetComponentsInChildren<MeshFilter>(true))
+        {
+            if (!filter.sharedMesh) continue;
+            Bounds mesh = filter.sharedMesh.bounds;
+            for (int corner = 0; corner < 8; corner++)
+            {
+                Vector3 point = mesh.center + Vector3.Scale(mesh.extents, new Vector3(
+                    (corner & 1) == 0 ? -1f : 1f, (corner & 2) == 0 ? -1f : 1f,
+                    (corner & 4) == 0 ? -1f : 1f));
+                point = transform.InverseTransformPoint(filter.transform.TransformPoint(point));
+                if (!any) { bounds = new Bounds(point, Vector3.zero); any = true; }
+                else bounds.Encapsulate(point);
+            }
+        }
+        if (!any) return false;
+        volume = gameObject.AddComponent<BoxCollider>();
+        volume.center = bounds.center;
+        volume.size = Vector3.Max(bounds.size + Vector3.one * .02f, Vector3.one * .04f);
+        body = gameObject.AddComponent<Rigidbody>();
+        body.isKinematic = true; body.useGravity = true;
+        body.mass = .5f; body.drag = .4f; body.angularDrag = 1.5f;
+        Color color = id == EcoAdventureRuntime.CircuitId ? new Color(.2f, .8f, 1f) :
+            id == EcoAdventureRuntime.MetalId ? new Color(1f, .65f, .2f) : new Color(.2f, 1f, .4f);
+        gameObject.AddComponent<C3ProximityHint>().Configure(color);
+        return true;
+    }
+
+    public void Launch(Vector3 velocity, Collider player)
+    {
+        if (player && volume)
+        {
+            Physics.IgnoreCollision(volume, player, true);
+            StartCoroutine(RestoreCollisionWhenClear(player));
+        }
+        body.isKinematic = false;
+        body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        body.velocity = velocity;
+    }
+    public void Commit() => committed = true;
+    public override bool CanInteract(GameObject actor) => isActiveAndEnabled && committed && owner && owner.IsDroppedMaterial(this);
+    public override void Interact(GameObject actor)
+    {
+        if (CanInteract(actor)) owner.RecoverDroppedMaterial(this, itemId, itemName);
+    }
+    private IEnumerator RestoreCollisionWhenClear(Collider player)
+    {
+        do
+        {
+            yield return new WaitForFixedUpdate();
+            if (!volume || !player) yield break;
+        }
+        while (Physics.ComputePenetration(volume, transform.position, transform.rotation,
+            player, player.transform.position, player.transform.rotation, out _, out _));
+        Physics.IgnoreCollision(volume, player, false);
+    }
+    private void OnDestroy()
+    {
+        if (committed && owner) owner.DroppedMaterialDestroyed(this, itemId, itemName);
+        C3ProximityHint hint = GetComponent<C3ProximityHint>();
+        if (hint) hint.ReleaseVisuals();
     }
 }

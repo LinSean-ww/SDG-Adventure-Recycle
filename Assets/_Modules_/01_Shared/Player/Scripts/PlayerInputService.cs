@@ -74,6 +74,19 @@ namespace SDGAdventure.SharedPlayer
         public bool CrouchActive => Context == PlayerInputContext.Gameplay &&
             (Keybindings.Settings.crouchMode == ButtonMode.Hold ? crouch.IsPressed() : crouchToggled);
 
+        public bool LeanLeftActive => Context == PlayerInputContext.Gameplay && leanLeft.IsPressed();
+        public bool LeanRightActive => Context == PlayerInputContext.Gameplay && leanRight.IsPressed();
+        public bool InventoryWasPressed => Context == PlayerInputContext.Gameplay ? inventory.WasPressedThisFrame() :
+            Context == PlayerInputContext.UI && uiInventory.WasPressedThisFrame();
+        public bool SlotWasPressed(int slot) => Context == PlayerInputContext.Gameplay &&
+            slot >= 1 && slot <= slots.Length && slots[slot - 1].WasPressedThisFrame();
+        public event Action InventoryPressed;
+        // Slot numbers are 1-based.
+        public event Action<int> SlotPressed;
+        public bool ReloadWasPressed => Context == PlayerInputContext.Gameplay && reload.WasPressedThisFrame();
+        public event Action ReloadPressed;
+        public bool DropWasPressed => Context == PlayerInputContext.Gameplay && drop.WasPressedThisFrame();
+        public event Action DropPressed;
         public event Action JumpPressed;
         public event Action PronePressed;
         public event Action InteractPressed;
@@ -87,8 +100,12 @@ namespace SDGAdventure.SharedPlayer
         private InputActionMap gameplay;
         private InputActionMap global;
         private InputActionMap ui;
+        private InputAction leanLeft, leanRight, inventory, uiInventory;
+        private InputAction[] slots;
         private InputAction move;
         private InputAction look;
+        private InputAction reload;
+        private InputAction drop;
         private InputAction jump;
         private InputAction sprint;
         private InputAction crouch;
@@ -131,8 +148,16 @@ namespace SDGAdventure.SharedPlayer
             gameplay = actions.FindActionMap("Gameplay", true);
             global = actions.FindActionMap("Global", true);
             ui = actions.FindActionMap("UI", true);
+            leanLeft = gameplay.FindAction("LeanLeft", true);
+            leanRight = gameplay.FindAction("LeanRight", true);
+            inventory = gameplay.FindAction("Inventory", true);
+            uiInventory = ui.FindAction("Inventory", true);
+            slots = new InputAction[5];
+            for (int i = 0; i < slots.Length; i++) slots[i] = gameplay.FindAction("Slot" + (i + 1), true);
             move = gameplay.FindAction("Move", true);
             look = gameplay.FindAction("Look", true);
+            reload = gameplay.FindAction("Reload", true);
+            drop = gameplay.FindAction("Drop", true);
             jump = gameplay.FindAction("Jump", true);
             sprint = gameplay.FindAction("Sprint", true);
             crouch = gameplay.FindAction("Crouch", true);
@@ -144,15 +169,12 @@ namespace SDGAdventure.SharedPlayer
             uiSubmit = ui.FindAction("Submit", true);
             uiTaskList = ui.FindAction("TaskList", true);
             Keybindings = new PlayerKeybindingController(actions, new PlayerSettingsStore());
-            // Upgrade saved legacy E interaction bindings to F, reserving E for right lean.
-            for (int i = 0; i < interact.bindings.Count; i++)
-            {
-                if (string.Equals(interact.bindings[i].effectivePath,
-                    "<Keyboard>/e", StringComparison.OrdinalIgnoreCase))
-                    interact.ApplyBindingOverride(i, "<Keyboard>/f");
-            }
+            inventory.performed += OnInventory;
+            uiInventory.performed += OnInventory;
+            foreach (var slot in slots) slot.performed += OnSlot;
 
-
+            reload.performed += OnReload;
+            drop.performed += OnDrop;
             jump.performed += OnJump;
             sprint.performed += OnSprint;
             crouch.performed += OnCrouch;
@@ -208,6 +230,14 @@ namespace SDGAdventure.SharedPlayer
         }
 
         private void OnSceneUnloaded(Scene _) => SetContext(PlayerInputContext.Inactive);
+        private void OnInventory(InputAction.CallbackContext _) => InventoryPressed?.Invoke();
+        private void OnSlot(InputAction.CallbackContext context)
+        {
+            for (int i = 0; i < slots.Length; i++)
+                if (context.action == slots[i]) { SlotPressed?.Invoke(i + 1); break; }
+        }
+        private void OnReload(InputAction.CallbackContext _) => ReloadPressed?.Invoke();
+        private void OnDrop(InputAction.CallbackContext _) => DropPressed?.Invoke();
         private void OnJump(InputAction.CallbackContext _) => JumpPressed?.Invoke();
         private void OnProne(InputAction.CallbackContext _) => PronePressed?.Invoke();
         private void OnSprint(InputAction.CallbackContext _) { if (Keybindings.Settings.sprintMode == ButtonMode.Toggle) sprintToggled = !sprintToggled; }
@@ -226,6 +256,11 @@ namespace SDGAdventure.SharedPlayer
             if (actions != null)
             {
                 actions.Disable();
+                inventory.performed -= OnInventory;
+                uiInventory.performed -= OnInventory;
+                foreach (var slot in slots) slot.performed -= OnSlot;
+                reload.performed -= OnReload;
+                drop.performed -= OnDrop;
                 jump.performed -= OnJump;
                 sprint.performed -= OnSprint;
                 crouch.performed -= OnCrouch;

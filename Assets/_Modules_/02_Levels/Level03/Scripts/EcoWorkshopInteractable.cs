@@ -10,6 +10,7 @@ public sealed class EcoWorkshopInteractable : MonoBehaviour
     [SerializeField] private EcoFactoryWorkshop workshop;
     [SerializeField] private StationKind kind;
     private bool claimed;
+    private bool legacyMaterialHidden;
 
     // Material caches expose their identity to the HUD only when the player is nearby.
     // A collected or disabled cache is never a hint candidate.
@@ -18,6 +19,10 @@ public sealed class EcoWorkshopInteractable : MonoBehaviour
 
     public bool IsUnclaimedMaterialCache => IsMaterialCache && !claimed &&
         isActiveAndEnabled && gameObject.activeInHierarchy;
+
+    public string MaterialItemId => kind == StationKind.PlasticMaterial ? EcoAdventureRuntime.PlasticId :
+        kind == StationKind.MetalMaterial ? EcoAdventureRuntime.MetalId :
+        kind == StationKind.CircuitMaterial ? EcoAdventureRuntime.CircuitId : null;
 
     public string MaterialDisplayName => kind == StationKind.PlasticMaterial ? "再生塑膠" :
         kind == StationKind.MetalMaterial ? "再生金屬" :
@@ -66,6 +71,33 @@ public sealed class EcoWorkshopInteractable : MonoBehaviour
                 ? "[F] 組裝量子武器（材料已齊）"
                 : "[F] 檢查組裝所缺材料（探索全廠找三種材料）";
         }
+    }
+
+    private void Start()
+    {
+        if (IsMaterialCache && EcoAdventureRuntime.Instance &&
+            EcoAdventureRuntime.Instance.WasWorkshopMaterialCollected(MaterialItemId))
+        { claimed = true; gameObject.SetActive(false); return; }
+        HideLegacyMaterialWhenReady();
+    }
+
+    private void LateUpdate()
+    {
+        if (IsMaterialCache && !legacyMaterialHidden) HideLegacyMaterialWhenReady();
+    }
+
+    private void HideLegacyMaterialWhenReady()
+    {
+        if (!IsMaterialCache) return;
+        Transform actual = transform.Find("V11_CacheContents_Visual");
+        if (!actual || actual.GetComponentsInChildren<MeshRenderer>(true).Length == 0) return;
+        Transform old = transform.Find("VisibleSalvagedMaterial");
+        if (old)
+        {
+            Renderer renderer = old.GetComponent<Renderer>();
+            if (renderer) renderer.enabled = false;
+        }
+        legacyMaterialHidden = true;
     }
 
     public void Configure(EcoFactoryWorkshop owner, StationKind stationKind)

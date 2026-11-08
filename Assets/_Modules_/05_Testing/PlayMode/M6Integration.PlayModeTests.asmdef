@@ -4,7 +4,8 @@
     "references": [
         "SDGAdventure.TestOutput",
         "SDGAdventure.SharedPlayer",
-        "Unity.ugui"
+        "Unity.ugui",
+        "Unity.InputSystem"
     ],
     "optionalUnityReferences": [
         "TestAssemblies"

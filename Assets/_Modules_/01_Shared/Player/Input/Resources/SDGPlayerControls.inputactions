@@ -58,6 +58,66 @@
           "type": "Button",
           "id": "b75c2675-2bf8-4b0e-9dcc-d1b285d17fb5",
           "expectedControlType": "Button"
+        },
+        {
+          "name": "LeanLeft",
+          "type": "Button",
+          "id": "535f60f5-22f2-4391-9bb7-506b644c601d",
+          "expectedControlType": "Button"
+        },
+        {
+          "name": "LeanRight",
+          "type": "Button",
+          "id": "4a9b3629-4bdd-44b6-ae1e-cd7f50bafbab",
+          "expectedControlType": "Button"
+        },
+        {
+          "name": "Inventory",
+          "type": "Button",
+          "id": "46c8ef27-5c2e-46d4-a3ae-c8a1f9ac0df6",
+          "expectedControlType": "Button"
+        },
+        {
+          "name": "Slot1",
+          "type": "Button",
+          "id": "c04f94ca-34ef-4b81-aa05-8b9352be1a5c",
+          "expectedControlType": "Button"
+        },
+        {
+          "name": "Slot2",
+          "type": "Button",
+          "id": "c65e63df-a909-49ac-8313-5dfc0b01c991",
+          "expectedControlType": "Button"
+        },
+        {
+          "name": "Slot3",
+          "type": "Button",
+          "id": "1a5e0bfa-cf83-4114-bd72-300773d7852e",
+          "expectedControlType": "Button"
+        },
+        {
+          "name": "Slot4",
+          "type": "Button",
+          "id": "407061d3-6ab0-487b-bbc8-3d8e5fec1a4b",
+          "expectedControlType": "Button"
+        },
+        {
+          "name": "Slot5",
+          "type": "Button",
+          "id": "c112ea09-366a-4327-b2ce-65cdf49b644f",
+          "expectedControlType": "Button"
+        },
+        {
+          "name": "Reload",
+          "type": "Button",
+          "id": "46b737c3-df1c-4c8f-af22-cc339349ca30",
+          "expectedControlType": "Button"
+        },
+        {
+          "name": "Drop",
+          "type": "Button",
+          "id": "2c19c94a-615a-4faa-b154-fbe427ca76e1",
+          "expectedControlType": "Button"
         }
       ],
       "bindings": [
@@ -123,7 +183,7 @@
         {
           "name": "",
           "id": "1048f100-b3d9-4566-99fb-8ec35b0c6404",
-          "path": "<Keyboard>/e",
+          "path": "<Keyboard>/f",
           "action": "Interact"
         },
         {
@@ -143,6 +203,66 @@
           "id": "8c8f16bb-ebaa-4d30-9b34-1ef933fa9fe1",
           "path": "<Keyboard>/z",
           "action": "Prone"
+        },
+        {
+          "name": "",
+          "id": "62868d7a-12dc-4194-9627-796b30e1d42c",
+          "path": "<Keyboard>/q",
+          "action": "LeanLeft"
+        },
+        {
+          "name": "",
+          "id": "b89a1c0f-500b-40fb-b159-0b6b23f249bf",
+          "path": "<Keyboard>/e",
+          "action": "LeanRight"
+        },
+        {
+          "name": "",
+          "id": "9e63e181-0175-4bd0-8a4a-d4347d98d096",
+          "path": "<Keyboard>/tab",
+          "action": "Inventory"
+        },
+        {
+          "name": "",
+          "id": "7292c3ab-6b73-41ad-8e34-15fa564cc240",
+          "path": "<Keyboard>/1",
+          "action": "Slot1"
+        },
+        {
+          "name": "",
+          "id": "7730f3c1-59f0-47f7-bc55-cd8ae336c9d3",
+          "path": "<Keyboard>/2",
+          "action": "Slot2"
+        },
+        {
+          "name": "",
+          "id": "b6f6c0e4-60c6-4f97-a5b7-84b62b4ca1c6",
+          "path": "<Keyboard>/3",
+          "action": "Slot3"
+        },
+        {
+          "name": "",
+          "id": "e525f8da-674e-4cc9-8dc5-4334f1f0a3c3",
+          "path": "<Keyboard>/4",
+          "action": "Slot4"
+        },
+        {
+          "name": "",
+          "id": "2837370e-6745-4184-b752-07bcb2aa94e2",
+          "path": "<Keyboard>/5",
+          "action": "Slot5"
+        },
+        {
+          "name": "",
+          "id": "6db9a2fc-be4f-4e54-b4fe-85c8d6c0ca62",
+          "path": "<Keyboard>/r",
+          "action": "Reload"
+        },
+        {
+          "name": "",
+          "id": "86892f9d-e4be-4b83-9b3f-2b054fe75ab8",
+          "path": "<Keyboard>/g",
+          "action": "Drop"
         }
       ]
     },
@@ -192,6 +312,12 @@
           "name": "TaskList",
           "type": "Button",
           "id": "fc294546-1664-473d-8c47-16cb2b0cfdaf",
+          "expectedControlType": "Button"
+        },
+        {
+          "name": "Inventory",
+          "type": "Button",
+          "id": "19cd0fbd-c3d9-4d15-90ee-889272d5673d",
           "expectedControlType": "Button"
         }
       ],
@@ -248,6 +374,12 @@
           "id": "76b8599a-564e-42fb-9aba-32ac3ca5071b",
           "path": "<Keyboard>/p",
           "action": "TaskList"
+        },
+        {
+          "name": "",
+          "id": "fb3d908c-e18b-413c-9db0-0f4e3207b6b1",
+          "path": "<Keyboard>/tab",
+          "action": "Inventory"
         }
       ]
     }

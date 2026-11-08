@@ -187,7 +187,7 @@ namespace C3TreasurePuzzle
             prompt.text = target == null ? "" :
                 target is EcoEnergyPickup ? target.DisplayName + "  [裝備武器後靠近]" :
                 target.DisplayName + "  [" + key + "] " +
-                (target is C3CollectiblePart ? "拾取" : "互動");
+                (target is C3CollectiblePart || target is EcoQuantumWorldPickup || target is EcoMaterialWorldPickup ? "拾取" : "互動");
             if (showTask)
             {
                 PlayerPauseMenu menu = interactor.GetComponent<PlayerPauseMenu>();

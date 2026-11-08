@@ -19,6 +19,7 @@ namespace C3TreasurePuzzle
         private EcoQuantumWeaponView weaponOwner;
         private const float UpperArmLength=.34f, ForearmLength=.33f;
         private bool HoldingWeapon => weaponOwner && weaponOwner.UsesThirdPersonPresentation;
+        public Transform ItemHand => rightHand;
         public float WeaponLeanAmount => controller?controller.VisualLeanAmount:0f;
         private float phase;
         private PlayerPerspectiveRig perspective;

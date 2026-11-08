@@ -321,8 +321,8 @@ namespace C3TreasurePuzzle
             float target = 0f;
             if (enabledInput)
             {
-                if (keyboard.qKey.isPressed) target = -1f;
-                if (keyboard.eKey.isPressed) target = 1f;
+                if (sharedInput != null ? sharedInput.LeanLeftActive : keyboard.qKey.isPressed) target = -1f;
+                if (sharedInput != null ? sharedInput.LeanRightActive : keyboard.eKey.isPressed) target = 1f;
             }
             if (target != 0f)
             {

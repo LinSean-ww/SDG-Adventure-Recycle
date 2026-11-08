@@ -72,6 +72,14 @@ namespace C3TreasurePuzzle
             if (!isActiveAndEnabled || panelOpen || activePanel != null || progress == null || puzzle == null || device == null ||
                 device.LevelCompleted || C3CompletionScreen.BlocksGameplayInputThisFrame || !progress.AllPartsCollected) return false;
             if (device.IsActivated && !ProductionInputAvailable) return false;
+            // Opening the console for the first time is the accepted hand-in.
+            // A collection receipt alone is insufficient if a part is on the ground.
+            if (!progress.PartsSubmitted && !progress.TrySubmitParts(EcoAdventureRuntime.Instance))
+            {
+                feedback = "請先持有保險絲、控制晶片及過濾模組，再提交控制台。";
+                noticeUntil = Time.unscaledTime + 4f;
+                return false;
+            }
             selection.Clear();
             Mode=device.IsActivated?ConsoleMode.ProductionControl:puzzle.PuzzleSolved?ConsoleMode.Activation:ConsoleMode.Puzzle;
             feedback = Mode==ConsoleMode.ProductionControl?ProductionStatus:

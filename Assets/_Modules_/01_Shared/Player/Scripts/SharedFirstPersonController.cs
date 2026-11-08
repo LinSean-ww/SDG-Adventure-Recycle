@@ -187,8 +187,8 @@ namespace SDGAdventure.SharedPlayer
             float target = 0f;
             if (allowed)
             {
-                if (keyboard.qKey.isPressed) target = -1f;
-                if (keyboard.eKey.isPressed) target = 1f;
+                if (input.LeanLeftActive) target = -1f;
+                if (input.LeanRightActive) target = 1f;
             }
             if (target != 0f)
             {
