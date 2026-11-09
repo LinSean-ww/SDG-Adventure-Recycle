@@ -41,7 +41,7 @@ namespace SDGAdventure.ModuleSystem
         {
             if (!canvasObject || !canvasObject.activeSelf || !coordinator) return;
             float width = Mathf.Min(600, Screen.width - 32);
-            panelRect.sizeDelta = new Vector2(width, 350);
+            panelRect.sizeDelta = new Vector2(width, 420);
             launchRect.sizeDelta = new Vector2(width - 40, 50);
             ModuleResult? last = coordinator.LastResult;
             result.text = last.HasValue ? "最近結果：" + last.Value.ModuleId + (last.Value.Completed ? " 通關" : " 未完成") : "";
@@ -62,7 +62,7 @@ namespace SDGAdventure.ModuleSystem
             CanvasScaler scaler = canvasObject.GetComponent<CanvasScaler>(); scaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
             GameObject panel = new GameObject("Panel", typeof(RectTransform), typeof(Image)); panel.transform.SetParent(canvasObject.transform, false);
             panelRect = (RectTransform)panel.transform; panelRect.anchorMin = panelRect.anchorMax = panelRect.pivot = new Vector2(0.5f, 1f);
-            panelRect.anchoredPosition = new Vector2(0, -40); panelRect.sizeDelta = new Vector2(600, 350); panel.GetComponent<Image>().color = new Color(0.22f, 0.22f, 0.22f, 0.95f);
+            panelRect.anchoredPosition = new Vector2(0, -40); panelRect.sizeDelta = new Vector2(600, 420); panel.GetComponent<Image>().color = new Color(0.22f, 0.22f, 0.22f, 0.95f);
             Font font = PlayerGuiFont.Load();
             AddText(panel.transform, font, "SDG Adventure｜M6 開發驗證選關入口", 14, 130, 28);
             AddText(panel.transform, font, "僅供整合驗證；不是正式遊戲 UI。", 14, 81, 44);
@@ -83,8 +83,16 @@ namespace SDGAdventure.ModuleSystem
             level01Button.onClick.AddListener(() =>
             { if (!coordinator.TryLaunch("level01", out string message)) error.text = message; });
             level01.GetComponentInChildren<Text>().text = "進入第一關";
-            result = AddText(panel.transform, font, "", 14, -95, 44);
-            error = AddText(panel.transform, font, "", 14, -145, 50);
+            GameObject level04 = Instantiate(buttonObject, panel.transform);
+            level04.name = "LaunchLevel04";
+            ((RectTransform)level04.transform).anchoredPosition = new Vector2(0, -96);
+            Button level04Button = level04.GetComponent<Button>();
+            level04Button.onClick.RemoveAllListeners();
+            level04Button.onClick.AddListener(() =>
+            { if (!coordinator.TryLaunch("level04", out string message)) error.text = message; });
+            level04.GetComponentInChildren<Text>().text = "進入第四關";
+            result = AddText(panel.transform, font, "", 14, -155, 44);
+            error = AddText(panel.transform, font, "", 14, -195, 50);
         }
 
         private static Text AddText(Transform parent, Font font, string value, int size, float y, float height)

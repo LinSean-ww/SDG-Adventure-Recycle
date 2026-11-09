@@ -75,6 +75,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
     private bool inventoryOpen;
     private bool reloading;
     private float nextShotTime;
+    private float nextPlasmaShotTime;
     private int totalShots;
     private string message = "";
     private float messageEnd;
@@ -168,7 +169,8 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
 
     public void AddItem(string id, string displayName, int quantity = 1)
     {
-        if (string.IsNullOrEmpty(id) || quantity <= 0 || (id == WeaponId && (droppedWeapon || Has(WeaponId)))) return;
+        if (string.IsNullOrEmpty(id) || quantity <= 0 || (id == WeaponId && (droppedWeapon || Has(WeaponId))) ||
+            (id == SDGAdventure.Level04.Level04PlasmaPickup.WeaponId && (quantity != 1 || Has(id) || SDGAdventure.Level04.Level04PlasmaPickup.HasDroppedWeapon))) return;
         InventoryItem entry = inventory.Find(x => x.id == id);
         if (entry == null)
         {
@@ -398,6 +400,9 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         return mouse != null && mouse.leftButton.isPressed;
     }
 
+    private static bool CarryingLevel04TaskItem => SDGAdventure.Level04.Level04RecycleController.Instance && SDGAdventure.Level04.Level04RecycleController.Instance.Carried;
+    public string CarriedTaskItemText => CarryingLevel04TaskItem ? "任務攜帶：" + SDGAdventure.Level04.Level04RecycleController.ItemName(SDGAdventure.Level04.Level04RecycleController.Instance.Carried.itemType) + " ×1" : "";
+
     private void Update()
     {
         BindCamera();
@@ -435,12 +440,12 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
 
         if (!GameplayEnabled()) return;
 
-        if (input != null)
+        if (input != null && !CarryingLevel04TaskItem)
         {
             for (int i = 1; i <= 5; i++)
                 if (input.SlotWasPressed(i)) selectedSlot = i - 1;
         }
-        else
+        else if (input == null && !CarryingLevel04TaskItem)
         {
             if (keyboard.digit1Key.wasPressedThisFrame) selectedSlot = 0;
             if (keyboard.digit2Key.wasPressedThisFrame) selectedSlot = 1;
@@ -458,7 +463,14 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             (c3Interactor == null || !c3Interactor.HandlesInteractionInput))
             InteractWorkshop();
 
-        if (input != null && input.DropWasPressed) TryDropCurrent();
+        if (input != null && input.DropWasPressed &&
+            !SDGAdventure.Level04.Level04RecycleController.TryHandleDrop()) TryDropCurrent();
+
+        if (CarryingLevel04TaskItem)
+        {
+            if (reloading) CancelReload();
+            return;
+        }
 
         if (reloading && !WeaponEquipped()) CancelReload();
         if (presentedId != CurrentSlotId()) BuildHeldModel();
@@ -470,6 +482,8 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             if ((input == null || !input.GameplayActionsBlocked) && FirePressed(mouse)) Shoot();
         }
 
+        if (CurrentSlotId() == SDGAdventure.Level04.Level04PlasmaPickup.WeaponId && Has(CurrentSlotId()) &&
+            input != null && !input.GameplayActionsBlocked && input.PrimaryPressed) ShootPlasma();
         if (presentedId != CurrentSlotId())
             BuildHeldModel();
     }
@@ -482,7 +496,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             service.SetContext(inventoryOpen ? PlayerInputContext.UI : PlayerInputContext.Gameplay);
         PlayerCursor.LockState = inventoryOpen ? CursorLockMode.None : CursorLockMode.Locked;
         Cursor.visible = inventoryOpen;
-        if (!inventoryOpen) presentedId = null;
+        if (!inventoryOpen && !CarryingLevel04TaskItem) presentedId = null;
     }
 
     private string CurrentSlotId()
@@ -507,6 +521,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         string id = CurrentSlotId();
         if (string.IsNullOrEmpty(id) || !Has(id) || !activeCamera) return false;
         if (id == WeaponId) return TryDropQuantumWeapon();
+        if (id == SDGAdventure.Level04.Level04PlasmaPickup.WeaponId) return SDGAdventure.Level04.Level04PlasmaPickup.TryDrop(this, activeCamera);
         if (IsWorkshopMaterial(id)) return TryDropWorkshopMaterial(id);
         C3CollectiblePart part = FindPart(id);
         CharacterController player = activeCamera.GetComponentInParent<CharacterController>();
@@ -610,7 +625,8 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
 
     private bool TryDropQuantumWeapon()
     {
-        if (!activeCamera || activeCamera.gameObject.scene.name != "C_Main" || droppedWeapon || !WeaponEquipped()) return false;
+        if (!activeCamera || (activeCamera.gameObject.scene.name != "C_Main" &&
+            activeCamera.gameObject.scene.path != "Assets/_Modules_/02_Levels/Level04/Imported/Scenes/SampleScene.unity") || droppedWeapon || !WeaponEquipped()) return false;
         InventoryItem entry = inventory.Find(x => x.id == WeaponId);
         CharacterController player = activeCamera.GetComponentInParent<CharacterController>();
         if (entry == null || entry.quantity != 1 || !player)
@@ -636,6 +652,8 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             SceneManager.MoveGameObjectToScene(world, activeCamera.gameObject.scene);
             EcoQuantumWorldPickup pickup = world.AddComponent<EcoQuantumWorldPickup>();
             pickup.Prepare(this, position, Quaternion.LookRotation(forward), player);
+            if (activeCamera.gameObject.scene.path == "Assets/_Modules_/02_Levels/Level04/Imported/Scenes/SampleScene.unity")
+                world.AddComponent<SDGAdventure.Level04.Level04ProximityHint>();
             world.SetActive(true);
             pickup.Launch(forward * 1.0f + Vector3.up * .25f, player);
             droppedWeapon = pickup;
@@ -799,6 +817,13 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             BuildHeldModel();
         if (weaponModel != null)
         {
+            bool showHeldWeapon = !CarryingLevel04TaskItem;
+            if (weaponModel.activeSelf != showHeldWeapon) weaponModel.SetActive(showHeldWeapon);
+            if (!showHeldWeapon)
+            {
+                if (reloading) CancelReload();
+                return;
+            }
             PlayerPerspectiveRig rig = activeCamera.GetComponentInParent<PlayerPerspectiveRig>();
             bool thirdPerson = rig != null && rig.IsThirdPerson;
             EcoQuantumWeaponView visual = weaponModel.GetComponent<EcoQuantumWeaponView>();
@@ -854,14 +879,29 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             destination = hit.point;
             surfaceHit = true;
             // Enemy damage uses the aim ray; the player's third-person body is excluded.
-            hit.collider.SendMessageUpwards("TakeDamage", 15f,
-                SendMessageOptions.DontRequireReceiver);
+            BossHealth level04Boss = hit.collider.GetComponentInParent<BossHealth>();
+            if (level04Boss != null && activeCamera.gameObject.scene.path == "Assets/_Modules_/02_Levels/Level04/Imported/Scenes/SampleScene.unity")
+                level04Boss.TakeDamage(1);
+            else hit.collider.SendMessageUpwards("TakeDamage", 15f, SendMessageOptions.DontRequireReceiver);
             break;
         }
         // One presentation path, driven by the unchanged hitscan result above.
         EcoQuantumWeaponView presentation = weaponModel != null
             ? weaponModel.GetComponent<EcoQuantumWeaponView>() : null;
         if (presentation != null) presentation.OnShot(destination, surfaceHit);
+    }
+
+    private void ShootPlasma()
+    {
+        if (activeCamera == null || Time.time < nextPlasmaShotTime) return;
+        nextPlasmaShotTime = Time.time + .4f;
+        Ray ray = new Ray(activeCamera.transform.position, activeCamera.transform.forward);
+        Vector3 target = ray.GetPoint(100f);
+        var hits = Physics.RaycastAll(ray, 100f, ~0, QueryTriggerInteraction.Ignore);
+        Array.Sort(hits, (a,b) => a.distance.CompareTo(b.distance));
+        var player = activeCamera.GetComponentInParent<CharacterController>();
+        foreach (var hit in hits) { if (player && hit.collider.transform.IsChildOf(player.transform)) continue; target=hit.point; var boss=hit.collider.GetComponentInParent<BossHealth>(); if(boss) boss.TakeDamage(1); break; }
+        SDGAdventure.Level04.Level04PlasmaPickup.ShowShot(weaponModel ? weaponModel.transform : null, activeCamera.transform.position + activeCamera.transform.forward * .6f, target);
     }
 
     private IEnumerator Reload()
@@ -906,6 +946,13 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             "EcoQuantumProjector_ViewModel" : "HeldInventoryItem");
         weaponModel.transform.SetParent(activeCamera.transform, false);
         weaponModel.transform.localPosition = new Vector3(0.32f, -0.29f, 0.55f);
+        if (selected == SDGAdventure.Level04.Level04PlasmaPickup.WeaponId)
+        {
+            var model = SDGAdventure.Level04.Level04PlasmaPickup.CreateModel(weaponModel.transform);
+            if (!model) { Destroy(weaponModel); weaponModel = null; }
+            else weaponModel.AddComponent<SDGAdventure.Level04.Level04WeaponPose>().Bind(activeCamera);
+            return;
+        }
         if (selected != WeaponId)
         {
             C3CollectiblePart part = FindPart(selected);
@@ -925,6 +972,9 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         EcoQuantumWeaponView appearance = weaponModel.AddComponent<EcoQuantumWeaponView>();
         appearance.AttachTo(activeCamera.transform);
         appearance.SetVisible(true);
+        if (activeCamera.gameObject.scene.path == "Assets/_Modules_/02_Levels/Level04/Imported/Scenes/SampleScene.unity" &&
+            activeCamera.GetComponentInParent<SDGAdventure.CompletePlayer.CompletePlayerWorkerAppearance>())
+            weaponModel.AddComponent<SDGAdventure.Level04.Level04WeaponPose>().Bind(activeCamera);
         weaponModel.transform.localPosition = new Vector3(0.32f, -0.29f, 0.55f);
     }
 
@@ -954,6 +1004,19 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         }
     }
 
+    public string QuickSlotDisplay(int index)
+    {
+        if (index < 0 || index >= quickSlots.Length) return "";
+        InventoryItem item = inventory.Find(x => x.id == quickSlots[index]);
+        string name = item != null ? item.name : "空手";
+        if (CarryingLevel04TaskItem && selectedSlot == index)
+            return "任務：" + SDGAdventure.Level04.Level04RecycleController.ItemName(SDGAdventure.Level04.Level04RecycleController.Instance.Carried.itemType) + " ×1\n原：" + name;
+        string binding = PlayerInputService.Instance != null
+            ? PlayerInputService.Instance.Keybindings.BindingDisplay("Gameplay", "Slot" + (index + 1), 0)
+            : (index + 1).ToString();
+        return (selectedSlot == index && !CarryingLevel04TaskItem ? "▼ " : "") + binding + "  " + name;
+    }
+
     private void OnGUI()
     {
         if (Instance != this || activeCamera == null) return;
@@ -966,14 +1029,8 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         int width = Screen.width, height = Screen.height;
         for (int i = 0; i < 5; i++)
         {
-            string id = quickSlots[i];
-            InventoryItem item = inventory.Find(x => x.id == id);
-            string name = item != null ? item.name : "空手";
             float x = width * 0.5f - 250f + i * 100f;
-            GUI.Box(new Rect(x, height - 70f, 98f, 54f),
-                (selectedSlot == i ? "▼ " : "") + (PlayerInputService.Instance != null
-                    ? PlayerInputService.Instance.Keybindings.BindingDisplay("Gameplay", "Slot" + (i + 1), 0)
-                    : (i + 1).ToString()) + "  " + name);
+            GUI.Box(new Rect(x, height - 70f, 98f, 54f), QuickSlotDisplay(i));
         }
         if (WeaponEquipped())
         {
@@ -1010,31 +1067,34 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         if (!inventoryOpen) return;
 
         float px = width * 0.5f - 270, py = Mathf.Max(30, height * 0.5f - 260);
-        GUI.Box(new Rect(px, py, 540, 520), "背包 INVENTORY");
+        string carriedTask = CarriedTaskItemText;
+        float taskOffset = string.IsNullOrEmpty(carriedTask) ? 0f : 24f;
+        GUI.Box(new Rect(px, py, 540, 520 + taskOffset), "背包 INVENTORY");
         GUI.Label(new Rect(px + 24, py + 36, 490, 24),
             "先選擇快捷欄，背包開啟後點選物品裝備。");
+        if (taskOffset > 0f) GUI.Label(new Rect(px + 24, py + 62, 490, 24), carriedTask);
         for (int i = 0; i < inventory.Count && i < 12; i++)
         {
             InventoryItem entry = inventory[i];
-            if (GUI.Button(new Rect(px + 24, py + 66 + i * 32f, 488, 29),
+            if (GUI.Button(new Rect(px + 24, py + 66 + taskOffset + i * 32f, 488, 29),
                 entry.name + "  ×" + entry.quantity))
             {
                 AssignQuickSlot(selectedSlot, entry.id);
             }
         }
-        if (GUI.Button(new Rect(px + 24, py + 452, 231, 36),
+        if (GUI.Button(new Rect(px + 24, py + 452 + taskOffset, 231, 36),
             "清空目前快捷欄（空手）"))
         {
             AssignQuickSlot(selectedSlot, null);
         }
-        if (GUI.Button(new Rect(px + 283, py + 452, 229, 36), "關閉背包"))
+        if (GUI.Button(new Rect(px + 283, py + 452 + taskOffset, 229, 36), "關閉背包"))
             ToggleInventory();
     }
 }
 
 // Scene representation only. Inventory and ammunition remain owned by the
 // persistent EcoAdventureRuntime, never by this visual/interaction component.
-public sealed class EcoQuantumWorldPickup : C3Interactable
+public sealed class EcoQuantumWorldPickup : C3Interactable, IPlayerInteractable
 {
     private EcoAdventureRuntime owner;
     private C3VisualBuilder art;
@@ -1042,6 +1102,7 @@ public sealed class EcoQuantumWorldPickup : C3Interactable
     private BoxCollider volume;
     private bool committed;
     public override string DisplayName => "循環量子投射器";
+    public string Prompt => "拾取循環量子投射器";
 
     public void Prepare(EcoAdventureRuntime runtime, Vector3 position, Quaternion rotation, Collider player)
     {

@@ -68,6 +68,13 @@ namespace C3TreasurePuzzle
             }
         }
 
+        public void ContinueToNext()
+        {
+            if (!visible || restarting || ModuleCoordinator.Instance == null) return;
+            if (!ModuleCoordinator.Instance.TryLaunchNext(out string error))
+                Debug.LogWarning("C3 next level unavailable: " + error);
+        }
+
         public void ReturnToSelection()
         {
             if (!visible || ModuleCoordinator.Instance == null) return;

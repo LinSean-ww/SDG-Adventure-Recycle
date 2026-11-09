@@ -59,6 +59,27 @@ namespace SDGAdventure.ModuleSystem
             return true;
         }
 
+        // Ordered campaign progression never skips an unavailable level. The
+        // persistent inventory owner survives the ordinary single-scene load.
+        public bool TryLaunchNext(out string error)
+        {
+            if (!completionReceived || !LastResult.HasValue || !LastResult.Value.Completed ||
+                LastResult.Value.ModuleId != CurrentModuleId)
+            { error = "The current module has not reported completion."; return false; }
+
+            string next;
+            switch (CurrentModuleId)
+            {
+                case "level01": next = "level02"; break;
+                case "level02": next = "c3_treasure_puzzle"; break;
+                case "c3_treasure_puzzle": next = "level04"; break;
+                default: error = "No next module is available."; return false;
+            }
+            if (!ModuleRegistry.TryGet(next, out _))
+            { error = "The next module is not installed: " + next; return false; }
+            return TryLaunch(next, out error);
+        }
+
         public bool RestartCurrent(out string error)
         {
             if (!ModuleRegistry.TryGet(CurrentModuleId, out ModuleDefinition module))

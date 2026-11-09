@@ -25,6 +25,28 @@ namespace SDGAdventure.SharedPlayer
         private CharacterController motor;
         private PlayerInputService input;
         private float verticalSpeed;
+        private Vector3 externalHorizontalVelocity;
+        private float externalControlLock;
+        private bool externalImpulseActive;
+        public bool IsExternallyDisplaced => externalImpulseActive;
+
+        public void ApplyExternalImpulse(Vector3 velocity, float controlLockSeconds)
+        {
+            externalHorizontalVelocity = Vector3.ProjectOnPlane(velocity, transform.up);
+            verticalSpeed = Mathf.Max(0f, Vector3.Dot(velocity, transform.up));
+            externalControlLock = Mathf.Max(0f, controlLockSeconds);
+            externalImpulseActive = true;
+            jumpQueued = false;
+        }
+
+        public void ClearExternalImpulse()
+        {
+            externalHorizontalVelocity = Vector3.zero;
+            externalControlLock = 0f;
+            externalImpulseActive = false;
+            verticalSpeed = 0f;
+            jumpQueued = false;
+        }
         private float pitch;
         private float standingStepOffset;
         private bool jumpQueued;
@@ -123,6 +145,13 @@ namespace SDGAdventure.SharedPlayer
         {
             if (deltaTime <= 0f || motor == null) return;
             bool grounded = IsGrounded;
+            if (externalImpulseActive)
+            {
+                externalControlLock = Mathf.Max(0f, externalControlLock - deltaTime);
+                movement = Vector2.zero;
+                jump = false;
+                if (verticalSpeed > 0f) grounded = false;
+            }
             bool blockedFromStanding = !prone && !crouch &&
                 motor.height < standingHeight - 0.01f && !CanStand();
             float target = prone ? Mathf.Clamp(proneHeight, motor.radius * 2f, crouchingHeight) :
@@ -159,14 +188,19 @@ namespace SDGAdventure.SharedPlayer
                 ? perspective.GetThirdPersonTravel(movement)
                 : (transform.right * movement.x + transform.forward * movement.y);
             if (perspective != null) perspective.FaceTravel(travel, deltaTime);
-            Vector3 horizontal = travel * CurrentSpeed;
+            Vector3 horizontal = travel * CurrentSpeed + externalHorizontalVelocity;
             if (grounded && verticalSpeed < 0f) verticalSpeed = -2f;
             if (jump && !IsCrouching && grounded)
                 verticalSpeed = Mathf.Sqrt(2f * gravity * jumpHeight);
             verticalSpeed -= gravity * deltaTime;
             CollisionFlags collision = motor.Move((horizontal + Vector3.up * verticalSpeed) * deltaTime);
             if ((collision & CollisionFlags.Above) != 0 && verticalSpeed > 0f) verticalSpeed = 0f;
-            if ((collision & CollisionFlags.Below) != 0 && verticalSpeed < 0f) verticalSpeed = -2f;
+            if ((collision & CollisionFlags.Below) != 0 && verticalSpeed < 0f)
+            {
+                verticalSpeed = -2f;
+                if (externalImpulseActive && externalControlLock <= 0f)
+                { externalImpulseActive = false; externalHorizontalVelocity = Vector3.zero; }
+            }
         }
 
         private void ToggleProne()
@@ -241,8 +275,7 @@ namespace SDGAdventure.SharedPlayer
         {
             motor.enabled = false;
             transform.SetPositionAndRotation(position, rotation);
-            verticalSpeed = 0f;
-            jumpQueued = false;
+            ClearExternalImpulse();
             motor.enabled = true;
         }
     }

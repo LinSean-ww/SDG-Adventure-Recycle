@@ -54,6 +54,10 @@ namespace M7SharedPlayerTests
                 var coordinatorType = Runtime("SDGAdventure.ModuleSystem.ModuleCoordinator");
                 coordinator = coordinatorType.GetProperty("Instance").GetValue(null);
                 Assert.NotNull(coordinator);
+                var launchNext = coordinatorType.GetMethod("TryLaunchNext");
+                object[] nextArgs = { null };
+                Assert.IsFalse((bool)launchNext.Invoke(coordinator, nextArgs), "Cannot advance before completion");
+                Assert.AreEqual("WTF", SceneManager.GetActiveScene().name);
                 completionEvent = coordinatorType.GetEvent("Completed");
                 var counter = new Counter();
                 var method = typeof(Counter).GetMethod("OnCompleted").MakeGenericMethod(Runtime("SDGAdventure.ModuleSystem.ModuleResult"));
@@ -101,6 +105,10 @@ namespace M7SharedPlayerTests
                     yield return null;
                 }
                 Assert.AreEqual(1, counter.Count, "Crossing exit must report exactly once");
+                nextArgs[0] = null;
+                Assert.IsFalse((bool)launchNext.Invoke(coordinator, nextArgs), "Missing Level02 must not be skipped");
+                StringAssert.Contains("level02", (string)nextArgs[0]);
+                Assert.AreEqual("WTF", SceneManager.GetActiveScene().name, "Unavailable next level must leave the current scene active");
                 Assert.AreEqual(PlayerInputContext.UI, input.Context);
                 Assert.AreEqual(CursorLockMode.None, PlayerCursor.LockState);
                 Assert.AreEqual(0f, Time.timeScale);

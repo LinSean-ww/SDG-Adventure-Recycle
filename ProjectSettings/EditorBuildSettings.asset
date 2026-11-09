@@ -14,5 +14,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Modules_/02_Levels/Level01/Imported/Scenes/WTF.unity
     guid: e7ba2a332c1dd274bba06da5ad63ef1a
+  - enabled: 1
+    path: Assets/_Modules_/02_Levels/Level04/Imported/Scenes/SampleScene.unity
+    guid: 9fc0d4010bbf28b4594072e72b8655ab
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

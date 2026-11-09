@@ -141,6 +141,7 @@ namespace C3TreasurePuzzle
             completeText = TextItem("CompletionText", completeContent, "", 18, TextAnchor.UpperLeft); Height(completeText.gameObject, 275);
             ButtonItem("Restart", completeContent, "重新開始本關卡", () => completion.RestartLevel()).GetComponent<LayoutElement>().preferredHeight = 48;
             ButtonItem("Selection", completeContent, "返回 M6 開發驗證選關入口", () => completion.ReturnToSelection()).GetComponent<LayoutElement>().preferredHeight = 48;
+            ButtonItem("NextLevel", completeContent, "前往第四關", () => completion.ContinueToNext()).GetComponent<LayoutElement>().preferredHeight = 48;
             puzzlePanel.SetActive(false); puzzleBackdrop.SetActive(false); taskPanel.SetActive(false); completionPanel.SetActive(false); completionBackdrop.SetActive(false);
         }
 
