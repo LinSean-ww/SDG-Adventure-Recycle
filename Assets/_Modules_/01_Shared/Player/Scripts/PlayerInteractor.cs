@@ -2,6 +2,13 @@ using UnityEngine;
 
 namespace SDGAdventure.SharedPlayer
 {
+    public interface IPlayerInteractionExtension
+    {
+        bool TryInteract();
+        string Prompt { get; }
+        bool SuppressLook { get; }
+    }
+
     public sealed class PlayerInteractor : MonoBehaviour
     {
         [SerializeField] private Camera playerCamera;
@@ -13,6 +20,8 @@ namespace SDGAdventure.SharedPlayer
         private IPlayerInteractable target;
 
         public IPlayerInteractable CurrentTarget => target;
+        public IPlayerInteractionExtension Extension { get; set; }
+        public bool SuppressLook => Extension != null && Extension.SuppressLook;
         public void SetCamera(Camera value) => playerCamera = value;
 
         private void Awake()
@@ -38,7 +47,8 @@ namespace SDGAdventure.SharedPlayer
         private void Update()
         {
             RefreshTarget();
-            string prompt = target == null ? "" : target.Prompt + "  [" +
+            string extensionPrompt = Extension != null ? Extension.Prompt : null;
+            string prompt = !string.IsNullOrEmpty(extensionPrompt) ? extensionPrompt : target == null ? "" : target.Prompt + "  [" +
                 input.Keybindings.BindingDisplay("Gameplay", "Interact", 0) + "]";
             hud.SetPrompt(prompt);
         }
@@ -79,6 +89,7 @@ namespace SDGAdventure.SharedPlayer
 
         public bool TryInteract()
         {
+            if (Extension != null && Extension.TryInteract()) return true;
             RefreshTarget();
             if (target == null) return false;
             target?.Interact(gameObject);

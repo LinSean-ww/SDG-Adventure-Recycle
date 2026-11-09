@@ -99,6 +99,7 @@ namespace SDGAdventure.SharedPlayer
         public event Action JumpPressed;
         public event Action PronePressed;
         public event Action InteractPressed;
+        public event Action HeadlampPressed;
         public event Action TaskListPressed;
         public event Action UiTaskListPressed;
         public event Action PausePressed;
@@ -121,6 +122,7 @@ namespace SDGAdventure.SharedPlayer
         private InputAction crouch;
         private InputAction prone;
         private InputAction interact;
+        private InputAction headlamp;
         private InputAction taskList;
         private InputAction pause;
         private InputAction uiCancel;
@@ -175,6 +177,7 @@ namespace SDGAdventure.SharedPlayer
             crouch = gameplay.FindAction("Crouch", true);
             prone = gameplay.FindAction("Prone", true);
             interact = gameplay.FindAction("Interact", true);
+            headlamp = gameplay.FindAction("Headlamp", true);
             taskList = gameplay.FindAction("TaskList", true);
             pause = global.FindAction("Pause", true);
             uiCancel = ui.FindAction("Cancel", true);
@@ -192,6 +195,7 @@ namespace SDGAdventure.SharedPlayer
             crouch.performed += OnCrouch;
             prone.performed += OnProne;
             interact.performed += OnInteract;
+            headlamp.performed += OnHeadlamp;
             taskList.performed += OnTaskList;
             pause.performed += OnPause;
             uiCancel.performed += OnUiCancel;
@@ -255,6 +259,7 @@ namespace SDGAdventure.SharedPlayer
         private void OnSprint(InputAction.CallbackContext _) { if (Keybindings.Settings.sprintMode == ButtonMode.Toggle) sprintToggled = !sprintToggled; }
         private void OnCrouch(InputAction.CallbackContext _) { if (Keybindings.Settings.crouchMode == ButtonMode.Toggle) crouchToggled = !crouchToggled; }
         private void OnInteract(InputAction.CallbackContext _) => InteractPressed?.Invoke();
+        private void OnHeadlamp(InputAction.CallbackContext _) { if (Context == PlayerInputContext.Gameplay) HeadlampPressed?.Invoke(); }
         private void OnTaskList(InputAction.CallbackContext _) => TaskListPressed?.Invoke();
         private void OnPause(InputAction.CallbackContext _) => PausePressed?.Invoke();
         private void OnUiCancel(InputAction.CallbackContext _) => UiCancelPressed?.Invoke();
@@ -278,6 +283,7 @@ namespace SDGAdventure.SharedPlayer
                 crouch.performed -= OnCrouch;
                 prone.performed -= OnProne;
                 interact.performed -= OnInteract;
+                headlamp.performed -= OnHeadlamp;
                 taskList.performed -= OnTaskList;
                 pause.performed -= OnPause;
                 uiCancel.performed -= OnUiCancel;

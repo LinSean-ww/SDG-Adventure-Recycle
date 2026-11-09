@@ -24,7 +24,41 @@ namespace SDGAdventure.SharedPlayer
                 interact.ApplyBindingOverride(0, "<Keyboard>/f");
             MirrorBinding("TaskList");
             MirrorBinding("Inventory");
+            ResolveHeadlampCollision();
             ResolveDropCollision();
+        }
+
+        // 新增預設 L 時保留舊設定：只有頭燈改用未被使用的鍵。
+        private void ResolveHeadlampCollision()
+        {
+            InputAction lamp = FindAction("Gameplay", "Headlamp");
+            if (lamp == null || lamp.bindings.Count == 0) return;
+            bool Occupied(string path)
+            {
+                if (string.IsNullOrEmpty(path)) return false;
+                foreach (InputActionMap map in actions.actionMaps)
+                {
+                    if (!CanCoexist("Gameplay", map.name)) continue;
+                    foreach (InputAction other in map.actions)
+                    {
+                        if (other == lamp) continue;
+                        foreach (InputBinding binding in other.bindings)
+                            if (!binding.isComposite && string.Equals(binding.effectivePath, path, StringComparison.OrdinalIgnoreCase)) return true;
+                    }
+                }
+                return false;
+            }
+            if (!Occupied(lamp.bindings[0].effectivePath)) return;
+            foreach (string key in new[] { "h", "j", "k", "b", "n", "v", "x", "c", "y", "u", "i", "o", "t" })
+            {
+                string path = "<Keyboard>/" + key;
+                if (Occupied(path)) continue;
+                lamp.ApplyBindingOverride(0, path);
+                store.Save(actions, Settings);
+                return;
+            }
+            lamp.ApplyBindingOverride(0, string.Empty);
+            store.Save(actions, Settings);
         }
 
         // Preserve existing user bindings when the newly introduced default G

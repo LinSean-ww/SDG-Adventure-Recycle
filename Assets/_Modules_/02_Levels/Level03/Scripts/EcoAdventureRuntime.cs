@@ -73,6 +73,10 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
     private readonly HashSet<EcoMaterialWorldPickup> droppedMaterials = new HashSet<EcoMaterialWorldPickup>();
     private string presentedId;
     private bool inventoryOpen;
+    private readonly HashSet<object> quickbarSuppressors = new HashSet<object>();
+    public void SuppressQuickbar(object owner) { if (owner != null) quickbarSuppressors.Add(owner); }
+    public void RestoreQuickbar(object owner) { if (owner != null) quickbarSuppressors.Remove(owner); }
+    public bool QuickbarSuppressed => quickbarSuppressors.Count > 0;
     private bool reloading;
     private float nextShotTime;
     private float nextPlasmaShotTime;
@@ -1027,7 +1031,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         if (C3CompletionScreen.BlocksGameplayInputThisFrame && !inventoryOpen)
             return;
         int width = Screen.width, height = Screen.height;
-        for (int i = 0; i < 5; i++)
+        if (!QuickbarSuppressed) for (int i = 0; i < 5; i++)
         {
             float x = width * 0.5f - 250f + i * 100f;
             GUI.Box(new Rect(x, height - 70f, 98f, 54f), QuickSlotDisplay(i));

@@ -117,7 +117,8 @@ namespace SDGAdventure.SharedPlayer
                 return;
             }
 
-            if (PlayerCursor.LockState == CursorLockMode.Locked)
+            if (PlayerCursor.LockState == CursorLockMode.Locked &&
+                !(GetComponent<PlayerInteractor>()?.SuppressLook ?? false))
             {
                 Vector2 look = input.Look * (degreesPerMousePixel * input.Keybindings.Settings.mouseSensitivity);
                 if (perspective != null && perspective.IsThirdPerson)

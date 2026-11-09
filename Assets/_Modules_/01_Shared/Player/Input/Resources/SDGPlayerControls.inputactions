@@ -124,6 +124,12 @@
           "type": "Button",
           "id": "a84f6938-6b96-4788-9109-1b70a58b41e5",
           "expectedControlType": "Button"
+        },
+        {
+          "name": "Headlamp",
+          "type": "Button",
+          "id": "6dd36da4-1d08-43e6-9127-6360f3dbbd6c",
+          "expectedControlType": "Button"
         }
       ],
       "bindings": [
@@ -275,6 +281,12 @@
           "id": "e2f14d8c-736e-40ce-871a-6f331d43588e",
           "path": "<Mouse>/rightButton",
           "action": "ScanAim"
+        },
+        {
+          "name": "",
+          "id": "e2a1f749-c852-4681-9d97-00e69704380c",
+          "path": "<Keyboard>/l",
+          "action": "Headlamp"
         }
       ]
     },

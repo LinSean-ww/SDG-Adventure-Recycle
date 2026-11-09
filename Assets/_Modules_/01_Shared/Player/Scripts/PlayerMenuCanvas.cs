@@ -16,6 +16,7 @@ namespace SDGAdventure.SharedPlayer
             ("左移", "Gameplay", "Move", 3), ("右移", "Gameplay", "Move", 4),
             ("跳躍", "Gameplay", "Jump", 0), ("奔跑", "Gameplay", "Sprint", 0),
             ("蹲下", "Gameplay", "Crouch", 0), ("趴下", "Gameplay", "Prone", 0), ("互動", "Gameplay", "Interact", 0),
+            ("頭燈開關", "Gameplay", "Headlamp", 0),
             ("左探頭", "Gameplay", "LeanLeft", 0), ("右探頭", "Gameplay", "LeanRight", 0),
             ("挖掘、射擊", "Gameplay", "Fire", 0), ("掃描、開鏡", "Gameplay", "ScanAim", 0),
             ("裝填", "Gameplay", "Reload", 0), ("丟棄物品", "Gameplay", "Drop", 0), ("背包", "Gameplay", "Inventory", 0),
