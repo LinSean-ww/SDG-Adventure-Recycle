@@ -1,0 +1,9 @@
+﻿SDG Adventure Unity Project Process Diagnosis
+Date: 2026-11-10 13:57:37
+Project: F:\SDG Adventure_R
+UnityLockfile exists: False
+UnityLockfile locked: False
+UnityLockfile reason: No lockfile
+Same-project Unity PIDs: 
+Other-project Unity PIDs: 
+Unknown Unity PIDs: 

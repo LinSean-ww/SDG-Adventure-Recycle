@@ -1,0 +1,66 @@
+﻿[
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scenes\\SDG_StartAndMainMenu.unity",
+        "existed":  true
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scenes\\SDG_StartAndMainMenu.unity.meta",
+        "existed":  true
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGGameSettingsRuntimeV1.cs",
+        "existed":  false
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGGameSettingsRuntimeV1.cs.meta",
+        "existed":  false
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\Editor\\SDGGameSettingsInstallerV1.cs",
+        "existed":  false
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\Editor\\SDGGameSettingsInstallerV1.cs.meta",
+        "existed":  false
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGGameSettingsPanelV1.cs",
+        "existed":  false
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGGameSettingsPanelV1.cs.meta",
+        "existed":  false
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGAudioRoleV1.cs",
+        "existed":  false
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGAudioRoleV1.cs.meta",
+        "existed":  false
+    },
+    {
+        "path":  "Assets\\_Modules_\\01_Shared\\Player\\Scripts\\PlayerInputService.cs",
+        "existed":  true
+    },
+    {
+        "path":  "Assets\\_Modules_\\01_Shared\\Player\\Scripts\\PlayerInputService.cs.meta",
+        "existed":  true
+    },
+    {
+        "path":  "Assets\\_Modules_\\02_Levels\\Level03\\Scripts\\C3FirstPersonController.cs",
+        "existed":  true
+    },
+    {
+        "path":  "Assets\\_Modules_\\02_Levels\\Level03\\Scripts\\C3FirstPersonController.cs.meta",
+        "existed":  true
+    },
+    {
+        "path":  "Assets\\_Modules_\\02_Levels\\Level04\\Imported\\Script\\CameraLook.cs",
+        "existed":  true
+    },
+    {
+        "path":  "Assets\\_Modules_\\02_Levels\\Level04\\Imported\\Script\\CameraLook.cs.meta",
+        "existed":  true
+    }
+]

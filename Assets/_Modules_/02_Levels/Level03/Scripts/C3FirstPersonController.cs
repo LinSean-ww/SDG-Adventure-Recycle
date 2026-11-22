@@ -154,7 +154,7 @@ namespace C3TreasurePuzzle
             if (!acceptsInput) ClearJumpRequest();
             if (acceptsInput) ReadProneKey();
             if (acceptsInput)
-                ApplyLook(new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")));
+                ApplyLook(new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y") * ((UnityEngine.PlayerPrefs.GetInt("SDG_Settings_V1_InvertY", 0) != 0) ? -1f : 1f)));
 
             Vector2 input = acceptsInput
                 ? new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"))

@@ -6,6 +6,15 @@ namespace C3TreasurePuzzle
     public enum C3DevicePhase { Unrepaired, AwaitingPuzzle, ReadyToActivate, Activated }
     public enum C3FactoryState { Dormant, Starting, Running, Completed }
 
+    // Level03-owned cross-assembly hooks: C3 remains independent of the add-on assembly.
+    public static class C3StoryV2Hooks
+    {
+        public static System.Func<bool> ExitCheck;
+        public static System.Func<bool> CraftCheck;
+        public static bool ExitUnlocked { get { return ExitCheck != null && ExitCheck(); } }
+        public static bool InterceptCraft() { return CraftCheck != null && CraftCheck(); }
+    }
+
     // The sole scene-level authority for activation and independent level completion.
     public sealed class C3DeviceState : MonoBehaviour
     {
@@ -72,6 +81,7 @@ namespace C3TreasurePuzzle
         {
             if (FactoryState != C3FactoryState.Running || progress == null || !progress.AllPartsCollected ||
                 puzzle == null || !puzzle.PuzzleSolved) return false;
+            if (!C3StoryV2Hooks.ExitUnlocked) return false;
             FactoryState = C3FactoryState.Completed;
             CompletionSeconds = Mathf.Max(0f, Time.unscaledTime - startedAt);
             Completed?.Invoke();

@@ -34,6 +34,31 @@ public class BossHealth : MonoBehaviour
             recycleParts.SetActive(false);
     }
 
+    // Restores a fresh scene AFTER Start() has initialized the boss. Does not award
+    // duplicate damage, and never lets an already-dead boss enter its attack AI.
+    public void RestoreFromSave(int savedHealth, bool savedDead, bool partsVisible)
+    {
+        CancelInvoke(nameof(ShowRecycleParts));
+        currentHealth = Mathf.Clamp(savedHealth, 0, Mathf.Max(1, maxHealth));
+        if (savedDead) currentHealth = 0;
+
+        if (currentHealth == 0 && !isDead)
+        {
+            isDead = true;
+            if (bossAI == null) bossAI = GetComponent<ToiletMechBossAI>();
+            if (bossAI != null) bossAI.OnBossDeath();
+            if (playerRecycleController != null) playerRecycleController.EnableRecycleMode();
+            Died?.Invoke(); // Level04RecycleController and level HUD must receive this.
+        }
+
+        if (recycleParts != null)
+        {
+            recycleParts.SetActive(isDead && partsVisible);
+            if (isDead && !partsVisible) Invoke(nameof(ShowRecycleParts), 3f);
+        }
+        HealthChanged?.Invoke();
+    }
+
     public void TakeDamage(int damage)
     {
         if (isDead) return;

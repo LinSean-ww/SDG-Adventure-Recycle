@@ -1,0 +1,27 @@
+﻿{
+    "created":  "2026-11-16T10:50:16.4847867+08:00",
+    "project":  "F:\\SDG Adventure_R",
+    "files":  [
+                  {
+                      "path":  "Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scripts/SDGSaveProgressRuntimeV1.cs",
+                      "sha256":  "80F4E218BAD40012E42B7A427AE66D06892AC2F48E216DE4A6277F49494136A7",
+                      "label":  "WORLD SOURCE 2026-11-16"
+                  },
+                  {
+                      "path":  "Assets/_Modules_/02_Levels/Level04/Imported/Script/BossHealth.cs",
+                      "sha256":  "EE3C1C808F79C7FD050F1DFE7048842D6EAC06D107B09204A1E101BED9758ABB",
+                      "label":  "WORLD SOURCE 2026-11-16"
+                  },
+                  {
+                      "path":  "Assets/_Modules_/02_Levels/Level04/Imported/Script/RecycleHouse.cs",
+                      "sha256":  "1C1FF58FB8DD566C8CAC36B12E9A9EB4A79A2C37AB8504C9856F7D7C52130152",
+                      "label":  "WORLD SOURCE 2026-11-16"
+                  },
+                  {
+                      "path":  "Assets/_Modules_/02_Levels/Level04/Scripts/Level04RecycleController.cs",
+                      "sha256":  "9315F8ED0D523C57D63158C3D0D8F09BA8193A283BA5CDAFFA883143B969812E",
+                      "label":  "WORLD SOURCE 2026-11-16"
+                  }
+              ],
+    "package":  "SDG_Level04_WorldState_SaveLoad_V262_SafeFix_R3"
+}

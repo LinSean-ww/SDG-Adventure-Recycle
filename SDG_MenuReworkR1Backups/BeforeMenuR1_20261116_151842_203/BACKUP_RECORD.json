@@ -1,0 +1,41 @@
+﻿{
+    "project":  "F:\\SDG Adventure_R",
+    "createdUtc":  "2026-11-16T07:18:42.2305753Z",
+    "files":  [
+                  {
+                      "relative":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scenes\\SDG_StartAndMainMenu.unity",
+                      "existed":  true,
+                      "sha256":  "4F442F259C3E89BEE2508CD261FCDB6471FC0CC2FE6895A0537169D633BF512B"
+                  },
+                  {
+                      "relative":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGMenuReworkR1.cs",
+                      "existed":  false,
+                      "sha256":  ""
+                  },
+                  {
+                      "relative":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGMenuReworkR1.cs.meta",
+                      "existed":  false,
+                      "sha256":  ""
+                  },
+                  {
+                      "relative":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGLevel01ClampGuardR1.cs",
+                      "existed":  false,
+                      "sha256":  ""
+                  },
+                  {
+                      "relative":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGLevel01ClampGuardR1.cs.meta",
+                      "existed":  false,
+                      "sha256":  ""
+                  },
+                  {
+                      "relative":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\Editor\\SDGMenuReworkR1Installer.cs",
+                      "existed":  false,
+                      "sha256":  ""
+                  },
+                  {
+                      "relative":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\Editor\\SDGMenuReworkR1Installer.cs.meta",
+                      "existed":  false,
+                      "sha256":  ""
+                  }
+              ]
+}

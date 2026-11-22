@@ -1,0 +1,27 @@
+SDG UI source collection - script source only
+ProjectRoot: F:\SDG Adventure_R
+Date: 2026-11-10 09:23:20
+Collects no scene assets, personal files, or Unity Library files.
+
+INCLUDED: Assets/_Modules_/01_Shared/Player/Scripts/PlayerMenuCanvas.cs
+INCLUDED: Assets/_Modules_/01_Shared/Player/Scripts/PlayerPauseMenu.cs
+INCLUDED: Assets/_Modules_/00_Core/ModuleSystem/M6SelectionUi.cs
+INCLUDED: Assets/_Modules_/05_Testing/Editor/LegacyTools/M6FontValidation.cs
+INCLUDED: Assets/_Modules_/05_Testing/Editor/LegacyTools/M6IntegrationSetup.cs
+INCLUDED: Assets/_Modules_/05_Testing/Editor/LegacyTools/M6VisualProbe.cs
+INCLUDED: Assets/_Modules_/05_Testing/PlayMode/M6FlowTests.cs
+INCLUDED: Assets/_Modules_/05_Testing/PlayMode/M6FontTests.cs
+INCLUDED: Assets/_Modules_/05_Testing/PlayMode/M6VisualRuntimeTests.cs
+INCLUDED: Assets/_Modules_/05_Testing/SharedPlayer/Automated/CompletePlayerPauseMenuTests.cs
+INCLUDED: Assets/_Modules_/00_Core/ModuleSystem/ModuleCoordinator.cs
+INCLUDED: Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scripts/SDGOfficialLevelUIStartupGuard.cs
+INCLUDED: Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scripts/Editor/SDGRuntimeUIDiagnosis.cs
+INCLUDED: Assets/_Modules_/05_Testing/PlayMode/M7/Level01CompletionTests.cs
+INCLUDED: Assets/_Modules_/05_Testing/PlayMode/M7/Level01FlowTests.cs
+INCLUDED: Assets/_Modules_/05_Testing/PlayMode/M7/Level02IntegrationTests.cs
+INCLUDED: Assets/_Modules_/05_Testing/PlayMode/M7/Level04CombatIntegrationTests.cs
+INCLUDED: Assets/_Modules_/05_Testing/PlayMode/M7/Level04RecycleFlowTests.cs
+INCLUDED: Assets/_Modules_/05_Testing/PlayMode/M7/Level04SelectionAndProgressionTests.cs
+INCLUDED: Assets/_Modules_/05_Testing/PlayMode/M7/PlayerInputServiceTests.cs
+
+Matching C# count: 20

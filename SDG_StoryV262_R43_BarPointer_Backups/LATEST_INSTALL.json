@@ -1,0 +1,47 @@
+﻿{
+    "BaselineHash":  "C3306EC08E9ACA9EC94A9771F3C4FE54045AFB0818F6812A93EFC1E626B1CD36",
+    "ProjectPath":  "F:\\SDG Adventure_R",
+    "InstalledHash":  "7663454F4DECF4BA37E84F8F791417FEFF111BD30E6A7D1A049EF644C5EF4601",
+    "Files":  [
+                  {
+                      "Existed":  true,
+                      "Hash":  "C3306EC08E9ACA9EC94A9771F3C4FE54045AFB0818F6812A93EFC1E626B1CD36",
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_R43_BarPointer_Backups\\BeforeR43_20261113_175949_230\\Original_0.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\SDGLevel03StoryV2Controller.cs"
+                  },
+                  {
+                      "Existed":  false,
+                      "Hash":  null,
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_R43_BarPointer_Backups\\BeforeR43_20261113_175949_230\\Original_1.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\Editor\\SDGLevel03StoryV262R43Validator.cs"
+                  },
+                  {
+                      "Existed":  false,
+                      "Hash":  null,
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_R43_BarPointer_Backups\\BeforeR43_20261113_175949_230\\Original_2.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\Editor\\SDGLevel03StoryV262R43Validator.cs.meta"
+                  },
+                  {
+                      "Existed":  true,
+                      "Hash":  "48472B04592FBB7023A08627F4160403430465F359A46C3F730614C53B99EB1D",
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_R43_BarPointer_Backups\\BeforeR43_20261113_175949_230\\Original_3.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\Resources.meta"
+                  },
+                  {
+                      "Existed":  false,
+                      "Hash":  null,
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_R43_BarPointer_Backups\\BeforeR43_20261113_175949_230\\Original_4.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R43_ReactionPanel.png"
+                  },
+                  {
+                      "Existed":  false,
+                      "Hash":  null,
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_R43_BarPointer_Backups\\BeforeR43_20261113_175949_230\\Original_5.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R43_ReactionPanel.png.meta"
+                  }
+              ],
+    "UnityLog":  null,
+    "Status":  "Restored",
+    "Validated":  null,
+    "BackupDir":  "F:\\SDG Adventure_R\\SDG_StoryV262_R43_BarPointer_Backups\\BeforeR43_20261113_175949_230"
+}

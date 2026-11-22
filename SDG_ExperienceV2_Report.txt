@@ -1,0 +1,11 @@
+﻿SDG EXPERIENCE V2 SUCCESS
+Compile=OK
+Level01=shovel impact dust + visual-only flying scrap fragments
+Level02=real scene object discovery + directional navigation + platform + gate stages
+KnownNameMatches=12
+StarOrBoxComponentMatches=4
+StarGoalPlateMatches=1
+SceneFilesModified=NO
+ExistingScriptsOverwritten=NO
+UnityPlayModeVerified=NO
+ObjectScan=F:\SDG Adventure_R\SDG_ExperienceV2_Level02Objects.txt

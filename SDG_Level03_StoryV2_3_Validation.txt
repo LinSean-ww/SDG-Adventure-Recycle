@@ -1,0 +1,8 @@
+SDG LEVEL03 STORY V2.3 STATIC SUCCESS
+Version=V2.3
+Scene=Assets/_Modules_/02_Levels/Level03/Scenes/C_Main.unity
+C3DeviceState=1 C3PuzzleConsole=1
+CurvedPath=joined spline ribbon, animated conducting pulse and hazard borders
+Assembly=drag ACTUAL 3D mesh parts by mouse onto glowing 3D socket
+Range=auto deploy all THREE real raycast airborne targets; no required F8
+LIMIT=Compilation and scene inspection only. User must verify 3D dragging, visibility, shots, exit in PlayMode.

@@ -79,7 +79,7 @@ public sealed class Level01ModuleAdapter : MonoBehaviour, IModuleAdapter
         PlayerCursor.LockState = CursorLockMode.None;
         Cursor.visible = true;
         completionView = gameObject.AddComponent<Level01CompletionView>();
-        completionView.Show(ReturnToSelection, Restart);
+        completionView.Show(ReturnToSelection, Restart, ContinueToNext);
     }
 
     private void UpdateTasks()
@@ -99,6 +99,11 @@ public sealed class Level01ModuleAdapter : MonoBehaviour, IModuleAdapter
         }
     }
 
+    private void ContinueToNext()
+    {
+        if (coordinator != null && !coordinator.TryLaunchNext(out string error))
+            Debug.LogWarning("[SDG Next] Level01 to Level02 failed: " + error);
+    }
     private void Restart() { if (coordinator != null && !coordinator.RestartCurrent(out string error)) Debug.LogError(error); }
     private void ReturnToSelection() { if (coordinator != null && !coordinator.ReturnToSelection(out string error)) Debug.LogError(error); }
     public void Shutdown()

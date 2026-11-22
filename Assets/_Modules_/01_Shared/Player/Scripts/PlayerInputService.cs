@@ -73,7 +73,7 @@ namespace SDGAdventure.SharedPlayer
         { if (gameplayActionBlocker == blocker) gameplayActionBlocker = null; }
         public InputActionAsset Actions => actions;
         public Vector2 Move => Context == PlayerInputContext.Gameplay ? move.ReadValue<Vector2>() : Vector2.zero;
-        public Vector2 Look => Context == PlayerInputContext.Gameplay ? look.ReadValue<Vector2>() : Vector2.zero;
+        public Vector2 Look { get { Vector2 v = Context == PlayerInputContext.Gameplay ? look.ReadValue<Vector2>() : Vector2.zero; if ((UnityEngine.PlayerPrefs.GetInt("SDG_Settings_V1_InvertY", 0) != 0)) v.y = -v.y; return v; } }
         public bool SprintActive => Context == PlayerInputContext.Gameplay &&
             (Keybindings.Settings.sprintMode == ButtonMode.Hold ? sprint.IsPressed() : sprintToggled);
         public bool CrouchActive => Context == PlayerInputContext.Gameplay &&

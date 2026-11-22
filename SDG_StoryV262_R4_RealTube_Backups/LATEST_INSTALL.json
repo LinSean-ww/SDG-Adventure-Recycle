@@ -1,0 +1,28 @@
+﻿{
+    "ProjectPath":  "F:\\SDG Adventure_R",
+    "InstalledHash":  "A24EBEDC3B776554F39BEC8D374F6E08DA18D95373AF6089B90F654D3B32A812",
+    "Files":  [
+                  {
+                      "Existed":  true,
+                      "Hash":  "121863AFB12831CA78306B02C0E1AA1ED306C4209FEE28F84735F39E96766C22",
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_R4_RealTube_Backups\\BeforeR4_20261113_163041_408\\Original_0.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\SDGLevel03StoryV2Controller.cs"
+                  },
+                  {
+                      "Existed":  false,
+                      "Hash":  null,
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_R4_RealTube_Backups\\BeforeR4_20261113_163041_408\\Original_1.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\Editor\\SDGLevel03StoryV262R4Validator.cs"
+                  },
+                  {
+                      "Existed":  false,
+                      "Hash":  null,
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_R4_RealTube_Backups\\BeforeR4_20261113_163041_408\\Original_2.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\Editor\\SDGLevel03StoryV262R4Validator.cs.meta"
+                  }
+              ],
+    "UnityLog":  "F:\\SDG_Level03_V262_R4_RealTube_SafeInstall_Candidate\\Reports\\Unity_R4_20261113_163041_468.log",
+    "Status":  "Installed",
+    "Validated":  "2026-11-13T16:31:06",
+    "BackupDir":  "F:\\SDG Adventure_R\\SDG_StoryV262_R4_RealTube_Backups\\BeforeR4_20261113_163041_408"
+}

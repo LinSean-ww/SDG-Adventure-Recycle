@@ -1,0 +1,32 @@
+{
+    "enableStartup": true,
+    "enableLevels": true,
+    "skipWithSpace": true,
+    "startupFiles": [
+        "startup.mp4",
+        "storyboard_01.mp4",
+        "storyboard_02.mp4"
+    ],
+    "levels": [
+        {
+            "levelNumber": 1,
+            "scenePath": "Assets/_Modules_/02_Levels/Level01/Imported/Scenes/WTF.unity",
+            "clipFile": "storyboard_03.mp4"
+        },
+        {
+            "levelNumber": 2,
+            "scenePath": "Assets/_Modules_/02_Levels/Level02/Imported/Scenes/SampleScene.unity",
+            "clipFile": "storyboard_04.mp4"
+        },
+        {
+            "levelNumber": 3,
+            "scenePath": "Assets/_Modules_/02_Levels/Level03/Scenes/C_Main.unity",
+            "clipFile": "storyboard_05.mp4"
+        },
+        {
+            "levelNumber": 4,
+            "scenePath": "Assets/_Modules_/02_Levels/Level04/Imported/Scenes/SampleScene.unity",
+            "clipFile": "storyboard_06.mp4"
+        }
+    ]
+}

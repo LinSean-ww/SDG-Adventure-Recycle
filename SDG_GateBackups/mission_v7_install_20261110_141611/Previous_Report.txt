@@ -1,0 +1,11 @@
+﻿SDG Mission Gates v7 | 2026-11-10 14:15:30Z
+APPLIED: Level03 C_Main.unity
+Backup: F:\SDG Adventure_R\SDG_GateBackups\mission_v7_20261110_141530_133
+B entrance: original 20-strip PVC curtain hidden; one 4.55m x 2.94m iron shutter at (-0.30,2.02,12.50).
+B unlock: C3TreasureProgress.AllPartsCollected = true (3 mission parts).
+D exit: existing frame and trigger kept; one 4.55m x 2.94m iron shutter at (-12.50,2.02,0.32).
+D unlock: C3DeviceState.FactoryState == Running or Completed (after puzzle and factory start).
+Once unlocked, player proximity raises shutter from either side. Otherwise the panel and collider stay closed.
+Exact v6-generated B/D gate objects removed, if found; no equipment or cabinet doors touched.
+Level01 / Level02 / Level04 unchanged.
+Unity compile and PlayMode validation must be completed on the user's computer.

@@ -1,0 +1,221 @@
+﻿#if UNITY_EDITOR
+using System;
+using System.IO;
+using TMPro;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.TextCore.LowLevel;
+
+namespace SDGAdventure.FrontEnd.Editor
+{
+    /// <summary>
+    /// Creates the CJK TMP font from the source OTF installed on this computer and
+    /// fixes only the menu scene. No Font Asset Creator or TMP Inspector is needed.
+    /// </summary>
+    [InitializeOnLoad]
+    public static class SDGFrontEndCjkAutoRepair
+    {
+        private const string Root = "Assets/_Modules_/00_Frontend/SDG_Menu_20261109";
+        private const string FontSource = Root + "/Fonts/NotoSansCJKtc-Regular.otf";
+        private const string FontAssetPath = Root + "/Fonts/SDG_NotoSansCJKtc_Dynamic.asset";
+        private const string ScenePath = Root + "/Scenes/SDG_StartAndMainMenu.unity";
+        private const string BackupPath = Root + "/Scenes/Backups/SDG_StartAndMainMenu_before_CJK_fix.unity";
+        private const string WarmupCharacters =
+            " !-/0123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" +
+            "開始遊戲繼續關卡選擇設定製作名單離開玩家資訊回收探險者最近的存檔進度" +
+            "遊玩時間尚無存檔第關返回主音量全螢幕專題團隊資料尚未填入請於此面板的文字元件更新正式名單" +
+            "分類處理區完成收集經驗等級讀取失敗建置";
+
+        private static double nextCheck;
+        private static int failureCount;
+        private static bool repairing;
+        private static bool autoDone;
+
+        static SDGFrontEndCjkAutoRepair()
+        {
+            EditorApplication.update += WatchForFont;
+            EditorSceneManager.sceneSaved += OnSceneSaved;
+            EditorApplication.playModeStateChanged += OnPlayModeChanged;
+        }
+
+        private static void OnPlayModeChanged(PlayModeStateChange state)
+        {
+            if (state == PlayModeStateChange.EnteredEditMode)
+                EditorApplication.delayCall += () => TryRepair(false);
+        }
+
+        private static void WatchForFont()
+        {
+            if (autoDone || repairing || failureCount >= 3)
+            {
+                EditorApplication.update -= WatchForFont;
+                return;
+            }
+            if (EditorApplication.timeSinceStartup < nextCheck) return;
+            nextCheck = EditorApplication.timeSinceStartup + 3.0;
+            if (EditorApplication.isCompiling || EditorApplication.isUpdating ||
+                EditorApplication.isPlayingOrWillChangePlaymode) return;
+            if (AssetDatabase.LoadAssetAtPath<Font>(FontSource) == null) return;
+            TryRepair(false);
+        }
+
+        private static void OnSceneSaved(Scene savedScene)
+        {
+            if (repairing || savedScene.path != ScenePath) return;
+            // The scene builder can recreate the menu. Reapply the chosen font later.
+            EditorApplication.delayCall += () => TryRepair(false);
+        }
+
+        [MenuItem("SDG Adventure/前端 UI/04 一鍵修正繁體中文字型（保留場景）")]
+        public static void RepairFromMenu()
+        {
+            TryRepair(true);
+        }
+
+        private static void TryRepair(bool showDialog)
+        {
+            if (repairing || EditorApplication.isCompiling || EditorApplication.isUpdating ||
+                EditorApplication.isPlayingOrWillChangePlaymode) return;
+
+            Font source = AssetDatabase.LoadAssetAtPath<Font>(FontSource);
+            if (source == null)
+            {
+                if (showDialog)
+                    EditorUtility.DisplayDialog("FrontEnd Chinese Font",
+                        "Font source not found. Rerun Install-To-Unity.ps1 while connected to the Internet.", "OK");
+                return;
+            }
+
+            repairing = true;
+            try
+            {
+                // This prevents a previously selected, malformed TMP asset from
+                // repeatedly throwing inside TMP_FontAssetEditor.OnInspectorGUI.
+                if (Selection.activeObject is TMP_FontAsset) Selection.activeObject = null;
+                TMP_FontAsset cjk = GetOrCreateFont(source);
+                if (cjk == null) throw new InvalidOperationException("Could not create TMP CJK font asset.");
+                int changed = ApplyToScene(cjk);
+                AssetDatabase.SaveAssets();
+                autoDone = true;
+                Debug.Log("[SDG FrontEnd] Chinese TMP font ready; updated " + changed +
+                          " text components. No Level01-Level04 scenes were edited.");
+                if (showDialog)
+                    EditorUtility.DisplayDialog("FrontEnd Chinese Font",
+                        "CJK font ready. Menu text objects updated: " + changed +
+                        ". Re-enter Play mode to check the Chinese labels.", "OK");
+            }
+            catch (Exception ex)
+            {
+                failureCount++;
+                Debug.LogError("[SDG FrontEnd] Automatic Chinese font fix failed: " + ex);
+                if (showDialog)
+                    EditorUtility.DisplayDialog("FrontEnd Chinese Font", ex.Message, "OK");
+            }
+            finally { repairing = false; }
+        }
+
+        private static TMP_FontAsset GetOrCreateFont(Font source)
+        {
+            TMP_FontAsset result = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FontAssetPath);
+            if (result != null && result.material != null && result.atlasTexture != null)
+            {
+                // Dynamic atlas can add more characters as names or labels change.
+                result.TryAddCharacters(WarmupCharacters);
+                EditorUtility.SetDirty(result);
+                return result;
+            }
+            if (File.Exists(FontAssetPath))
+                throw new InvalidOperationException("Font asset path already occupied. Please inspect " + FontAssetPath);
+
+            result = TMP_FontAsset.CreateFontAsset(source, 48, 5,
+                GlyphRenderMode.SDFAA, 2048, 2048, AtlasPopulationMode.Dynamic, true);
+            if (result == null || result.material == null)
+                throw new InvalidOperationException("TextMeshPro failed to generate the font asset.");
+            result.name = "SDG_NotoSansCJKtc_Dynamic";
+            result.TryAddCharacters(WarmupCharacters);
+
+            Directory.CreateDirectory(Root + "/Fonts");
+            AssetDatabase.CreateAsset(result, FontAssetPath);
+
+            // Persist the material and all atlas pages with the .asset; otherwise
+            // TMP_FontAssetEditor may throw NullReferenceException in Unity 2023.
+            foreach (Texture2D atlas in result.atlasTextures)
+            {
+                if (atlas != null && !AssetDatabase.Contains(atlas))
+                    AssetDatabase.AddObjectToAsset(atlas, result);
+            }
+            if (result.material != null)
+            {
+                result.material.mainTexture = result.atlasTexture;
+                if (!AssetDatabase.Contains(result.material))
+                    AssetDatabase.AddObjectToAsset(result.material, result);
+                EditorUtility.SetDirty(result.material);
+            }
+            EditorUtility.SetDirty(result);
+            AssetDatabase.SaveAssets();
+
+            // Validate the saved asset, not only the temporary in-memory object.
+            var saved = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FontAssetPath);
+            if (saved == null || saved.material == null)
+                throw new InvalidOperationException("Saved CJK font asset is incomplete.");
+            bool materialSaved = false;
+            foreach (UnityEngine.Object obj in AssetDatabase.LoadAllAssetsAtPath(FontAssetPath))
+                if (obj is Material) materialSaved = true;
+            if (!materialSaved)
+                throw new InvalidOperationException("Font material did not persist in .asset.");
+            return saved;
+        }
+
+        private static int ApplyToScene(TMP_FontAsset font)
+        {
+            if (!File.Exists(ScenePath)) return 0; // Builder may not have run yet.
+
+            Scene scene = SceneManager.GetSceneByPath(ScenePath);
+            bool openedByUs = !scene.isLoaded;
+            if (openedByUs)
+                scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Additive);
+            try
+            {
+                TMP_Text[] texts = FindTextComponents(scene);
+                int changed = 0;
+                foreach (TMP_Text text in texts)
+                {
+                    if (text == null || text.font == font) continue;
+                    text.font = font;
+                    text.SetAllDirty();
+                    EditorUtility.SetDirty(text);
+                    changed++;
+                }
+                if (changed > 0)
+                {
+                    // One-time backup of the menu scene only; never touch level scenes.
+                    if (!File.Exists(BackupPath))
+                    {
+                        Directory.CreateDirectory(Root + "/Scenes/Backups");
+                        AssetDatabase.CopyAsset(ScenePath, BackupPath);
+                    }
+                    EditorSceneManager.MarkSceneDirty(scene);
+                    if (!EditorSceneManager.SaveScene(scene))
+                        throw new IOException("Failed to save menu scene: " + ScenePath);
+                }
+                return changed;
+            }
+            finally
+            {
+                if (openedByUs && scene.IsValid() && scene.isLoaded)
+                    EditorSceneManager.CloseScene(scene, true);
+            }
+        }
+
+        private static TMP_Text[] FindTextComponents(Scene scene)
+        {
+            var all = new System.Collections.Generic.List<TMP_Text>();
+            foreach (GameObject root in scene.GetRootGameObjects())
+                all.AddRange(root.GetComponentsInChildren<TMP_Text>(true));
+            return all.ToArray();
+        }
+    }
+}
+#endif

@@ -1,0 +1,10 @@
+SDG PROFILE BAR CENTER V3.3 SUCCESS
+Scene=Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scenes/SDG_StartAndMainMenu.unity
+OriginalSprite=FE_Menu_PlayerPanel
+RailYBefore=-41.994
+RailYAfter=-45.279
+RailXPreserved=56.528
+ArtworkDownshift=14/682 of panel height
+HP fill size, HP data binding, avatar, player name, XP counter=untouched
+Level01-04 scenes=untouched
+Visual alignment still requires Game-view inspection

@@ -1,0 +1,271 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using UnityEngine.Video;
+
+namespace SDG.Cinematics
+{
+    /// <summary>
+    /// Isolated cinematic overlay. No scene edits, menu callbacks, or save-system modifications.
+    /// Startup: startup -> storyboard 01 -> storyboard 02 -> existing main menu.
+    /// Levels: exact EditorBuildSettings scene-path matches, not approximate scene names.
+    /// </summary>
+    public sealed class SDGCinematicRuntime : MonoBehaviour
+    {
+        private static SDGCinematicRuntime instance;
+        private readonly Queue<string> pendingClips = new Queue<string>();
+        private SDGCinematicSettings settings;
+        private VideoPlayer video;
+        private AudioSource audioSource;
+        private RenderTexture outputTexture;
+        private GameObject overlay;
+        private bool startedStartup;
+        private bool active;
+        private bool preparing;
+        private float previousTimeScale;
+        private bool previousListenerPause;
+        private float prepareStartedAt;
+        private float clipStartedAt;
+        private string currentClip;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void Initialize()
+        {
+#if UNITY_EDITOR
+            // Test suites / EditMode / ordinary Play Mode remain unaffected unless explicitly enabled.
+            if (!UnityEditor.EditorPrefs.GetBool("SDG.Cinematics.EditorPreview", false)) return;
+#endif
+            if (instance != null) return;
+            SDGCinematicSettings candidate = SDGCinematicSettings.Load();
+            if (candidate == null) return;
+            GameObject host = new GameObject("SDG Cinematics - isolated overlay");
+            DontDestroyOnLoad(host);
+            SDGCinematicRuntime component = host.AddComponent<SDGCinematicRuntime>();
+            component.settings = candidate;
+            instance = component;
+            SceneManager.sceneLoaded += component.SceneLoaded;
+        }
+
+        private void Awake()
+        {
+            // The host exists only when preview is explicitly enabled or in a player build.
+            audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.playOnAwake = false;
+            audioSource.spatialBlend = 0f;
+            audioSource.ignoreListenerPause = true;
+
+            video = gameObject.AddComponent<VideoPlayer>();
+            video.playOnAwake = false;
+            video.isLooping = false;
+            video.source = VideoSource.Url;
+            video.renderMode = VideoRenderMode.RenderTexture;
+            video.audioOutputMode = VideoAudioOutputMode.AudioSource;
+            video.SetTargetAudioSource(0, audioSource);
+            video.prepareCompleted += VideoPrepared;
+            video.loopPointReached += VideoFinished;
+            video.errorReceived += VideoError;
+
+            outputTexture = new RenderTexture(1920, 1080, 0, RenderTextureFormat.ARGB32);
+            outputTexture.name = "SDG Cinematic Video Target";
+            outputTexture.Create();
+            video.targetTexture = outputTexture;
+
+            overlay = new GameObject("SDG Cinematic Canvas", typeof(RectTransform), typeof(Canvas), typeof(GraphicRaycaster));
+            overlay.transform.SetParent(transform, false);
+            Canvas canvas = overlay.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = 32760;
+            CreateImage("Black background", Color.black, null, false);
+            GameObject movie = CreateImage("1920x1080 cinematic", Color.white, outputTexture, true);
+            AspectRatioFitter fitter = movie.AddComponent<AspectRatioFitter>();
+            fitter.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+            fitter.aspectRatio = 16f / 9f;
+            overlay.SetActive(false);
+        }
+
+        private GameObject CreateImage(string label, Color color, Texture texture, bool isVideo)
+        {
+            GameObject go = new GameObject(label, typeof(RectTransform), typeof(RawImage));
+            go.transform.SetParent(overlay.transform, false);
+            RectTransform rect = go.GetComponent<RectTransform>();
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            RawImage img = go.GetComponent<RawImage>();
+            img.color = color;
+            img.texture = texture != null ? texture : Texture2D.whiteTexture;
+            img.raycastTarget = true;
+            return go;
+        }
+
+        private void SceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (settings == null) return;
+            if (!startedStartup)
+            {
+                startedStartup = true;
+                if (settings.enableStartup && settings.startupFiles != null)
+                {
+                    for (int i = 0; i < settings.startupFiles.Length; ++i)
+                        EnqueueClip(settings.startupFiles[i]);
+                }
+            }
+
+            if (settings.enableLevels && settings.levels != null)
+            {
+                foreach (SDGCinematicLevel mapping in settings.levels)
+                {
+                    if (mapping == null || string.IsNullOrWhiteSpace(mapping.scenePath)) continue;
+                    // Compare exact Unity scene asset path, never only a generic SampleScene name.
+                    if (string.Equals(mapping.scenePath.Replace('\\', '/'), scene.path.Replace('\\', '/'), StringComparison.OrdinalIgnoreCase))
+                    {
+                        EnqueueClip(mapping.clipFile);
+                        break;
+                    }
+                }
+            }
+            if (!active) BeginNextClip();
+        }
+
+        private void EnqueueClip(string fileName)
+        {
+            if (string.IsNullOrWhiteSpace(fileName)) return;
+            // Only basename inside our dedicated StreamingAssets folder may be played.
+            if (!string.Equals(Path.GetFileName(fileName), fileName, StringComparison.Ordinal) ||
+                !string.Equals(Path.GetExtension(fileName), ".mp4", StringComparison.OrdinalIgnoreCase))
+            {
+                Debug.LogWarning("[SDG Cinematics] Rejected unsafe movie filename.");
+                return;
+            }
+            pendingClips.Enqueue(fileName);
+        }
+
+        private void BeginNextClip()
+        {
+            video.Stop();
+            preparing = false;
+            currentClip = null;
+            while (pendingClips.Count > 0)
+            {
+                string candidate = pendingClips.Dequeue();
+                string absolutePath = Path.Combine(SDGCinematicSettings.RootDirectory, candidate);
+                if (!File.Exists(absolutePath))
+                {
+                    Debug.LogWarning("[SDG Cinematics] Missing MP4; skipping: " + candidate);
+                    continue;
+                }
+                currentClip = candidate;
+                if (!active) EnterCinematicMode();
+                try
+                {
+                    video.url = new Uri(absolutePath).AbsoluteUri;
+                    video.EnableAudioTrack(0, true);
+                    video.SetTargetAudioSource(0, audioSource);
+                    preparing = true;
+                    prepareStartedAt = Time.realtimeSinceStartup;
+                    video.Prepare();
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning("[SDG Cinematics] Prepare failed for " + candidate + ": " + ex.Message);
+                    preparing = false;
+                    continue;
+                }
+                return;
+            }
+            LeaveCinematicMode();
+        }
+
+        private void EnterCinematicMode()
+        {
+            previousTimeScale = Time.timeScale;
+            previousListenerPause = AudioListener.pause;
+            Time.timeScale = 0f;
+            AudioListener.pause = true;
+            overlay.SetActive(true);
+            active = true;
+        }
+
+        private void LeaveCinematicMode()
+        {
+            if (!active) return;
+            video.Stop();
+            preparing = false;
+            overlay.SetActive(false);
+            AudioListener.pause = previousListenerPause;
+            Time.timeScale = previousTimeScale;
+            active = false;
+        }
+
+        private void VideoPrepared(VideoPlayer player)
+        {
+            if (!active || !preparing) return;
+            preparing = false;
+            clipStartedAt = Time.realtimeSinceStartup;
+            player.Play();
+        }
+
+        private void VideoFinished(VideoPlayer player)
+        {
+            if (!active) return;
+            BeginNextClip();
+        }
+
+        private void VideoError(VideoPlayer player, string message)
+        {
+            Debug.LogWarning("[SDG Cinematics] Video playback failed: " + currentClip + "; " + message);
+            BeginNextClip(); // Never trap the player on a black cinematic screen.
+        }
+
+        private void Update()
+        {
+            if (!active) return;
+            if (settings.skipWithSpace && PressedSpace())
+            {
+                BeginNextClip();
+                return;
+            }
+            // Driver/codec errors sometimes never dispatch a callback. Fail open safely.
+            if (preparing && Time.realtimeSinceStartup - prepareStartedAt > 25f)
+                BeginNextClip();
+            else if (!preparing && Time.realtimeSinceStartup - clipStartedAt > 90f)
+                BeginNextClip();
+        }
+
+        private static bool PressedSpace()
+        {
+#if ENABLE_INPUT_SYSTEM
+            UnityEngine.InputSystem.Keyboard kb = UnityEngine.InputSystem.Keyboard.current;
+            if (kb != null && kb.spaceKey.wasPressedThisFrame) return true;
+#endif
+#if ENABLE_LEGACY_INPUT_MANAGER
+            return Input.GetKeyDown(KeyCode.Space);
+#else
+            return false;
+#endif
+        }
+
+        private void OnDestroy()
+        {
+            SceneManager.sceneLoaded -= SceneLoaded;
+            if (active) LeaveCinematicMode();
+            if (video != null)
+            {
+                video.prepareCompleted -= VideoPrepared;
+                video.loopPointReached -= VideoFinished;
+                video.errorReceived -= VideoError;
+                video.Stop();
+            }
+            if (outputTexture != null)
+            {
+                outputTexture.Release();
+                Destroy(outputTexture);
+            }
+            if (instance == this) instance = null;
+        }
+    }
+}

@@ -1,0 +1,9 @@
+SDG PROFILE LAYOUT V2 SUCCESS
+Scene=Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scenes/SDG_StartAndMainMenu.unity
+Avatar=original chooser preserved
+Name=existing input, transparent over original upper slot
+0-100=left mini-slot, now real player HP
+HealthRail=original long lower track, fill driven by HP
+Level04=auto syncs CurrentHealth/MaxHealth
+Other levels=may call SDGFrontEndPlayerVitals.ReportHealth(current,max)
+Level01-04 scenes=not modified

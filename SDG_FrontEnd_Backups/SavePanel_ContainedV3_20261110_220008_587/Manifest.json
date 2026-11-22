@@ -1,0 +1,22 @@
+﻿[
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scenes\\SDG_StartAndMainMenu.unity",
+        "existed":  true
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scenes\\SDG_StartAndMainMenu.unity.meta",
+        "existed":  true
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Art\\MainMenu\\FE_Menu_SavePanel.png.meta",
+        "existed":  true
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\Editor\\SDGSavePanelContainedLayoutV3.cs",
+        "existed":  false
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\Editor\\SDGSavePanelContainedLayoutV3.cs.meta",
+        "existed":  false
+    }
+]

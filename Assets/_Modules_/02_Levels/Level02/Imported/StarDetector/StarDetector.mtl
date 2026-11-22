@@ -1,0 +1,30 @@
+newmtl DarkSteel
+Kd 0.14 0.16 0.17
+Ks 0.38 0.40 0.41
+Ns 95
+
+newmtl TrimSteel
+Kd 0.36 0.39 0.40
+Ks 0.55 0.57 0.58
+Ns 125
+
+newmtl ScreenGlass
+Kd 0.035 0.065 0.065
+Ks 0.45 0.58 0.56
+Ns 160
+
+newmtl SensorGreen
+Kd 0.12 0.90 0.51
+Ke 0.04 0.42 0.20
+Ks 0.50 0.75 0.60
+Ns 150
+
+newmtl SafetyYellow
+Kd 0.88 0.57 0.04
+Ks 0.45 0.36 0.12
+Ns 85
+
+newmtl GoldStar
+Kd 0.98 0.70 0.07
+Ks 0.75 0.61 0.20
+Ns 170

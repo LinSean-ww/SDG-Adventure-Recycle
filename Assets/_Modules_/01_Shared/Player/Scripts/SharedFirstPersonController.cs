@@ -62,6 +62,16 @@ namespace SDGAdventure.SharedPlayer
 
         public bool IsCrouching { get; private set; }
         public bool IsProne => prone;
+        public float SnapshotViewPitch => pitch;
+        public float SnapshotViewYaw => perspective ? perspective.SnapshotOrbitYaw : transform.eulerAngles.y;
+        public void RestoreViewFromSave(float savedPitch, float savedYaw)
+        {
+            ClearExternalImpulse();
+            pitch = Mathf.Clamp(savedPitch, -maxLookAngle, maxLookAngle);
+            if (perspective) perspective.RestoreOrbitFromSave(savedYaw, pitch);
+            if (viewTransform != null && (!perspective || !perspective.IsThirdPerson))
+                viewTransform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+        }
         public float CurrentSpeed { get; private set; }
         public float CurrentHeight => motor == null ? 0f : motor.height;
         public float StandingHeight => standingHeight;

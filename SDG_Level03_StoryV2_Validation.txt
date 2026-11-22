@@ -1,0 +1,5 @@
+SDG LEVEL03 STORY V2 STATIC SUCCESS
+Scene=Assets/_Modules_/02_Levels/Level03/Scenes/C_Main.unity
+Device=1 Console=1 Parts=3 MissionGates=2 Workbenches=2
+Flow=Dark intro > original repair and puzzle > auto voltage calibration > mouse cable trace > 100-unit load allocation > existing recycling line > intercepted real weapon craft > real weapon 3-target test > exit gate
+Warning=Static inspection only, not proof of PlayMode or FPS.

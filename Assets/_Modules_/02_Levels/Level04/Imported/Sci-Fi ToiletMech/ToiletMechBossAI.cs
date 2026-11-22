@@ -1,6 +1,7 @@
 
 using UnityEngine;
 using UnityEngine.AI;
+using SDGAdventure.FrontEnd;
 
 public class ToiletMechBossAI : MonoBehaviour
 {
@@ -85,8 +86,11 @@ public class ToiletMechBossAI : MonoBehaviour
         Debug.Log("Boss正在地底休眠...");
     }
 
+    // Stop AI transitions while a saved scene is being reconstructed. In particular,
+    // prevent a dormant boss from waking and attacking before its old position/phase arrives.
     void Update()
     {
+        if (SDGSaveProgressRuntimeV1.IsRestoringWorld) return;
         if (player == null) return;
 
 
@@ -279,6 +283,91 @@ public class ToiletMechBossAI : MonoBehaviour
         nextAttackTime = Time.time + attackCooldown;
         if (agent && agent.enabled && agent.isOnNavMesh) { agent.isStopped = false; if (player) agent.SetDestination(player.position); }
         phase = BossPhase.Chasing;
+    }
+
+    // Explicit, versioned combat snapshot. Timers are stored RELATIVE to Time.time,
+    // because Time.time restarts with every Play Mode session.
+    public SDGProgressLevel04BossBattleV2 CaptureBattleState()
+    {
+        AnimatorStateInfo current = animator ? animator.GetCurrentAnimatorStateInfo(0) : default(AnimatorStateInfo);
+        return new SDGProgressLevel04BossBattleV2
+        {
+            schema = 2,
+            position = transform.position,
+            rotation = transform.rotation,
+            phase = (int)phase,
+            animatorState = animator ? current.fullPathHash : 0,
+            animatorTime = animator ? Mathf.Repeat(current.normalizedTime, 1f) : 0f,
+            attackCooldownRemaining = Mathf.Max(0f, nextAttackTime - Time.time),
+            attackElapsed = Mathf.Max(0f, Time.time - attackRequestTime),
+            attackStateStarted = attackStateStarted,
+            hitAttempted = hitAttempted
+        };
+    }
+
+    public void RestoreBattleState(SDGProgressLevel04BossBattleV2 saved, bool bossDead)
+    {
+        if (saved == null || saved.schema != 2 || saved.phase < 0 || saved.phase > 5)
+            throw new System.InvalidOperationException("Level04 Boss battle snapshot invalid.");
+        if (!animator) animator = GetComponentInChildren<Animator>(true);
+        if (!agent) agent = GetComponent<NavMeshAgent>();
+        // Warp is required: moving the transform directly while NavMeshAgent is live
+        // can immediately snap the boss back to its initial position.
+        if (agent && agent.enabled)
+        {
+            if (!agent.isOnNavMesh || !agent.Warp(saved.position))
+                throw new System.InvalidOperationException("Boss NavMeshAgent cannot warp to saved combat position.");
+            agent.ResetPath();
+            agent.isStopped = true;
+        }
+        else transform.position = saved.position;
+        transform.rotation = saved.rotation;
+        phase = bossDead ? BossPhase.Dead : (BossPhase)saved.phase;
+        hitAttempted = saved.hitAttempted;
+        attackStateStarted = saved.attackStateStarted;
+        attackRequestTime = Time.time - Mathf.Clamp(saved.attackElapsed, 0f, 120f);
+        nextAttackTime = Time.time + Mathf.Clamp(saved.attackCooldownRemaining, 0f, 120f);
+        if (animator)
+        {
+            animator.ResetTrigger("WakeUp");
+            animator.ResetTrigger("Attack");
+            animator.ResetTrigger("Death");
+            if (bossDead)
+            {
+                animator.SetFloat("Speed", 0f);
+                animator.SetTrigger("Death");
+            }
+            else
+            {
+                // Restore the actual animation frame where Unity still has that state.
+                // A clip or controller changed by a later build is not silently guessed.
+                if (saved.animatorState != 0 && animator.HasState(0, saved.animatorState))
+                {
+                    animator.Play(saved.animatorState, 0, Mathf.Clamp01(saved.animatorTime));
+                    animator.Update(0f);
+                }
+                else if (phase == BossPhase.Attacking)
+                    throw new System.InvalidOperationException("Saved Boss attack animation no longer exists.");
+                animator.SetFloat("Speed", phase == BossPhase.Chasing ? 1f : 0f);
+                // A snapshot captured between SetTrigger and animation entry needs
+                // the pending transition replayed, otherwise it would get stuck.
+                if (phase == BossPhase.Emerging && saved.animatorTime < 0.01f)
+                    animator.SetTrigger("WakeUp");
+                if (phase == BossPhase.Attacking && !saved.attackStateStarted)
+                    animator.SetTrigger("Attack");
+            }
+        }
+        if (agent && agent.enabled && agent.isOnNavMesh && !bossDead)
+        {
+            if (phase == BossPhase.Chasing)
+            {
+                agent.isStopped = false;
+                if (player) agent.SetDestination(player.position);
+            }
+            else agent.isStopped = true;
+        }
+        Debug.Log("[SDG FullScene R4] BOSS PHASE RESTORED " + phase +
+                  " pos=" + transform.position + " attackElapsed=" + saved.attackElapsed);
     }
 
     public void OnBossDeath()

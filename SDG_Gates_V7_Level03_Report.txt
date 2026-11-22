@@ -1,0 +1,2 @@
+﻿SDG Mission Gates v7 | 2026-11-10 14:16:22Z
+v7 already installed. Both verified gates exist; no changes made. Recheck mission gates in PlayMode.

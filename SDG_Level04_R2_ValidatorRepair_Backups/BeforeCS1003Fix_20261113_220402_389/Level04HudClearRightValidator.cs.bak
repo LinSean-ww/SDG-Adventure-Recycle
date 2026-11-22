@@ -1,0 +1,45 @@
+using System;
+using System.IO;
+using System.Reflection;
+using UnityEditor;
+using UnityEngine;
+
+namespace SDGAdventure.Level04.Editor
+{
+    // R2 validation checks source structure, not the full game's Play Mode visuals.
+    public static class Level04HudClearRightValidator
+    {
+        public static void Validate()
+        {
+            Type hud = typeof(SDGAdventure.Level04.Level04CombatHud);
+            if (!typeof(MonoBehaviour).IsAssignableFrom(hud) ||
+                hud.GetMethod("Initialize", BindingFlags.Public | BindingFlags.Instance) == null)
+                throw new InvalidOperationException("LEVEL04_R2_HUD_CLASS_OR_INITIALIZE_MISSING");
+
+            string source = Path.Combine(Application.dataPath,
+                "_Modules_/02_Levels/Level04/Scripts/Level04CombatHud.cs");
+            if (!File.Exists(source))
+                throw new FileNotFoundException("LEVEL04_R2_SOURCE_NOT_FOUND", source);
+            string src = File.ReadAllText(source);
+            if (!src.Contains("LEVEL04_HUD_CLEAR_TOP_RIGHT_R2") ||
+                !src.Contains("Level04DamageFlash") ||
+                !src.Contains("player.Damaged += OnDamaged") ||
+                !src.Contains("flash.raycastTarget = false"))
+                throw new InvalidOperationException("LEVEL04_R2_REQUIRED_DAMAGE_FEEDBACK_HOOKS_MISSING");
+
+            // Check executable creation code, not prose comments.
+            string[] forbidden = {
+                "NewRect("Level04GameplayHelp"",
+                "NewRect("Level04CombatStatus"",
+                "CreateBar(root,"PlayerHealth"",
+                "CreateBar(root,"BossHealth"",
+                "AddText("HelpHeading"",
+                "AddText("PhaseInstructions""
+            };
+            foreach (string hook in forbidden)
+                if (src.Contains(hook))
+                    throw new InvalidOperationException("LEVEL04_R2_FORBIDDEN_CORNER_HUD_FOUND: " + hook);
+            Debug.Log("LEVEL04_R2_CLEAR_TOP_RIGHT_PASS EDITMODE_ONLY_PLAYMODE_UNVERIFIED");
+        }
+    }
+}

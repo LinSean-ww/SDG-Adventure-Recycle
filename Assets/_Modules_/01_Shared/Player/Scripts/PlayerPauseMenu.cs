@@ -7,6 +7,24 @@ namespace SDGAdventure.SharedPlayer
 {
     public enum PlayerMenuState { Playing, Paused, Settings, Tasks }
 
+    // Shared with ModuleCoordinator, which already references the SharedPlayer namespace.
+    // Avoids introducing a reverse assembly dependency from SharedPlayer to ModuleSystem.
+    public static class OfficialFrontEndSession
+    {
+        public const string ScenePath =
+            "Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scenes/SDG_StartAndMainMenu.unity";
+        public static bool Active { get; private set; }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void Reset() => Active = false;
+
+        public static void Observe(Scene scene, string developmentSelectionPath)
+        {
+            if (scene.path == ScenePath) Active = true;
+            else if (scene.path == developmentSelectionPath) Active = false;
+        }
+    }
+
     public sealed class PlayerPauseMenu : MonoBehaviour
     {
         [SerializeField] private SharedFirstPersonController player;
@@ -27,6 +45,9 @@ namespace SDGAdventure.SharedPlayer
         private bool tasksOpenedFromPause;
         private Action openTaskView;
         private Action closeTaskView;
+        // Input can be delivered again while the new scene is starting, notably after
+        // switching from the official front end. Direct calls to Pause() remain available.
+        private float pauseInputBlockedUntilRealtime = -1f;
 
         public PlayerMenuState State { get; private set; } = PlayerMenuState.Playing;
         public bool HasTestReturnPoint => testReturnPoint != null;
@@ -69,7 +90,7 @@ namespace SDGAdventure.SharedPlayer
             input = PlayerInputService.Instance;
             if (input != null)
             {
-                input.PausePressed += Pause;
+                input.PausePressed += OnPauseInput;
                 input.TaskListPressed += OpenTasks;
                 input.UiTaskListPressed += HandleUiTaskList;
                 input.UiCancelPressed += HandleCancel;
@@ -77,7 +98,23 @@ namespace SDGAdventure.SharedPlayer
             if (journal != null) journal.Changed += RefreshTasks;
         }
 
-        private void Start() => Resume();
+        private void Start()
+        {
+            Resume();
+            bool officialLevel = OfficialFrontEndSession.Active &&
+                gameObject.scene.path.StartsWith("Assets/_Modules_/02_Levels/", StringComparison.Ordinal);
+            pauseInputBlockedUntilRealtime = officialLevel ? Time.realtimeSinceStartup + 0.85f : -1f;
+        }
+
+        private void OnPauseInput()
+        {
+            if (pauseInputBlockedUntilRealtime > Time.realtimeSinceStartup)
+            {
+                Debug.Log("[SDG Official Flow] Ignored pause input carried into level startup.");
+                return;
+            }
+            Pause();
+        }
 
         public void Pause()
         {
@@ -165,6 +202,22 @@ namespace SDGAdventure.SharedPlayer
 
         public void ReturnToSelection()
         {
+            // The official front-end button must not send players to M6_DevelopmentSelection.
+            // Preserve the original callbacks and test scene behavior for development sessions.
+            if (OfficialFrontEndSession.Active)
+            {
+                string officialScene = OfficialFrontEndSession.ScenePath;
+                if (!Application.CanStreamedLevelBeLoaded(officialScene))
+                {
+                    ShowPauseFeedback("無法返回主選單：正式前端場景未加入 Build Settings。");
+                    return;
+                }
+                CancelRebind();
+                Time.timeScale = 1f;
+                input?.SetContext(PlayerInputContext.Inactive);
+                TryLoadScene(officialScene, "無法返回正式主選單，請確認場景可載入。");
+                return;
+            }
             if (returnToSelection != null) { returnToSelection(); return; }
             if (!standaloneLevelActions) return;
             if (string.IsNullOrWhiteSpace(selectionScene))
@@ -304,7 +357,7 @@ namespace SDGAdventure.SharedPlayer
         {
             if (input != null)
             {
-                input.PausePressed -= Pause;
+                input.PausePressed -= OnPauseInput;
                 input.TaskListPressed -= OpenTasks;
                 input.UiTaskListPressed -= HandleUiTaskList;
                 input.UiCancelPressed -= HandleCancel;

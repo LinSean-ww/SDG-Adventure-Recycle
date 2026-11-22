@@ -1,0 +1,8 @@
+SDG EXPERIENCE ENHANCEMENTS V1 SUCCESS
+Compile=OK
+ScenePaths=Assets/_Modules_/02_Levels/Level01/Imported/Scenes/WTF.unity,Assets/_Modules_/02_Levels/Level02/Imported/Scenes/SampleScene.unity,Assets/_Modules_/02_Levels/Level04/Imported/Scenes/SampleScene.unity
+Level01=hand-held clamp/shovel visual models and tool action animations (original interactions unchanged)
+Level02=objective tutorial shown at runtime, F1 help
+Level04=Boss HP top overlay, minimum 30 HP at sceneLoaded before Start, 3 AI speed phases, recycling tutorial
+ScenesModified=NO
+UnityPlayModeVerified=NO

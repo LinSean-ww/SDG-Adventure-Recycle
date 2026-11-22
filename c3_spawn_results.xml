@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="4" result="Passed" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-08 02:51:12Z" end-time="2026-11-08 02:51:14Z" duration="2.6734255">
+  <test-suite type="TestSuite" id="1000" name="My project" fullname="My project" runstate="Runnable" testcasecount="221" result="Passed" start-time="2026-11-08 02:51:12Z" end-time="2026-11-08 02:51:14Z" duration="2.673426" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1223" name="M6Integration.PlayModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/M6Integration.PlayModeTests.dll" runstate="Runnable" testcasecount="188" result="Passed" start-time="2026-11-08 02:51:12Z" end-time="2026-11-08 02:51:14Z" duration="1.699899" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="37576" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <test-suite type="TestSuite" id="1224" name="M6IntegrationTests" fullname="M6IntegrationTests" runstate="Runnable" testcasecount="175" result="Passed" start-time="2026-11-08 02:51:12Z" end-time="2026-11-08 02:51:13Z" duration="1.695249" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <test-suite type="TestFixture" id="1009" name="C3SceneBugFixTests" fullname="M6IntegrationTests.C3SceneBugFixTests" classname="M6IntegrationTests.C3SceneBugFixTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-11-08 02:51:12Z" end-time="2026-11-08 02:51:13Z" duration="1.685115" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-case id="1012" name="BDoorSpawnIsCenteredClearStableAndCanApproachDoor" fullname="M6IntegrationTests.C3SceneBugFixTests.BDoorSpawnIsCenteredClearStableAndCanApproachDoor" methodname="BDoorSpawnIsCenteredClearStableAndCanApproachDoor" classname="M6IntegrationTests.C3SceneBugFixTests" runstate="Runnable" seed="907153477" result="Passed" start-time="2026-11-08 02:51:12Z" end-time="2026-11-08 02:51:13Z" duration="0.784952" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <output><![CDATA[C3 movement blocked by: C_CollisionProxies/B_Safety_End | world=(1.80, 1.35, 12.50) | player=(1.40, 0.63, 12.50)
+B doorway route stops at x=1.42 before B_Safety_End at x=1.8
+]]></output>
+          </test-case>
+          <test-case id="1010" name="CaptureBugFixViews" fullname="M6IntegrationTests.C3SceneBugFixTests.CaptureBugFixViews" methodname="CaptureBugFixViews" classname="M6IntegrationTests.C3SceneBugFixTests" runstate="Runnable" seed="1281979139" result="Passed" start-time="2026-11-08 02:51:13Z" end-time="2026-11-08 02:51:13Z" duration="0.499162" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1011" name="OriginalControllerMovesJumpsAndPhysicalSupportsBlock" fullname="M6IntegrationTests.C3SceneBugFixTests.OriginalControllerMovesJumpsAndPhysicalSupportsBlock" methodname="OriginalControllerMovesJumpsAndPhysicalSupportsBlock" classname="M6IntegrationTests.C3SceneBugFixTests" runstate="Runnable" seed="1107085713" result="Passed" start-time="2026-11-08 02:51:13Z" end-time="2026-11-08 02:51:13Z" duration="0.381495" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <output><![CDATA[C3 movement blocked by: M3_Treasure/C3_P2_RecyclingLine/SORTER_MAIN_BODY_2/MACHINE_SIDE | world=(-10.14, 2.80, 16.08) | player=(-9.72, 1.00, 16.08)
+]]></output>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1247" name="M7SharedPlayer.PlayModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/M7SharedPlayer.PlayModeTests.dll" runstate="Runnable" testcasecount="17" result="Passed" start-time="2026-11-08 02:51:14Z" end-time="2026-11-08 02:51:14Z" duration="0.962657" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="37576" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <test-suite type="TestSuite" id="1248" name="M7SharedPlayerTests" fullname="M7SharedPlayerTests" runstate="Runnable" testcasecount="17" result="Passed" start-time="2026-11-08 02:51:14Z" end-time="2026-11-08 02:51:14Z" duration="0.959955" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <test-suite type="TestFixture" id="1227" name="PlayerInputServiceTests" fullname="M7SharedPlayerTests.PlayerInputServiceTests" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-08 02:51:14Z" end-time="2026-11-08 02:51:14Z" duration="0.958025" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-case id="1232" name="BDoorSpawnAcceptsWasdInput" fullname="M7SharedPlayerTests.PlayerInputServiceTests.BDoorSpawnAcceptsWasdInput" methodname="BDoorSpawnAcceptsWasdInput" classname="M7SharedPlayerTests.PlayerInputServiceTests" runstate="Runnable" seed="1373416378" result="Passed" start-time="2026-11-08 02:51:14Z" end-time="2026-11-08 02:51:14Z" duration="0.954886" asserts="0">
+            <properties>
+              <property name="_JOINTYPE" value="UnityCombinatorial" />
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SDGAdventure.SharedPlayer;
+using SDGAdventure.FrontEnd;
 using UnityEngine;
 namespace SDGAdventure.Level04 {
  public sealed class Level04RecycleController : MonoBehaviour {
@@ -36,6 +37,38 @@ namespace SDGAdventure.Level04 {
    if(!CanInteract(item)||lastInteractionFrame==Time.frameCount)return;lastInteractionFrame=Time.frameCount;
    if(item){Carried=item;proxies[item].enabled=false;item.PickUp(carry);}
    else {var current=Carried;Carried=null;bool correct=house.TrySubmit(current);if(!correct && current){current.Drop(DropPosition());if(proxies.TryGetValue(current,out var proxy)&&proxy)proxy.enabled=true;}}
+   Changed?.Invoke();
+  }
+  // Scene has exactly one of each of the five RecycleItemType objects.
+  // Keeping them in the original proxy dictionary lets us find inactive items.
+  public RecycleItem FindItemByType(int type){
+   foreach(var entry in proxies){var candidate=entry.Key;if(candidate && (int)candidate.itemType==type)return candidate;}
+   return null;
+  }
+  public void RestoreItemsFromSave(List<SDGProgressLevel04ItemV1> savedItems,int successfulMask,int carriedType){
+   if(savedItems==null || savedItems.Count!=5)throw new InvalidOperationException("Level04 item snapshot incomplete");
+   Carried=null;
+   for(int i=0;i<5;i++){
+    var saved=savedItems.Find(x=>x!=null && x.itemType==i);
+    if(saved==null)throw new InvalidOperationException("Missing Level04 item type "+i);
+    var item=FindItemByType(i);
+    bool consumed=(successfulMask & (1<<i))!=0;
+    if(!item && !consumed)throw new InvalidOperationException("Unconsumed Level04 item not present: "+i);
+    if(!item)continue; // Already Destroyed: valid only when the successful mask says so.
+    if(proxies.TryGetValue(item,out Collider proxy) && proxy)proxy.enabled=false;
+    if(consumed){item.gameObject.SetActive(false);Destroy(item.gameObject);continue;}
+    item.gameObject.SetActive(saved.activeSelf);
+    item.transform.SetPositionAndRotation(saved.position,saved.rotation);
+    if(proxies.TryGetValue(item,out proxy) && proxy)proxy.enabled=RecycleMode && saved.activeSelf;
+   }
+   if(carriedType>=0){
+    var held=FindItemByType(carriedType);
+    if(!held || (successfulMask & (1<<carriedType))!=0)throw new InvalidOperationException("Invalid carried Level04 item");
+    held.gameObject.SetActive(true);
+    held.PickUp(carry);
+    Carried=held;
+    if(proxies.TryGetValue(held,out Collider proxy) && proxy)proxy.enabled=false;
+   }
    Changed?.Invoke();
   }
   public static bool TryHandleDrop(){if(!Instance || !Instance.Carried)return false;Instance.DropCarried();return true;}

@@ -1,0 +1,46 @@
+﻿[
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Art\\MainMenu\\FE_Menu_SavePanel.png.meta",
+        "existed":  true
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scenes\\SDG_StartAndMainMenu.unity",
+        "existed":  true
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scenes\\SDG_StartAndMainMenu.unity.meta",
+        "existed":  true
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGSaveProgressRuntimeV1.cs",
+        "existed":  true
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGSaveProgressRuntimeV1.cs.meta",
+        "existed":  true
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGSaveProfilesV2.cs",
+        "existed":  false
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGSaveProfilesV2.cs.meta",
+        "existed":  false
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGSaveProgressMenuV2.cs",
+        "existed":  false
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGSaveProgressMenuV2.cs.meta",
+        "existed":  false
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\Editor\\SDGSaveProgressPanelLayoutV2Installer.cs",
+        "existed":  false
+    },
+    {
+        "path":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\Editor\\SDGSaveProgressPanelLayoutV2Installer.cs.meta",
+        "existed":  false
+    }
+]

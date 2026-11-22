@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="6" result="Passed" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-08 02:39:47Z" end-time="2026-11-08 02:39:47Z" duration="0.280349">
+  <test-suite type="TestSuite" id="1000" name="My project" fullname="My project" runstate="Runnable" testcasecount="15" result="Passed" start-time="2026-11-08 02:39:47Z" end-time="2026-11-08 02:39:47Z" duration="0.280349" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1021" name="PlayerControl.EditModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/PlayerControl.EditModeTests.dll" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-11-08 02:39:47Z" end-time="2026-11-08 02:39:47Z" duration="0.200267" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="23428" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+      </properties>
+      <test-suite type="TestSuite" id="1022" name="SDGAdventure" fullname="SDGAdventure" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-11-08 02:39:47Z" end-time="2026-11-08 02:39:47Z" duration="0.195922" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="EditMode" />
+        </properties>
+        <test-suite type="TestSuite" id="1023" name="PlayerControlTests" fullname="SDGAdventure.PlayerControlTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-11-08 02:39:47Z" end-time="2026-11-08 02:39:47Z" duration="0.190651" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="EditMode" />
+          </properties>
+          <test-suite type="TestFixture" id="1014" name="PlayerControlAssetTests" fullname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests" classname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-11-08 02:39:47Z" end-time="2026-11-08 02:39:47Z" duration="0.184607" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties>
+              <property name="platform" value="EditMode" />
+            </properties>
+            <test-case id="1015" name="CMainAndSharedPlayerPrefabHaveNoMissingScripts" fullname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests.CMainAndSharedPlayerPrefabHaveNoMissingScripts" methodname="CMainAndSharedPlayerPrefabHaveNoMissingScripts" classname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests" runstate="Runnable" seed="589162832" result="Passed" start-time="2026-11-08 02:39:44Z" end-time="2026-11-08 02:39:45Z" duration="0.303789" asserts="0">
+              <properties>
+                <property name="platform" value="EditMode" />
+              </properties>
+            </test-case>
+            <test-case id="1016" name="SharedCanvasFontLoadsWithoutChangingGuiSkin" fullname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests.SharedCanvasFontLoadsWithoutChangingGuiSkin" methodname="SharedCanvasFontLoadsWithoutChangingGuiSkin" classname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests" runstate="Runnable" seed="559509174" result="Passed" start-time="2026-11-08 02:39:45Z" end-time="2026-11-08 02:39:45Z" duration="0.025416" asserts="0">
+              <properties>
+                <property name="platform" value="EditMode" />
+              </properties>
+            </test-case>
+            <test-case id="1018" name="SharedPlayerPrefabHasOneMotorCameraAndMenu" fullname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests.SharedPlayerPrefabHasOneMotorCameraAndMenu" methodname="SharedPlayerPrefabHasOneMotorCameraAndMenu" classname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests" runstate="Runnable" seed="1473249286" result="Passed" start-time="2026-11-08 02:39:45Z" end-time="2026-11-08 02:39:45Z" duration="0.005284" asserts="0">
+              <properties>
+                <property name="platform" value="EditMode" />
+              </properties>
+            </test-case>
+            <test-case id="1020" name="StandaloneSceneEntersPlayModeWithoutBuildSettings" fullname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests.StandaloneSceneEntersPlayModeWithoutBuildSettings" methodname="StandaloneSceneEntersPlayModeWithoutBuildSettings" classname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests" runstate="Runnable" seed="1051972912" result="Passed" start-time="2026-11-08 02:39:45Z" end-time="2026-11-08 02:39:47Z" duration="2.711829" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="platform" value="EditMode" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[GfxDevice renderer is null. Unity cannot update the Ambient Probe and Reflection Probes that the SkyManager generates. Run the Editor without the -nographics argument or generate lighting for your scene.
+]]></output>
+            </test-case>
+            <test-case id="1019" name="StandaloneSceneReferencesPrefabAndTestObjects" fullname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests.StandaloneSceneReferencesPrefabAndTestObjects" methodname="StandaloneSceneReferencesPrefabAndTestObjects" classname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests" runstate="Runnable" seed="1921407878" result="Passed" start-time="2026-11-08 02:39:47Z" end-time="2026-11-08 02:39:47Z" duration="0.074210" asserts="0">
+              <properties>
+                <property name="platform" value="EditMode" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1017" name="TaskListActionIsBoundToPInSharedInputAsset" fullname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests.TaskListActionIsBoundToPInSharedInputAsset" methodname="TaskListActionIsBoundToPInSharedInputAsset" classname="SDGAdventure.PlayerControlTests.PlayerControlAssetTests" runstate="Runnable" seed="710739651" result="Passed" start-time="2026-11-08 02:39:47Z" end-time="2026-11-08 02:39:47Z" duration="0.001310" asserts="0">
+              <properties>
+                <property name="platform" value="EditMode" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[GfxDevice renderer is null. Unity cannot update the Ambient Probe and Reflection Probes that the SkyManager generates. Run the Editor without the -nographics argument or generate lighting for your scene.
+Saving results to: C:\Users\h7796\Desktop\Project\Codex Work\Unity\SDG Adventure_R\sdg_edit_results.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

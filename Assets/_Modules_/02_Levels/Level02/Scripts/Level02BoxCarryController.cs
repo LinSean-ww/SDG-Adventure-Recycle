@@ -65,6 +65,15 @@ namespace SDGAdventure.SharedPlayer
         public string Prompt { get; private set; }
         public IPlayerInteractable CurrentTarget => target;
         public Rigidbody HeldBox => heldBox;
+        // Explicit values needed to reconstruct held physics on a V5 world restore.
+        // Do not expose the live arrays for mutation by other systems.
+        public bool SavePreviousKinematic => previousKinematic;
+        public bool SavePreviousGravity => previousGravity;
+        public bool SavePreviousDetectCollisions => previousDetectCollisions;
+        public int SavePreviousInterpolation => (int)previousInterpolation;
+        public int SavePreviousCollisionMode => (int)previousCollisionMode;
+        public bool[] SavePreviousPlayerIgnores => previousPlayerCollisionIgnored == null
+            ? null : (bool[])previousPlayerCollisionIgnored.Clone();
         public bool SuppressLook => IsRotatingHeldBox;
         public bool IsRotatingHeldBox => heldBox != null && input != null &&
             input.Context == PlayerInputContext.Gameplay &&
@@ -311,6 +320,63 @@ namespace SDGAdventure.SharedPlayer
             target = null;
             boxTarget = null;
             return true;
+        }
+
+        // Called ONLY after the scene's Rigidbody pose has been restored, while
+        // Time.timeScale is zero. Re-creates carried-box collision handling.
+        public bool RestoreCarryFromWorldSave(Rigidbody body, bool savedKinematic,
+            bool savedGravity, bool savedDetectCollisions, int savedInterpolation,
+            int savedCollisionMode, bool[] savedPlayerIgnores)
+        {
+            if (heldBox != null || body == null || !enabled || !gameObject.activeInHierarchy ||
+                body.gameObject.scene != gameObject.scene || playerCamera == null ||
+                !IsBoxBody(body) || savedPlayerIgnores == null ||
+                !Enum.IsDefined(typeof(RigidbodyInterpolation), savedInterpolation) ||
+                !Enum.IsDefined(typeof(CollisionDetectionMode), savedCollisionMode)) return false;
+            // A held box is kinematic in the world snapshot; TryPickUpBox accepts
+            // a free Rigidbody only. Physics is paused during world restore.
+            bool snapshotKinematic = body.isKinematic;
+            bool snapshotGravity = body.useGravity;
+            bool snapshotDetect = body.detectCollisions;
+            RigidbodyInterpolation snapshotInterp = body.interpolation;
+            CollisionDetectionMode snapshotCollision = body.collisionDetectionMode;
+            try
+            {
+                body.isKinematic = false;
+                if (!TryPickUpBox(body)) return false;
+                if (previousPlayerCollisionIgnored == null ||
+                    previousPlayerCollisionIgnored.Length != savedPlayerIgnores.Length)
+                {
+                    ReleaseHeldBox(false);
+                    return false;
+                }
+                // Restore the physics settings that must be reinstated on drop,
+                // not the temporary kinematic values from the held snapshot.
+                previousKinematic = savedKinematic;
+                previousGravity = savedGravity;
+                previousDetectCollisions = savedDetectCollisions;
+                previousInterpolation = (RigidbodyInterpolation)savedInterpolation;
+                previousCollisionMode = (CollisionDetectionMode)savedCollisionMode;
+                Array.Copy(savedPlayerIgnores, previousPlayerCollisionIgnored, savedPlayerIgnores.Length);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("[SDG Level02 Carry Save] Failed to restore held box: " + ex.Message);
+                if (heldBox != null) ReleaseHeldBox(false);
+                return false;
+            }
+            finally
+            {
+                if (heldBox == null)
+                {
+                    body.isKinematic = snapshotKinematic;
+                    body.useGravity = snapshotGravity;
+                    body.detectCollisions = snapshotDetect;
+                    body.interpolation = snapshotInterp;
+                    body.collisionDetectionMode = snapshotCollision;
+                }
+            }
         }
 
         private Quaternion GetViewRotation()

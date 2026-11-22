@@ -1,0 +1,11 @@
+SDG SAVE PANEL TALL V2 SUCCESS
+Scene=Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scenes/SDG_StartAndMainMenu.unity
+Image=FE_Menu_SavePanel.png original pixels unchanged; Single Sprite 9-slice meta updated
+Panel=495x306 (original 495x191; height +60%)
+Left=click player portrait to switch save owner; new owner; name/progress/playtime
+Right=Auto + Manual1 + Manual2 + Manual3; choose/load/save/delete
+Files=original profile keeps old unscoped saves, new profiles use independent files
+Settings=keeps auto-save toggle; F5 & pause actions are preserved
+Limit=menu save unavailable outside levels; per-level mission inventories not yet adapted
+LevelScenes=unchanged
+VisualPlaymodeValidation=PENDING

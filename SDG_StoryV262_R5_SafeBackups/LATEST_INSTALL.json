@@ -1,0 +1,297 @@
+﻿{
+    "BaselineHash":  "C3306EC08E9ACA9EC94A9771F3C4FE54045AFB0818F6812A93EFC1E626B1CD36",
+    "ProjectPath":  "F:\\SDG Adventure_R",
+    "Files":  [
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\SDGLevel03StoryV2Controller.cs",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_0.bak",
+                      "InstalledHash":  "463FA73B54B9ED09F34726B3243E9F565D9BA3A3F23C305FE5E0CC87C2933445",
+                      "Hash":  "C3306EC08E9ACA9EC94A9771F3C4FE54045AFB0818F6812A93EFC1E626B1CD36",
+                      "Existed":  true
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\SDGLevel03R5SortingEnergyGame.cs",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_1.bak",
+                      "InstalledHash":  "2A626E58300CB14438544422108F4B604889FB0F87EDD9440696787DD5CFEB1C",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\SDGLevel03R5SortingEnergyGame.cs.meta",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_2.bak",
+                      "InstalledHash":  "BB3101D070ED5BD43F1CC663397EC1126DA1D0FA0687C349FD3574C491D2A72D",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Editor\\SDGLevel03StoryV262R5Validator.cs",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_3.bak",
+                      "InstalledHash":  "4E983EB087F633BB2CE9240970DB19BC0AB369CCCB92E69BBF801F4904A342F8",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Editor\\SDGLevel03StoryV262R5Validator.cs.meta",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_4.bak",
+                      "InstalledHash":  "BE6AE4EC456B13FF352159BAF09DB8C8249CABDB40FB128413964621092513B8",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Belt.png",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_5.bak",
+                      "InstalledHash":  "F705D526887C125DEF05AD90D7D8F55098171D019BEE242B2A4E1C6DA4EE1B0F",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Belt.png.meta",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_6.bak",
+                      "InstalledHash":  "820DF89CE89A1C6F7ABC7CDA26245365FA7DF4C185B6BBA47D11B6260A27D6A5",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Bin_Electronics.png",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_7.bak",
+                      "InstalledHash":  "6E677E3BD6626F29CD5564CF005AD327915001329C69E23AE80B232C742401D6",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Bin_Electronics.png.meta",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_8.bak",
+                      "InstalledHash":  "94DDA2CBD332E35B1E76F779901906E15582F36BF98C8997B586A60EDC3D4305",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Bin_General.png",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_9.bak",
+                      "InstalledHash":  "91640B66A42B16D059EC7AFEF3DFB2E6DFD165D6DB651CF789EFF333B46E32DC",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Bin_General.png.meta",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_10.bak",
+                      "InstalledHash":  "12A013A4D877979FA7F77858F9D219E3B9969C335938105F40B479E940976FA4",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Bin_Metal.png",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_11.bak",
+                      "InstalledHash":  "A25B525B195345D419DC425B1F18D1DA90934DF95DCF7567C0DE95DC0B7749B0",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Bin_Metal.png.meta",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_12.bak",
+                      "InstalledHash":  "7E4245E791EE788B7843901DD1CE2BC45423FD86718FFF7CECAF3B663546734F",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Bin_Plastic.png",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_13.bak",
+                      "InstalledHash":  "A35E7E2BE362E8C53563D068C53AB215B0BB11AF4E58BD3B4CF9ECD51FBA0DB3",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Bin_Plastic.png.meta",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_14.bak",
+                      "InstalledHash":  "B5DD7C4ED50EE0FA8B64FD8DE618BB46800855CD562CA35AEB8573B29252E1A6",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_Bag.png",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_15.bak",
+                      "InstalledHash":  "DCE6B09B62006D3F6CD0E69084936E3BEB1C5D0829050665C3398CD786F3498B",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_Bag.png.meta",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_16.bak",
+                      "InstalledHash":  "86A947BE8691E70C4521A5C7EA4A757EEFB56DBB1924B9E638606887D4A226F7",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_Battery.png",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_17.bak",
+                      "InstalledHash":  "85C3793D09C07F5D4540314029B35B14541D29866B5B5A99DC002BEE1D0A374F",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_Battery.png.meta",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_18.bak",
+                      "InstalledHash":  "A4D4941F4DC0350C6805729687BDDD8859CCD68E00C7C97E50EE3085CF12A927",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_Bottle.png",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_19.bak",
+                      "InstalledHash":  "221DDC3D145E5273CFFD3CCD757F3BC10E0D47425228E1D8ABD762C1634DDA81",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_Bottle.png.meta",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_20.bak",
+                      "InstalledHash":  "D4DE22B53845157DE2632AC7E44F9D49C1428F8F332799521D15A2A1CAE10457",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_Can.png",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_21.bak",
+                      "InstalledHash":  "E4BFC0CD16B4951326D95E28F4BA9B86A077CA69BA777062EB75ABE295DDE861",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_Can.png.meta",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_22.bak",
+                      "InstalledHash":  "D89AD687FBA5139D16A47926CDF8C274839BDAC4ADBF73C46C80BC00B6C45B49",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_Cup.png",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_23.bak",
+                      "InstalledHash":  "6492B92B522FBCD4BC1CEACA5160C741AE648AB245BC3F32580A1B750F8A99B5",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_Cup.png.meta",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_24.bak",
+                      "InstalledHash":  "6519037221D4D4225A71DFE82FCE7043B7DF55512F949382AE6A6975C0894955",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_Detergent.png",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_25.bak",
+                      "InstalledHash":  "420B1635FAA6CE6A80877636D5046B3C4A917FD409009B5CF0B3838986741B75",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_Detergent.png.meta",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_26.bak",
+                      "InstalledHash":  "D1C49EB3DFF4A44C6C761F99E8132ADDD0560A52F9BF6098CF347C40591739BA",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_PCB.png",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_27.bak",
+                      "InstalledHash":  "1DA168974BF58C46FD8DCA696FC146BD8AFE8CA3BB5462E92D49645F4AF627C4",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_PCB.png.meta",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_28.bak",
+                      "InstalledHash":  "CFEA3A89E1C1941B2D43219F8170CF0D22F99A6CE8D96FC51EEF0AADB3CB62FB",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_Phone.png",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_29.bak",
+                      "InstalledHash":  "DE18E90B89C8F9F746136382F0C9A254482DD7B21B6C4F6BA59EE3ADF0AD15F1",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_Phone.png.meta",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_30.bak",
+                      "InstalledHash":  "3C06FD758189FD26602863B95AD6E6FBE8E1D1FBF57172B8197F2BCE915910C1",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_Scrap.png",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_31.bak",
+                      "InstalledHash":  "75A5AFEA783EE84929A6165F14B51D3EA0046B8D9668C9F35C8836AB17B0856D",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_Scrap.png.meta",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_32.bak",
+                      "InstalledHash":  "505ED8ED6E6A135EAEF702D37EB5ED14A995F32A852293B34CD2C13FF68902F6",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_Tin.png",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_33.bak",
+                      "InstalledHash":  "21F987904695A3F3930E9BB47B3497C7724147B76E3B4A06BAB4A456C836DC83",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_Tin.png.meta",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_34.bak",
+                      "InstalledHash":  "8431295F1B2652AB95BE4AE5901979A127654F628C31084EC91A9781F14C5124",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_Tissue.png",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_35.bak",
+                      "InstalledHash":  "465F0DCEEC2B879B7DF837F6AB756C2C4F6814D8CC7825E24DA9C57F41C17DB4",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_Tissue.png.meta",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_36.bak",
+                      "InstalledHash":  "B2CC87E8D216BBAD67236EEC7EB95AE87C38BBC7153D69B5D5D2299457032668",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_Wrapper.png",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_37.bak",
+                      "InstalledHash":  "E1B5F07DF0F640FB1FEED19B42EAA47E82F07C0FA493E247827241E0B36B0D55",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Item_Wrapper.png.meta",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_38.bak",
+                      "InstalledHash":  "2619D340AF238A9685CA6D9179950FB3EE1E2F15CEC146C08DA80CCD86761ABF",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Panel.png",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_39.bak",
+                      "InstalledHash":  "B1DC38B4EC7B8269229A048FF88F217DC1899434C44B362B2B226D436B346033",
+                      "Hash":  null,
+                      "Existed":  false
+                  },
+                  {
+                      "Destination":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R5_Panel.png.meta",
+                      "BackupPath":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600\\Original_40.bak",
+                      "InstalledHash":  "E97A464540CFCFA8D6B78DC50C20395EC2BE3AC98EC9092304D2FEADA42D86DE",
+                      "Hash":  null,
+                      "Existed":  false
+                  }
+              ],
+    "UnityLog":  "F:\\SDG_Level03_V262_R5_TrashSortingEnergy_SafeInstall\\Reports\\Unity_R5_20261113_201403_891.log",
+    "Status":  "Installed",
+    "Validated":  "2026-11-13T20:14:16",
+    "BackupDir":  "F:\\SDG Adventure_R\\SDG_StoryV262_R5_SafeBackups\\BeforeR5_20261113_201403_600"
+}

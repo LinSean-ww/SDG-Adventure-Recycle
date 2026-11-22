@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="1" result="Passed" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-08 03:40:18Z" end-time="2026-11-08 03:40:18Z" duration="0.0385141">
+  <test-suite type="TestSuite" id="1000" name="CompletePlayer_Test_V2_20261108_113334" fullname="CompletePlayer_Test_V2_20261108_113334" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-11-08 03:40:18Z" end-time="2026-11-08 03:40:18Z" duration="0.038514" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1009" name="V2Acceptance.PlayModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/CompletePlayer_Test_V2_20261108_113334/Library/ScriptAssemblies/V2Acceptance.PlayModeTests.dll" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-11-08 03:40:18Z" end-time="2026-11-08 03:40:18Z" duration="0.031094" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="41740" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <test-suite type="TestFixture" id="1003" name="RestartPersistenceTests" fullname="RestartPersistenceTests" classname="RestartPersistenceTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-08 03:40:18Z" end-time="2026-11-08 03:40:18Z" duration="0.030011" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <test-case id="1005" name="ReadAfterRestartAndReset" fullname="RestartPersistenceTests.ReadAfterRestartAndReset" methodname="ReadAfterRestartAndReset" classname="RestartPersistenceTests" runstate="Runnable" seed="331837398" result="Passed" start-time="2026-11-08 03:40:18Z" end-time="2026-11-08 03:40:18Z" duration="0.021918" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

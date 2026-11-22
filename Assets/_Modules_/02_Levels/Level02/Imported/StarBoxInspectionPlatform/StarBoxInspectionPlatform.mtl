@@ -1,0 +1,49 @@
+# Unity import materials for the inspection platform
+newmtl Brushed_Gunmetal
+Ka 0.12 0.13 0.14
+Kd 0.35 0.38 0.40
+Ks 0.45 0.47 0.49
+Ns 80
+illum 2
+
+newmtl Silver_Trim
+Ka 0.25 0.27 0.28
+Kd 0.66 0.70 0.72
+Ks 0.72 0.75 0.76
+Ns 130
+illum 2
+
+newmtl Dark_Trim
+Ka 0.04 0.05 0.05
+Kd 0.10 0.13 0.14
+Ks 0.32 0.36 0.36
+Ns 60
+illum 2
+
+newmtl Safety_Green
+Ka 0.02 0.14 0.06
+Kd 0.055 0.40 0.17
+Ks 0.16 0.35 0.20
+Ns 35
+illum 2
+
+newmtl Star_Outline
+Ka 0.01 0.012 0.012
+Kd 0.025 0.035 0.035
+Ks 0.18 0.20 0.20
+Ns 30
+illum 2
+
+newmtl Signal_Yellow
+Ka 0.30 0.21 0.00
+Kd 1.00 0.79 0.025
+Ks 0.80 0.68 0.20
+Ns 60
+illum 2
+
+newmtl Indicator_Green
+Ka 0.00 0.25 0.08
+Kd 0.04 0.92 0.24
+Ks 0.70 0.95 0.75
+Ns 120
+illum 2

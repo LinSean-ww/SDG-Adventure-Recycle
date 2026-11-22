@@ -1,0 +1,59 @@
+﻿{
+    "BaselineHash":  "38D4DAA87B7773A0E715EA6EDEDC567E2D7ACE1348B86EEE0DDDCBE93C42013C",
+    "ProjectPath":  "F:\\SDG Adventure_R",
+    "InstalledHash":  "C3306EC08E9ACA9EC94A9771F3C4FE54045AFB0818F6812A93EFC1E626B1CD36",
+    "Files":  [
+                  {
+                      "Existed":  true,
+                      "Hash":  "38D4DAA87B7773A0E715EA6EDEDC567E2D7ACE1348B86EEE0DDDCBE93C42013C",
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_R42_Calibration_Backups\\BeforeR42_20261113_173808_416\\Original_0.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\SDGLevel03StoryV2Controller.cs"
+                  },
+                  {
+                      "Existed":  false,
+                      "Hash":  null,
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_R42_Calibration_Backups\\BeforeR42_20261113_173808_416\\Original_1.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\Editor\\SDGLevel03StoryV262R42Validator.cs"
+                  },
+                  {
+                      "Existed":  false,
+                      "Hash":  null,
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_R42_Calibration_Backups\\BeforeR42_20261113_173808_416\\Original_2.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\Editor\\SDGLevel03StoryV262R42Validator.cs.meta"
+                  },
+                  {
+                      "Existed":  true,
+                      "Hash":  "48472B04592FBB7023A08627F4160403430465F359A46C3F730614C53B99EB1D",
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_R42_Calibration_Backups\\BeforeR42_20261113_173808_416\\Original_3.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\Resources.meta"
+                  },
+                  {
+                      "Existed":  false,
+                      "Hash":  null,
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_R42_Calibration_Backups\\BeforeR42_20261113_173808_416\\Original_4.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R42_ReactionPanel.png"
+                  },
+                  {
+                      "Existed":  false,
+                      "Hash":  null,
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_R42_Calibration_Backups\\BeforeR42_20261113_173808_416\\Original_5.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R42_ReactionPanel.png.meta"
+                  },
+                  {
+                      "Existed":  false,
+                      "Hash":  null,
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_R42_Calibration_Backups\\BeforeR42_20261113_173808_416\\Original_6.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R42_MovingPointer.png"
+                  },
+                  {
+                      "Existed":  false,
+                      "Hash":  null,
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_R42_Calibration_Backups\\BeforeR42_20261113_173808_416\\Original_7.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\Resources\\SDG_R42_MovingPointer.png.meta"
+                  }
+              ],
+    "UnityLog":  "F:\\SDG_Level03_V262_R42_ReferenceHUD_RealInteraction_SafeInstall\\Reports\\Unity_R42_20261113_173808_639.log",
+    "Status":  "Installed",
+    "Validated":  "2026-11-13T17:38:41",
+    "BackupDir":  "F:\\SDG Adventure_R\\SDG_StoryV262_R42_Calibration_Backups\\BeforeR42_20261113_173808_416"
+}

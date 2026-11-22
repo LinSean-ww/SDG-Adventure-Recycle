@@ -27,7 +27,7 @@ public class CameraLook : MonoBehaviour
     {
         // 取得滑鼠數值
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * ((UnityEngine.PlayerPrefs.GetInt("SDG_Settings_V1_InvertY", 0) != 0) ? -1f : 1f);
 
         // 1. 上下旋轉攝影機（抬頭 60 度 [-60]，低頭 48 度 [48]）
         cameraPitch -= mouseY;

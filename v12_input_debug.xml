@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="1" result="Passed" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-08 04:23:22Z" end-time="2026-11-08 04:23:22Z" duration="0.3680848">
+  <test-suite type="TestSuite" id="1000" name="My project" fullname="My project" runstate="Runnable" testcasecount="223" result="Passed" start-time="2026-11-08 04:23:22Z" end-time="2026-11-08 04:23:22Z" duration="0.368085" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1272" name="PlayerControl.PlayModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/PlayerControl.PlayModeTests.dll" runstate="Runnable" testcasecount="18" result="Passed" start-time="2026-11-08 04:23:22Z" end-time="2026-11-08 04:23:22Z" duration="0.353585" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="47564" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <test-suite type="TestSuite" id="1273" name="SDGAdventure" fullname="SDGAdventure" runstate="Runnable" testcasecount="18" result="Passed" start-time="2026-11-08 04:23:22Z" end-time="2026-11-08 04:23:22Z" duration="0.352916" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <test-suite type="TestSuite" id="1274" name="PlayerControlTests" fullname="SDGAdventure.PlayerControlTests" runstate="Runnable" testcasecount="18" result="Passed" start-time="2026-11-08 04:23:22Z" end-time="2026-11-08 04:23:22Z" duration="0.352453" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-suite type="TestFixture" id="1253" name="CompletePlayerV12InputTests" fullname="SDGAdventure.PlayerControlTests.CompletePlayerV12InputTests" classname="SDGAdventure.PlayerControlTests.CompletePlayerV12InputTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-08 04:23:22Z" end-time="2026-11-08 04:23:22Z" duration="0.351237" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+            </properties>
+            <test-case id="1254" name="DemoInputUiAndFiveSlotsRemainAvailable" fullname="SDGAdventure.PlayerControlTests.CompletePlayerV12InputTests.DemoInputUiAndFiveSlotsRemainAvailable" methodname="DemoInputUiAndFiveSlotsRemainAvailable" classname="SDGAdventure.PlayerControlTests.CompletePlayerV12InputTests" runstate="Runnable" seed="764482887" result="Passed" start-time="2026-11-08 04:23:22Z" end-time="2026-11-08 04:23:22Z" duration="0.339817" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="platform" value="PlayMode" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

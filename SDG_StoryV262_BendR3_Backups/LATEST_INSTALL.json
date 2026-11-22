@@ -1,0 +1,28 @@
+﻿{
+    "ProjectPath":  "F:\\SDG Adventure_R",
+    "InstalledHash":  "121863AFB12831CA78306B02C0E1AA1ED306C4209FEE28F84735F39E96766C22",
+    "Files":  [
+                  {
+                      "Existed":  true,
+                      "Hash":  "838569132C2E18047FA90B2B70686EF6059D85A942CC94B0CFF351C463F14B41",
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_BendR3_Backups\\BeforeBendR3_20261113_160013_205\\Original_0.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\SDGLevel03StoryV2Controller.cs"
+                  },
+                  {
+                      "Existed":  false,
+                      "Hash":  null,
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_BendR3_Backups\\BeforeBendR3_20261113_160013_205\\Original_1.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\Editor\\SDGLevel03StoryV262BendR3Validator.cs"
+                  },
+                  {
+                      "Existed":  false,
+                      "Hash":  null,
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_BendR3_Backups\\BeforeBendR3_20261113_160013_205\\Original_2.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\Editor\\SDGLevel03StoryV262BendR3Validator.cs.meta"
+                  }
+              ],
+    "UnityLog":  "F:\\SDG_Level03_V262_BendR3_SafeFix_Candidate\\Reports\\Unity_BendR3_20261113_160013_266.log",
+    "Status":  "Installed",
+    "Validated":  "2026-11-13T16:00:42",
+    "BackupDir":  "F:\\SDG Adventure_R\\SDG_StoryV262_BendR3_Backups\\BeforeBendR3_20261113_160013_205"
+}

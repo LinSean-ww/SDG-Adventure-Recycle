@@ -1,0 +1,8 @@
+SDG LEVEL03 GREENPULSE V1 SUCCESS
+Scene=Assets/_Modules_/02_Levels/Level03/Scenes/C_Main.unity
+C3DeviceState=1
+C3PuzzleConsole=1
+Gameplay=OPTIONAL; unlocked after factory running
+Keys=F7 open/close; SPACE/ENTER sync; R retry; ESC close
+QuestOrGateFilesChanged=NO
+PlayModeTest=NOT RUN; verify in Game view

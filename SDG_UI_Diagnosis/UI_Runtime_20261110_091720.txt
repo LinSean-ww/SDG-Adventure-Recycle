@@ -1,0 +1,120 @@
+﻿SDG Runtime UI Diagnosis - READ ONLY
+Captured UTC: 2026-11-10 01:17:20
+Unity: 2023.1.22f1
+Active scene: Assets/_Modules_/02_Levels/Level01/Imported/Scenes/WTF.unity
+Time.timeScale: 0
+
+=== Loaded scenes ===
+[0] WTF | Assets/_Modules_/02_Levels/Level01/Imported/Scenes/WTF.unity | loaded=True
+
+=== All loaded UI Canvases (including persistent scene) ===
+Canvas: Level01 CompletePlayer/PlayerHudCanvas
+  scene=WTF (Assets/_Modules_/02_Levels/Level01/Imported/Scenes/WTF.unity) active=True canvasEnabled=False sortOrder=100
+  owner[0] Level01 CompletePlayer/PlayerHudCanvas => UnityEngine.UI.CanvasScaler [enabled=True]
+  owner[1] Level01 CompletePlayer => SDGAdventure.SharedPlayer.SharedFirstPersonController [enabled=True], SDGAdventure.SharedPlayer.PlayerInteractor [enabled=True], SDGAdventure.SharedPlayer.PlayerPauseMenu [enabled=True], SDGAdventure.CompletePlayer.CompletePlayerWorkerAppearance [enabled=True], SDGAdventure.SharedPlayer.PlayerTaskJournal [enabled=True], SDGAdventure.SharedPlayer.PlayerMenuCanvas [enabled=True], SDGAdventure.SharedPlayer.PlayerHudCanvas [enabled=True], SDGAdventure.SharedPlayer.PlayerPerspectiveRig [enabled=True]
+Canvas: Level01 CompletePlayer/PlayerMenuCanvas
+  scene=WTF (Assets/_Modules_/02_Levels/Level01/Imported/Scenes/WTF.unity) active=True canvasEnabled=True sortOrder=500
+  owner[0] Level01 CompletePlayer/PlayerMenuCanvas => UnityEngine.UI.CanvasScaler [enabled=True], UnityEngine.UI.GraphicRaycaster [enabled=True]
+  owner[1] Level01 CompletePlayer => SDGAdventure.SharedPlayer.SharedFirstPersonController [enabled=True], SDGAdventure.SharedPlayer.PlayerInteractor [enabled=True], SDGAdventure.SharedPlayer.PlayerPauseMenu [enabled=True], SDGAdventure.CompletePlayer.CompletePlayerWorkerAppearance [enabled=True], SDGAdventure.SharedPlayer.PlayerTaskJournal [enabled=True], SDGAdventure.SharedPlayer.PlayerMenuCanvas [enabled=True], SDGAdventure.SharedPlayer.PlayerHudCanvas [enabled=True], SDGAdventure.SharedPlayer.PlayerPerspectiveRig [enabled=True]
+Canvas: Level01 CompletePlayer/Level01 Scanner Anchor/scanball/MTE
+  scene=WTF (Assets/_Modules_/02_Levels/Level01/Imported/Scenes/WTF.unity) active=True canvasEnabled=True sortOrder=0
+  owner[0] Level01 CompletePlayer/Level01 Scanner Anchor/scanball/MTE => UnityEngine.UI.CanvasScaler [enabled=True], UnityEngine.UI.GraphicRaycaster [enabled=True]
+  owner[1] Level01 CompletePlayer/Level01 Scanner Anchor/scanball => scanball [enabled=True], TreasureDetector [enabled=True]
+  owner[3] Level01 CompletePlayer => SDGAdventure.SharedPlayer.SharedFirstPersonController [enabled=True], SDGAdventure.SharedPlayer.PlayerInteractor [enabled=True], SDGAdventure.SharedPlayer.PlayerPauseMenu [enabled=True], SDGAdventure.CompletePlayer.CompletePlayerWorkerAppearance [enabled=True], SDGAdventure.SharedPlayer.PlayerTaskJournal [enabled=True], SDGAdventure.SharedPlayer.PlayerMenuCanvas [enabled=True], SDGAdventure.SharedPlayer.PlayerHudCanvas [enabled=True], SDGAdventure.SharedPlayer.PlayerPerspectiveRig [enabled=True]
+Canvas: aim
+  scene=WTF (Assets/_Modules_/02_Levels/Level01/Imported/Scenes/WTF.unity) active=True canvasEnabled=True sortOrder=0
+  owner[0] aim => UnityEngine.UI.CanvasScaler [enabled=True], UnityEngine.UI.GraphicRaycaster [enabled=True]
+Canvas: Level01 CompletePlayer/Level01 Scanner Anchor/scanball/scan
+  scene=WTF (Assets/_Modules_/02_Levels/Level01/Imported/Scenes/WTF.unity) active=True canvasEnabled=True sortOrder=0
+  owner[0] Level01 CompletePlayer/Level01 Scanner Anchor/scanball/scan => UnityEngine.UI.CanvasScaler [enabled=True], UnityEngine.UI.GraphicRaycaster [enabled=True]
+  owner[1] Level01 CompletePlayer/Level01 Scanner Anchor/scanball => scanball [enabled=True], TreasureDetector [enabled=True]
+  owner[3] Level01 CompletePlayer => SDGAdventure.SharedPlayer.SharedFirstPersonController [enabled=True], SDGAdventure.SharedPlayer.PlayerInteractor [enabled=True], SDGAdventure.SharedPlayer.PlayerPauseMenu [enabled=True], SDGAdventure.CompletePlayer.CompletePlayerWorkerAppearance [enabled=True], SDGAdventure.SharedPlayer.PlayerTaskJournal [enabled=True], SDGAdventure.SharedPlayer.PlayerMenuCanvas [enabled=True], SDGAdventure.SharedPlayer.PlayerHudCanvas [enabled=True], SDGAdventure.SharedPlayer.PlayerPerspectiveRig [enabled=True]
+Total loaded-scene Canvases: 5
+
+=== Matches (exact object paths and owning scripts) ===
+--- Match #1 ---
+Text: 返回選關
+Object: Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport/ScrollContent/Button/Text
+Scene: WTF (Assets/_Modules_/02_Levels/Level01/Imported/Scenes/WTF.unity)
+activeSelf=True activeInHierarchy=True componentEnabled=True
+  owner[0] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport/ScrollContent/Button/Text => UnityEngine.UI.Text [enabled=True]
+  owner[1] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport/ScrollContent/Button => UnityEngine.UI.Image [enabled=True], UnityEngine.UI.Button [enabled=True], UnityEngine.UI.LayoutElement [enabled=True]
+  owner[2] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport/ScrollContent => UnityEngine.UI.VerticalLayoutGroup [enabled=True], UnityEngine.UI.ContentSizeFitter [enabled=True]
+  owner[3] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport => UnityEngine.UI.RectMask2D [enabled=True], UnityEngine.UI.ScrollRect [enabled=True]
+  owner[4] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel => UnityEngine.UI.Image [enabled=True]
+  owner[5] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay => UnityEngine.UI.Image [enabled=True]
+  owner[6] Level01 CompletePlayer/PlayerMenuCanvas => UnityEngine.UI.CanvasScaler [enabled=True], UnityEngine.UI.GraphicRaycaster [enabled=True]
+  owner[7] Level01 CompletePlayer => SDGAdventure.SharedPlayer.SharedFirstPersonController [enabled=True], SDGAdventure.SharedPlayer.PlayerInteractor [enabled=True], SDGAdventure.SharedPlayer.PlayerPauseMenu [enabled=True], SDGAdventure.CompletePlayer.CompletePlayerWorkerAppearance [enabled=True], SDGAdventure.SharedPlayer.PlayerTaskJournal [enabled=True], SDGAdventure.SharedPlayer.PlayerMenuCanvas [enabled=True], SDGAdventure.SharedPlayer.PlayerHudCanvas [enabled=True], SDGAdventure.SharedPlayer.PlayerPerspectiveRig [enabled=True]
+--- Match #2 ---
+Text: 重新開始本關
+Object: Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport/ScrollContent/Button/Text
+Scene: WTF (Assets/_Modules_/02_Levels/Level01/Imported/Scenes/WTF.unity)
+activeSelf=True activeInHierarchy=True componentEnabled=True
+  owner[0] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport/ScrollContent/Button/Text => UnityEngine.UI.Text [enabled=True]
+  owner[1] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport/ScrollContent/Button => UnityEngine.UI.Image [enabled=True], UnityEngine.UI.Button [enabled=True], UnityEngine.UI.LayoutElement [enabled=True]
+  owner[2] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport/ScrollContent => UnityEngine.UI.VerticalLayoutGroup [enabled=True], UnityEngine.UI.ContentSizeFitter [enabled=True]
+  owner[3] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport => UnityEngine.UI.RectMask2D [enabled=True], UnityEngine.UI.ScrollRect [enabled=True]
+  owner[4] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel => UnityEngine.UI.Image [enabled=True]
+  owner[5] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay => UnityEngine.UI.Image [enabled=True]
+  owner[6] Level01 CompletePlayer/PlayerMenuCanvas => UnityEngine.UI.CanvasScaler [enabled=True], UnityEngine.UI.GraphicRaycaster [enabled=True]
+  owner[7] Level01 CompletePlayer => SDGAdventure.SharedPlayer.SharedFirstPersonController [enabled=True], SDGAdventure.SharedPlayer.PlayerInteractor [enabled=True], SDGAdventure.SharedPlayer.PlayerPauseMenu [enabled=True], SDGAdventure.CompletePlayer.CompletePlayerWorkerAppearance [enabled=True], SDGAdventure.SharedPlayer.PlayerTaskJournal [enabled=True], SDGAdventure.SharedPlayer.PlayerMenuCanvas [enabled=True], SDGAdventure.SharedPlayer.PlayerHudCanvas [enabled=True], SDGAdventure.SharedPlayer.PlayerPerspectiveRig [enabled=True]
+--- Match #3 ---
+Text: 任務清單
+Object: Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport/ScrollContent/Button/Text
+Scene: WTF (Assets/_Modules_/02_Levels/Level01/Imported/Scenes/WTF.unity)
+activeSelf=True activeInHierarchy=True componentEnabled=True
+  owner[0] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport/ScrollContent/Button/Text => UnityEngine.UI.Text [enabled=True]
+  owner[1] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport/ScrollContent/Button => UnityEngine.UI.Image [enabled=True], UnityEngine.UI.Button [enabled=True], UnityEngine.UI.LayoutElement [enabled=True]
+  owner[2] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport/ScrollContent => UnityEngine.UI.VerticalLayoutGroup [enabled=True], UnityEngine.UI.ContentSizeFitter [enabled=True]
+  owner[3] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport => UnityEngine.UI.RectMask2D [enabled=True], UnityEngine.UI.ScrollRect [enabled=True]
+  owner[4] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel => UnityEngine.UI.Image [enabled=True]
+  owner[5] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay => UnityEngine.UI.Image [enabled=True]
+  owner[6] Level01 CompletePlayer/PlayerMenuCanvas => UnityEngine.UI.CanvasScaler [enabled=True], UnityEngine.UI.GraphicRaycaster [enabled=True]
+  owner[7] Level01 CompletePlayer => SDGAdventure.SharedPlayer.SharedFirstPersonController [enabled=True], SDGAdventure.SharedPlayer.PlayerInteractor [enabled=True], SDGAdventure.SharedPlayer.PlayerPauseMenu [enabled=True], SDGAdventure.CompletePlayer.CompletePlayerWorkerAppearance [enabled=True], SDGAdventure.SharedPlayer.PlayerTaskJournal [enabled=True], SDGAdventure.SharedPlayer.PlayerMenuCanvas [enabled=True], SDGAdventure.SharedPlayer.PlayerHudCanvas [enabled=True], SDGAdventure.SharedPlayer.PlayerPerspectiveRig [enabled=True]
+--- Match #4 ---
+Text: 操作設定
+Object: Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport/ScrollContent/Button/Text
+Scene: WTF (Assets/_Modules_/02_Levels/Level01/Imported/Scenes/WTF.unity)
+activeSelf=True activeInHierarchy=True componentEnabled=True
+  owner[0] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport/ScrollContent/Button/Text => UnityEngine.UI.Text [enabled=True]
+  owner[1] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport/ScrollContent/Button => UnityEngine.UI.Image [enabled=True], UnityEngine.UI.Button [enabled=True], UnityEngine.UI.LayoutElement [enabled=True]
+  owner[2] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport/ScrollContent => UnityEngine.UI.VerticalLayoutGroup [enabled=True], UnityEngine.UI.ContentSizeFitter [enabled=True]
+  owner[3] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport => UnityEngine.UI.RectMask2D [enabled=True], UnityEngine.UI.ScrollRect [enabled=True]
+  owner[4] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel => UnityEngine.UI.Image [enabled=True]
+  owner[5] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay => UnityEngine.UI.Image [enabled=True]
+  owner[6] Level01 CompletePlayer/PlayerMenuCanvas => UnityEngine.UI.CanvasScaler [enabled=True], UnityEngine.UI.GraphicRaycaster [enabled=True]
+  owner[7] Level01 CompletePlayer => SDGAdventure.SharedPlayer.SharedFirstPersonController [enabled=True], SDGAdventure.SharedPlayer.PlayerInteractor [enabled=True], SDGAdventure.SharedPlayer.PlayerPauseMenu [enabled=True], SDGAdventure.CompletePlayer.CompletePlayerWorkerAppearance [enabled=True], SDGAdventure.SharedPlayer.PlayerTaskJournal [enabled=True], SDGAdventure.SharedPlayer.PlayerMenuCanvas [enabled=True], SDGAdventure.SharedPlayer.PlayerHudCanvas [enabled=True], SDGAdventure.SharedPlayer.PlayerPerspectiveRig [enabled=True]
+--- Match #5 ---
+Text: 繼續遊戲
+Object: Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport/ScrollContent/Button/Text
+Scene: WTF (Assets/_Modules_/02_Levels/Level01/Imported/Scenes/WTF.unity)
+activeSelf=True activeInHierarchy=True componentEnabled=True
+  owner[0] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport/ScrollContent/Button/Text => UnityEngine.UI.Text [enabled=True]
+  owner[1] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport/ScrollContent/Button => UnityEngine.UI.Image [enabled=True], UnityEngine.UI.Button [enabled=True], UnityEngine.UI.LayoutElement [enabled=True]
+  owner[2] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport/ScrollContent => UnityEngine.UI.VerticalLayoutGroup [enabled=True], UnityEngine.UI.ContentSizeFitter [enabled=True]
+  owner[3] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/ScrollViewport => UnityEngine.UI.RectMask2D [enabled=True], UnityEngine.UI.ScrollRect [enabled=True]
+  owner[4] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel => UnityEngine.UI.Image [enabled=True]
+  owner[5] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay => UnityEngine.UI.Image [enabled=True]
+  owner[6] Level01 CompletePlayer/PlayerMenuCanvas => UnityEngine.UI.CanvasScaler [enabled=True], UnityEngine.UI.GraphicRaycaster [enabled=True]
+  owner[7] Level01 CompletePlayer => SDGAdventure.SharedPlayer.SharedFirstPersonController [enabled=True], SDGAdventure.SharedPlayer.PlayerInteractor [enabled=True], SDGAdventure.SharedPlayer.PlayerPauseMenu [enabled=True], SDGAdventure.CompletePlayer.CompletePlayerWorkerAppearance [enabled=True], SDGAdventure.SharedPlayer.PlayerTaskJournal [enabled=True], SDGAdventure.SharedPlayer.PlayerMenuCanvas [enabled=True], SDGAdventure.SharedPlayer.PlayerHudCanvas [enabled=True], SDGAdventure.SharedPlayer.PlayerPerspectiveRig [enabled=True]
+--- Match #6 ---
+Text: 暫停
+Object: Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/Heading
+Scene: WTF (Assets/_Modules_/02_Levels/Level01/Imported/Scenes/WTF.unity)
+activeSelf=True activeInHierarchy=True componentEnabled=True
+  owner[0] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/Heading => UnityEngine.UI.Text [enabled=True]
+  owner[1] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel => UnityEngine.UI.Image [enabled=True]
+  owner[2] Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay => UnityEngine.UI.Image [enabled=True]
+  owner[3] Level01 CompletePlayer/PlayerMenuCanvas => UnityEngine.UI.CanvasScaler [enabled=True], UnityEngine.UI.GraphicRaycaster [enabled=True]
+  owner[4] Level01 CompletePlayer => SDGAdventure.SharedPlayer.SharedFirstPersonController [enabled=True], SDGAdventure.SharedPlayer.PlayerInteractor [enabled=True], SDGAdventure.SharedPlayer.PlayerPauseMenu [enabled=True], SDGAdventure.CompletePlayer.CompletePlayerWorkerAppearance [enabled=True], SDGAdventure.SharedPlayer.PlayerTaskJournal [enabled=True], SDGAdventure.SharedPlayer.PlayerMenuCanvas [enabled=True], SDGAdventure.SharedPlayer.PlayerHudCanvas [enabled=True], SDGAdventure.SharedPlayer.PlayerPerspectiveRig [enabled=True]
+Total matching labels: 6
+
+=== Candidate UI objects by name ===
+Level01 CompletePlayer/PlayerHudCanvas | scene=WTF (Assets/_Modules_/02_Levels/Level01/Imported/Scenes/WTF.unity) | active=True | scripts=UnityEngine.UI.CanvasScaler [enabled=True]
+Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel/PauseFeedback | scene=WTF (Assets/_Modules_/02_Levels/Level01/Imported/Scenes/WTF.unity) | active=False | scripts=UnityEngine.UI.Text [enabled=True]
+Level01 CompletePlayer/PlayerMenuCanvas/ModalOverlay/MenuPanel | scene=WTF (Assets/_Modules_/02_Levels/Level01/Imported/Scenes/WTF.unity) | active=True | scripts=UnityEngine.UI.Image [enabled=True]
+Level01 CompletePlayer/PlayerMenuCanvas | scene=WTF (Assets/_Modules_/02_Levels/Level01/Imported/Scenes/WTF.unity) | active=True | scripts=UnityEngine.UI.CanvasScaler [enabled=True], UnityEngine.UI.GraphicRaycaster [enabled=True]
+Total name matches: 4
+
+NOTE: Source lines above identify the scene and components that currently own the UI.
+This diagnostic has not disabled or changed anything.

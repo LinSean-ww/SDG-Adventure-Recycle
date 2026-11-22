@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="2" result="Passed" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-08 03:39:39Z" end-time="2026-11-08 03:39:41Z" duration="1.3106461">
+  <test-suite type="TestSuite" id="1000" name="CompletePlayer_Test_V2_20261108_113334" fullname="CompletePlayer_Test_V2_20261108_113334" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-11-08 03:39:39Z" end-time="2026-11-08 03:39:41Z" duration="1.310646" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1009" name="V2Acceptance.PlayModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/CompletePlayer_Test_V2_20261108_113334/Library/ScriptAssemblies/V2Acceptance.PlayModeTests.dll" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-11-08 03:39:39Z" end-time="2026-11-08 03:39:41Z" duration="1.302925" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="13060" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <test-suite type="TestFixture" id="1006" name="V2AcceptanceTests" fullname="V2AcceptanceTests" classname="V2AcceptanceTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-08 03:39:39Z" end-time="2026-11-08 03:39:41Z" duration="1.301685" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <test-case id="1007" name="DemoSettingsContainsAllRowsAndScrollsToEach" fullname="V2AcceptanceTests.DemoSettingsContainsAllRowsAndScrollsToEach" methodname="DemoSettingsContainsAllRowsAndScrollsToEach" classname="V2AcceptanceTests" runstate="Runnable" seed="338493344" result="Passed" start-time="2026-11-08 03:39:39Z" end-time="2026-11-08 03:39:40Z" duration="0.305061" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="platform" value="PlayMode" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1008" name="InteractiveRebindUpdatesUiEventsPersistenceAndDefaults" fullname="V2AcceptanceTests.InteractiveRebindUpdatesUiEventsPersistenceAndDefaults" methodname="InteractiveRebindUpdatesUiEventsPersistenceAndDefaults" classname="V2AcceptanceTests" runstate="Runnable" seed="1374093509" result="Passed" start-time="2026-11-08 03:39:40Z" end-time="2026-11-08 03:39:41Z" duration="0.987180" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="platform" value="PlayMode" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

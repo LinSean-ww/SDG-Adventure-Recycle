@@ -8,6 +8,37 @@ namespace C3TreasurePuzzle
     public enum C3MaterialState
     { Spawned,Feeding,MainBelt,Identified,Diverting,MachineInput,Processing,OutputReady,Outfeeding,Collected }
 
+    [Serializable]
+    public sealed class SDGC3SavedMaterialR1
+    {
+        public string id;
+        public int kind;
+        public string batchId;
+    }
+
+    [Serializable]
+    public sealed class SDGC3SavedBatchR1
+    {
+        public string id;
+        public int kind;
+        public string[] sourceIds;
+        public Vector3 position;
+        public Quaternion rotation = Quaternion.identity;
+    }
+
+    [Serializable]
+    public sealed class SDGC3ProductionCheckpointR1
+    {
+        public int schema = 1;
+        public string runId;
+        public bool supplied;
+        public float elapsedSeconds;
+        public int receiptsCommitted;
+        public int lastCompletedKind;
+        public List<SDGC3SavedMaterialR1> materials = new List<SDGC3SavedMaterialR1>();
+        public List<SDGC3SavedBatchR1> batches = new List<SDGC3SavedBatchR1>();
+    }
+
     [DisallowMultipleComponent]
     public sealed class C3RecyclingLine : MonoBehaviour
     {
@@ -646,6 +677,137 @@ namespace C3TreasurePuzzle
                 }
             }
         }
+        // R1 supports only a fully settled official checkpoint. No in-flight belt,
+        // machine, presentation, or pending receipt is silently approximated.
+        public SDGC3ProductionCheckpointR1 CaptureCompletedCheckpointR1()
+        {
+            if (!isActiveAndEnabled || !geometry || !visuals || !cargoRoot || !device ||
+                presentation != null || records.Count > 27 || batches.Count > 9 ||
+                records.Count != batches.Count * UnitsPerBale ||
+                accepted.Count != records.Count ||
+                work.Any(m => m.Processing || m.Prepared != null || m.Slots.Any(r => r != null)) ||
+                records.Any(r => !r.Cargo || !r.Cargo.processed || !r.Cargo.lineOwned ||
+                    !r.Counted || !r.ProcessingComplete || !r.ProductCreated ||
+                    r.State != C3MaterialState.Collected) ||
+                batches.Any(b => !b.Product || !b.Collected || !b.OutputReached))
+                throw new InvalidOperationException(
+                    "第三關產線仍在運送或加工；請等待回收物完成加工且成品全部到位後再存檔。");
+            var data = new SDGC3ProductionCheckpointR1
+            {
+                runId = runId,
+                supplied = supplied,
+                elapsedSeconds = official.ElapsedSeconds,
+                receiptsCommitted = official.ReceiptsCommitted,
+                lastCompletedKind = (int)lastCompleted
+            };
+            foreach (MaterialRecord r in records)
+                data.materials.Add(new SDGC3SavedMaterialR1
+                { id = r.MaterialId, kind = (int)r.MaterialType, batchId = r.BatchId });
+            foreach (FinishedBatch b in batches)
+                data.batches.Add(new SDGC3SavedBatchR1
+                {
+                    id = b.BatchId, kind = (int)b.MaterialType,
+                    sourceIds = (string[])b.SourceMaterialIds.Clone(),
+                    position = b.Product.position, rotation = b.Product.rotation
+                });
+            if (!ValidCompletedCheckpointR1(data))
+                throw new InvalidOperationException("第三關產線成品和收據對應不完整，拒絕存檔。");
+            return data;
+        }
+
+        public static bool ValidCompletedCheckpointR1(SDGC3ProductionCheckpointR1 data)
+        {
+            if (data == null || data.schema != 1 || string.IsNullOrWhiteSpace(data.runId) ||
+                data.runId.Length > 128 || data.materials == null || data.batches == null ||
+                data.materials.Count > 27 || data.batches.Count > 9 ||
+                data.materials.Count != data.batches.Count * UnitsPerBale ||
+                data.receiptsCommitted < 0 || data.receiptsCommitted > 9 ||
+                float.IsNaN(data.elapsedSeconds) || float.IsInfinity(data.elapsedSeconds) ||
+                data.elapsedSeconds < 0f || MachineIndex((EcoRecycleCargo.Kind)data.lastCompletedKind) < 0)
+                return false;
+            var materials = new Dictionary<string, SDGC3SavedMaterialR1>(StringComparer.Ordinal);
+            foreach (SDGC3SavedMaterialR1 m in data.materials)
+                if (m == null || string.IsNullOrWhiteSpace(m.id) || m.id.Length > 128 ||
+                    MachineIndex((EcoRecycleCargo.Kind)m.kind) < 0 ||
+                    string.IsNullOrWhiteSpace(m.batchId) || m.batchId.Length > 128 ||
+                    materials.ContainsKey(m.id)) return false;
+                else materials.Add(m.id, m);
+            var batchIds = new HashSet<string>(StringComparer.Ordinal);
+            var assigned = new HashSet<string>(StringComparer.Ordinal);
+            int[] laneCount = new int[3];
+            foreach (SDGC3SavedBatchR1 b in data.batches)
+            {
+                int lane = b == null ? -1 : MachineIndex((EcoRecycleCargo.Kind)b.kind);
+                if (lane < 0 || string.IsNullOrWhiteSpace(b.id) || b.id.Length > 128 ||
+                    !batchIds.Add(b.id) || b.sourceIds == null || b.sourceIds.Length != UnitsPerBale ||
+                    ++laneCount[lane] > BalesPerMachineCapacity ||
+                    float.IsNaN(b.position.x) || float.IsNaN(b.position.y) || float.IsNaN(b.position.z) ||
+                    float.IsInfinity(b.position.x) || float.IsInfinity(b.position.y) || float.IsInfinity(b.position.z) ||
+                    float.IsNaN(b.rotation.x) || float.IsNaN(b.rotation.y) ||
+                    float.IsNaN(b.rotation.z) || float.IsNaN(b.rotation.w)) return false;
+                foreach (string id in b.sourceIds)
+                    if (string.IsNullOrEmpty(id) || !materials.TryGetValue(id, out SDGC3SavedMaterialR1 m) ||
+                        m.batchId != b.id || m.kind != b.kind || !assigned.Add(id)) return false;
+            }
+            return assigned.Count == materials.Count && data.receiptsCommitted == data.batches.Count;
+        }
+
+        public static bool CoveredByLedgerR1(SDGC3ProductionCheckpointR1 production, SDGC3ReceiptLedgerR1 ledger)
+        {
+            if (!ValidCompletedCheckpointR1(production) || !EcoAdventureRuntime.ValidRecyclingLedgerForSaveR1(ledger))
+                return false;
+            var materials = new HashSet<string>(ledger.materialIds, StringComparer.Ordinal);
+            var batches = new HashSet<string>(ledger.batchIds, StringComparer.Ordinal);
+            return production.materials.All(m => materials.Contains(m.id)) &&
+                production.batches.All(b => batches.Contains(b.id));
+        }
+
+        public void RestoreCompletedCheckpointR1(SDGC3ProductionCheckpointR1 data)
+        {
+            if (!ValidCompletedCheckpointR1(data) || !geometry || !visuals || !cargoRoot ||
+                official == null || records.Count != 0 || batches.Count != 0 ||
+                presentation != null || work.Any(m => m.Processing || m.Slots.Any(r => r != null)))
+                throw new InvalidOperationException("第三關產線還原狀態不相容，禁止不完整讀檔。");
+            runId = data.runId;
+            official = new RecyclingSession(runId, false, cargoRoot, records, batches, accepted, work);
+            foreach (SDGC3SavedMaterialR1 item in data.materials)
+            {
+                CreateCargo(official, item.id, (EcoRecycleCargo.Kind)item.kind);
+                MaterialRecord r = records[records.Count - 1];
+                r.State = C3MaterialState.Collected;
+                r.Counted = r.ProcessingComplete = r.ProductCreated = true;
+                r.BatchId = item.batchId;
+                r.Cargo.processed = true;
+                r.History.Clear();
+                for (int stage = 0; stage <= (int)C3MaterialState.Collected; stage++)
+                    r.History.Add((C3MaterialState)stage);
+            }
+            foreach (SDGC3SavedBatchR1 item in data.batches)
+            {
+                GameObject product = new GameObject("P2_FINISHED_" + ((EcoRecycleCargo.Kind)item.kind) + "_" + item.id);
+                product.transform.SetParent(cargoRoot, false);
+                product.SetActive(false);
+                visuals.CreateBale((EcoRecycleCargo.Kind)item.kind, product.transform);
+                product.transform.SetPositionAndRotation(item.position, item.rotation);
+                BoxCollider collider = product.AddComponent<BoxCollider>();
+                collider.size = ProductSize;
+                batches.Add(new FinishedBatch
+                {
+                    BatchId = item.id, MaterialType = (EcoRecycleCargo.Kind)item.kind,
+                    SourceMaterialIds = (string[])item.sourceIds.Clone(), Product = product.transform,
+                    OutputReached = true, Collected = true
+                });
+                work[MachineIndex((EcoRecycleCargo.Kind)item.kind)].Completed++;
+                product.SetActive(true);
+            }
+            // A completed run must never reissue DEMO-* material IDs on the next Update.
+            supplied = data.supplied || data.materials.Count != 0;
+            official.ElapsedSeconds = data.elapsedSeconds;
+            official.ReceiptsCommitted = data.receiptsCommitted;
+            lastCompleted = (EcoRecycleCargo.Kind)data.lastCompletedKind;
+            LastBlockedReason = "";
+        }
+
         private void OnDestroy()
         {
             CancelPresentation();

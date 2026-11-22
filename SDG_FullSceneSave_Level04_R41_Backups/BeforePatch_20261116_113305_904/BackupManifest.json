@@ -1,0 +1,47 @@
+﻿{
+    "created":  "2026-11-16T11:33:06.1603157+08:00",
+    "project":  "F:\\SDG Adventure_R",
+    "files":  [
+                  {
+                      "path":  "Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scripts/SDGSaveProgressRuntimeV1.cs",
+                      "sha256":  "BBD339FE9FFCB535170C99E75DF92AC2FA4BF1A14DDFC6031BD19B00AF1061E6",
+                      "label":  "R3"
+                  },
+                  {
+                      "path":  "Assets/_Modules_/02_Levels/Level04/Imported/Script/BossHealth.cs",
+                      "sha256":  "B64EFDCF7D6196F9B644CB948D558075797EE7CA48DCFFD2052E37C341C973DD",
+                      "label":  "R3"
+                  },
+                  {
+                      "path":  "Assets/_Modules_/02_Levels/Level04/Imported/Script/RecycleHouse.cs",
+                      "sha256":  "B3C571596672F46A7864FEF2D80A93DF5788644068314EB7C084B49BFD7DBA19",
+                      "label":  "R3"
+                  },
+                  {
+                      "path":  "Assets/_Modules_/02_Levels/Level04/Scripts/Level04RecycleController.cs",
+                      "sha256":  "D3E7635864720A4D2B47A8B0A1A798E7DAF21A8E0F25FFC19C31DB43AA4937AA",
+                      "label":  "R3"
+                  },
+                  {
+                      "path":  "Assets/_Modules_/02_Levels/Level04/Imported/Sci-Fi ToiletMech/ToiletMechBossAI.cs",
+                      "sha256":  "08317A81BEBA7DF553264D94B94B75FEE6B133471F3B8ABC0E132B6AADC9617F",
+                      "label":  "SOURCE 2026-11-16"
+                  },
+                  {
+                      "path":  "Assets/_Modules_/01_Shared/Player/Scripts/SharedFirstPersonController.cs",
+                      "sha256":  "DC39AA024442D900BCA1C050C2E4389EF17175EDBD057FA6048DAC2DAD03CBDA",
+                      "label":  "SOURCE FRONT 2026-11-16"
+                  },
+                  {
+                      "path":  "Assets/_Modules_/01_Shared/Player/Scripts/PlayerPerspectiveRig.cs",
+                      "sha256":  "2E499CBEDE31D7E39B25A34C9E55E53C02D6B4F4F127DB1EA3060EAFB2DBED1B",
+                      "label":  "SOURCE FRONT 2026-11-16"
+                  },
+                  {
+                      "path":  "Assets/_Modules_/02_Levels/Level04/Scripts/Level04PlasmaPickup.cs",
+                      "sha256":  "4E15222F0A5D0C08FDB27B48DB856DD852A3AA8C64DD5261173D03E17FFAE465",
+                      "label":  "SOURCE 2026-11-16"
+                  }
+              ],
+    "package":  "SDG_FullSceneSave_Level04_R4_1"
+}

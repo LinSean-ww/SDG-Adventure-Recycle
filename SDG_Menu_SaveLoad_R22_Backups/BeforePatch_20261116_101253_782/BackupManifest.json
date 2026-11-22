@@ -1,0 +1,32 @@
+﻿{
+    "created":  "2026-11-16T10:12:54.2518466+08:00",
+    "project":  "F:\\SDG Adventure_R",
+    "files":  [
+                  {
+                      "path":  "Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scripts/SDGFrontEndController.cs",
+                      "sha256":  "53F21BF493FF62FE4EFBA3D08F74337AD72CD99850485C875FE238CAB37C679E",
+                      "label":  "SOURCE 2026-11-16"
+                  },
+                  {
+                      "path":  "Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scripts/SDGSaveProgressRuntimeV1.cs",
+                      "sha256":  "E7D29D1751E3640FB1D0ABE5D4A5A8E414A374BD857EBB6F74C35FD67956B49F",
+                      "label":  "SOURCE 2026-11-16"
+                  },
+                  {
+                      "path":  "Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scripts/SDGSaveProgressMenuV2.cs",
+                      "sha256":  "6DF15006C868BB70C534F51B81FF74FCC62C92C01B533C775852A551E9A04FE4",
+                      "label":  "SOURCE 2026-11-16"
+                  },
+                  {
+                      "path":  "Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scripts/SDGFrontEndHealthSync.cs",
+                      "sha256":  "A9C5E3CD94B7D661C327490A056CBA6DED1529E26BDD7F6C5FBC97952319CED0",
+                      "label":  "SOURCE 2026-11-16"
+                  },
+                  {
+                      "path":  "Assets/_Modules_/02_Levels/Level04/Scripts/Level04PlayerHealth.cs",
+                      "sha256":  "C7033A2C406963180A4681ACFFAFCBE92427453AAC38BF4ED9EF59603094D3BC",
+                      "label":  "SOURCE 2026-11-16"
+                  }
+              ],
+    "package":  "SDG_MenuBypass_SaveLoad_V262_SafeFix_R2_2"
+}

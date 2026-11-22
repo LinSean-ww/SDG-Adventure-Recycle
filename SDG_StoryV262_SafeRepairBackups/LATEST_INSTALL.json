@@ -1,0 +1,30 @@
+﻿{
+    "Validated":  "2026-11-13T15:26:45",
+    "ProjectPath":  "F:\\SDG Adventure_R",
+    "UnityLog":  "F:\\SDG_Level03_V262_SafeInstall_Candidate_R2\\Reports\\UnityV262_20261113_152629_196.log",
+    "Started":  "2026-11-13T15:26:29",
+    "Files":  [
+                  {
+                      "Existed":  true,
+                      "Hash":  "C1A2344055474D262D592A03E0193E19CE2C56DBF655D20540C042C3BCAE5DC6",
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_SafeRepairBackups\\BeforeV262Patch_20261113_152629_107\\original_0.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\SDGLevel03StoryV2Controller.cs"
+                  },
+                  {
+                      "Existed":  false,
+                      "Hash":  null,
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_SafeRepairBackups\\BeforeV262Patch_20261113_152629_107\\original_1.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\Editor\\SDGLevel03StoryV262PatchValidator.cs"
+                  },
+                  {
+                      "Existed":  false,
+                      "Hash":  null,
+                      "BackupFile":  "F:\\SDG Adventure_R\\SDG_StoryV262_SafeRepairBackups\\BeforeV262Patch_20261113_152629_107\\original_2.bak",
+                      "Relative":  "Assets\\SDG_Level03_StoryV2\\Editor\\SDGLevel03StoryV262PatchValidator.cs.meta"
+                  }
+              ],
+    "BackupDir":  "F:\\SDG Adventure_R\\SDG_StoryV262_SafeRepairBackups\\BeforeV262Patch_20261113_152629_107",
+    "Status":  "Installed",
+    "InstalledHash":  "838569132C2E18047FA90B2B70686EF6059D85A942CC94B0CFF351C463F14B41",
+    "Restored":  null
+}

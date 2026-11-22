@@ -1,0 +1,11 @@
+SDG SAVE PROGRESS PANEL SUCCESS
+Scene=Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scenes/SDG_StartAndMainMenu.unity
+Artwork=existing FE_Menu_SavePanel.png untouched
+Slots=Auto,Manual1,Manual2,Manual3 (separate JSON in persistentDataPath)
+Manual=F5 or pause menu; Load=menu or F9
+Auto=Settings toggle, interval 150 seconds and focus/quit
+Progress=actual module completion events; four levels, 25% each
+Save=level/player position,name,avatar,XP,reported HP,old shutter states,time
+LIMITATION=inventory, mission flags, puzzle objects and live health restoration require game-specific adapters
+Other scenes=not modified
+GameView=not yet verified

@@ -1,0 +1,9 @@
+SDG LEVEL03 STORY V2.6.1 STATIC SUCCESS
+PatchVersion=V2.6.1
+Texture=1448x1086
+Renderer=UnityEngine.UI.Image + Sprite.Create
+NestedCanvasSortingOrder=1100
+CursorPathPoints=271
+CollisionSparks=retained
+LIMITATION: NO PIXEL OR PLAYMODE RENDER VERIFICATION.
+Check Unity Console for [SDG Story V2.6.1] TRACE_SCREEN_OPEN and send a Game View screenshot.

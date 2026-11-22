@@ -1,0 +1,30 @@
+﻿{
+    "project":  "F:\\SDG Adventure_R",
+    "files":  [
+                  {
+                      "existed":  true,
+                      "path":  "Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scripts/SDGFrontEndPlayerProfile.cs",
+                      "sha256":  "6E85C58ACE16781B70462AB881EF36B3D5F6AF08CC50654ADD96CB4609990F64"
+                  },
+                  {
+                      "existed":  true,
+                      "path":  "Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scripts/SDGSaveProfilesV2.cs",
+                      "sha256":  "571405557B4BCEC3FDBF6C2FD28BDFE468DD6B92AA7578C5ED18F359E0D6274D"
+                  },
+                  {
+                      "existed":  true,
+                      "path":  "Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scripts/SDGMenuReworkR1.cs",
+                      "sha256":  "57C4D5ACBAFEDEC692BDDDD6DA16B1688262C50B6342BB503ACEDF41DD7F5EAC"
+                  },
+                  {
+                      "existed":  false,
+                      "path":  "Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scripts/SDGLevelIsolationAuditR13.cs",
+                      "sha256":  ""
+                  },
+                  {
+                      "existed":  false,
+                      "path":  "Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scripts/SDGLevelIsolationAuditR13.cs.meta",
+                      "sha256":  ""
+                  }
+              ]
+}

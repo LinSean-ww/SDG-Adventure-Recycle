@@ -8,7 +8,7 @@ public sealed class Level01CompletionView : MonoBehaviour
     private GameObject overlay;
     public bool Visible => overlay != null && overlay.activeSelf;
 
-    public void Show(Action returnToSelection, Action retry)
+    public void Show(Action returnToSelection, Action retry, Action nextLevel = null)
     {
         if (overlay != null) return;
         var canvasObject = new GameObject("Level01CompletionCanvas", typeof(RectTransform), typeof(Canvas),
@@ -29,7 +29,7 @@ public sealed class Level01CompletionView : MonoBehaviour
         Place(heading.rectTransform, 0f, 100f, 400f, 48f);
         AddButton(panel, "ReturnToSelection", "返回選關", 40f, returnToSelection, true);
         AddButton(panel, "Retry", "重新挑戰", -18f, retry, true);
-        AddButton(panel, "NextLevel", "下一關（尚未開放）", -76f, null, false);
+        AddButton(panel, "NextLevel", "前往第二關", -76f, nextLevel, nextLevel != null);
     }
 
     private static RectTransform CreateRect(string name, Transform parent)

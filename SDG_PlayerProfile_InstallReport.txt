@@ -1,0 +1,8 @@
+﻿SDG PLAYER PROFILE PATCH SUCCESS
+Scene: Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scenes/SDG_StartAndMainMenu.unity
+Player title: hidden
+Player name: editable (PlayerPrefs SDG_FE_PlayerName)
+Experience count: left mini-column
+Avatar: click portrait, choose existing or import PNG
+Bundled project portrait choices: 1
+Other level scenes: unchanged

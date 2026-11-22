@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="1" result="Passed" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-08 04:39:55Z" end-time="2026-11-08 04:39:55Z" duration="0.0464273">
+  <test-suite type="TestSuite" id="1000" name="My project" fullname="My project" runstate="Runnable" testcasecount="228" result="Passed" start-time="2026-11-08 04:39:55Z" end-time="2026-11-08 04:39:55Z" duration="0.046427" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1253" name="M7SharedPlayer.PlayModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/M7SharedPlayer.PlayModeTests.dll" runstate="Runnable" testcasecount="21" result="Passed" start-time="2026-11-08 04:39:55Z" end-time="2026-11-08 04:39:55Z" duration="0.036672" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="27900" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <test-suite type="TestSuite" id="1254" name="M7SharedPlayerTests" fullname="M7SharedPlayerTests" runstate="Runnable" testcasecount="21" result="Passed" start-time="2026-11-08 04:39:55Z" end-time="2026-11-08 04:39:55Z" duration="0.035847" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <test-suite type="TestFixture" id="1250" name="ReloadRestartPersistenceTests" fullname="M7SharedPlayerTests.ReloadRestartPersistenceTests" classname="M7SharedPlayerTests.ReloadRestartPersistenceTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-08 04:39:55Z" end-time="2026-11-08 04:39:55Z" duration="0.034657" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-case id="1252" name="ReadReloadAfterRestartAndRestore" fullname="M7SharedPlayerTests.ReloadRestartPersistenceTests.ReadReloadAfterRestartAndRestore" methodname="ReadReloadAfterRestartAndRestore" classname="M7SharedPlayerTests.ReloadRestartPersistenceTests" runstate="Runnable" seed="1874290289" result="Passed" start-time="2026-11-08 04:39:55Z" end-time="2026-11-08 04:39:55Z" duration="0.023141" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

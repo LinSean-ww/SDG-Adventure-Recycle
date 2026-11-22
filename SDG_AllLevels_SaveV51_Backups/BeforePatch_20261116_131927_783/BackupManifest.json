@@ -1,0 +1,55 @@
+﻿{
+    "created":  "2026-11-16T13:19:27.9887468+08:00",
+    "project":  "F:\\SDG Adventure_R",
+    "files":  [
+                  {
+                      "path":  "Assets/SDG_Level03_StoryV2/SDGLevel03StoryV2Controller.cs",
+                      "original":  "463FA73B54B9ED09F34726B3243E9F565D9BA3A3F23C305FE5E0CC87C2933445",
+                      "name":  "SNAPSHOT",
+                      "existed":  true
+                  },
+                  {
+                      "path":  "Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scripts/SDGSavePauseButtonsV1.cs",
+                      "original":  "839EE4514B47DE76131927AB9B224AA1DAFFE2AE66EFAB327BC5FB8B4AE1089B",
+                      "name":  "SNAPSHOT",
+                      "existed":  true
+                  },
+                  {
+                      "path":  "Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scripts/SDGSaveProfilesV2.cs",
+                      "original":  "048A7D28B547FDA398E5466766B67936185AD2BAA417C95065100B916FA0D62D",
+                      "name":  "SNAPSHOT",
+                      "existed":  true
+                  },
+                  {
+                      "path":  "Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scripts/SDGSaveProgressMenuV1.cs",
+                      "original":  "6BA4BCDD6B0734AE2D12EDCD7238AEAB5EF22FFF18F06E68C3AFE10D2887B37F",
+                      "name":  "SNAPSHOT",
+                      "existed":  true
+                  },
+                  {
+                      "path":  "Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scripts/SDGSaveProgressMenuV2.cs",
+                      "original":  "144C8D95E4E92195858CA7291BF786D9BB8C6D39D4766BBF3A00FF0AD2DECC7E",
+                      "name":  "SNAPSHOT",
+                      "existed":  true
+                  },
+                  {
+                      "path":  "Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scripts/SDGSaveProgressRuntimeV1.cs",
+                      "original":  "A80691B86C52A99E5F6375F2BA80954048A46AA95F3ED77491D81B74689A0888",
+                      "name":  "SNAPSHOT",
+                      "existed":  true
+                  },
+                  {
+                      "path":  "Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scripts/SDGSaveSlotsOverlayV5.cs",
+                      "original":  "ABSENT",
+                      "name":  "NEW",
+                      "existed":  false
+                  },
+                  {
+                      "path":  "Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scripts/SDGSaveSlotsOverlayV5.cs.meta",
+                      "original":  "ABSENT",
+                      "name":  "NEW",
+                      "existed":  false
+                  }
+              ],
+    "package":  "SDG_AllLevels_ManualSlots_WorldState_V262_R5_1_SafeFix"
+}

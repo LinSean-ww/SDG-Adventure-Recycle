@@ -1,0 +1,8 @@
+SDG SAVE PANEL CONTAINED V3 SUCCESS
+Scene=Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scenes/SDG_StartAndMainMenu.unity
+OriginalPNG=unchanged
+9Slice=original frame border preserved; effectivePPU=4.1253
+UI=one 495x306 frame; left avatar and owner info; right four selectable save rows and buttons
+Runtime=V2 scripts unchanged; player profiles and save files untouched
+Levels01-04=unchanged
+ProgrammaticRectBounds=PASS; GameViewVisualValidation=PENDING

@@ -1,0 +1,14 @@
+﻿[
+    {
+        "Name":  "SDGLevel03StoryV2Controller.cs",
+        "Existed":  true,
+        "MetaExisted":  true,
+        "InstalledHash":  "8A2E32150381551686E1056E568558FA954D760CCF872B76790F6E5ECFEE1681"
+    },
+    {
+        "Name":  "Editor\\SDGLevel03StoryV262Validator.cs",
+        "Existed":  false,
+        "MetaExisted":  false,
+        "InstalledHash":  "C614AEEED1E94F631CBEB0C1844617A87C9803820D25953E40676D8F68245D1F"
+    }
+]

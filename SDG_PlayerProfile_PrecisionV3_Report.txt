@@ -1,0 +1,10 @@
+SDG PROFILE PRECISION V3 SUCCESS
+Scene=Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scenes/SDG_StartAndMainMenu.unity
+OriginalArt=FE_Menu_PlayerPanel
+XP mini slot=Experience text + legacy mirror, visible, linked to front-end XP
+XP mini position=(-52.05, -17.60); size=(86.16, 29.00)
+XP mirror text=0 / 100; enabled=True
+HP track position=(56.53, -41.99); size=(300.32, 7.04)
+HP max fill width=300.3223
+HP values=previous v2 stored health (Level04 auto sync, others need adapters)
+Avatar picker and player name unchanged; Level01-04 scenes unchanged

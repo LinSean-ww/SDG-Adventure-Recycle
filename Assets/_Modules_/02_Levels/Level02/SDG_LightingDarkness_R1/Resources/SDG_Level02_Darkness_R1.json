@@ -1,0 +1,12 @@
+{
+  "enabled": true,
+  "targetScenePath": "Assets/_Modules_/02_Levels/Level02/Imported/Scenes/SampleScene.unity",
+  "ambientBrightness": 0.012,
+  "removeBakedLightmaps": true,
+  "disableDirectionalLights": true,
+  "disablePointLights": true,
+  "preserveSpotLights": true,
+  "blackSkybox": true,
+  "disableReflections": true,
+  "blackCameraBackground": true
+}

@@ -55,6 +55,17 @@ namespace SDGAdventure.SharedPlayer
         public Vector3 CameraFlatForward => Quaternion.Euler(0f, orbitYaw, 0f) * Vector3.forward;
         public Vector3 CameraFlatRight => Quaternion.Euler(0f, orbitYaw, 0f) * Vector3.right;
         public float OrbitPitch => orbitPitch;
+        public float SnapshotOrbitYaw => orbitYaw;
+
+        public void RestoreOrbitFromSave(float yaw, float pitch)
+        {
+            orbitYaw = Mathf.Repeat(yaw, 360f);
+            orbitPitch = Mathf.Clamp(pitch, -80f, 80f);
+            followVelocity = Vector3.zero;
+            snapNext = true;
+            if (view != null && !IsThirdPerson)
+                view.localRotation = Quaternion.Euler(orbitPitch, 0f, 0f);
+        }
 
         public void Bind(Transform cameraTransform)
         {

@@ -12,6 +12,35 @@ namespace SDGAdventure.Level04 {
   private static bool worldPickupCollected;
   private static GameObject sharedModel, sharedProjectile, sharedLightning;
   public static bool HasDroppedWeapon => dropped;
+  public static bool WorldPickupCollected => worldPickupCollected;
+  public static Vector3 DroppedPosition => dropped ? dropped.transform.position : Vector3.zero;
+  public static Quaternion DroppedRotation => dropped ? dropped.transform.rotation : Quaternion.identity;
+
+  // Called after scene Start and inventory restoration. Do not call TryDrop: that
+  // would debit the just-restored inventory and could choose a different location.
+  public static void RestorePickupFromSave(UnityEngine.SceneManagement.Scene scene, bool pickedOriginal,
+      bool hasDropped, Vector3 position, Quaternion rotation)
+  {
+   if(dropped)throw new InvalidOperationException("Unexpected dropped plasma instance while restoring");
+   worldPickupCollected=pickedOriginal;
+   Level04PlasmaPickup original=null;
+   foreach(var candidate in Resources.FindObjectsOfTypeAll<Level04PlasmaPickup>())
+    if(candidate && candidate.gameObject.scene==scene && !candidate.committed)
+     {if(original)throw new InvalidOperationException("Duplicate plasma pickup in scene");original=candidate;}
+   if(!original)throw new InvalidOperationException("Scene plasma pickup missing");
+   original.gameObject.SetActive(!pickedOriginal);
+   if(!hasDropped)return;
+   if(!sharedModel)throw new InvalidOperationException("Dropped plasma model reference missing");
+   GameObject world=new GameObject("DroppedLevel04Plasma");world.SetActive(false);
+   SceneManager.MoveGameObjectToScene(world,scene);
+   world.transform.SetPositionAndRotation(position,rotation);
+   var pickup=world.AddComponent<Level04PlasmaPickup>();
+   pickup.modelPrefab=sharedModel;pickup.projectileEffect=sharedProjectile;pickup.lightningEffect=sharedLightning;
+   var model=Instantiate(sharedModel,world.transform,false);
+   foreach(var col in model.GetComponentsInChildren<Collider>(true))col.enabled=false;
+   world.AddComponent<BoxCollider>().size=new Vector3(.5f,.5f,.7f);
+   pickup.committed=true;dropped=pickup;world.SetActive(true);
+  }
   private bool committed;
   public string Prompt => "拾取電漿槍";
   [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)] static void ResetStatics(){sharedModel=null;sharedProjectile=null;sharedLightning=null;dropped=null;worldPickupCollected=false;}

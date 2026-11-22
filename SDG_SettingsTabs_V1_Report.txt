@@ -1,0 +1,7 @@
+SDG SETTINGS TABS V1 SUCCESS
+Scene=Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Scenes/SDG_StartAndMainMenu.unity
+Pages=Audio,Video,Input,Game
+Original factory background/art assets=unchanged
+Level01-04 scene assets=unchanged
+Settings values=persistent PlayerPrefs
+Visual GameView and input integration tests=PENDING

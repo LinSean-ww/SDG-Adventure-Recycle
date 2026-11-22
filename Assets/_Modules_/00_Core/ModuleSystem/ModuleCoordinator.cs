@@ -89,10 +89,16 @@ namespace SDGAdventure.ModuleSystem
 
         public bool ReturnToSelection(out string error)
         {
-            if (!Application.CanStreamedLevelBeLoaded(SelectionScenePath))
-            { error = "Selection scene is not enabled in Build Settings."; return false; }
+            // Only a session that entered through the official front end returns to that menu.
+            // Direct M6 development sessions still return to the M6 testing selection scene.
+            string destination = OfficialFrontEndSession.Active ? OfficialFrontEndSession.ScenePath : SelectionScenePath;
+            if (!Application.CanStreamedLevelBeLoaded(destination))
+            {
+                error = "Selection scene is not enabled in Build Settings: " + destination;
+                return false;
+            }
             PrepareTransition();
-            SceneManager.LoadScene(SelectionScenePath, LoadSceneMode.Single);
+            SceneManager.LoadScene(destination, LoadSceneMode.Single);
             error = null;
             return true;
         }
@@ -130,6 +136,7 @@ namespace SDGAdventure.ModuleSystem
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             if (Instance != this || mode != LoadSceneMode.Single) return;
+            OfficialFrontEndSession.Observe(scene, SelectionScenePath);
             if (scene.path == SelectionScenePath)
             {
                 if (selectionUi == null) selectionUi = gameObject.AddComponent<M6SelectionUi>();

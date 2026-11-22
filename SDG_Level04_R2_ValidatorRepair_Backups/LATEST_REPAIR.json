@@ -1,0 +1,8 @@
+﻿{
+    "Status":  "Patched",
+    "AfterHash":  "799D603227B0E52464270746AE97C7BD1593152C7233921E7F055CE1ADBF88EF",
+    "BeforeHash":  "B4F2C1CBCCD618DFA0D6BA4799493991A6BDD8F8699146166F596DCD25D8F321",
+    "Backup":  "F:\\SDG Adventure_R\\SDG_Level04_R2_ValidatorRepair_Backups\\BeforeCS1003Fix_20261113_220402_389\\Level04HudClearRightValidator.cs.bak",
+    "Target":  "F:\\SDG Adventure_R\\Assets\\_Modules_\\02_Levels\\Level04\\Scripts\\Editor\\Level04HudClearRightValidator.cs",
+    "Project":  "F:\\SDG Adventure_R"
+}

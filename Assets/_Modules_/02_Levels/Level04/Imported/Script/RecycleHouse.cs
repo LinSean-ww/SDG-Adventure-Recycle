@@ -11,6 +11,8 @@ public class RecycleHouse : MonoBehaviour
     public GameObject winPanel;
 
     private int currentQuestion = 0;
+    private int correctlyRecycledMask = 0;
+    public int CorrectlyRecycledMask => correctlyRecycledMask;
 
     private string feedback = "";
     public int CompletedQuestions => currentQuestion;
@@ -67,6 +69,19 @@ public class RecycleHouse : MonoBehaviour
     }
 
 
+    // Restore before notifying the module adapter, so it cannot finish a level
+    // while the remaining scene objects are still being rehydrated.
+    public void RestoreFromSave(int completed, int successfulMask, string restoredFeedback)
+    {
+        currentQuestion = Mathf.Clamp(completed, 0, answers.Length);
+        correctlyRecycledMask = successfulMask & 31;
+        feedback = restoredFeedback ?? "";
+        if (winPanel != null) winPanel.SetActive(currentQuestion >= answers.Length);
+        UpdateBoard();
+    }
+
+    public void NotifyRestored() { ProgressChanged?.Invoke(); }
+
     public bool TrySubmit(RecycleItem item)
     {
         if (item == null || currentQuestion >= answers.Length)
@@ -84,6 +99,8 @@ public class RecycleHouse : MonoBehaviour
         {
             Debug.Log("答案正確！");
 
+            // Record success before Destroy (Unity defers actual destruction).
+            correctlyRecycledMask |= 1 << (int)item.itemType;
             // 正確物品回收，從場景移除
             Destroy(item.gameObject);
 

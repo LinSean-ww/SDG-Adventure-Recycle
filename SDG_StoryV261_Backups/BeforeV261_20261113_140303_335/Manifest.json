@@ -1,0 +1,38 @@
+﻿[
+    {
+        "Name":  "SDGLevel03StoryV2Controller.cs",
+        "Existed":  true,
+        "MetaExisted":  true,
+        "InstalledHash":  "C1A2344055474D262D592A03E0193E19CE2C56DBF655D20540C042C3BCAE5DC6"
+    },
+    {
+        "Name":  "SDGLevel03TraceBakedTexture.cs",
+        "Existed":  false,
+        "MetaExisted":  false,
+        "InstalledHash":  "BF0517DD1A479BF54482AD45BFBCB1E49DB76F8A7F5E4BF39D020CA9355C1DAD"
+    },
+    {
+        "Name":  "SDGLevel03ShortCircuitFX.cs",
+        "Existed":  false,
+        "MetaExisted":  false,
+        "InstalledHash":  "780D2A360A755598F995CE7DF8642C820ADA5B49943F68D3F94919762DA9072A"
+    },
+    {
+        "Name":  "SDGLevel03PhotoTracePath.cs",
+        "Existed":  false,
+        "MetaExisted":  false,
+        "InstalledHash":  "8D18E09C468649EA2D4F73E71072866344229C27669DCA04AAB11853D58A3E13"
+    },
+    {
+        "Name":  "Resources\\SDG_Level03_ElectricCable_Reference.png",
+        "Existed":  false,
+        "MetaExisted":  false,
+        "InstalledHash":  "FEB86CE2ED8FDACF89C6BF51E78ED404BCC33DE493564D5AE8C1CFEFFC242A3D"
+    },
+    {
+        "Name":  "Editor\\SDGLevel03StoryV261Validator.cs",
+        "Existed":  false,
+        "MetaExisted":  false,
+        "InstalledHash":  "4C9914E341C5198CB255B0DB09021D4154DDF6667B1F2F2D48D36848C59A2420"
+    }
+]

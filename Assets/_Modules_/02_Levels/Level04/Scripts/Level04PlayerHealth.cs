@@ -14,6 +14,17 @@ namespace SDGAdventure.Level04 {
   public int CurrentHealth=>currentHealth;public int MaxHealth=>maxHealth;public bool IsDead=>dead;
   public event Action Changed;public event Action Damaged;public event Action Died;
   void Awake(){maxHealth=Mathf.Max(1,maxHealth);currentHealth=maxHealth;motor=GetComponent<SharedFirstPersonController>();}
+  // Used only by the save-slot restorer after the scene's Awake/Start initialization.
+  // Never modify the configured maximum or trigger damage/knockback while loading.
+  public void RestoreFromSave(int savedHealth){
+   int next=Mathf.Clamp(savedHealth,0,Mathf.Max(1,maxHealth));
+   currentHealth=next;
+   dead=next==0;
+   invulnerableUntil=0f;
+   if(dead&&motor)motor.ClearExternalImpulse();
+   Changed?.Invoke();
+   if(dead)Died?.Invoke();
+  }
   public bool TryBossHit(BossHealth boss,int damage,Vector3 source){
    var input=PlayerInputService.Instance;
    if(!boss||boss.IsDead||dead||damage<=0||Time.timeScale<=0||Time.time<invulnerableUntil||!input||input.Context!=PlayerInputContext.Gameplay||input.GameplayActionsBlocked)return false;

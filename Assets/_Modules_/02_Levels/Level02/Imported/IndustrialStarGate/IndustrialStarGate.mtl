@@ -1,0 +1,29 @@
+newmtl Charcoal
+Kd 0.075 0.080 0.090
+Ks 0.35 0.35 0.35
+Ns 80
+
+newmtl DarkSteel
+Kd 0.16 0.17 0.18
+Ks 0.38 0.38 0.38
+Ns 95
+
+newmtl SteelFace
+Kd 0.25 0.26 0.27
+Ks 0.42 0.42 0.42
+Ns 100
+
+newmtl SilverEdges
+Kd 0.42 0.43 0.43
+Ks 0.55 0.55 0.55
+Ns 130
+
+newmtl GoldStar
+Kd 1.0 0.62 0.02
+Ks 0.75 0.58 0.18
+Ns 180
+
+newmtl SafetyYellow
+Kd 0.92 0.53 0.01
+Ks 0.35 0.30 0.10
+Ns 75

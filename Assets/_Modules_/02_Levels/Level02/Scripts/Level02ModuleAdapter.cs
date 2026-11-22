@@ -77,8 +77,14 @@ public sealed class Level02ModuleAdapter : MonoBehaviour, IModuleAdapter
         PlayerCursor.LockState = CursorLockMode.None;
         Cursor.visible = true;
         gameObject.AddComponent<Level02CompletionView>().Show(Return, Restart);
+        SDGLevel02NextButtonV1.Attach(gameObject.transform, ContinueToNext);
     }
 
+    private void ContinueToNext()
+    {
+        if (coordinator != null && !coordinator.TryLaunchNext(out string error))
+            Debug.LogWarning("[SDG Next] Level02 to Level03 failed: " + error);
+    }
     private void Restart() { if (coordinator && !coordinator.RestartCurrent(out string error)) Debug.LogError(error); }
     private void Return() { if (coordinator && !coordinator.ReturnToSelection(out string error)) Debug.LogError(error); }
 

@@ -1,0 +1,42 @@
+﻿[
+    {
+        "RelativePath":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scenes\\SDG_StartAndMainMenu.unity",
+        "Existed":  true
+    },
+    {
+        "RelativePath":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scenes\\SDG_StartAndMainMenu.unity.meta",
+        "Existed":  true
+    },
+    {
+        "RelativePath":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGSaveProgressRuntimeV1.cs",
+        "Existed":  false
+    },
+    {
+        "RelativePath":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGSaveProgressRuntimeV1.cs.meta",
+        "Existed":  false
+    },
+    {
+        "RelativePath":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGSaveProgressMenuV1.cs",
+        "Existed":  false
+    },
+    {
+        "RelativePath":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGSaveProgressMenuV1.cs.meta",
+        "Existed":  false
+    },
+    {
+        "RelativePath":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGSavePauseButtonsV1.cs",
+        "Existed":  false
+    },
+    {
+        "RelativePath":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGSavePauseButtonsV1.cs.meta",
+        "Existed":  false
+    },
+    {
+        "RelativePath":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\Editor\\SDGSaveProgressPanelInstallerV1.cs",
+        "Existed":  false
+    },
+    {
+        "RelativePath":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\Editor\\SDGSaveProgressPanelInstallerV1.cs.meta",
+        "Existed":  false
+    }
+]

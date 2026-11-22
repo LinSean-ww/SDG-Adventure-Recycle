@@ -1,0 +1,26 @@
+﻿[
+    {
+        "RelativePath":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGSharedLevelPlayerHUD.cs",
+        "Existed":  false
+    },
+    {
+        "RelativePath":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGSharedLevelPlayerHUD.cs.meta",
+        "Existed":  false
+    },
+    {
+        "RelativePath":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\Editor\\SDGSharedLevelHUDInstaller.cs",
+        "Existed":  false
+    },
+    {
+        "RelativePath":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\Editor\\SDGSharedLevelHUDInstaller.cs.meta",
+        "Existed":  false
+    },
+    {
+        "RelativePath":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Resources\\SDG_LevelPlayerHUD.prefab",
+        "Existed":  false
+    },
+    {
+        "RelativePath":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Resources\\SDG_LevelPlayerHUD.prefab.meta",
+        "Existed":  false
+    }
+]

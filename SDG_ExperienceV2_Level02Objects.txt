@@ -1,0 +1,50 @@
+﻿SDG Level02 scene object scan (read-only)
+Scene=Assets/_Modules_/02_Levels/Level02/Imported/Scenes/SampleScene.unity
+object=sobox
+  pos=(0.00, 0.00, 0.00) active=True
+  scripts=
+object=sobox/StarBox
+  pos=(0.34, -0.29, 29.73) active=True
+  scripts=
+object=sobox/StarBox (1)
+  pos=(13.72, -0.30, 7.04) active=True
+  scripts=
+object=sobox/StarBox (2)
+  pos=(21.02, -0.31, 19.14) active=True
+  scripts=
+object=sobox/StarBox (3)
+  pos=(17.46, -0.31, 26.93) active=True
+  scripts=
+object=sobox/StarBox (4)
+  pos=(18.47, 0.56, 21.98) active=True
+  scripts=
+object=sobox/StarBox (5)
+  pos=(23.92, -0.30, 13.18) active=True
+  scripts=
+object=sobox/StarBox (6)
+  pos=(20.49, -0.29, 15.42) active=True
+  scripts=
+object=sobox/StarBox (7)
+  pos=(19.06, -0.30, 14.46) active=True
+  scripts=
+object=sobox/StarBox (8)
+  pos=(19.34, -0.31, 24.78) active=True
+  scripts=
+object=sobox/StarBox (9)
+  pos=(18.79, -0.31, 30.67) active=True
+  scripts=
+object=StarBoxInspectionPlatform
+  pos=(2.70, 0.33, 11.19) active=True
+  scripts=
+object=StarBoxInspectionPlatform/CheckPlatform
+  pos=(2.70, 0.33, 11.19) active=True
+  scripts=StarPlatformBuilder,StarGoalPlate
+object=Industrial Star Gate
+  pos=(0.03, 0.29, 16.64) active=True
+  scripts=SlidingStarGate
+object=StarDetector/default
+  pos=(7.13, 0.25, 4.85) active=True
+  scripts=StarDetectorMap
+object=SDG Official Level UI Startup Guard
+  pos=(0.00, 0.00, 0.00) active=True
+  scripts=SDGOfficialLevelUIStartupGuard

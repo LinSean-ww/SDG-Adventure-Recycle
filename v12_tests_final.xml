@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="11" result="Passed" total="11" passed="11" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-08 04:25:56Z" end-time="2026-11-08 04:25:56Z" duration="0.4826338">
+  <test-suite type="TestSuite" id="1000" name="My project" fullname="My project" runstate="Runnable" testcasecount="223" result="Passed" start-time="2026-11-08 04:25:56Z" end-time="2026-11-08 04:25:56Z" duration="0.482634" total="11" passed="11" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1247" name="M7SharedPlayer.PlayModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/M7SharedPlayer.PlayModeTests.dll" runstate="Runnable" testcasecount="17" result="Passed" start-time="2026-11-08 04:25:56Z" end-time="2026-11-08 04:25:56Z" duration="0.131311" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="31900" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <test-suite type="TestSuite" id="1248" name="M7SharedPlayerTests" fullname="M7SharedPlayerTests" runstate="Runnable" testcasecount="17" result="Passed" start-time="2026-11-08 04:25:56Z" end-time="2026-11-08 04:25:56Z" duration="0.130295" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <test-suite type="TestFixture" id="1237" name="PlayerSettingsTests" fullname="M7SharedPlayerTests.PlayerSettingsTests" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-11-08 04:25:56Z" end-time="2026-11-08 04:25:56Z" duration="0.128846" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-case id="1246" name="CorruptSettingsRecoverToDefaults" fullname="M7SharedPlayerTests.PlayerSettingsTests.CorruptSettingsRecoverToDefaults" methodname="CorruptSettingsRecoverToDefaults" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="300210318" result="Passed" start-time="2026-11-08 04:25:56Z" end-time="2026-11-08 04:25:56Z" duration="0.022281" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <output><![CDATA[Player settings were invalid and were reset to defaults: JSON parse error: Missing a name for object member.
+]]></output>
+          </test-case>
+          <test-case id="1238" name="DefaultsMatchUnifiedControls" fullname="M7SharedPlayerTests.PlayerSettingsTests.DefaultsMatchUnifiedControls" methodname="DefaultsMatchUnifiedControls" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="839336133" result="Passed" start-time="2026-11-08 04:25:56Z" end-time="2026-11-08 04:25:56Z" duration="0.001338" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1245" name="NewActionsRespondOnlyToReboundKeys" fullname="M7SharedPlayerTests.PlayerSettingsTests.NewActionsRespondOnlyToReboundKeys" methodname="NewActionsRespondOnlyToReboundKeys" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="290909420" result="Passed" start-time="2026-11-08 04:25:56Z" end-time="2026-11-08 04:25:56Z" duration="0.072457" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1244" name="NewBindingsRebindPersistRejectConflictsAndReset" fullname="M7SharedPlayerTests.PlayerSettingsTests.NewBindingsRebindPersistRejectConflictsAndReset" methodname="NewBindingsRebindPersistRejectConflictsAndReset" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="371065212" result="Passed" start-time="2026-11-08 04:25:56Z" end-time="2026-11-08 04:25:56Z" duration="0.010025" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1242" name="ProneActionRespondsOnlyToCurrentKey" fullname="M7SharedPlayerTests.PlayerSettingsTests.ProneActionRespondsOnlyToCurrentKey" methodname="ProneActionRespondsOnlyToCurrentKey" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="1310799833" result="Passed" start-time="2026-11-08 04:25:56Z" end-time="2026-11-08 04:25:56Z" duration="0.002172" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1243" name="ProneBindingCanRebindRejectConflictReloadAndReset" fullname="M7SharedPlayerTests.PlayerSettingsTests.ProneBindingCanRebindRejectConflictReloadAndReset" methodname="ProneBindingCanRebindRejectConflictReloadAndReset" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="674306808" result="Passed" start-time="2026-11-08 04:25:56Z" end-time="2026-11-08 04:25:56Z" duration="0.002660" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1239" name="RebindRejectsConflictWithoutChangingOldBinding" fullname="M7SharedPlayerTests.PlayerSettingsTests.RebindRejectsConflictWithoutChangingOldBinding" methodname="RebindRejectsConflictWithoutChangingOldBinding" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="1509746091" result="Passed" start-time="2026-11-08 04:25:56Z" end-time="2026-11-08 04:25:56Z" duration="0.001209" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1240" name="RestoreDefaultsClearsOverridesAndModes" fullname="M7SharedPlayerTests.PlayerSettingsTests.RestoreDefaultsClearsOverridesAndModes" methodname="RestoreDefaultsClearsOverridesAndModes" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="1049600200" result="Passed" start-time="2026-11-08 04:25:56Z" end-time="2026-11-08 04:25:56Z" duration="0.002028" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1241" name="SavedOverridesAndModesReload" fullname="M7SharedPlayerTests.PlayerSettingsTests.SavedOverridesAndModesReload" methodname="SavedOverridesAndModesReload" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="1355753477" result="Passed" start-time="2026-11-08 04:25:56Z" end-time="2026-11-08 04:25:56Z" duration="0.002170" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1272" name="PlayerControl.PlayModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/SDG Adventure_R/Library/ScriptAssemblies/PlayerControl.PlayModeTests.dll" runstate="Runnable" testcasecount="18" result="Passed" start-time="2026-11-08 04:25:56Z" end-time="2026-11-08 04:25:56Z" duration="0.333026" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="31900" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <test-suite type="TestSuite" id="1273" name="SDGAdventure" fullname="SDGAdventure" runstate="Runnable" testcasecount="18" result="Passed" start-time="2026-11-08 04:25:56Z" end-time="2026-11-08 04:25:56Z" duration="0.332345" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <test-suite type="TestSuite" id="1274" name="PlayerControlTests" fullname="SDGAdventure.PlayerControlTests" runstate="Runnable" testcasecount="18" result="Passed" start-time="2026-11-08 04:25:56Z" end-time="2026-11-08 04:25:56Z" duration="0.331877" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-suite type="TestFixture" id="1253" name="CompletePlayerV12InputTests" fullname="SDGAdventure.PlayerControlTests.CompletePlayerV12InputTests" classname="SDGAdventure.PlayerControlTests.CompletePlayerV12InputTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-08 04:25:56Z" end-time="2026-11-08 04:25:56Z" duration="0.270287" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+            </properties>
+            <test-case id="1254" name="DemoInputUiAndFiveSlotsRemainAvailable" fullname="SDGAdventure.PlayerControlTests.CompletePlayerV12InputTests.DemoInputUiAndFiveSlotsRemainAvailable" methodname="DemoInputUiAndFiveSlotsRemainAvailable" classname="SDGAdventure.PlayerControlTests.CompletePlayerV12InputTests" runstate="Runnable" seed="30045968" result="Passed" start-time="2026-11-08 04:25:56Z" end-time="2026-11-08 04:25:56Z" duration="0.269477" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="platform" value="PlayMode" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1255" name="CompletePlayerWorkerParityTests" fullname="SDGAdventure.PlayerControlTests.CompletePlayerWorkerParityTests" classname="SDGAdventure.PlayerControlTests.CompletePlayerWorkerParityTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-08 04:25:56Z" end-time="2026-11-08 04:25:56Z" duration="0.060633" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+            </properties>
+            <test-case id="1256" name="WorkerMatchesC3GeometryMaterialsAndStancePoses" fullname="SDGAdventure.PlayerControlTests.CompletePlayerWorkerParityTests.WorkerMatchesC3GeometryMaterialsAndStancePoses" methodname="WorkerMatchesC3GeometryMaterialsAndStancePoses" classname="SDGAdventure.PlayerControlTests.CompletePlayerWorkerParityTests" runstate="Runnable" seed="640992465" result="Passed" start-time="2026-11-08 04:25:56Z" end-time="2026-11-08 04:25:56Z" duration="0.059351" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="platform" value="PlayMode" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[There are 3 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 3 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 3 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 3 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 3 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 3 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 3 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 3 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+There are 3 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene.
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

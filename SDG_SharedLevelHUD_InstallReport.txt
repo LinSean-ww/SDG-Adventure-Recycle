@@ -1,0 +1,15 @@
+﻿SDG SHARED LEVEL HUD SUCCESS
+ResourcePrefab=Assets/_Modules_/00_Frontend/SDG_Menu_20261109/Resources/SDG_LevelPlayerHUD.prefab
+VisualSource=real existing main-menu profile (v3.3)
+Mode=automatic runtime overlay; no Level scene editing
+Display=top-left, original artwork and HP rail
+XP=reads SDG_FE_Experience and SDG_FE_ExperienceMax
+HP=reads previously installed SDG_FE_PlayerHealth via player vitals
+AvatarName=uses existing saved PlayerPrefs
+LevelInputs=read-only; FPS mouse unaffected
+NOTE=Level01-03 HP must be reported by their gameplay health controllers
+NOTE=Game View and builds still require local validation
+Level01=Assets/_Modules_/02_Levels/Level01/Imported/Scenes/WTF.unity
+Level02=Assets/_Modules_/02_Levels/Level02/Imported/Scenes/SampleScene.unity
+Level03=Assets/_Modules_/02_Levels/Level03/Scenes/C_Main.unity
+Level04=Assets/_Modules_/02_Levels/Level04/Imported/Scenes/SampleScene.unity

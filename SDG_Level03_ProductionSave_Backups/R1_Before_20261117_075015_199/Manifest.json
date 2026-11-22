@@ -1,0 +1,24 @@
+{
+    "package":  "SDG_C3_ProductionCheckpoint_R1",
+    "created":  "20261117_075015_199",
+    "entries":  [
+                    {
+                        "file":  "SDGSaveProgressRuntimeV1.cs",
+                        "relative":  "Assets\\_Modules_\\00_Frontend\\SDG_Menu_20261109\\Scripts\\SDGSaveProgressRuntimeV1.cs",
+                        "before":  "8D9B2EC93C939A8B7F259BC142963DC4DDAED7200FE73421D911263DB9F466F1",
+                        "after":  "40AD5306278F4235716C0D71D30A5CD698188CA7992865108ACC2D86429C90FB"
+                    },
+                    {
+                        "file":  "C3RecyclingLine.cs",
+                        "relative":  "Assets\\_Modules_\\02_Levels\\Level03\\Scripts\\C3RecyclingLine.cs",
+                        "before":  "5EA7F15B0749619B0BBFD22A6D79AE7E668976E9BE59277B7B3C4B0481DBB878",
+                        "after":  "759907B951F1B6CDD63DA7B6455C035C02FDB6F2D064250BB009E2D8452A76F0"
+                    },
+                    {
+                        "file":  "EcoAdventureRuntime.cs",
+                        "relative":  "Assets\\_Modules_\\02_Levels\\Level03\\Scripts\\EcoAdventureRuntime.cs",
+                        "before":  "0D748F3E800AE039DD47017DF6FFD07819CCA18D749DBB08C6591CFB27CF7357",
+                        "after":  "5FF7C05F842529B3C03DCD88E80C730F9DDDFD0473D33377C70CC565A34BB805"
+                    }
+                ]
+}

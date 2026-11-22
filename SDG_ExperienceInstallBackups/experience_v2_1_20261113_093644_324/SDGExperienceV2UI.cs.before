@@ -1,0 +1,63 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace SDGAdventure.ExperienceV2
+{
+    internal static class SDGExperienceV2UI
+    {
+        private static Font font;
+        public static Font Font()
+        {
+            if (font != null) return font;
+            try
+            {
+                font = Font.CreateDynamicFontFromOSFont(new[] { "Microsoft JhengHei", "Noto Sans CJK TC", "Microsoft YaHei", "Arial Unicode MS" }, 22);
+            }
+            catch (System.Exception) { /* fall back to built-in for platforms without these fonts */ }
+            if (font == null) font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            return font;
+        }
+
+        public static Canvas Canvas(string name, int order)
+        {
+            GameObject go = new GameObject(name, typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler));
+            Canvas canvas = go.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = order;
+            CanvasScaler scaler = go.GetComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920, 1080);
+            scaler.matchWidthOrHeight = 0.5f;
+            return canvas;
+        }
+
+        public static RectTransform Rect(string name, Transform parent, Vector2 anchor, Vector2 pivot, Vector2 size, Vector2 position)
+        {
+            GameObject go = new GameObject(name, typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            RectTransform rect = (RectTransform)go.transform;
+            rect.anchorMin = anchor;
+            rect.anchorMax = anchor;
+            rect.pivot = pivot;
+            rect.sizeDelta = size;
+            rect.anchoredPosition = position;
+            return rect;
+        }
+
+        public static Text Text(string name, Transform parent, string value, int size, Color color, TextAnchor alignment,
+                                Vector2 anchor, Vector2 pivot, Vector2 boxSize, Vector2 position)
+        {
+            RectTransform rect = Rect(name, parent, anchor, pivot, boxSize, position);
+            Text text = rect.gameObject.AddComponent<Text>();
+            text.font = Font();
+            text.fontSize = size;
+            text.text = value;
+            text.color = color;
+            text.alignment = alignment;
+            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.verticalOverflow = VerticalWrapMode.Overflow;
+            text.raycastTarget = false;
+            return text;
+        }
+    }
+}

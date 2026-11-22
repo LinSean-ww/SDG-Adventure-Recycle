@@ -7,6 +7,18 @@ using UnityEngine.SceneManagement;
 using SDGAdventure.SharedPlayer;
 using C3TreasurePuzzle;
 
+// Third-level save checkpoint ledger. Only primitive/serializable values are persisted.
+[Serializable]
+public sealed class SDGC3ReceiptLedgerR1
+{
+    public int schema = 1;
+    public List<string> materialIds = new List<string>();
+    public List<string> batchIds = new List<string>();
+    public int plasticSorts;
+    public int metalSorts;
+    public int paperSorts;
+}
+
 // One persistent inventory/equipment owner. The camera and controller stay scene-owned.
 public sealed class EcoAdventureRuntime : MonoBehaviour
 {
@@ -21,6 +33,9 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
     }
 
     public const string WeaponId = "eco_quantum_projector";
+    // Story-3 crafted weapon persists across scenes. The Level04 world pickup is level-exclusive.
+    private const string Level04ScenePath = "Assets/_Modules_/02_Levels/Level04/Imported/Scenes/SampleScene.unity";
+    private static bool IsLevel04Scene() => SceneManager.GetActiveScene().path == Level04ScenePath;
     public const string MetalId = "eco_recycled_metal";
     public const string PlasticId = "eco_recycled_plastic";
     public const string CircuitId = "eco_recovered_circuit";
@@ -58,6 +73,54 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
         recyclingBatches.Add(batchId);
         foreach (string id in materialIds) { recyclingReceipts.Add(id); ReceiveSortedMaterial(kind); }
         return true;
+    }
+
+    // A read-only snapshot for the level-3 world save; never issue a second receipt on restore.
+    public SDGC3ReceiptLedgerR1 CaptureRecyclingLedgerForSaveR1()
+    {
+        var state = new SDGC3ReceiptLedgerR1
+        {
+            materialIds = new List<string>(recyclingReceipts),
+            batchIds = new List<string>(recyclingBatches),
+            plasticSorts = completedPlasticSorts,
+            metalSorts = completedMetalSorts,
+            paperSorts = completedPaperSorts
+        };
+        state.materialIds.Sort(StringComparer.Ordinal);
+        state.batchIds.Sort(StringComparer.Ordinal);
+        if (!ValidRecyclingLedgerForSaveR1(state))
+            throw new InvalidOperationException("第三關回收收據狀態不完整，拒絕存檔。");
+        return state;
+    }
+
+    public static bool ValidRecyclingLedgerForSaveR1(SDGC3ReceiptLedgerR1 state)
+    {
+        if (state == null || state.schema != 1 || state.materialIds == null || state.batchIds == null ||
+            state.materialIds.Count > RecyclingReceiptCapacity ||
+            state.batchIds.Count > RecyclingReceiptCapacity / C3RecyclingLine.UnitsPerBale ||
+            state.plasticSorts < 0 || state.metalSorts < 0 || state.paperSorts < 0 ||
+            state.plasticSorts > RecyclingReceiptCapacity || state.metalSorts > RecyclingReceiptCapacity ||
+            state.paperSorts > RecyclingReceiptCapacity) return false;
+        var ids = new HashSet<string>(StringComparer.Ordinal);
+        foreach (string id in state.materialIds)
+            if (string.IsNullOrWhiteSpace(id) || id.Length > 128 || !ids.Add(id)) return false;
+        ids.Clear();
+        foreach (string id in state.batchIds)
+            if (string.IsNullOrWhiteSpace(id) || id.Length > 128 || !ids.Add(id)) return false;
+        return true;
+    }
+
+    public void RestoreRecyclingLedgerFromSaveR1(SDGC3ReceiptLedgerR1 state)
+    {
+        if (!ValidRecyclingLedgerForSaveR1(state))
+            throw new InvalidOperationException("第三關回收收據資料無效，禁止讀檔。");
+        recyclingReceipts.Clear();
+        recyclingBatches.Clear();
+        recyclingReceipts.UnionWith(state.materialIds);
+        recyclingBatches.UnionWith(state.batchIds);
+        completedPlasticSorts = state.plasticSorts;
+        completedMetalSorts = state.metalSorts;
+        completedPaperSorts = state.paperSorts;
     }
 
     // A weapon carried in inventory does not recharge unless it is held.
@@ -124,6 +187,19 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
 
     private void SceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        // Level04's temporary gun must never leak into another level, selection menu, or save.
+        if (scene.path != Level04ScenePath)
+        {
+            string localId = SDGAdventure.Level04.Level04PlasmaPickup.WeaponId;
+            bool wasHoldingLocalWeapon = CurrentSlotId() == localId;
+            inventory.RemoveAll(item => item != null && item.id == localId);
+            RemoveSlotsFor(localId);
+            if (wasHoldingLocalWeapon)
+            {
+                int earnedWeaponSlot = Array.IndexOf(quickSlots, WeaponId);
+                selectedSlot = earnedWeaponSlot >= 0 ? earnedWeaponSlot : 0;
+            }
+        }
         // Replaying C begins a fresh sorting cycle. Inventory and loaded energy persist.
         if (scene.name == "C_Main")
         {
@@ -167,12 +243,15 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
 
     public bool Has(string id, int count = 1)
     {
+        if (id == SDGAdventure.Level04.Level04PlasmaPickup.WeaponId && !IsLevel04Scene()) return false;
         InventoryItem entry = inventory.Find(x => x.id == id);
         return entry != null && entry.quantity >= count;
     }
 
     public void AddItem(string id, string displayName, int quantity = 1)
     {
+        // A stale Level04 pickup cannot re-grant its gun while another level is active.
+        if (id == SDGAdventure.Level04.Level04PlasmaPickup.WeaponId && !IsLevel04Scene()) return;
         if (string.IsNullOrEmpty(id) || quantity <= 0 || (id == WeaponId && (droppedWeapon || Has(WeaponId))) ||
             (id == SDGAdventure.Level04.Level04PlasmaPickup.WeaponId && (quantity != 1 || Has(id) || SDGAdventure.Level04.Level04PlasmaPickup.HasDroppedWeapon))) return;
         InventoryItem entry = inventory.Find(x => x.id == id);
@@ -367,6 +446,7 @@ public sealed class EcoAdventureRuntime : MonoBehaviour
             return false;
         }
 
+        if (C3TreasurePuzzle.C3StoryV2Hooks.InterceptCraft()) return false;
         Consume(MetalId, 1);
         Consume(PlasticId, 1);
         Consume(CircuitId, 1);

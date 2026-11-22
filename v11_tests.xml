@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="13" result="Passed" total="13" passed="13" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-08 04:00:43Z" end-time="2026-11-08 04:00:45Z" duration="1.7073693">
+  <test-suite type="TestSuite" id="1000" name="CompletePlayer_Test_v11_20261108" fullname="CompletePlayer_Test_v11_20261108" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-11-08 04:00:43Z" end-time="2026-11-08 04:00:45Z" duration="1.707369" total="13" passed="13" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1019" name="V11Acceptance.PlayModeTests.dll" fullname="C:/Users/h7796/Desktop/Project/Codex Work/Unity/CompletePlayer_Test_v11_20261108/Library/ScriptAssemblies/V11Acceptance.PlayModeTests.dll" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-11-08 04:00:43Z" end-time="2026-11-08 04:00:45Z" duration="1.699790" total="13" passed="13" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="38772" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <test-suite type="TestSuite" id="1020" name="M7SharedPlayerTests" fullname="M7SharedPlayerTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-11-08 04:00:43Z" end-time="2026-11-08 04:00:43Z" duration="0.133642" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <test-suite type="TestFixture" id="1009" name="PlayerSettingsTests" fullname="M7SharedPlayerTests.PlayerSettingsTests" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-11-08 04:00:43Z" end-time="2026-11-08 04:00:43Z" duration="0.130460" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties>
+            <property name="platform" value="PlayMode" />
+          </properties>
+          <test-case id="1018" name="CorruptSettingsRecoverToDefaults" fullname="M7SharedPlayerTests.PlayerSettingsTests.CorruptSettingsRecoverToDefaults" methodname="CorruptSettingsRecoverToDefaults" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="917373892" result="Passed" start-time="2026-11-08 04:00:43Z" end-time="2026-11-08 04:00:43Z" duration="0.021779" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <output><![CDATA[Player settings were invalid and were reset to defaults: JSON parse error: Missing a name for object member.
+]]></output>
+          </test-case>
+          <test-case id="1010" name="DefaultsMatchUnifiedControls" fullname="M7SharedPlayerTests.PlayerSettingsTests.DefaultsMatchUnifiedControls" methodname="DefaultsMatchUnifiedControls" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="519600498" result="Passed" start-time="2026-11-08 04:00:43Z" end-time="2026-11-08 04:00:43Z" duration="0.001427" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1017" name="NewActionsRespondOnlyToReboundKeys" fullname="M7SharedPlayerTests.PlayerSettingsTests.NewActionsRespondOnlyToReboundKeys" methodname="NewActionsRespondOnlyToReboundKeys" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="1126549355" result="Passed" start-time="2026-11-08 04:00:43Z" end-time="2026-11-08 04:00:43Z" duration="0.076284" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1016" name="NewBindingsRebindPersistRejectConflictsAndReset" fullname="M7SharedPlayerTests.PlayerSettingsTests.NewBindingsRebindPersistRejectConflictsAndReset" methodname="NewBindingsRebindPersistRejectConflictsAndReset" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="1176676965" result="Passed" start-time="2026-11-08 04:00:43Z" end-time="2026-11-08 04:00:43Z" duration="0.008021" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1014" name="ProneActionRespondsOnlyToCurrentKey" fullname="M7SharedPlayerTests.PlayerSettingsTests.ProneActionRespondsOnlyToCurrentKey" methodname="ProneActionRespondsOnlyToCurrentKey" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="1281224292" result="Passed" start-time="2026-11-08 04:00:43Z" end-time="2026-11-08 04:00:43Z" duration="0.001917" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1015" name="ProneBindingCanRebindRejectConflictReloadAndReset" fullname="M7SharedPlayerTests.PlayerSettingsTests.ProneBindingCanRebindRejectConflictReloadAndReset" methodname="ProneBindingCanRebindRejectConflictReloadAndReset" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="874232038" result="Passed" start-time="2026-11-08 04:00:43Z" end-time="2026-11-08 04:00:43Z" duration="0.003959" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1011" name="RebindRejectsConflictWithoutChangingOldBinding" fullname="M7SharedPlayerTests.PlayerSettingsTests.RebindRejectsConflictWithoutChangingOldBinding" methodname="RebindRejectsConflictWithoutChangingOldBinding" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="945647339" result="Passed" start-time="2026-11-08 04:00:43Z" end-time="2026-11-08 04:00:43Z" duration="0.001282" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1012" name="RestoreDefaultsClearsOverridesAndModes" fullname="M7SharedPlayerTests.PlayerSettingsTests.RestoreDefaultsClearsOverridesAndModes" methodname="RestoreDefaultsClearsOverridesAndModes" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="1168769668" result="Passed" start-time="2026-11-08 04:00:43Z" end-time="2026-11-08 04:00:43Z" duration="0.002554" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1013" name="SavedOverridesAndModesReload" fullname="M7SharedPlayerTests.PlayerSettingsTests.SavedOverridesAndModesReload" methodname="SavedOverridesAndModesReload" classname="M7SharedPlayerTests.PlayerSettingsTests" runstate="Runnable" seed="167194887" result="Passed" start-time="2026-11-08 04:00:43Z" end-time="2026-11-08 04:00:43Z" duration="0.002773" asserts="0">
+            <properties>
+              <property name="platform" value="PlayMode" />
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+      <test-suite type="TestFixture" id="1003" name="V11AcceptanceTests" fullname="V11AcceptanceTests" classname="V11AcceptanceTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-08 04:00:43Z" end-time="2026-11-08 04:00:44Z" duration="0.526845" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <test-case id="1004" name="FirstThirdPersonShowsModelAndCameraTracks" fullname="V11AcceptanceTests.FirstThirdPersonShowsModelAndCameraTracks" methodname="FirstThirdPersonShowsModelAndCameraTracks" classname="V11AcceptanceTests" runstate="Runnable" seed="270791166" result="Passed" start-time="2026-11-08 04:00:43Z" end-time="2026-11-08 04:00:44Z" duration="0.432562" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="platform" value="PlayMode" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1005" name="InventoryAndFiveSlotsUseRebindableEventsAndRespectPause" fullname="V11AcceptanceTests.InventoryAndFiveSlotsUseRebindableEventsAndRespectPause" methodname="InventoryAndFiveSlotsUseRebindableEventsAndRespectPause" classname="V11AcceptanceTests" runstate="Runnable" seed="255905147" result="Passed" start-time="2026-11-08 04:00:44Z" end-time="2026-11-08 04:00:44Z" duration="0.093060" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="platform" value="PlayMode" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1006" name="V2AcceptanceTests" fullname="V2AcceptanceTests" classname="V2AcceptanceTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-08 04:00:44Z" end-time="2026-11-08 04:00:45Z" duration="1.038618" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties>
+          <property name="platform" value="PlayMode" />
+        </properties>
+        <test-case id="1007" name="DemoSettingsContainsAllRowsAndScrollsToEach" fullname="V2AcceptanceTests.DemoSettingsContainsAllRowsAndScrollsToEach" methodname="DemoSettingsContainsAllRowsAndScrollsToEach" classname="V2AcceptanceTests" runstate="Runnable" seed="1519823319" result="Passed" start-time="2026-11-08 04:00:44Z" end-time="2026-11-08 04:00:44Z" duration="0.055887" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="platform" value="PlayMode" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1008" name="InteractiveRebindUpdatesUiEventsPersistenceAndDefaults" fullname="V2AcceptanceTests.InteractiveRebindUpdatesUiEventsPersistenceAndDefaults" methodname="InteractiveRebindUpdatesUiEventsPersistenceAndDefaults" classname="V2AcceptanceTests" runstate="Runnable" seed="1049066117" result="Passed" start-time="2026-11-08 04:00:44Z" end-time="2026-11-08 04:00:45Z" duration="0.981804" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="platform" value="PlayMode" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>
